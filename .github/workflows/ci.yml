@@ -8,6 +8,7 @@ on:
 
 env:
   NODE_VERSION: '22'
+  DEPLOY_PROD: false
 
 jobs:
   lint-and-build:
