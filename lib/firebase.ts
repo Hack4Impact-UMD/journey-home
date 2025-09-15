@@ -32,7 +32,7 @@ if (typeof window !== 'undefined') {
     try {
       connectFirestoreEmulator(db, emulatorHost, parseInt(emulatorPort));
       console.log('Connected to Firestore emulator');
-    } catch (error) {
+    } catch {
       // Emulator already connected
       console.log('Firestore emulator already connected');
     }
@@ -54,7 +54,7 @@ if (typeof window !== 'undefined') {
     try {
       connectStorageEmulator(storage, emulatorHost, parseInt(emulatorPort));
       console.log('Connected to Storage emulator');
-    } catch (error) {
+    } catch {
       // Emulator already connected
       console.log('Storage emulator already connected');
     }

@@ -11,14 +11,9 @@ import {
   orderBy, 
   limit,
   onSnapshot,
-  DocumentData,
-  QueryDocumentSnapshot,
-  QuerySnapshot,
-  DocumentSnapshot,
-  CollectionReference,
-  DocumentReference,
   Query,
-  Unsubscribe
+  Unsubscribe,
+  WhereFilterOp
 } from 'firebase/firestore';
 import { db } from './firebase';
 
@@ -98,7 +93,7 @@ export class FirestoreService {
   // Query documents with conditions
   static async query<T>(
     collectionName: string, 
-    conditions: Array<{ field: string; operator: any; value: any }>,
+    conditions: Array<{ field: string; operator: WhereFilterOp; value: unknown }>,
     orderByField?: string,
     orderDirection?: 'asc' | 'desc',
     limitCount?: number
@@ -152,7 +147,7 @@ export class FirestoreService {
   static subscribeToCollection<T>(
     collectionName: string, 
     callback: (data: T[]) => void,
-    conditions?: Array<{ field: string; operator: any; value: any }>,
+    conditions?: Array<{ field: string; operator: WhereFilterOp; value: unknown }>,
     orderByField?: string,
     orderDirection?: 'asc' | 'desc',
     limitCount?: number
