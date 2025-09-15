@@ -1,0 +1,32 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow read/write access to all documents for development
+    // In production, you should implement proper security rules
+    match /{document=**} {
+      allow read, write: if true;
+    }
+    
+    // Example of more restrictive rules for production:
+    // 
+    // // Users can only access their own user document
+    // match /users/{userId} {
+    //   allow read, write: if request.auth != null && request.auth.uid == userId;
+    // }
+    // 
+    // // Posts are readable by everyone but only writable by authenticated users
+    // match /posts/{postId} {
+    //   allow read: if true;
+    //   allow write: if request.auth != null;
+    // }
+    // 
+    // // Comments can be read by everyone but only created by authenticated users
+    // match /posts/{postId}/comments/{commentId} {
+    //   allow read: if true;
+    //   allow create: if request.auth != null;
+    //   allow update, delete: if request.auth != null && 
+    //     resource.data.authorId == request.auth.uid;
+    // }
+  }
+}

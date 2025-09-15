@@ -1,0 +1,30 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Allow read/write access to all files for development
+    // In production, you should implement proper security rules
+    match /{allPaths=**} {
+      allow read, write: if true;
+    }
+    
+    // Example of more restrictive rules for production:
+    // 
+    // // Users can only access their own files
+    // match /users/{userId}/{allPaths=**} {
+    //   allow read, write: if request.auth != null && request.auth.uid == userId;
+    // }
+    // 
+    // // Public images are readable by everyone but only writable by authenticated users
+    // match /public/{allPaths=**} {
+    //   allow read: if true;
+    //   allow write: if request.auth != null;
+    // }
+    // 
+    // // Profile pictures are readable by everyone but only writable by the owner
+    // match /profile-pictures/{userId} {
+    //   allow read: if true;
+    //   allow write: if request.auth != null && request.auth.uid == userId;
+    // }
+  }
+}

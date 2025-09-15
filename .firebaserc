@@ -1,0 +1,10 @@
+{
+  "projects": {
+    "default": "journey-home-e346f",
+    "dev": "journey-home-e346f",
+    "staging": "your-staging-project-id",
+    "prod": "your-prod-project-id"
+  },
+  "targets": {},
+  "etags": {}
+}

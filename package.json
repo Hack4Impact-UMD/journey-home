@@ -1,17 +1,26 @@
 {
-  "name": "journey_homep",
+  "name": "journey_home",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "firebase:emulator": "firebase emulators:start",
+    "firebase:emulator:ui": "firebase emulators:start --only firestore,storage",
+    "firebase:emulator:export": "firebase emulators:export ./firebase-export",
+    "firebase:emulator:import": "firebase emulators:start --import ./firebase-export",
+    "firebase:deploy": "firebase deploy",
+    "firebase:deploy:hosting": "firebase deploy --only hosting",
+    "firebase:deploy:firestore": "firebase deploy --only firestore",
+    "firebase:deploy:storage": "firebase deploy --only storage"
   },
   "dependencies": {
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "next": "15.5.3"
+    "next": "15.5.3",
+    "firebase": "^10.13.0"
   },
   "devDependencies": {
     "typescript": "^5",
@@ -22,6 +31,7 @@
     "tailwindcss": "^4",
     "eslint": "^9",
     "eslint-config-next": "15.5.3",
-    "@eslint/eslintrc": "^3"
+    "@eslint/eslintrc": "^3",
+    "firebase-tools": "^13.0.0"
   }
 }
