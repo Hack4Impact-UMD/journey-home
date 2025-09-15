@@ -1,4 +1,9 @@
+# Journey Home
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+[![CI/CD Pipeline](https://github.com/your-username/journey_home/actions/workflows/ci.yml/badge.svg)](https://github.com/your-username/journey_home/actions/workflows/ci.yml)
+[![Playwright Tests](https://github.com/your-username/journey_home/actions/workflows/playwright.yml/badge.svg)](https://github.com/your-username/journey_home/actions/workflows/playwright.yml)
 
 ## Getting Started
 
@@ -19,6 +24,21 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Testing
+
+This project uses Playwright for end-to-end testing. See [TESTING.md](./TESTING.md) for detailed testing information.
+
+```bash
+# Run tests
+npm test
+
+# Run tests with UI
+npm run test:ui
+
+# View test report
+npm run test:report
+```
 
 ## Learn More
 

@@ -7,6 +7,11 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:report": "playwright show-report",
     "firebase:emulator": "firebase emulators:start",
     "firebase:emulator:ui": "firebase emulators:start --only firestore,storage",
     "firebase:emulator:export": "firebase emulators:export ./firebase-export",
@@ -17,21 +22,22 @@
     "firebase:deploy:storage": "firebase deploy --only storage"
   },
   "dependencies": {
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "firebase": "^10.13.0",
     "next": "15.5.3",
-    "firebase": "^10.13.0"
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@eslint/eslintrc": "^3",
+    "@playwright/test": "^1.55.0",
+    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
     "eslint": "^9",
     "eslint-config-next": "15.5.3",
-    "@eslint/eslintrc": "^3",
-    "firebase-tools": "^13.0.0"
+    "firebase-tools": "^13.0.0",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }
