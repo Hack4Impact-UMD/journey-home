@@ -2,7 +2,7 @@ import {
   ref, 
   uploadBytes, 
   uploadBytesResumable, 
-  getDownloadURL, 
+  getDownloadURL as firebaseGetDownloadURL, 
   deleteObject, 
   listAll, 
   getMetadata,
@@ -54,7 +54,7 @@ export class StorageService {
         },
         async () => {
           try {
-            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            const downloadURL = await firebaseGetDownloadURL(uploadTask.snapshot.ref);
             onComplete(downloadURL);
           } catch (error) {
             onError(error as Error);
@@ -70,7 +70,7 @@ export class StorageService {
   static async getDownloadURL(path: string): Promise<string> {
     try {
       const storageRef = ref(storage, path);
-      return await getDownloadURL(storageRef);
+      return await firebaseGetDownloadURL(storageRef);
     } catch (error) {
       console.error('Error getting download URL:', error);
       throw error;
