@@ -15,12 +15,12 @@
     "test:coverage": "nyc mocha --reporter spec --require ts-node/register test/**/*.test.ts"
   },
   "engines": {
-    "node": "18"
+    "node": "20"
   },
   "main": "lib/index.js",
   "dependencies": {
     "firebase-admin": "^12.0.0",
-    "firebase-functions": "^5.0.0"
+    "firebase-functions": "^6.4.0"
   },
   "devDependencies": {
     "@types/chai": "^4.3.0",
