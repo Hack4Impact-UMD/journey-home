@@ -15,7 +15,7 @@
     "test:coverage": "nyc mocha --reporter spec --require ts-node/register test/**/*.test.ts"
   },
   "engines": {
-    "node": "20"
+    "node": "22"
   },
   "main": "lib/index.js",
   "dependencies": {

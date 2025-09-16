@@ -1,5 +1,6 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
+import { onSchedule } from 'firebase-functions/v2/scheduler';
 
 // Initialize Firebase Admin SDK
 admin.initializeApp();
@@ -11,16 +12,16 @@ export const helloWorld = functions.https.onRequest((request, response) => {
 });
 
 // Sample callable function
-export const getUserData = functions.https.onCall(async (data, context) => {
+export const getUserData = functions.https.onCall(async (request) => {
   // Check if user is authenticated
-  if (!context.auth) {
+  if (!request.auth) {
     throw new functions.https.HttpsError(
       'unauthenticated',
       'The function must be called while authenticated.'
     );
   }
 
-  const uid = context.auth.uid;
+  const uid = request.auth.uid;
   
   try {
     // Get user data from Firestore
@@ -46,33 +47,29 @@ export const getUserData = functions.https.onCall(async (data, context) => {
   }
 });
 
-// Sample Firestore trigger
-export const onUserCreate = functions.firestore
-  .document('users/{userId}')
-  .onCreate(async (snap, context) => {
-    const userData = snap.data();
-    const userId = context.params.userId;
+// Sample Firestore trigger (commented out until Firestore database is created)
+// export const onUserCreate = onDocumentCreated('users/{userId}', async (event) => {
+//   const userData = event.data?.data();
+//   const userId = event.params.userId;
 
-    functions.logger.info(`New user created: ${userId}`, userData);
+//   functions.logger.info(`New user created: ${userId}`, userData);
 
-    // You can add additional logic here, such as:
-    // - Send welcome email
-    // - Create user profile
-    // - Initialize user settings
-    // - etc.
+//   // You can add additional logic here, such as:
+//   // - Send welcome email
+//   // - Create user profile
+//   // - Initialize user settings
+//   // - etc.
 
-    return null;
-  });
+//   return null;
+// });
 
 // Sample scheduled function (runs every day at midnight)
-export const dailyCleanup = functions.pubsub
-  .schedule('0 0 * * *')
-  .timeZone('UTC')
-  .onRun(async (_context) => {
-    functions.logger.info('Running daily cleanup task');
-    
-    // Add your cleanup logic here
-    // For example: delete old documents, update statistics, etc.
-    
-    return null;
-  });
+export const dailyCleanup = onSchedule({
+  schedule: '0 0 * * *',
+  timeZone: 'UTC'
+}, async (event) => {
+  functions.logger.info('Running daily cleanup task');
+  
+  // Add your cleanup logic here
+  // For example: delete old documents, update statistics, etc.
+});
