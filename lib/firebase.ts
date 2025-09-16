@@ -15,7 +15,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app); 
 
-if(process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR == 'true') {
+if(process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true' && typeof window !== 'undefined') {
   connectFirestoreEmulator(
     db, 
     process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_HOST ?? 'localhost', 
