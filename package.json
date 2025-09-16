@@ -19,7 +19,14 @@
     "firebase:deploy": "firebase deploy",
     "firebase:deploy:hosting": "firebase deploy --only hosting",
     "firebase:deploy:firestore": "firebase deploy --only firestore",
-    "firebase:deploy:storage": "firebase deploy --only storage"
+    "firebase:deploy:storage": "firebase deploy --only storage",
+    "firebase:deploy:functions": "firebase deploy --only functions",
+    "functions:install": "cd functions && npm install",
+    "functions:build": "cd functions && npm run build",
+    "functions:test": "cd functions && npm test",
+    "functions:test:coverage": "cd functions && npm run test:coverage",
+    "functions:serve": "cd functions && npm run serve",
+    "test:all": "npm run test && npm run functions:test"
   },
   "dependencies": {
     "firebase": "^10.13.0",
