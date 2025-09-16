@@ -1,26 +1,15 @@
-import * as admin from 'firebase-admin';
 import test from 'firebase-functions-test';
 import { expect } from 'chai';
-import * as sinon from 'sinon';
+import * as functions from '../src/index';
 
 // Initialize Firebase Test SDK in offline mode
 const testEnv = test();
 
-// Mock Firebase Admin SDK
-const adminInitStub = sinon.stub(admin, 'initializeApp');
-
 describe('Firebase Functions', () => {
-  let myFunctions: any;
-
-  before(() => {
-    // Import functions after stubbing admin.initializeApp
-    myFunctions = require('../src/index');
-  });
 
   after(() => {
     // Clean up
     testEnv.cleanup();
-    adminInitStub.restore();
   });
 
   describe('helloWorld', () => {
@@ -28,6 +17,7 @@ describe('Firebase Functions', () => {
       const req = {
         method: 'GET',
         url: '/',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any;
 
       const res = {
@@ -35,9 +25,10 @@ describe('Firebase Functions', () => {
           expect(message).to.equal('Hello from Firebase Functions!');
           done();
         },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any;
 
-      myFunctions.helloWorld(req, res);
+      functions.helloWorld(req, res);
     });
   });
 
@@ -47,40 +38,32 @@ describe('Firebase Functions', () => {
         auth: null,
       };
 
-      const wrapped = testEnv.wrap(myFunctions.getUserData);
+      const wrapped = testEnv.wrap(functions.getUserData);
       
       try {
         await wrapped({}, mockContext);
         expect.fail('Expected function to throw an error');
-      } catch (error: any) {
-        expect(error.message).to.include('The function must be called while authenticated');
+      } catch (error: unknown) {
+        expect((error as Error).message).to.include('The function must be called while authenticated');
       }
     });
   });
 
   describe('onUserCreate', () => {
     it('should log when user is created', async () => {
-      // Create a simple mock snapshot without using firebase-functions-test
+      // Create a mock snapshot using firebase-functions-test
       const mockData = {
         name: 'New User',
         email: 'newuser@example.com',
       };
 
-      const mockSnapshot = {
-        data: () => mockData,
-        ref: {
-          path: 'users/new-user-id',
-        },
-      };
+      const mockSnapshot = testEnv.firestore.makeDocumentSnapshot(
+        mockData,
+        'users/new-user-id'
+      );
 
-      const mockContext = {
-        params: {
-          userId: 'new-user-id',
-        },
-      };
-
-      const wrapped = testEnv.wrap(myFunctions.onUserCreate);
-      const result = await wrapped(mockSnapshot, mockContext as any);
+      const wrapped = testEnv.wrap(functions.onUserCreate);
+      const result = await wrapped(mockSnapshot);
 
       expect(result).to.be.null;
     });

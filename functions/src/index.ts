@@ -68,7 +68,7 @@ export const onUserCreate = functions.firestore
 export const dailyCleanup = functions.pubsub
   .schedule('0 0 * * *')
   .timeZone('UTC')
-  .onRun(async (context) => {
+  .onRun(async (_context) => {
     functions.logger.info('Running daily cleanup task');
     
     // Add your cleanup logic here
