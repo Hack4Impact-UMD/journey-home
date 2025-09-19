@@ -1,9 +1,140 @@
 # Journey Home
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+### 👥 Meet the Team
 
-[![CI/CD Pipeline](https://github.com/your-username/journey_home/actions/workflows/ci.yml/badge.svg)](https://github.com/your-username/journey_home/actions/workflows/ci.yml)
-[![Playwright Tests](https://github.com/your-username/journey_home/actions/workflows/playwright.yml/badge.svg)](https://github.com/your-username/journey_home/actions/workflows/playwright.yml)
+Meet our wonderful team comprised of Product Managers, Designers, Tech Leads, Engineers, and Microsoft Mentors!
+
+<table align="center">
+  <tr>
+    <td align="center" width="150">
+      <a href="https://umd.hack4impact.org/">
+        <img src="public/team-photos/pending-image.jpg" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
+        <b>Kalpana Iyer</b><br/><br/>
+        <img src="https://img.shields.io/badge/👩‍💼_product_manager-007ACC?style=flat-square"/>
+      </a>
+    </td>
+    <td align="center" width="150">
+      <a href="https://umd.hack4impact.org/">
+        <img src="public/team-photos/pending-image.jpg" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
+        <b>Laila Shakoor</b><br/><br/>
+        <img src="https://img.shields.io/badge/👩‍💼_product_manager-007ACC?style=flat-square"/>
+      </a>
+    </td>
+  </tr>
+</table>
+
+<table align="center">
+  <tr>
+    <td align="center" height="150" width="150">
+      <a href="https://umd.hack4impact.org/">
+        <img src="public/team-photos/pending-image.jpg" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
+        <b>Arnav Dadarya</b><br/><br/>
+        <img src="https://img.shields.io/badge/🛠️_technical_lead-FF5733?style=flat-square"/>
+      </a>
+    </td>
+    <td align="center" height="150" width="150">
+      <a href="https://umd.hack4impact.org/">
+        <img src="public/team-photos/pending-image.jpg" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
+        <b>Joel Chemmanur</b><br/><br/>
+        <img src="https://img.shields.io/badge/🛠️_technical_lead-FF5733?style=flat-square"/>
+      </a>
+    </td>
+  </tr>
+</table>
+
+<table align="center">
+  <tr>
+    <td align="center" width="150">
+      <a href="https://umd.hack4impact.org/">
+        <img src="public/team-photos/pending-image.jpg" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
+        <b>Sohayainder Kaur</b><br/><br/>
+        <img src="https://img.shields.io/badge/🎨_designer-9B59B6?style=flat-square"/>
+      </a>
+    </td>
+    <td align="center" width="150">
+      <a href="https://umd.hack4impact.org/">
+        <img src="public/team-photos/pending-image.jpg" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
+        <b>Tracy Tan</b><br/><br/>
+        <img src="https://img.shields.io/badge/🎨_designer-9B59B6?style=flat-square"/>
+      </a>
+    </td>
+    <td align="center" width="150">
+      <a href="https://umd.hack4impact.org/">
+        <img src="public/team-photos/pending-image.jpg" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
+        <b>Katie Yang</b><br/><br/>
+        <img src="https://img.shields.io/badge/🎨_designer-9B59B6?style=flat-square"/>
+      </a>
+    </td>
+  </tr>
+</table>
+
+<table align="center">
+  <tr>
+    <td align="center" width="150">
+      <a href="https://umd.hack4impact.org/">
+        <img src="public/team-photos/pending-image.jpg" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
+        <b>Anya Jain</b><br/><br/>
+        <img src="https://img.shields.io/badge/💻_engineer-27AE60?style=flat-square"/>
+      </a>
+    </td>
+    <td align="center" width="150">
+      <a href="https://umd.hack4impact.org/">
+        <img src="public/team-photos/pending-image.jpg" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
+        <b>Sarayu Jilludumudi</b><br/><br/>
+        <img src="https://img.shields.io/badge/💻_engineer-27AE60?style=flat-square"/>
+      </a>
+    </td>
+    <td align="center" width="150">
+      <a href="https://umd.hack4impact.org/">
+        <img src="public/team-photos/pending-image.jpg" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
+        <b>Amber Li</b><br/><br/>
+        <img src="https://img.shields.io/badge/💻_engineer-27AE60?style=flat-square"/>
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="4" align="center">
+        <table align="center">
+          <tr>
+            <td align="center" width="150">
+                <a href="https://umd.hack4impact.org/">
+                <img src="public/team-photos/pending-image.jpg" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
+                <b>Savya Miriyala</b><br><br>
+                <img src="https://img.shields.io/badge/💻_engineer-27AE60?style=flat-square"/>
+                </a>
+            </td>
+            <td align="center" width="150">
+                <a href="https://umd.hack4impact.org/">
+                <img src="public/team-photos/pending-image.jpg" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
+                <b>Ritika Pokharel</b><br/><br/>
+                <img src="https://img.shields.io/badge/💻_engineer-27AE60?style=flat-square"/>
+                </a>
+            </td>
+            <td align="center" width="150">
+                <a href="https://umd.hack4impact.org/">
+                <img src="public/team-photos/pending-image.jpg" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
+                <b>Tanvi Tewary</b><br/><br/>
+                <img src="https://img.shields.io/badge/💻_engineer-27AE60?style=flat-square"/>
+                </a>
+            </td>
+          </tr>
+        </table>
+    </td>
+  </tr>
+</table>
+<table align="center">
+  <tr>
+    <td align="center" width="150">
+        <a href="https://umd.hack4impact.org/">
+        <img src="public/team-photos/pending-image.jpg" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
+        <b>Jibran</b><br/><br/>
+        <img src="https://img.shields.io/badge/🧑‍🏫_mentor-95A5A6?style=flat-square"/>
+      </a>
+    </td>
+  </tr>
+</table>
+
+---
 
 ## Getting Started
 
@@ -39,18 +170,3 @@ npm run test:ui
 # View test report
 npm run test:report
 ```
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
