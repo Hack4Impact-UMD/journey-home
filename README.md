@@ -27,7 +27,7 @@ Meet our wonderful team comprised of Product Managers, Designers, Tech Leads, En
   <tr>
     <td align="center" height="150" width="150">
       <a href="https://umd.hack4impact.org/">
-        <img src="public/team-photos/pending-image.jpg" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
+        <img src="public/team-photos/arnav_dadarya.jpg" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
         <b>Arnav Dadarya</b><br/><br/>
         <img src="https://img.shields.io/badge/🛠️_technical_lead-FF5733?style=flat-square"/>
       </a>
