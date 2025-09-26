@@ -1,0 +1,12 @@
+specVersion: "v1beta"
+serviceId: "journey-home"
+location: "asia-east1"
+schema:
+  source: "./schema"
+  datasource:
+    postgresql:
+      database: "fdcdb"
+      cloudSql:
+        instanceId: "journey-home-fdc"
+      # schemaValidation: "COMPATIBLE"
+connectorDirs: ["./connector"]
