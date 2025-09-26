@@ -33,8 +33,8 @@ Meet our wonderful team comprised of Product Managers, Designers, Tech Leads, En
       </a>
     </td>
     <td align="center" height="150" width="150">
-      <a href="https://umd.hack4impact.org/">
-        <img src="public/team-photos/pending-image.jpg" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
+      <a href="https://linkedin.com/in/joelchem">
+        <img src="public/team-photos/Chemmanur_Joel.JPG" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
         <b>Joel Chemmanur</b><br/><br/>
         <img src="https://img.shields.io/badge/🛠️_technical_lead-FF5733?style=flat-square"/>
       </a>
