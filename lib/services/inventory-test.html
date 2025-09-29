@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <meta charset="UTF-8">
+    <title>HTML Only Filter</title>
+    </head>
+    <body>
+        <div>
+            <!--Section for filtering-->
+            <h3>Filter Options:</h3>
+            <form>
+            <!-- i'm not sure how else to do this in html so -->
+                <!--filtering based on furniture type-->
+                <label for="furnitureType">Furniture type:</label>
+                <select id="furnitureType" name="furnitureType">
+                    <option value="">-- Select Furniture --</option>
+                    <option value="couch">Couch</option>
+                    <option value="bed">Bed</option>
+                    <option value="table">Table</option>
+                </select>
+                <br>
+                <!--filtering based on before/after date-->
+                <label for="beforeDate">Before Date:</label>
+                <input type="date" id="beforeDate" name="beforeDate">
+                <label for="afterDate">After Date:</label>
+                <input type="date" id="afterDate" name="afterDate">
+                <br>
+                <!--filtering based on min/max stock-->
+                <label for="minStock"> Minimum Stock</label>
+                <input type="text" id="minStock" name="minStock">
+                <label for="maxStock"> Maximum Stock </label>
+                <input type="text" id="maxStock" name="maxStock">
+                <br>
+                <!--filtering based on category-->
+                <label for="category">Choose a category:</label>
+                <select id="category" name="category">
+                    <option value="chairs">Chairs</option>
+                    <option value="tables">Tables</option>
+                    <option value="couches">Couches</option>
+                </select>
+            
+                <!--Submitting the filtering option-->
+                <button>
+                    Submit
+                </button>
+            </form>
+        </div>
+         <div>
+            <br>
+            <h4>Search bar </h4>
+            <form>
+                <input type="text" id="search" name="search" placeholder="What do you want to search?">
+                <button> 
+                    Submit
+                </button>
+            </form>
+        </div>
+
+        <div>
+            <br>
+            <br>
+            <h4>Adding inventory</h4>
+            <form>
+                <input type="text" id="itemName" name="itemName" placeholder="Enter the name">
+                <input type="text" id="thumbnail" name="thumbnail" placeholder="Enter the thumbnail">
+                <input type="text" id="otherPhoto" name="otherPhoto" placeholder="Enter other photos">
+                <input type="text" id="itemCategory" name="itemCategory" placeholder="Enter category">
+                <input type="text" id="notes" name="notes" placeholder="Enter notes">
+                <input type="text"id="quantity" name="quantity" placeholder="Enter quantity">
+                <button>
+                    add
+                </button>
+            </form>
+        </div>
+        <div>
+            <br>
+            <br>
+            <table border="black">
+                <tr>
+                    <th>Name</th>
+                    <th>Link to Photo</th>
+                    <th>Other Photos</th>
+                    <th>Category</th>
+                    <th>Notes</th>
+                    <th>Quantity</th>
+                    <th>Date Added</th>
+                    <th>Delete</th>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        <button>
+                            delete
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </body>
+</html>
