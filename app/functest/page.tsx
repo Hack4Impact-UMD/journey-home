@@ -1,3 +1,6 @@
+import {InventoryRecord, InventoryRecordData, SearchFilters} from "@/types/inventory";
+import {search, createInventoryRecord, getInventoryRecord, updateInventoryRecord, deleteInventoryRecord} from "@/lib/services/inventory";
+
 export default function FuncTestPage() {
     return (  
         <div>
