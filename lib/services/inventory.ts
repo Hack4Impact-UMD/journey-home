@@ -4,7 +4,7 @@ import {
     SearchFilters,
 } from "@/types/inventory";
 
-import { db } from "./firebase";
+import { db } from "../firebase";
 import { collection, addDoc, doc, getDoc } from "firebase/firestore";
 
 const MAX_RESULTS = 25
