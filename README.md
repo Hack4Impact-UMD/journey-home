@@ -27,14 +27,14 @@ Meet our wonderful team comprised of Product Managers, Designers, Tech Leads, En
   <tr>
     <td align="center" height="150" width="150">
       <a href="https://umd.hack4impact.org/">
-        <img src="public/team-photos/pending-image.jpg" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
+        <img src="public/team-photos/arnav_dadarya.jpg" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
         <b>Arnav Dadarya</b><br/><br/>
         <img src="https://img.shields.io/badge/🛠️_technical_lead-FF5733?style=flat-square"/>
       </a>
     </td>
     <td align="center" height="150" width="150">
-      <a href="https://umd.hack4impact.org/">
-        <img src="public/team-photos/pending-image.jpg" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
+      <a href="https://linkedin.com/in/joelchem">
+        <img src="public/team-photos/Chemmanur_Joel.JPG" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
         <b>Joel Chemmanur</b><br/><br/>
         <img src="https://img.shields.io/badge/🛠️_technical_lead-FF5733?style=flat-square"/>
       </a>
@@ -72,7 +72,7 @@ Meet our wonderful team comprised of Product Managers, Designers, Tech Leads, En
   <tr>
     <td align="center" width="150">
       <a href="https://umd.hack4impact.org/">
-        <img src="public/team-photos/pending-image.jpg" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
+        <img src="public/team-photos/anya.jpg" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
         <b>Anya Jain</b><br/><br/>
         <img src="https://img.shields.io/badge/💻_engineer-27AE60?style=flat-square"/>
       </a>
@@ -98,14 +98,14 @@ Meet our wonderful team comprised of Product Managers, Designers, Tech Leads, En
           <tr>
             <td align="center" width="150">
                 <a href="https://umd.hack4impact.org/">
-                <img src="public/team-photos/Savya_Miriyala.jpg" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
+                <img src="public/team-photos/Savya_Miriyala.JPG" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
                 <b>Savya Miriyala</b><br><br>
                 <img src="https://img.shields.io/badge/💻_engineer-27AE60?style=flat-square"/>
                 </a>
             </td>
             <td align="center" width="150">
                 <a href="https://umd.hack4impact.org/">
-                <img src="public/team-photos/pending-image.jpg" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
+                <img src="public/team-photos/ritika_pokharel.jpeg" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
                 <b>Ritika Pokharel</b><br/><br/>
                 <img src="https://img.shields.io/badge/💻_engineer-27AE60?style=flat-square"/>
                 </a>
