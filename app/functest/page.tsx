@@ -19,6 +19,16 @@ export default function FuncTestPage() {
         dateAdded: new Date(),
     });
 
+    const [results, setResults] = useState<InventoryRecord[]>([]);
+    const [searchText, setSearchText] = useState("");
+    const [filters, setFilters] = useState<SearchFilters>({
+        categories: [],
+        minStock: undefined,
+        maxStock: undefined,
+        afterDate: undefined,
+        beforeDate: undefined,
+    })
+
     //found how to manipulate change and submit online for forms specifically 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
@@ -36,10 +46,27 @@ export default function FuncTestPage() {
                                         altText: value 
                                     }
             }));
+        } else if (name === "quantity") {
+            setRecord(prevData => ({
+                ...prevData,
+                [name]: Number(value)
+            }));
         } else {
             setRecord(prevData => ({...prevData, [name]: value})) 
         }
     } 
+
+    const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+
+        if (name === "minStock") setFilters(prev => ({ ...prev, minStock: value ? Number(value) : undefined }));
+        else if (name === "maxStock") setFilters(prev => ({ ...prev, maxStock: value ? Number(value) : undefined }));
+        else if (name === "beforeDate") setFilters(prev => ({ ...prev, beforeDate: value ? new Date(value) : undefined }));
+        else if (name === "afterDate") setFilters(prev => ({ ...prev, afterDate: value ? new Date(value) : undefined }));
+        else if (name === "category") setFilters(prev => ({ ...prev, categories: value ? [value] : [] }));
+        else if (name === "search") setSearchText(value);
+    };
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -48,15 +75,27 @@ export default function FuncTestPage() {
         createInventoryRecord(response);
     }
 
+    const handleSearch = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        try {
+            const res = await search(searchText, filters);
+            setResults(res);
+            console.log("it's doing something!!!!")
+        } catch (err) {
+            console.error("Search failed", err);
+        }
+    };
+
     return (  
         <div>
             <div>
                 
                 <h3>Filter Options:</h3>
-                <form>
+                <form onSubmit={handleSearch}>
                     {/*filtering based on furniture type*/}
                     <label>Furniture type:</label>
-                    <select id="furnitureType" name="furnitureType" style={{ border: '1px solid black', 
+                    <select name="category" value={filters.categories[0] || ""} onChange={handleFilterChange} style={{ border: '1px solid black', 
                         borderCollapse: 'collapse', width: '10rem'}}>
                         <option value="">-- Select Furniture --</option>
                         <option value="couch">Couch</option>
@@ -67,28 +106,20 @@ export default function FuncTestPage() {
                     {/*filtering based on before/after date*/}
                     <label>Before Date:</label>
                     <input type="date" id="beforeDate" name="beforeDate" style={{ border: '1px solid black', 
-                        borderCollapse: 'collapse', width: '10rem'}}/>
+                        borderCollapse: 'collapse', width: '10rem'}} onChange={handleFilterChange}/>
                     <label>After Date:</label>
                     <input type="date" id="afterDate" name="afterDate" style={{ border: '1px solid black', 
-                        borderCollapse: 'collapse', width: '10rem'}}/>
+                        borderCollapse: 'collapse', width: '10rem'}} onChange={handleFilterChange}/>
                     <br/>
                     {/*filtering based on min/max stock*/}
                     <label> Minimum Stock</label>
                     <input type="text" id="minStock" name="minStock" style={{ border: '1px solid black', 
-                        borderCollapse: 'collapse', width: '10rem'}} />
+                        borderCollapse: 'collapse', width: '10rem'}} onChange={handleFilterChange}/>
                     <label> Maximum Stock </label>
                     <input type="text" id="maxStock" name="maxStock" style={{ border: '1px solid black', 
-                        borderCollapse: 'collapse', width: '10rem'}}/>
+                        borderCollapse: 'collapse', width: '10rem'}} onChange={handleFilterChange}/>
                     <br/>
-                    {/*filtering based on category */}
-                    <label>Choose a category:</label>
-                    <select id="category" name="category" style={{ border: '1px solid black', 
-                        borderCollapse: 'collapse', width: '10rem'}}>
-                        <option value="chairs">Chairs</option>
-                        <option value="tables">Tables</option>
-                        <option value="couches">Couches</option>
-                    </select>
-                
+                    
                     {/*Submitting the filtering option*/}
                     <button>
                         Submit
@@ -98,9 +129,11 @@ export default function FuncTestPage() {
             <div>
                 <br/>
                 <h4>Search bar </h4>
-                <form>
+                <form onSubmit={handleSearch}>
                     <input  style={{ border: '1px solid black', borderCollapse: 'collapse', width: '30rem'}} 
-                    type="text" id="search" name="search" placeholder="What do you want to search?"/>
+                    type="text" id="search" name="search" placeholder="What do you want to search?"
+                    onChange={(e) => setSearchText(e.target.value)}
+                    value={searchText}/>
                     <button style={{ border: '1px solid black', borderCollapse: 'collapse' }}> 
                         Submit
                     </button>
@@ -172,20 +205,23 @@ export default function FuncTestPage() {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr style={{ border: '1px solid black', borderCollapse: 'collapse' }}>
-                            <td style={{ border: '1px solid black', borderCollapse: 'collapse' }}></td>
-                            <td style={{ border: '1px solid black', borderCollapse: 'collapse' }}></td>
-                            <td style={{ border: '1px solid black', borderCollapse: 'collapse' }}></td>
-                            <td style={{ border: '1px solid black', borderCollapse: 'collapse' }}></td>
-                            <td style={{ border: '1px solid black', borderCollapse: 'collapse' }}></td>
-                            <td style={{ border: '1px solid black', borderCollapse: 'collapse' }}></td>
-                            <td style={{ border: '1px solid black', borderCollapse: 'collapse' }}></td>
+                        {results.length === 0 ? (
+                        <tr><td colSpan={6}>No results found</td></tr>
+                        ) : (
+                        results.map(item => (
+                            <tr key={item.id}>
+                            <td>{item.name}</td>
+                            <td><a href={item.thumbnail.url}>{item.thumbnail.altText}</a></td>
                             <td>
-                                <button style={{ border: '1px solid black', borderCollapse: 'collapse' }}>
-                                    delete
-                                </button>
+                                {item.otherPhotos.map(p => <div key={p.url}><a href={p.url}>{p.altText}</a></div>)}
                             </td>
-                        </tr>
+                            <td>{item.category}</td>
+                            <td>{item.notes}</td>
+                            <td>{item.quantity}</td>
+                            <td>{item.dateAdded.toDateString()}</td>  
+                            </tr>
+                        ))
+                        )}
                     </tbody>
                 </table>
             </div>
