@@ -111,6 +111,11 @@ export async function updateInventoryRecord(
 }
 
 export async function deleteInventoryRecord(id: string): Promise<boolean> {
-    // TODO: implement
-    return false;
+    try{
+        await deleteDoc(doc(db, "inventoryRecords", id));
+        return true;
+    } catch (error) {
+        console.log(error);
+        return false;
+    }
 }
