@@ -5,7 +5,7 @@ import {
 } from "@/types/inventory";
 
 import { db } from "../firebase";
-import { collection, addDoc, doc, getDoc, query as searchQuery, getDocs, QueryConstraint, where, orderBy, deleteDoc } from "firebase/firestore";
+import { collection, addDoc, doc, getDoc, query as searchQuery, getDocs, QueryConstraint, where, orderBy, deleteDoc, Timestamp } from "firebase/firestore";
 
 const MAX_RESULTS = 25
 
@@ -54,7 +54,7 @@ export async function search(
     const snapshot = await getDocs(q);
 
     let results = snapshot.docs.map(doc => {
-    const data = doc.data() as InventoryRecordData & { dateAdded: any };
+    const data = doc.data() as InventoryRecordData & { dateAdded: Timestamp };
     return {
         id: doc.id,
         ...data,
