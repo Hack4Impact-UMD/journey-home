@@ -5,7 +5,7 @@ import {
 } from "@/types/inventory";
 
 import { db } from "../firebase";
-import { collection, addDoc, doc, getDoc, query as searchQuery, getDocs, QueryConstraint, where, orderBy } from "firebase/firestore";
+import { collection, addDoc, doc, getDoc, query as searchQuery, getDocs, QueryConstraint, where, orderBy, deleteDoc } from "firebase/firestore";
 
 const MAX_RESULTS = 25
 
