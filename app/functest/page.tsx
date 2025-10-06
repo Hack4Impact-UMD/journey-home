@@ -81,7 +81,6 @@ export default function FuncTestPage() {
         try {
             const res = await search(searchText, filters);
             setResults(res);
-            console.log("it's doing something!!!!")
         } catch (err) {
             console.error("Search failed", err);
         }

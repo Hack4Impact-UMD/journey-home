@@ -85,7 +85,7 @@ export async function createInventoryRecord(
         category: recordData.category,
         notes: recordData.notes,
         quantity: recordData.quantity,
-        dateAdded: recordData.dateAdded,
+        dateAdded: Timestamp.now(),
     });
     return docRef.id;
 }
