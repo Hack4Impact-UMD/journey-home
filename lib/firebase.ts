@@ -1,4 +1,5 @@
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
+import { connectAuthEmulator, getAuth } from 'firebase/auth';
 import { getFirestore, connectFirestoreEmulator, Firestore } from 'firebase/firestore';
 import { getStorage, connectStorageEmulator, FirebaseStorage } from 'firebase/storage';
 
@@ -14,6 +15,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app); 
+const auth = getAuth(app);
+
 
 if(process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true' && typeof window !== 'undefined') {
   connectFirestoreEmulator(
@@ -27,8 +30,13 @@ if(process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true' && typeof window !==
     process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_HOST ?? 'localhost', 
     parseInt(process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_STORAGE_PORT ?? '9199')
   );
+
+  connectAuthEmulator(
+  auth,
+  `http://${process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_HOST ?? 'localhost'}:${process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_AUTH_PORT ?? '9099'}`
+  );
 }
 
 
-export { app, db, storage };
+export { app, db, storage, auth};
 export default app;

@@ -1,11 +1,16 @@
-import ButtonProps from '../types/button';
+import {LongButtonProps} from '../types/button';
 
 
-export default function longButton(props: ButtonProps) {
- const name = props.name;
- return (
-   <button className="bg-primary text-white rounded-[5px] text-[16px] w-[452px] h-[56px] font-bold">
-     {name}
-   </button>
- );
+export default function LongButton({ name, type = 'button', disabled = false }: LongButtonProps) {
+  return (
+    <button
+      type={type}
+      disabled={disabled}
+      className={`w-full h-[56px] rounded-[8px] font-semibold text-white ${
+        disabled ? 'bg-gray-400' : 'bg-primary'
+      }`}
+    >
+      {name}
+    </button>
+  );
 }
