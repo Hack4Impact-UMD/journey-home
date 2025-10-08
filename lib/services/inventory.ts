@@ -5,7 +5,7 @@ import {
 } from "@/types/inventory";
 
 import { db } from "../firebase";
-import { collection, addDoc, doc, getDoc, deleteDoc } from "firebase/firestore";
+import { collection, addDoc, doc, getDoc, deleteDoc, setDoc } from "firebase/firestore";
 
 const MAX_RESULTS = 25
 
@@ -23,16 +23,21 @@ export async function search(
 export async function createInventoryRecord(
     recordData: InventoryRecordData
 ): Promise<string> {
-    const docRef = await addDoc(collection(db, "inventoryRecords"), {
-        name: recordData.name,
-        thumbnail: recordData.thumbnail,
-        otherPhotos: recordData.otherPhotos,
-        category: recordData.category,
-        notes: recordData.notes,
-        quantity: recordData.quantity,
-        dateAdded: recordData.dateAdded,
-    });
-    return docRef.id;
+    try{
+        const docRef = await addDoc(collection(db, "inventoryRecords"), {
+            name: recordData.name,
+            thumbnail: recordData.thumbnail,
+            otherPhotos: recordData.otherPhotos,
+            category: recordData.category,
+            notes: recordData.notes,
+            quantity: recordData.quantity,
+            dateAdded: recordData.dateAdded,
+        });
+        return docRef.id;
+    } catch(error) {
+        console.error(error);
+        throw new Error();
+    }
 }
 
 
@@ -51,8 +56,22 @@ export async function getInventoryRecord(id: string): Promise<InventoryRecord | 
 export async function updateInventoryRecord(
     record: InventoryRecord
 ): Promise<boolean> {
-    // TODO: implement
-    return false;
+    try{
+        await setDoc(doc(db, "inventoryRecords", record.id), {
+            name: record.name,
+            thumbnail: record.thumbnail,
+            otherPhotos: record.otherPhotos,
+            category: record.category,
+            notes: record.notes,
+            quantity: record.quantity,
+            dateAdded: record.dateAdded,
+        });
+        return true;
+    } catch (error){
+        console.error(error);
+        return false;
+    }
+
 }
 
 export async function deleteInventoryRecord(id: string): Promise<boolean> {
