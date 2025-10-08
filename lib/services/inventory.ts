@@ -28,7 +28,6 @@ export async function search(
         alert("Invalid minimum and/or maximum stock filters");
     } else {
         if (filters.minStock) {
-            
             search.push(where("quantity", ">=", Number(filters.minStock)));
         }
         if (filters.maxStock) {
@@ -51,7 +50,10 @@ export async function search(
         }
 
         if (filters.beforeDate) {
-            search.push(where("dateAdded", "<=", filters.beforeDate));
+            //makes it so that items made on that date also appear
+            const endOfDay = new Date(filters.beforeDate);
+            endOfDay.setUTCHours(23, 59, 59, 999);
+            search.push(where("dateAdded", "<=",Timestamp.fromDate(endOfDay)));
         }
     }  
 
@@ -60,31 +62,32 @@ export async function search(
 
     const snapshot = await getDocs(q);
 
-   let results: InventoryRecord[] = [];
-
-    for (const doc of snapshot.docs) {
-        const record = await getInventoryRecord(doc.id);
-
-        if (record) {
-            results.push({
-            ...record,
-            dateAdded:
-            //converting Timestamp type back into Date so it can print properly
+    let results: InventoryRecord[] = (
+        await Promise.all(
+            snapshot.docs.map(async (doc) => {
+            const record = await getInventoryRecord(doc.id);
+            if (!record) {
+                return []; 
+            }
+            return [{
+                ...record,
+                dateAdded:
+                //converting Timestamp type back into Date so it can print properly
                 record.dateAdded instanceof Timestamp
-                ? record.dateAdded.toDate()
-                : new Date(record.dateAdded),
-            });
-        }
-    }
- 
+                    ? record.dateAdded.toDate()
+                    : new Date(record.dateAdded),
+            } as InventoryRecord];
+            })
+        )
+    ).flat(); 
+    
     if (query) {
         const lowerQuery = query.toLowerCase();
-        results = results.filter(item =>
+        results = results.filter(item => 
         item.name.toLowerCase().includes(lowerQuery) ||
         item.category.toLowerCase().includes(lowerQuery) ||
         //makes it so that notes with key words also show up in search results
-        (item.notes?.toLowerCase() ?? "").includes(lowerQuery)
-        );
+        (item.notes?.toLowerCase() ?? "").includes(lowerQuery));
     }
 
     return results;
