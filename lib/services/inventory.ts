@@ -121,21 +121,16 @@ export async function sortByQuantity(
 export async function createInventoryRecord(
     recordData: InventoryRecordData
 ): Promise<string> {
-    try{
-        const docRef = await addDoc(collection(db, "inventoryRecords"), {
-            name: recordData.name,
-            thumbnail: recordData.thumbnail,
-            otherPhotos: recordData.otherPhotos,
-            category: recordData.category,
-            notes: recordData.notes,
-            quantity: recordData.quantity,
-            dateAdded: Timestamp.now(),
-        });
-        return docRef.id;
-    } catch(error) {
-        console.error(error);
-        throw new Error();
-    }
+    const docRef = await addDoc(collection(db, "inventoryRecords"), {
+        name: recordData.name,
+        thumbnail: recordData.thumbnail,
+        otherPhotos: recordData.otherPhotos,
+        category: recordData.category,
+        notes: recordData.notes,
+        quantity: recordData.quantity,
+        dateAdded: Timestamp.now(),
+    });
+    return docRef.id;
 }
 
 
