@@ -15,7 +15,7 @@ export default function SignUpPage() {
       {/* image on the left */}
       <div className="flex shrink-0 items-start justify-start">
         <img
-          src="/login-background.png"
+          src="/background.png"
           alt="Login Background"
           className="h-[843px] w-[492px] object-cover object-left"
         />
