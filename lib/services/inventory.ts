@@ -42,7 +42,7 @@ export async function search(
         search.push(orderBy("name"));
     }
 
-    if (filters.beforeDate && filters.afterDate && filters.beforeDate > filters.afterDate) {
+    if (filters.beforeDate && filters.afterDate && filters.beforeDate < filters.afterDate) {
         alert("Invalid before and after date stock filters");
     } else {
         if (filters.afterDate) {
@@ -91,6 +91,30 @@ export async function search(
     }
 
     return results;
+}
+
+export async function sortByDate(
+    searchResult: InventoryRecord[],
+    earliestToOldest: boolean
+): Promise<InventoryRecord[]> {
+    return [...searchResult].sort((a, b) => {
+        const dateA = a.dateAdded.getTime();
+        const dateB = b.dateAdded.getTime();
+
+        return earliestToOldest ? dateA - dateB : dateB - dateA;
+    });
+}
+
+export async function sortByQuantity(
+    searchResult: InventoryRecord[],
+    leastToGreatest: boolean
+): Promise<InventoryRecord[]> {
+    return[...searchResult].sort((a,b) => {
+        const itemA = a.quantity;
+        const itemB = b.quantity;
+        return leastToGreatest ? itemA - itemB : itemB - itemA;
+
+    });
 }
 
 

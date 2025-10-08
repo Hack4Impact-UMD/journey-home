@@ -1,6 +1,6 @@
 'use client';
 import {InventoryPhoto, InventoryRecord, InventoryRecordData, SearchFilters} from "@/types/inventory";
-import {search, createInventoryRecord, getInventoryRecord, updateInventoryRecord, deleteInventoryRecord} from "@/lib/services/inventory";
+import {search, createInventoryRecord, getInventoryRecord, updateInventoryRecord, deleteInventoryRecord, sortByDate, sortByQuantity} from "@/lib/services/inventory";
 import {useState} from 'react';
 
 
@@ -28,6 +28,7 @@ export default function FuncTestPage() {
         afterDate: undefined,
         beforeDate: undefined,
     })
+    const [sortOption, setSortOption] = useState(""); 
 
     //found how to manipulate change and submit online for forms specifically 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,6 +78,7 @@ export default function FuncTestPage() {
 
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
+        //TO DO: add functionality that when a sortOption is selected, it holds for the search results
 
         try {
             const res = await search(searchText, filters);
@@ -84,6 +86,30 @@ export default function FuncTestPage() {
         } catch (err) {
             console.error("Search failed", err);
         }
+    };
+
+    const handleSortSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        const sortMap: Record<string, () => Promise<InventoryRecord[]>> = {
+            "date-newest": () => sortByDate(results, false),
+            "date-oldest": () => sortByDate(results, true),
+            "quantity-least": () => sortByQuantity(results, true),
+            "quantity-greatest": () => sortByQuantity(results, false),
+        };
+
+        // only call the function if a valid option is selected
+        const sorting = sortMap[sortOption];
+        if (!sorting) { 
+            return;
+        }
+
+        const sortedResults = await sorting();
+        setResults(sortedResults);
+    };
+
+    const handleSortSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSortOption(e.target.value);
     };
 
     return (  
@@ -120,7 +146,7 @@ export default function FuncTestPage() {
                     <br/>
                     
                     {/*Submitting the filtering option*/}
-                    <button>
+                    <button type= "submit" style={{ border: '1px solid black', borderCollapse: 'collapse' }}>
                         Submit
                     </button>
                 </form>
@@ -184,6 +210,22 @@ export default function FuncTestPage() {
 
                     <button type= "submit" style={{ border: '1px solid black', borderCollapse: 'collapse' }}>
                         add
+                    </button>
+                </form>
+            </div>
+
+            <div>
+                <form onSubmit={handleSortSubmit}>
+                    <select name="sort" value={sortOption} onChange={handleSortSelect} style={{ 
+                        border: '1px solid black',  borderCollapse: 'collapse', width: '12rem', }}>
+                    <option value="">-- Sort Results By --</option>
+                    <option value="date-newest">Date (Newest to Oldest)</option>
+                    <option value="date-oldest">Date (Oldest to Newest)</option>
+                    <option value="quantity-least">Quantity (Least to Greatest)</option>
+                    <option value="quantity-greatest">Quantity (Greatest to Least)</option>
+                    </select>           
+                    <button type= "submit" style={{ border: '1px solid black', borderCollapse: 'collapse' }}>
+                        Submit
                     </button>
                 </form>
             </div>
