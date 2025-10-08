@@ -63,8 +63,10 @@ export default function LoginPage() {
          onSubmit={handleLogin}
          className="w-[452px] h-[565px] flex flex-col text-black space-y-4"
        >
-         <img src="login-header.png" alt="Login Header" className="w-[388px] h-[107px]" />
-         <h1 className="font-bold text-[24px] font-family-raleway mt-10">Welcome Back!</h1>
+        <div className="flex justify-center">
+         <img src="journey-home-logo.png" alt="Journey Home" className="h-[100px] w-[364px]" />
+        </div>
+         <h1 className="font-bold text-[24px] text-center font-family-raleway mt-10">Welcome Back!</h1>
 
 
          <div className="font-family-opensans flex flex-col items-center space-y-3">
