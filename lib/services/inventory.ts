@@ -6,7 +6,7 @@ import {
 } from "@/types/inventory";
 
 import { db } from "../firebase";
-import { collection, addDoc, doc, getDoc, query as searchQuery, getDocs, QueryConstraint, where, orderBy, deleteDoc, Timestamp } from "firebase/firestore";
+import { collection, addDoc, doc, getDoc, setDoc, query as searchQuery, getDocs, QueryConstraint, where, orderBy, deleteDoc, Timestamp } from "firebase/firestore";
 
 const MAX_RESULTS = 25
 
@@ -158,8 +158,22 @@ export async function getInventoryRecord(id: string): Promise<InventoryRecord | 
 export async function updateInventoryRecord(
     record: InventoryRecord
 ): Promise<boolean> {
-    // TODO: implement
-    return false;
+    try{
+        await setDoc(doc(db, "inventoryRecords", record.id), {
+            name: record.name,
+            thumbnail: record.thumbnail,
+            otherPhotos: record.otherPhotos,
+            category: record.category,
+            notes: record.notes,
+            quantity: record.quantity,
+            dateAdded: record.dateAdded,
+        });
+        return true;
+    } catch (error){
+        console.error(error);
+        return false;
+    }
+
 }
 
 export async function deleteInventoryRecord(id: string): Promise<boolean> {

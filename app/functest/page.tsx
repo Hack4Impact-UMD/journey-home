@@ -77,7 +77,38 @@ export default function FuncTestPage() {
         e.preventDefault();
 
         const response = recordData;
-        createInventoryRecord(response);
+        await createInventoryRecord(response);
+        
+        setRecord({
+            name: '',
+            thumbnail: {
+                url: '',
+                altText: '',
+            },
+            otherPhotos: [],
+            category: '',
+            notes: '',
+            quantity: 0,
+            dateAdded: new Date(),
+        });
+    }
+
+    const record1 = { //this only works with the random ID i made in my emulator lol
+            id: 'ZB8PBhIElyUZ4s1f1Zwv',
+            name: 'hehehe',
+            thumbnail: {
+                url: 'oop',
+                altText: 'lolz',
+            },
+            otherPhotos: [],
+            category: 'hi',
+            notes: 'hllo',
+            quantity: 4,
+            dateAdded: new Date(),
+     };
+
+    const handleUpdate = async () => {
+        await updateInventoryRecord(record1);
     }
 
     //handles submitting your search query
@@ -166,6 +197,11 @@ export default function FuncTestPage() {
                         Submit
                     </button>
                 </form>
+            </div>
+
+            <div>
+                <h1>Check Update</h1>
+                <button onClick={handleUpdate} style={{ border: '1px solid black', borderCollapse: 'collapse' }}>Update!</button>
             </div>
 
             <div>
