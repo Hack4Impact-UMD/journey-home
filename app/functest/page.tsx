@@ -152,7 +152,6 @@ export default function FuncTestPage() {
                     <input type="text" id="maxStock" name="maxStock" style={{ border: '1px solid black', 
                         borderCollapse: 'collapse', width: '10rem'}} onChange={handleFilterChange}/>
                     <br/>
-    
                 </form>
             </div>
             <div>
