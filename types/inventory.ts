@@ -24,3 +24,9 @@ export type SearchFilters = {
   beforeDate: Date | undefined;
   afterDate: Date | undefined;
 };
+
+export type sortType = {
+  newestOldest: boolean | undefined;
+  leastGreatest: boolean | undefined;
+}
+
