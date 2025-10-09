@@ -2,6 +2,7 @@ import {
     InventoryRecord,
     InventoryRecordData,
     SearchFilters,
+    sortType,
 } from "@/types/inventory";
 
 import { db } from "../firebase";
@@ -13,7 +14,8 @@ const MAX_RESULTS = 25
 export async function search(
     query: string,
     filters: SearchFilters,
-    page: number = 0
+    page: number = 0,
+    sort: sortType,
 ): Promise<InventoryRecord[]> {
     
     const search: QueryConstraint[] = [];
@@ -90,13 +92,20 @@ export async function search(
         (item.notes?.toLowerCase() ?? "").includes(lowerQuery));
     }
 
+    // applies sorting only if user selected it
+    if (sort.newestOldest !== undefined) {
+        results = sortByDate(results, sort.newestOldest);
+    } else if (sort.leastGreatest !== undefined) {
+        results = sortByQuantity(results, sort.leastGreatest);
+    }
     return results;
 }
 
-export async function sortByDate(
+//removing async + promise since it's faster + unneeded
+export function sortByDate(
     searchResult: InventoryRecord[],
     earliestToOldest: boolean
-): Promise<InventoryRecord[]> {
+):  InventoryRecord[]{
     return [...searchResult].sort((a, b) => {
         const dateA = a.dateAdded.getTime();
         const dateB = b.dateAdded.getTime();
@@ -105,10 +114,10 @@ export async function sortByDate(
     });
 }
 
-export async function sortByQuantity(
+export function sortByQuantity(
     searchResult: InventoryRecord[],
     leastToGreatest: boolean
-): Promise<InventoryRecord[]> {
+):  InventoryRecord[] {
     return[...searchResult].sort((a,b) => {
         const itemA = a.quantity;
         const itemB = b.quantity;

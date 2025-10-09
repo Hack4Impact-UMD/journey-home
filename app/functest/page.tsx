@@ -1,5 +1,5 @@
 'use client';
-import {InventoryPhoto, InventoryRecord, InventoryRecordData, SearchFilters} from "@/types/inventory";
+import {InventoryPhoto, InventoryRecord, InventoryRecordData, SearchFilters, sortType} from "@/types/inventory";
 import {search, createInventoryRecord, getInventoryRecord, updateInventoryRecord, deleteInventoryRecord, sortByDate, sortByQuantity} from "@/lib/services/inventory";
 import {useState} from 'react';
 
@@ -28,7 +28,10 @@ export default function FuncTestPage() {
         afterDate: undefined,
         beforeDate: undefined,
     })
-    const [sortOption, setSortOption] = useState(""); 
+     const [sort, setSort] = useState<sortType>({
+        newestOldest: undefined,
+        leastGreatest: undefined,
+    });
 
     //found how to manipulate change and submit online for forms specifically 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,6 +60,7 @@ export default function FuncTestPage() {
         }
     } 
 
+    //sets the filters
     const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
 
@@ -76,48 +80,52 @@ export default function FuncTestPage() {
         createInventoryRecord(response);
     }
 
+    //handles submitting your search query
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
-        //TO DO: add functionality that when a sortOption is selected, it holds for the search results
 
         try {
-            const res = await search(searchText, filters);
+            const res = await search(searchText, filters, 0, sort);
             setResults(res);
         } catch (err) {
             console.error("Search failed", err);
         }
     };
 
-    const handleSortSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
 
-        const sortMap: Record<string, () => Promise<InventoryRecord[]>> = {
-            "date-newest": () => sortByDate(results, false),
-            "date-oldest": () => sortByDate(results, true),
-            "quantity-least": () => sortByQuantity(results, true),
-            "quantity-greatest": () => sortByQuantity(results, false),
+    //sets the sorting options
+    const handleSortSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const value = e.target.value;
+        const newSort: sortType = {
+            newestOldest: undefined,
+            leastGreatest: undefined,
         };
 
-        // only call the function if a valid option is selected
-        const sorting = sortMap[sortOption];
-        if (!sorting) { 
-            return;
+        switch (value) {
+            case "date-newest":
+                newSort.newestOldest = false;
+                break;
+            case "date-oldest":
+                newSort.newestOldest = true;
+                break;
+            case "quantity-least":
+                newSort.leastGreatest = true;
+                break;
+            case "quantity-greatest":
+                newSort.leastGreatest = false;
+                break;
         }
-
-        const sortedResults = await sorting();
-        setResults(sortedResults);
+        setResults(results);
+        setSort(newSort);
     };
 
-    const handleSortSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSortOption(e.target.value);
-    };
 
     return (  
         <div>
             <div>
                 
                 <h3>Filter Options:</h3>
-                <form onSubmit={handleSearch}>
+                <form>
                     {/*filtering based on furniture type*/}
                     <label>Furniture type:</label>
                     <select name="category" value={filters.categories[0] || ""} onChange={handleFilterChange} style={{ border: '1px solid black', 
@@ -144,11 +152,7 @@ export default function FuncTestPage() {
                     <input type="text" id="maxStock" name="maxStock" style={{ border: '1px solid black', 
                         borderCollapse: 'collapse', width: '10rem'}} onChange={handleFilterChange}/>
                     <br/>
-                    
-                    {/*Submitting the filtering option*/}
-                    <button type= "submit" style={{ border: '1px solid black', borderCollapse: 'collapse' }}>
-                        Submit
-                    </button>
+    
                 </form>
             </div>
             <div>
@@ -215,8 +219,8 @@ export default function FuncTestPage() {
             </div>
 
             <div>
-                <form onSubmit={handleSortSubmit}>
-                    <select name="sort" value={sortOption} onChange={handleSortSelect} style={{ 
+                <form>
+                    <select name="sort" onChange={handleSortSelect} style={{ 
                         border: '1px solid black',  borderCollapse: 'collapse', width: '12rem', }}>
                     <option value="">-- Sort Results By --</option>
                     <option value="date-newest">Date (Newest to Oldest)</option>
@@ -224,9 +228,7 @@ export default function FuncTestPage() {
                     <option value="quantity-least">Quantity (Least to Greatest)</option>
                     <option value="quantity-greatest">Quantity (Greatest to Least)</option>
                     </select>           
-                    <button type= "submit" style={{ border: '1px solid black', borderCollapse: 'collapse' }}>
-                        Submit
-                    </button>
+                    
                 </form>
             </div>
             <div>
