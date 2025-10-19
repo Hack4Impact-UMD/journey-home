@@ -53,7 +53,7 @@ export async function search(
     
 
 
-    let q = searchQuery(collection(db, "inventoryRecords"), ...search);
+    const q = searchQuery(collection(db, "inventoryRecords"), ...search);
 
     const snapshot = await getDocs(q);
 
@@ -69,7 +69,7 @@ export async function search(
         } as InventoryRecord;
     });
 
-    
+
     if (query) {
         const lowerQuery = query.toLowerCase();
         results = results.filter(item => 
