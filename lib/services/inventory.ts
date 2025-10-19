@@ -26,15 +26,11 @@ export async function search(
 
     const stockFilterApplied = filters.minStock || filters.maxStock;
 
-    if (filters.minStock && filters.maxStock && filters.minStock > filters.maxStock) {
-        alert("Invalid minimum and/or maximum stock filters");
-    } else {
-        if (filters.minStock) {
-            search.push(where("quantity", ">=", Number(filters.minStock)));
-        }
-        if (filters.maxStock) {
-            search.push(where("quantity", "<=", Number(filters.maxStock)));
-        }
+    if (filters.minStock) {
+        search.push(where("quantity", ">=", Number(filters.minStock)));
+    }
+    if (filters.maxStock) {
+        search.push(where("quantity", "<=", Number(filters.maxStock)));
     }
 
     if (stockFilterApplied) {
@@ -44,44 +40,35 @@ export async function search(
         search.push(orderBy("name"));
     }
 
-    if (filters.beforeDate && filters.afterDate && filters.beforeDate < filters.afterDate) {
-        alert("Invalid before and after date stock filters");
-    } else {
-        if (filters.afterDate) {
-            search.push(where("dateAdded", ">=", filters.afterDate));
-        }
-
-        if (filters.beforeDate) {
-            //makes it so that items made on that date also appear
-            const endOfDay = new Date(filters.beforeDate);
-            endOfDay.setUTCHours(23, 59, 59, 999);
-            search.push(where("dateAdded", "<=",Timestamp.fromDate(endOfDay)));
-        }
-    }  
+    
+    if (filters.afterDate) {
+        search.push(where("dateAdded", ">=", filters.afterDate));
+    }
+    if (filters.beforeDate) {
+        //makes it so that items made on that date also appear
+        const endOfDay = new Date(filters.beforeDate);
+        endOfDay.setUTCHours(23, 59, 59, 999);
+        search.push(where("dateAdded", "<=",Timestamp.fromDate(endOfDay)));
+    }
+    
 
 
-    const q = searchQuery(collection(db, "inventoryRecords"), ...search);
+    let q = searchQuery(collection(db, "inventoryRecords"), ...search);
 
     const snapshot = await getDocs(q);
 
-    let results: InventoryRecord[] = (
-        await Promise.all(
-            snapshot.docs.map(async (doc) => {
-            const record = await getInventoryRecord(doc.id);
-            if (!record) {
-                return []; 
-            }
-            return [{
-                ...record,
-                dateAdded:
-                //converting Timestamp type back into Date so it can print properly
-                record.dateAdded instanceof Timestamp
-                    ? record.dateAdded.toDate()
-                    : new Date(record.dateAdded),
-            } as InventoryRecord];
-            })
-        )
-    ).flat(); 
+    let results: InventoryRecord[] = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+            id: doc.id,
+            ...data,
+            dateAdded:
+            data.dateAdded instanceof Timestamp
+                ? data.dateAdded.toDate()
+                : new Date(data.dateAdded),
+        } as InventoryRecord;
+    });
+
     
     if (query) {
         const lowerQuery = query.toLowerCase();
@@ -137,7 +124,7 @@ export async function createInventoryRecord(
         category: recordData.category,
         notes: recordData.notes,
         quantity: recordData.quantity,
-        dateAdded: Timestamp.now(),
+        dateAdded: recordData.dateAdded,
     });
     return docRef.id;
 }
