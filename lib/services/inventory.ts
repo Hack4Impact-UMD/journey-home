@@ -1,23 +1,59 @@
 import {
     InventoryRecord,
     InventoryRecordData,
-    SearchFilters,
-    SortBy,
+    SearchParams,
 } from "@/types/inventory";
 
 import { db } from "../firebase";
 import { collection, addDoc, doc, getDoc, setDoc, query as searchQuery, getDocs, QueryConstraint, where, orderBy, deleteDoc, Timestamp } from "firebase/firestore";
 
-const WAREHOUSE_COLLECTION = "warehouse";
+export const WAREHOUSE_COLLECTION = "warehouse";
 
 export async function search(
     query: string,
-    filters: SearchFilters,
-    sort: SortBy,
+    params: SearchParams
 ): Promise<InventoryRecord[]> {
     
-    
-    return [];
+    const querySnapshot = await getDocs(collection(db, WAREHOUSE_COLLECTION));
+    let records: InventoryRecord[] = querySnapshot.docs.map(doc => (
+        {
+            id: doc.id,
+            ...doc.data()
+        } as InventoryRecord
+    ));
+
+    return records.filter(record => {
+
+        if (params.categories.length != 0 && !params.categories.includes(record.category)) {
+            return false;
+        }
+
+        if (params.sizes.length != 0 && !params.sizes.includes(record.size)) {
+            return false;
+        }
+
+        let keywords = `${record.name} ${record.category} ${record.notes} ${record.size}`.toLowerCase();
+        query = query.toLowerCase().trim();
+
+        return keywords.includes(query);
+
+    }).sort((rec1, rec2) => {
+
+        let diff;
+        if(params.sortBy == "Date") {
+            diff = rec1.dateAdded.seconds - rec2.dateAdded.seconds;
+        } else if(params.sortBy == "Quantity") {
+            diff = rec1.quantity - rec2.quantity;
+        } else {
+            diff = rec1.name.localeCompare(rec2.name);
+        }
+
+        if (!params.ascending) {
+            diff *= -1;
+        }
+
+        return diff
+    });
 }
 
 export async function createInventoryRecord(

@@ -3,7 +3,7 @@ import { Timestamp } from "firebase/firestore";
 export type InventoryPhoto = {
   url: string;
   altText: string;
-}
+};
 
 export type InventoryRecordData = {
   name: string;
@@ -12,17 +12,17 @@ export type InventoryRecordData = {
   category: string;
   notes: string;
   quantity: number;
+  size: "Small" | "Medium" | "Large";
   dateAdded: Timestamp;
-}
-
-export type InventoryRecord extends InventoryRecordData {
-  id: string; // this is the document ID assigned by Firebase
-}
-
-export type SearchFilters = {
-  category: string | undefined;
-  minStock: number | undefined;
-  maxStock: number | undefined;
 };
 
-export type SortBy = ""
+export type InventoryRecord = InventoryRecordData & {
+  id: string; // this is the document ID assigned by Firebase
+};
+
+export type SearchParams = {
+  categories: string[],
+  sizes: string[],
+  sortBy: "Quantity" | "Date" | "Name",
+  ascending: boolean
+};
