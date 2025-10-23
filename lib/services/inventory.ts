@@ -5,7 +5,7 @@ import {
 } from "@/types/inventory";
 
 import { db } from "../firebase";
-import { collection, addDoc, doc, getDoc, setDoc, query as searchQuery, getDocs, QueryConstraint, where, orderBy, deleteDoc, Timestamp } from "firebase/firestore";
+import { collection, addDoc, doc, getDoc, setDoc, getDocs, deleteDoc } from "firebase/firestore";
 
 export const WAREHOUSE_COLLECTION = "warehouse";
 
@@ -15,7 +15,7 @@ export async function search(
 ): Promise<InventoryRecord[]> {
     
     const querySnapshot = await getDocs(collection(db, WAREHOUSE_COLLECTION));
-    let records: InventoryRecord[] = querySnapshot.docs.map(doc => (
+    const records: InventoryRecord[] = querySnapshot.docs.map(doc => (
         {
             id: doc.id,
             ...doc.data()
@@ -32,7 +32,7 @@ export async function search(
             return false;
         }
 
-        let keywords = `${record.name} ${record.category} ${record.notes} ${record.size}`.toLowerCase();
+        const keywords = `${record.name} ${record.category} ${record.notes} ${record.size}`.toLowerCase();
         query = query.toLowerCase().trim();
 
         return keywords.includes(query);
