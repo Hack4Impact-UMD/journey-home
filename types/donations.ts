@@ -1,3 +1,4 @@
+import { Timestamp } from "firebase/firestore"
 import { InventoryRecord } from "./inventory"
 
 type DonorAddress = {
@@ -16,15 +17,16 @@ type DonorInfo = {
 }
 
 type DonationItem = {
-    itemm: InventoryRecord, 
+    item: InventoryRecord, 
     status: "Not Reviewed" | "Approved" | "Denied" | "Acquired";
 }
 
-type DonationRequestData = {
+type DonationRequest = {
     donor: DonorInfo,
     firstTimeDonor: boolean,
     howDidYouHear: string,
     canDropOff: boolean,
     notes: string,
+    date: Timestamp,
     items: DonationItem[]
 }
