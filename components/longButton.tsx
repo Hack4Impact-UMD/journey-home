@@ -6,7 +6,7 @@ export default function LongButton({ name, type = 'button', disabled = false }: 
     <button
       type={type}
       disabled={disabled}
-      className={`w-full h-[56px] rounded-[8px] font-semibold text-white ${
+      className={`w-full h-[56px] rounded-[8px] font-semibold text-white hover:cursor-pointer ${
         disabled ? 'bg-gray-400' : 'bg-primary'
       }`}
     >
