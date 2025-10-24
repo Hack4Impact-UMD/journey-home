@@ -1,23 +1,20 @@
 import { Timestamp } from "firebase/firestore";
 
 export type InventoryPhoto = {
-  url: string;
-  altText: string;
+  url: string,
+  altText: string,
 };
 
-export type InventoryRecordData = {
-  name: string;
-  thumbnail: InventoryPhoto;
-  otherPhotos: InventoryPhoto[];
-  category: string;
-  notes: string;
-  quantity: number;
-  size: "Small" | "Medium" | "Large";
-  dateAdded: Timestamp;
-};
-
-export type InventoryRecord = InventoryRecordData & {
-  id: string; // this is the document ID assigned by Firebase
+export type InventoryRecord = {
+  id: string,
+  name: string,
+  photos: InventoryPhoto[],
+  category: string,
+  notes: string,
+  quantity: number,
+  size: "Small" | "Medium" | "Large",
+  dateAdded: Timestamp,
+  donorEmail: string | null,
 };
 
 export type SearchParams = {
