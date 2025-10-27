@@ -1,16 +1,26 @@
 "use client";
 
-export default function GalleryItem() {
+import { InventoryRecord } from "../types/inventory";
+import InventoryItem from "../app/inventory/warehouse/page";
+
+type GalleryItemProps = {
+  item: InventoryRecord;
+};
+
+export default function GalleryItem({item}: GalleryItemProps) {
     return (
-        <div className="w-100 aspect-[18/20] flex flex-col justify-start p-4 bg-white border-4 border-grey shadow-lg rounded-lg">
-            <div className="w-90 h-80 bg-white border-4 border-black rounded-lg"> 
+        <div className="w-full max-w-md aspect-[15/21] flex flex-col justify-start p-4 bg-white border-1 relative border-gray-200 shadow-lg rounded-lg">
+            <div className="w-80 aspect-square bg-white border border-grey rounded-lg"> 
+                <div className="w-1/12 aspect-square bg-white border border-black relative top-1/18 left-6/7 flex items-center justify-center pt-4"> 
+
+                </div>
                 picture
             </div>
-            <div className="justify-start pyt-2">Name</div>
-            <div>
-                categories here
+            <div className="justify-start pt-6 font-bold text-2xl">{item.name}</div>
+            <div className="text-xl">
+                Category {item.category}
             </div>
-            <div> Date</div>
+            <div className=" text-lg text-gray-400">{item.dateAdded.toDate().toLocaleDateString()}</div>
         </div>
     )
 

@@ -1,19 +1,20 @@
 "use client";
 
 import SideNavbar from "@/components/SideNav";
+import StockSidebar from "@/components/StockSidebar";
 import TopNavbar from "@/components/TopNav";
 import { ReactNode } from "react";
 
 export default function InventoryLayout({ children }: { children: ReactNode }) {
     return (
         <>  
-            <div className="h-full w-full flex flex-col">
+            <div className="h-100rem overflow-y-auto w-full flex flex-col">
                 <TopNavbar/>
                 <div className="flex flex-1">
                     <SideNavbar/>
                     <div className="flex-1  bg-[#F7F7F7] py-4 px-6 flex flex-col">
-                        <span className="text-2xl text-primary font-extrabold block">Inventory</span>
-                        <div className="flex gap-8 text-sm">
+                        <span className="text-4xl text-primary font-extrabold block">Inventory</span>
+                        <div className="flex gap-8 text-xl">
                             <a className="py-4 border-b-2 border-primary text-primary" href="/inventory/warehouse">Warehouse</a>
                             <a className="py-4" href="/inventory/donation-requests">Donation Requests</a>
                             <a className="py-4" href="/inventory/approved-donations">Approved Donations</a>
@@ -23,6 +24,7 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
                             { children }
                         </div>
                     </div>
+                    <StockSidebar/>
                 </div>
             </div>
         </>
