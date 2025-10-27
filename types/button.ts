@@ -3,6 +3,8 @@ export interface InputBoxProps {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   logo?: string;
+  name?: string;
+  disabled?: boolean;
 }
 
 export interface LongButtonProps {
