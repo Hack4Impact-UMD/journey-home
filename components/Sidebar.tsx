@@ -1,5 +1,6 @@
-// inventory/Sidebar.tsx
+"use client";
 import React from "react";
+import Link from "next/link";
 
 export function Sidebar({ 
   activeSection, 
@@ -16,17 +17,27 @@ export function Sidebar({
       </div>
       
       <div className="space-y-1">
-        <button 
-          onClick={() => setActiveSection("Inventory")}
-          className={`w-full text-left px-3 py-2 rounded text-sm ${
-            activeSection === "Inventory" ? "bg-white shadow-sm" : "hover:bg-white/50"
-          }`}
-        >
-          Inventory
-        </button>
+        <Link href="/inventory">
+          <button 
+            onClick={() => setActiveSection("Inventory")}
+            className={`w-full text-left px-3 py-2 rounded text-sm ${
+              activeSection === "Inventory" ? "bg-white shadow-sm" : "hover:bg-white/50"
+            }`}
+          >
+            Inventory
+          </button>
+        </Link>
+
+        <Link href="/donation-requests">
+          <button className="w-full text-left px-3 py-2 rounded text-sm hover:bg-white/50">
+            Donation Requests
+          </button>
+        </Link>
+
         <button className="w-full text-left px-3 py-2 rounded text-sm hover:bg-white/50">
           Volunteers
         </button>
+        
         <button className="w-full text-left px-3 py-2 rounded text-sm hover:bg-white/50">
           Case managers
         </button>

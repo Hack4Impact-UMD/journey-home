@@ -1,30 +1,53 @@
 "use client";
+import React, { useState } from "react";
+import { Sidebar } from "../../components/Sidebar";
+import TopNav from "../../components/TopNav";
+import { Tabs } from "./Tabs";
+import { StockSidebar } from "./Stock_Sidebar";
 
-import SideNavbar from "@/components/SideNav";
-import TopNavbar from "@/components/TopNav";
-import { ReactNode } from "react";
+export default function InventoryLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [activeSection, setActiveSection] = useState("Inventory");
+  const [stockOpen, setStockOpen] = useState(false);
 
-export default function InventoryLayout({ children }: { children: ReactNode }) {
-    return (
-        <>  
-            <div className="h-full w-full flex flex-col">
-                <TopNavbar/>
-                <div className="flex flex-1">
-                    <SideNavbar/>
-                    <div className="flex-1  bg-[#F7F7F7] py-4 px-6 flex flex-col">
-                        <span className="text-2xl text-primary font-extrabold block">Inventory</span>
-                        <div className="flex gap-8 text-sm">
-                            <a className="py-4 border-b-2 border-primary text-primary" href="/inventory/warehouse">Warehouse</a>
-                            <a className="py-4" href="/inventory/donation-requests">Donation Requests</a>
-                            <a className="py-4" href="/inventory/approved-donations">Approved Donations</a>
-                            <a className="py-4" href="/inventory/denied-donations">Denied Donations</a>
-                        </div>
-                        <div className="bg-background rounded-xl my-2 flex-1 py-4 px-6">
-                            { children }
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </>
-    );
+  return (
+    <div className="flex h-screen bg-gray-100">
+      {/* LEFT SIDEBAR */}
+      <Sidebar 
+        activeSection={activeSection} 
+        setActiveSection={setActiveSection} 
+      />
+      
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* TOP NAVBAR */}
+        <TopNav />
+        
+        {/* INVENTORY HEADER + TABS */}
+        <div className="bg-white border-b border-gray-200 p-6 flex-shrink-0">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-2xl font-bold text-cyan-500">Inventory</h1>
+            
+            <button 
+              onClick={() => setStockOpen(true)}
+              className="p-2 hover:bg-gray-100 rounded-lg text-gray-600 font-medium text-xl"
+            >
+              ☰
+            </button>
+          </div>
+          
+          <Tabs />
+        </div>
+        
+        {/* SCROLLABLE CONTENT */}
+        <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+          {children}
+        </div>
+      </div>
+      
+      <StockSidebar isOpen={stockOpen} onClose={() => setStockOpen(false)} />
+    </div>
+  );
 }
