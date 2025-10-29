@@ -3,17 +3,82 @@
 import { useDonorForm } from "../DonorFormContext";
 import StepIndicator from "../components/StepIndicator";
 import Button from "../components/Button";
+import { Timestamp } from "firebase/firestore";
+import { createDonationRequest } from "../../../lib/services/donations";
+import { v4 as uuidv4 } from "uuid";
+import { DonationRequest, DonationItem } from "../../../types/donations";
+
+
 
 export default function Step3Review() {
   const { formState, setCurrentStep } = useDonorForm();
 
+  type FormDonationItem = {
+    name: string;
+    category: string;
+    size: string;
+    quantity: number;
+    notes?: string;
+    photos?: string[];
+  };
   const handleBack = () => {
     setCurrentStep(2);
   };
 
-  const handleSubmit = () => {
-    // TODO: Handle form submission to backend
-    setCurrentStep(4);
+  const handleSubmit = async () => {
+    try {
+      const donor = {
+        firstName: formState.donorInfo.firstName ?? "",
+        lastName: formState.donorInfo.lastName ?? "",
+        email: formState.donorInfo.email ?? "",
+        phoneNumber: formState.donorInfo.phoneNumber ?? "",
+        address: formState.donorInfo.address ?? {
+          streetAddress: "",
+          city: "",
+          state: "",
+          zipCode: ""
+        },
+      };
+
+      const validSizes = ["Small", "Medium", "Large"] as const;
+      type Size = (typeof validSizes)[number];
+      const items: DonationItem[] = (formState.donationItems as FormDonationItem[]).map((item) => {
+        const size = validSizes.includes(item.size as Size) ? (item.size as Size) : "Medium";
+
+        return {
+          item: {
+            id: uuidv4(),
+            name: item.name ?? "",
+            category: item.category ?? "",
+            size,
+            quantity: item.quantity ?? 1,
+            notes: item.notes ?? "",
+            dateAdded: Timestamp.now(),
+            donorEmail: donor.email,
+            photos: (item.photos ?? []).map((p) => ({ url: p, altText: "" })),
+          },
+          status: "Not Reviewed" as const,
+        };
+      });
+
+      const request: DonationRequest = {
+        donor,
+        firstTimeDonor: formState.firstTimeDonor ?? true,
+        howDidYouHear: formState.howDidYouHear ?? "",
+        canDropOff: formState.canDropOff ?? false,
+        notes: formState.notes ?? "",
+        date: Timestamp.now(),
+        items,
+      };
+
+      const docId = await createDonationRequest(request);
+      console.log("Donation request created with ID:", docId);
+
+      setCurrentStep(4);
+    } catch (error) {
+      console.error("Error submitting donation request:", error);
+      alert("There was a problem submitting your donation. Please try again.");
+    }
   };
 
   return (
