@@ -1,7 +1,6 @@
 import { db } from "../firebase";
 import { collection, doc, getDoc, setDoc, addDoc, Timestamp } from "firebase/firestore";
-import { v4 as uuidv4 } from "uuid";
-import { DonationRequest, DonorInfo, DonationItem } from "../../types/donations";
+import { DonationRequest, DonorInfo } from "../../types/donations";
 
 const DONATIONS_COLLECTION = "donation-requests";
 const DONORS_COLLECTION = "donors";
@@ -19,9 +18,6 @@ export async function addDonorIfNotExists(
 
   if (!donorSnap.exists()) {
     await setDoc(donorRef, donor);
-    console.log(`Added new donor: ${donor.email}`);
-  } else {
-    console.log(`Donor already exists: ${donor.email}`);
   }
 }
 
@@ -34,16 +30,7 @@ export async function createDonationRequest(request: DonationRequest): Promise<s
     notes: request.notes,
   });
 
-  const itemsWithIds: DonationItem[] = request.items.map((donationItem) => ({
-    ...donationItem,
-    item: {
-      ...donationItem.item,
-      id: uuidv4(),
-      dateAdded: donationItem.item.dateAdded ?? Timestamp.now(),
-      donorEmail: request.donor.email,
-    },
-  }));
-
+  // Items already have IDs generated in Step3Review
   const donationDoc = {
     donor: request.donor,
     firstTimeDonor: request.firstTimeDonor,
@@ -51,10 +38,9 @@ export async function createDonationRequest(request: DonationRequest): Promise<s
     canDropOff: request.canDropOff,
     notes: request.notes ?? "",
     date: request.date ?? Timestamp.now(),
-    items: itemsWithIds,
+    items: request.items,
   };
 
   const docRef = await addDoc(collection(db, DONATIONS_COLLECTION), donationDoc);
-  console.log(`Donation request created: ${docRef.id}`);
   return docRef.id;
 }

@@ -5,22 +5,20 @@ import StepIndicator from "../components/StepIndicator";
 import Button from "../components/Button";
 import { Timestamp } from "firebase/firestore";
 import { createDonationRequest } from "../../../lib/services/donations";
-import { v4 as uuidv4 } from "uuid";
 import { DonationRequest, DonationItem } from "../../../types/donations";
 
-
+type FormDonationItem = {
+  name?: string;
+  category?: string;
+  size?: string;
+  quantity?: number;
+  notes?: string;
+  photos?: string[];
+};
 
 export default function Step3Review() {
   const { formState, setCurrentStep } = useDonorForm();
 
-  type FormDonationItem = {
-    name: string;
-    category: string;
-    size: string;
-    quantity: number;
-    notes?: string;
-    photos?: string[];
-  };
   const handleBack = () => {
     setCurrentStep(2);
   };
@@ -35,35 +33,37 @@ export default function Step3Review() {
         address: formState.donorInfo.address ?? {
           streetAddress: "",
           city: "",
-          state: "",
+          state: "CT",
           zipCode: ""
         },
       };
 
-      const validSizes = ["Small", "Medium", "Large"] as const;
-      type Size = (typeof validSizes)[number];
-      const items: DonationItem[] = (formState.donationItems as FormDonationItem[]).map((item) => {
-        const size = validSizes.includes(item.size as Size) ? (item.size as Size) : "Medium";
-
+      const validSizes = ["Small", "Medium", "Large"];
+      const items: DonationItem[] = formState.donationItems.map((donationItem) => {
+        const formItem = donationItem as FormDonationItem;
+        const size = formItem.size && validSizes.includes(formItem.size) ? formItem.size : "Medium";
+        
         return {
           item: {
-            id: uuidv4(),
-            name: item.name ?? "",
-            category: item.category ?? "",
-            size,
-            quantity: item.quantity ?? 1,
-            notes: item.notes ?? "",
+            id: crypto.randomUUID(),
+            name: formItem.name ?? "",
+            category: formItem.category ?? "",
+            size: size as "Small" | "Medium" | "Large",
+            quantity: formItem.quantity ?? 1,
+            notes: formItem.notes ?? "",
             dateAdded: Timestamp.now(),
             donorEmail: donor.email,
-            photos: (item.photos ?? []).map((p) => ({ url: p, altText: "" })),
+            photos: (formItem.photos ?? []).map((p: string) => ({ url: p, altText: formItem.name ?? "" })),
           },
           status: "Not Reviewed" as const,
         };
       });
 
+      const isFirstTimeDonor = formState.firstTimeDonor === null ? true : formState.firstTimeDonor;
+
       const request: DonationRequest = {
         donor,
-        firstTimeDonor: formState.firstTimeDonor ?? true,
+        firstTimeDonor: isFirstTimeDonor,
         howDidYouHear: formState.howDidYouHear ?? "",
         canDropOff: formState.canDropOff ?? false,
         notes: formState.notes ?? "",
@@ -71,12 +71,9 @@ export default function Step3Review() {
         items,
       };
 
-      const docId = await createDonationRequest(request);
-      console.log("Donation request created with ID:", docId);
-
+      await createDonationRequest(request);
       setCurrentStep(4);
-    } catch (error) {
-      console.error("Error submitting donation request:", error);
+    } catch {
       alert("There was a problem submitting your donation. Please try again.");
     }
   };
@@ -145,33 +142,33 @@ export default function Step3Review() {
               </div>
               <div className="grid grid-cols-2 gap-y-6 p-6">
                 <div className="font-semibold text-gray-900">Short Description</div>
-                <div className="text-gray-700">{(item as any).name || "N/A"}</div>
+                <div className="text-gray-700">{(item as FormDonationItem).name || "N/A"}</div>
                 
                 <div className="font-semibold text-gray-900">Category</div>
-                <div className="text-gray-700">{(item as any).category || "N/A"}</div>
+                <div className="text-gray-700">{(item as FormDonationItem).category || "N/A"}</div>
                 
                 <div className="font-semibold text-gray-900">Size</div>
-                <div className="text-gray-700">{(item as any).size || "N/A"}</div>
+                <div className="text-gray-700">{(item as FormDonationItem).size || "N/A"}</div>
                 
                 <div className="font-semibold text-gray-900">Quantity</div>
-                <div className="text-gray-700">{(item as any).quantity || "N/A"}</div>
+                <div className="text-gray-700">{(item as FormDonationItem).quantity || "N/A"}</div>
                 
-                {(item as any).notes && (
+                {(item as FormDonationItem).notes && (
                   <>
                     <div className="font-semibold text-gray-900">Notes</div>
-                    <div className="text-gray-700">{(item as any).notes}</div>
+                    <div className="text-gray-700">{(item as FormDonationItem).notes}</div>
                   </>
                 )}
                 
-                {(item as any).photos && (item as any).photos.length > 0 && (
+                {(item as FormDonationItem).photos && (item as FormDonationItem).photos!.length > 0 && (
                   <>
                     <div className="font-semibold text-gray-900">Photos</div>
                     <div className="flex gap-4">
-                      {(item as any).photos.slice(0, 3).map((photo: any, photoIndex: number) => (
+                      {(item as FormDonationItem).photos!.slice(0, 3).map((photo: string, photoIndex: number) => (
                         <div key={photoIndex} className="w-24 h-24 border rounded overflow-hidden">
                           <img
-                            src={photo.url}
-                            alt={photo.altText}
+                            src={photo}
+                            alt="Donation item"
                             className="w-full h-full object-cover"
                           />
                         </div>

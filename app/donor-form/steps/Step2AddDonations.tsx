@@ -8,14 +8,15 @@ import FormSelect from "../components/FormSelect";
 import FormTextarea from "../components/FormTextarea";
 import Button from "../components/Button";
 
+type DonationInputValue = string | number | undefined;
+
 export default function Step2AddDonations() {
   const { formState, setCurrentStep, addDonationItem, removeDonationItem, updateDonationItem } = useDonorForm();
   const [showFullList, setShowFullList] = useState(false);
   
-  // Local state for donation items input
-  const [donationInputs, setDonationInputs] = useState<Record<string, any>>({});
+  const [donationInputs, setDonationInputs] = useState<Record<string, DonationInputValue>>({});
   
-  const updateDonationInput = (index: number, field: string, value: any) => {
+  const updateDonationInput = (index: number, field: string, value: DonationInputValue) => {
     const key = `item-${index}-${field}`;
     setDonationInputs(prev => ({
       ...prev,
@@ -121,7 +122,11 @@ export default function Step2AddDonations() {
               We do <span className="font-extrabold">not</span> accept the following items:
             </p>
             <ul className="list-disc ml-6 space-y-1">
-              <li>Sofa beds</li>
+              <li>Sleeper/recliner sofas</li>
+              <li>Glass-topped tables</li>
+              <li>Electronic chairs</li>
+              <li>Stained/ripped sofas, mattresses, armchairs (or anything not gently used)</li>
+              <li>Bed frames with headboards or footboards</li>
             </ul>
           </div>
         </div>
@@ -157,6 +162,7 @@ export default function Step2AddDonations() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
+                    //svg path for the icon
                     d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                   />
                 </svg>
@@ -167,14 +173,14 @@ export default function Step2AddDonations() {
           <div className="space-y-4">
             <FormInput
               label="Short description (1-3 words)"
-              value={donationInputs[`item-${index}-name`] || ""}
+              value={String(donationInputs[`item-${index}-name`] || "")}
               onChange={(e) => updateDonationInput(index, "name", e.target.value)}
             />
 
             <FormSelect
               label="Category"
               required
-              value={donationInputs[`item-${index}-category`] || ""}
+              value={String(donationInputs[`item-${index}-category`] || "")}
               onChange={(e) => updateDonationInput(index, "category", e.target.value)}
               options={categoryOptions}
             />
@@ -183,7 +189,7 @@ export default function Step2AddDonations() {
               <FormSelect
                 label="Size"
                 required
-                value={donationInputs[`item-${index}-size`] || ""}
+                value={String(donationInputs[`item-${index}-size`] || "")}
                 onChange={(e) => updateDonationInput(index, "size", e.target.value)}
                 options={sizeOptions}
               />
@@ -192,14 +198,14 @@ export default function Step2AddDonations() {
                 label="Quantity"
                 required
                 type="number"
-                value={donationInputs[`item-${index}-quantity`] || ""}
+                value={String(donationInputs[`item-${index}-quantity`] || "")}
                 onChange={(e) => updateDonationInput(index, "quantity", parseInt(e.target.value) || 0)}
               />
             </div>
 
             <FormTextarea
               label="Notes"
-              value={donationInputs[`item-${index}-notes`] || ""}
+              value={String(donationInputs[`item-${index}-notes`] || "")}
               onChange={(e) => updateDonationInput(index, "notes", e.target.value)}
               rows={3}
             />
@@ -218,6 +224,7 @@ export default function Step2AddDonations() {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
+                      //svg path for the icon 
                       d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                     />
                   </svg>
