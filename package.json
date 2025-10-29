@@ -32,7 +32,8 @@
     "firebase": "^10.13.0",
     "next": "15.5.3",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -41,9 +42,10 @@
     "@types/node": "^20",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
+    "@types/uuid": "^10.0.0",
     "eslint": "^9",
     "eslint-config-next": "15.5.3",
-    "firebase-tools": "^13.0.0",
+    "firebase-tools": "^13.35.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
