@@ -18,10 +18,7 @@ const ITEMS: InventoryRecord[] = [
 ];
 
 export default function WarehousePage() {
-  // search results from SearchBar (null = show all)
   const [results, setResults] = useState<InventoryRecord[] | null>(null);
-
-  // filters + sort
   const [filters, setFilters] = useState({ category: "Any", size: "Any", inStockOnly: false });
   const [sortBy, setSortBy] = useState<SortKey>("Highest stock");
 
@@ -34,17 +31,20 @@ export default function WarehousePage() {
 
   return (
     <div className="p-6 flex flex-1 flex-col h-[calc(80vh-5rem)] min-h-0 overflow-hidden">
-      <div className="mb-6 flex flex-col gap-3">
-        <div className="flex items-center gap-3">
+      {/* Top bar: Search left, Filters right */}
+      <div className="mb-6 flex items-center justify-between gap-4">
+        <div className="flex-1 max-w-lg">
           <SearchBar setResults={setResults} />
         </div>
-        <FilterBar
-          filters={filters}
-          onFiltersChange={setFilters}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          categories={categories}
-        />
+        <div className="flex items-center gap-3">
+          <FilterBar
+            filters={filters}
+            onFiltersChange={setFilters}
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+            categories={categories}
+          />
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto min-h-0">
