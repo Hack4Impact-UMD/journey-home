@@ -18,7 +18,7 @@ export default function WarehousePage() {
     const [results, setResults] = useState<InventoryRecord[] | null>(null);
 
     //this will be changed when the adding functionality is implemented. for now, the purpose of this is to just see what the gallery looks like and when search 
-    //is executed, nothing should show up since nothing is stored in firebase. 
+    //is executed, nothing should show up since nothing is stored in firebase.  
     const itemsToDisplay = results === null ? ITEMS : results;
     return (
          <div className="p-6 flex flex-1 flex-col h-[calc(80vh-5rem)] min-h-0 overflow-hidden">
