@@ -29,7 +29,9 @@
     "test:all": "npm run test && npm run functions:test"
   },
   "dependencies": {
+    "clsx": "^2.1.1",
     "firebase": "^10.13.0",
+    "lucide-react": "^0.548.0",
     "next": "15.5.3",
     "react": "19.1.0",
     "react-dom": "19.1.0"
