@@ -17,7 +17,7 @@ export default function SignUpPage() {
         <img
           src="/background.png"
           alt="Login Background"
-          className="h-[843px] w-[492px] object-cover object-left"
+          className="h-[52em] w-[30em] object-cover object-left"
         />
       </div>
 
