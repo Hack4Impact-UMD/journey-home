@@ -1,60 +1,35 @@
-"use client"
-import { Timestamp } from "firebase/firestore";
-import { search } from "../lib/services/inventory";
-import { InventoryRecord, SearchParams } from "../types/inventory";
+"use client";
 import { useState } from "react";
 
-interface SearchBarProps {
-  ITEMS: InventoryRecord[];
-  setResults: (results: InventoryRecord[]) => void;
-}
+export default function SearchBar({
+  onSearch,
+}: {
+  onSearch: (query: string) => Promise<void> | void;
+}) {
+  const [q, setQ] = useState("");
 
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSearch(q);
+  };
 
-const ITEMS: InventoryRecord[] = [
-    { id: "1", name: "item1", photos: [], category: "Couches", notes: "N/A", quantity: 1, size: "Large", dateAdded: Timestamp.fromDate(new Date("2025-10-27T16:00:00Z")), donorEmail: null},
-    { id: "2", name: "item2", photos: [], category: "Chairs", notes: "N/A", quantity: 1, size: "Medium", dateAdded: Timestamp.fromDate(new Date("2025-10-28T16:00:00Z")), donorEmail: null},
-    { id: "3", name: "item3", photos: [], category: "Tables", notes: "N/A", quantity: 1, size: "Small", dateAdded: Timestamp.fromDate(new Date("2025-10-29T16:00:00Z")), donorEmail: null},
-    { id: "4", name: "item4", photos: [], category: "Tables", notes: "N/A", quantity: 1, size: "Small", dateAdded: Timestamp.fromDate(new Date("2025-10-30T16:00:00Z")), donorEmail: null},
-    { id: "5", name: "item5", photos: [], category: "Tables", notes: "N/A", quantity: 1, size: "Small", dateAdded: Timestamp.fromDate(new Date("2025-10-31T16:00:00Z")), donorEmail: null},
-];
-
-const params: SearchParams = {
-    categories: [],   
-    sizes: [],        
-    sortBy: "Name",   
-    ascending: true   
-};
-
-export default function SearchBar({setResults}: {setResults: React.Dispatch<React.SetStateAction<InventoryRecord[] | null>>;}) {
-    const [searchQuery, setQuery] = useState("");
-
-    const handleSearch = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        try {
-            const res = await search(searchQuery, params);
-            setResults(res);
-            console.log("it's doing something!!!!")
-        } catch (err) {
-            console.error("Search failed", err);
-        }
-    };
-        
-    return (
-        <form onSubmit={handleSearch}>
-            <div className="w-96 border border-gray-300 flex flex-row">
-                <input
-                    type="text"
-                    placeholder="Search"
-                    value={searchQuery} 
-                    onChange={(e) => setQuery(e.target.value)}
-                    className="flex-1 border border-gray-200 px-3 py-2 text-xl placeholder-gray-300 font-normal"
-                />
-
-                <button type="submit" className=" text-black border border-gray-300 px-4 py-2">
-                    Search
-                </button>
-            </div> 
-       </form>
-    )
+  return (
+    <form onSubmit={submit} className="flex">
+      <input
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        placeholder="Search"
+        className="h-10 w-full rounded-l-[2px] border border-gray-300 bg-white px-3 text-sm outline-none"
+      />
+      <button
+        type="submit"
+        onClick={() => onSearch(q)}
+        className="h-10 rounded-r-[2px] border border-l-0 border-gray-300 bg-white px-3 text-sm hover:bg-gray-50"
+        aria-label="Search"
+      >
+        {/* magnifier icon could live here if you have one */}
+        Q
+      </button>
+    </form>
+  );
 }
