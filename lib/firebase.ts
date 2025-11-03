@@ -1,7 +1,7 @@
-import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
+import { initializeApp } from 'firebase/app';
 import { connectAuthEmulator, getAuth } from 'firebase/auth';
-import { getFirestore, connectFirestoreEmulator, Firestore } from 'firebase/firestore';
-import { getStorage, connectStorageEmulator, FirebaseStorage } from 'firebase/storage';
+import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { getStorage, connectStorageEmulator } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -37,10 +37,6 @@ if(process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true' && typeof window !==
   `http://${process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_HOST ?? 'localhost'}:${process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_AUTH_PORT ?? '9099'}`
   );
 
-  connectAuthEmulator(
-  auth,
-  `http://${process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_HOST ?? 'localhost'}:${process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_AUTH_PORT ?? '9099'}`
-  );
 }
 
 export { app, db, storage, auth};

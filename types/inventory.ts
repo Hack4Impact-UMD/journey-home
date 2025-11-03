@@ -1,26 +1,25 @@
-export interface InventoryPhoto {
-  url: string;
-  altText: string;
-}
+import { Timestamp } from "firebase/firestore";
 
-export interface InventoryRecordData {
-  name: string;
-  thumbnail: InventoryPhoto;
-  otherPhotos: InventoryPhoto[];
-  category: string;
-  notes: string;
-  quantity: number;
-  dateAdded: Date;
-}
+export type InventoryPhoto = {
+  url: string,
+  altText: string,
+};
 
-export interface InventoryRecord extends InventoryRecordData {
-  id: string; // this is the document ID assigned by Firebase
-}
+export type InventoryRecord = {
+  id: string,
+  name: string,
+  photos: InventoryPhoto[],
+  category: string,
+  notes: string,
+  quantity: number,
+  size: "Small" | "Medium" | "Large",
+  dateAdded: Timestamp,
+  donorEmail: string | null,
+};
 
-export type SearchFilters = {
-  categories: string[];
-  minStock: number | undefined;
-  maxStock: number | undefined;
-  beforeDate: Date | undefined;
-  afterDate: Date | undefined;
+export type SearchParams = {
+  categories: string[],
+  sizes: string[],
+  sortBy: "Quantity" | "Date" | "Name",
+  ascending: boolean
 };
