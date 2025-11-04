@@ -4,9 +4,10 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import LongButton from '../../components/longButton';
-import InputBox from '../../components/inputBox';
+import LongButton from '@/components/auth/LongButton';
+import InputBox from '../../components/auth/InputBox';
 import { FirebaseError } from 'firebase/app';
+import { login } from '@/lib/services/auth';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,29 +22,13 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await signInWithEmailAndPassword(auth, email.trim(), password.trim());
-      router.push('/inventory');
-    } catch (err: unknown) {
-      if (err instanceof FirebaseError) {
-        switch (err.code) {
-          case 'auth/invalid-email':
-            setError('Invalid email format.');
-            break;
-          case 'auth/user-not-found':
-            setError('No user found with this email.');
-            break;
-          case 'auth/wrong-password':
-            setError('Incorrect password.');
-            break;
-          default:
-            setError('Failed to log in. Please try again.');
-        }
-      } else {
-        setError('Failed to log in. Please try again.');
-      }
-    } finally {
-      setLoading(false);
+      await login(email, password);
+      router.push("/inventory");
+    } catch (e: unknown) {
+      console.error("Login failed:", e);
+      setError((e as FirebaseError).message);
     }
+    setLoading(false);
   };
 
   return (
@@ -59,7 +44,7 @@ export default function LoginPage() {
       <div className="flex-1 flex items-center justify-center">
         <form
           onSubmit={handleLogin}
-          className="w-[28em] h-[35em] flex flex-col text-black space-y-[1.2em]"
+          className="w-[24em] h-[35em] flex flex-col text-black space-y-[1.2em]"
         >
           <div className="flex justify-center">
             <img
@@ -69,13 +54,13 @@ export default function LoginPage() {
             />
           </div>
 
-          <h1 className="font-bold text-[1.5em] text-center font-raleway mt-[1em]">
+          <h1 className="font-bold text-2xl text-center font-raleway mt-4">
             Welcome Back!
           </h1>
 
-          <div className="font-opensans flex flex-col items-center space-y-[1em]">
-            <div className="w-full">
-              <p className="text-[1em] mb-[0.3em]">Email</p>
+          <div className="flex flex-col items-center font-family-roboto">
+            <div className="w-full mb-6">
+              <p className="text-sm mb-2">Email</p>
               <InputBox
                 value={email}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -86,7 +71,7 @@ export default function LoginPage() {
             </div>
 
             <div className="w-full">
-              <p className="text-[1em] mb-[0.3em]">Password</p>
+              <p className="text-sm mb-2">Password</p>
               <InputBox
                 type="password"
                 value={password}
@@ -97,8 +82,8 @@ export default function LoginPage() {
               />
             </div>
 
-            <div className="w-full flex justify-end">
-              <p className="text-[1em] mb-[1em] cursor-pointer hover:underline">
+            <div className="w-full flex justify-end mt-2 mb-8">
+              <p className="mb-4 cursor-pointer hover:underline text-sm">
                 Forgot Password?
               </p>
             </div>

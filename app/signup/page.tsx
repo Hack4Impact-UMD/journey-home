@@ -1,29 +1,29 @@
 "use client"
 import { useState } from "react";
-import PickRole from "./chooseRole";
-import SignUpInformation from "./signupInfoFields";
+import PickRole from "./PickRole";
+import SignUpInformation from "./SignUpInformation";
+import { UserRole } from "@/types/user";
 
-type Role = "Administrator" | "Case Manager" | "Volunteer";
 type Step = "pick" | "form";
 
 export default function SignUpPage() {
   const [step, setStep] = useState<Step>("pick");
-  const [role, setRole] = useState<Role | null>("Administrator");
+  const [role, setRole] = useState<UserRole>("Volunteer");
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="bg-background flex h-full">
       {/* image on the left */}
-      <div className="flex shrink-0 items-start justify-start">
+      <div className="flex shrink-0 items-start justify-start h-full">
         <img
           src="/background.png"
           alt="Login Background"
-          className="h-[52em] w-[30em] object-cover object-left"
+          className="h-[58em] w-[30em] object-cover object-left overflow-hidden"
         />
       </div>
 
       {/* RIGHT column */}
-      <div className="flex flex-1 flex-col px-6 py-10">
-        <div className="flex-1 flex items-start justify-center">
+      <div className="flex flex-1 flex-col h-full items-center justify-center">
+        <div className="flex items-center justify-center">
           {step === "pick" ? (
             <PickRole
               role={role}
@@ -32,7 +32,7 @@ export default function SignUpPage() {
             />
           ) : (
             <SignUpInformation
-              selectedRole={(role ?? "Administrator")}
+              selectedRole={(role)}
               onBack={() => setStep("pick")}
             />
           )}

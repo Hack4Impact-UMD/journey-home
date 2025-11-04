@@ -1,5 +1,11 @@
 import { useState } from 'react';
-import { InputBoxProps } from '../types/button';
+
+export interface InputBoxProps {
+  type?: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  logo?: string;
+}
 
 
 export default function InputBox({ type = 'text', value, onChange, logo}: InputBoxProps) {
@@ -10,12 +16,12 @@ export default function InputBox({ type = 'text', value, onChange, logo}: InputB
 
 
  return (
-   <div className="relative w-[452px] h-[46px]">
+   <div className="relative w-full h-8">
      {showLogo && (
        <img
          src={logo}
          alt="Logo placeholder"
-         className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 opacity-50 pointer-events-none"
+         className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50 pointer-events-none"
        />
      )}
      <input
@@ -24,7 +30,7 @@ export default function InputBox({ type = 'text', value, onChange, logo}: InputB
        onChange={onChange}
        onFocus={() => setIsFocused(true)}
        onBlur={() => setIsFocused(false)}
-       className={`border border-black rounded-[5px] text-[16px] w-full h-full p-2 ${
+       className={`border border-[#D9D9D9] rounded-xs text-sm w-full h-full p-2 ${
          showLogo ? 'pl-10' : 'pl-2'
        }`}
      />
