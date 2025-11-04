@@ -1,15 +1,35 @@
+"use client"
 
-type UserRoles = {
-    admin: boolean,
-    caseManager: boolean,
-    volunteer: boolean,
-    donor: boolean
-}
+import { User } from "firebase/auth";
+import { Timestamp } from "firebase/firestore"
 
-type User = {
+export type UserRole = "Admin" | "Case Manager" | "Volunteer";
+
+export type UserData = {
+    uid: string,
     firstName: string,
     lastName: string,
     email: string,
-    roles: UserRoles,
-
+    dob: Timestamp | null,
+    role: UserRole,
+    emailVerified: boolean
 }
+
+export interface AuthContextType {
+    currentUser: User | null;
+    userData: UserData | null;
+    loading: boolean;
+    signup: (
+        email: string,
+        password: string,
+        firstName: string,
+        lastName: string,
+        dob: string,
+        role: UserRole
+    ) => Promise<User>;
+    login: (
+        email: string, 
+        password: string
+    ) => Promise<User>;
+    logout: () => Promise<void>;
+  }

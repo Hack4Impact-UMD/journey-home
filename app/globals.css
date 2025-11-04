@@ -26,4 +26,9 @@
 
 body {
   background: var(--background);
+  font: var(--font-family-roboto)
+}
+
+button:hover {
+  cursor: pointer
 }
