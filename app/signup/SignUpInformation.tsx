@@ -38,7 +38,7 @@ export default function SignUpInformation({
             await signUp(email, pw, first, last, dob, selectedRole);
             router.push("/inventory");
 
-        } catch (e: any) {
+        } catch (e: unknown) {
             console.error("Signup failed:", e);
             setErr((e as FirebaseError).message);
         } finally {

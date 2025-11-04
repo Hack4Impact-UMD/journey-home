@@ -2,8 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
 import LongButton from '@/components/auth/LongButton';
 import InputBox from '../../components/auth/InputBox';
 import { FirebaseError } from 'firebase/app';

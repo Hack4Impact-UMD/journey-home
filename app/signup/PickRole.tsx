@@ -1,9 +1,6 @@
 "use client";
 
-import LongButton from "@/components/auth/LongButton";
 import { UserRole } from "@/types/user";
-
-type Role = "Administrator" | "Case Manager" | "Volunteer";
 
 export default function PickRole({
   role,
