@@ -1,14 +1,14 @@
 import { Timestamp } from "firebase/firestore"
 import { InventoryRecord } from "./inventory"
 
-type DonorAddress = {
+export type DonorAddress = {
     streetAddress: string,
     city: string,
     state: string,
     zipCode: string
 }
 
-type DonorInfo = {
+export type DonorInfo = {
     firstName: string,
     lastName: string,
     email: string,
@@ -16,12 +16,13 @@ type DonorInfo = {
     address: DonorAddress
 }
 
-type DonationItem = {
+export type DonationItem = {
     item: InventoryRecord, 
     status: "Not Reviewed" | "Approved" | "Denied" | "Acquired";
 }
 
-type DonationRequest = {
+export type DonationRequest = {
+    id: string, //added, would firebase still automatically generate it into here?
     donor: DonorInfo,
     firstTimeDonor: boolean,
     howDidYouHear: string,
@@ -30,3 +31,9 @@ type DonationRequest = {
     date: Timestamp,
     items: DonationItem[]
 }
+
+export type DonationSearchParams = {
+  status: string[]
+  sortBy: "Quantity" | "Date" | "Name",
+  ascending: boolean
+};
