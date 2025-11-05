@@ -5,6 +5,7 @@ import SearchBar from "@/components/SearchBar";
 import CategorySelect from "@/components/CategorySelect";
 import SizeSelect from "@/components/SizeSelect";
 import SortToggle, { SortKeyToggle } from "@/components/SortToggle";
+import NewItemButton from "@/components/NewItemButton";
 
 import type { InventoryRecord, SearchParams } from "@/types/inventory";
 import { Timestamp } from "firebase/firestore";
@@ -25,12 +26,16 @@ export default function WarehousePage() {
   const [size, setSize] = useState("Any");
   const [sortKey, setSortKey] = useState<SortKeyToggle>("Quantity");
   const [ascending, setAscending] = useState(false);
-  const params: SearchParams = useMemo(() => ({
-    categories: category === "Any" ? [] : [category],
-    sizes: size === "Any" ? [] : [size],
-    sortBy: sortKey === "Quantity" ? "Quantity" : "Date",
-    ascending,
-  }), [category, size, sortKey, ascending]);
+
+  const params: SearchParams = useMemo(
+    () => ({
+      categories: category === "Any" ? [] : [category],
+      sizes: size === "Any" ? [] : [size],
+      sortBy: sortKey === "Quantity" ? "Quantity" : "Date",
+      ascending,
+    }),
+    [category, size, sortKey, ascending]
+  );
 
   const localFilterAndSort = useCallback((q: string, p: SearchParams) => {
     const query = q.toLowerCase().trim();
@@ -47,14 +52,18 @@ export default function WarehousePage() {
       return p.ascending ? d : -d;
     });
   }, []);
-  const onSearch = useCallback(async (q: string) => {
-    try {
-      const data = await searchBackend(q, params);
-      setResults(data);
-    } catch {
-      setResults(localFilterAndSort(q, params)); // fallback to local data
-    }
-  }, [params, localFilterAndSort]);
+
+  const onSearch = useCallback(
+    async (q: string) => {
+      try {
+        const data = await searchBackend(q, params);
+        setResults(data);
+      } catch {
+        setResults(localFilterAndSort(q, params)); // fallback to local data
+      }
+    },
+    [params, localFilterAndSort]
+  );
 
   const itemsToDisplay = results ?? ITEMS;
 
@@ -72,6 +81,14 @@ export default function WarehousePage() {
           ascending={ascending}
           onChange={(k, asc) => { setSortKey(k); setAscending(asc); }}
         />
+        {/* New Item button pinned to the right */}
+        <div className="ml-auto">
+          <NewItemButton
+            onCreated={(record) => {
+              setResults((prev) => [record, ...(prev ?? ITEMS)]);
+            }}
+          />
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto min-h-0">
