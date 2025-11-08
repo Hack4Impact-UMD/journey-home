@@ -43,7 +43,7 @@ export default function SortToggle({
   };
 
   return (
-    <div className="inline-flex items-center gap-3">
+    <div className="inline-flex items-center gap-2">
       <Chip label="Quantity" />
       <Chip label="Date" />
     </div>

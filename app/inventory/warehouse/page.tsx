@@ -68,10 +68,10 @@ export default function WarehousePage() {
   const itemsToDisplay = results ?? ITEMS;
 
   return (
-    <div className="p-6 flex flex-1 flex-col h-[calc(80vh-5rem)] min-h-0 overflow-hidden">
+    <div className="p-6 flex flex-wrap flex-1 flex-col h-[calc(80vh-5rem)] min-h-0 overflow-hidden">
       {/* toolbar: tight alignment */}
-      <div className="mb-6 flex items-center gap-3">
-        <div className="flex-1 max-w-lg">
+      <div className="mb-6 flex gap-2 flex-row items-center justify-start">
+        <div>
           <SearchBar onSearch={onSearch} />
         </div>
         <CategorySelect value={category} onChange={setCategory} />
@@ -82,16 +82,16 @@ export default function WarehousePage() {
           onChange={(k, asc) => { setSortKey(k); setAscending(asc); }}
         />
         {/* New Item button pinned to the right */}
-        <div className="ml-auto">
-          <NewItemButton
-            onCreated={(record) => {
-              setResults((prev) => [record, ...(prev ?? ITEMS)]);
-            }}
-          />
-        </div>
+        
+        <NewItemButton
+          onCreated={(record) => {
+            setResults((prev) => [record, ...(prev ?? ITEMS)]);
+          }}
+        />
+
       </div>
 
-      <div className="flex-1 overflow-y-auto min-h-0">
+      <div className="flex-1 flex-wrap overflow-y-auto min-h-0">
         <div className="grid grid-cols-4 gap-6">
           {itemsToDisplay.map((item) => (
             <GalleryItem key={item.id} item={item} />
