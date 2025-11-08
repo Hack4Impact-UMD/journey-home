@@ -68,7 +68,7 @@ export default function Step2AddDonations() {
               <li>Sheets</li>
               <li>Blankets/comforters</li>
               <li>Bath towels/hand towels/washcloths</li>
-              {showFullList && (
+              {showFullList ? (
                 <>
                   <li>Shower curtains/rings/liners</li>
                   <li>Shower curtain rods</li>
@@ -94,12 +94,13 @@ export default function Step2AddDonations() {
                   <li>Laundry baskets</li>
                   <li>Plungers</li>
                   <li>Sponges</li>
-                </>
-              )}
+                </>) : 
+                <li>...</li>
+              }
             </ul>
             <button
               onClick={() => setShowFullList(!showFullList)}
-              className="text-gray-500 mt-2 hover:text-gray-700"
+              className="text-gray-500 mt-2 hover:text-gray-700 cursor-pointer"
             >
               {showFullList ? "Collapse list" : "Expand for full list"}
             </button>
@@ -188,7 +189,7 @@ export default function Step2AddDonations() {
                   label="Quantity"
                   required
                   type="number"
-                min={0}
+                  min={0}
                   value={item.quantity?.toString() ?? ""}
                   onChange={(e) => {
                     const rawValue = e.target.value;
@@ -249,7 +250,7 @@ export default function Step2AddDonations() {
       <div className="border border-gray-300 rounded-t cursor-pointer">
         <button
           onClick={addDonationItem}
-          className="w-full py-2 px-4 flex items-center justify-center gap-2 bg-gray-50 hover:bg-gray-100"
+          className="w-full py-2 px-4 flex items-center cursor-pointer justify-center gap-2 bg-gray-50 hover:bg-gray-100"
         >
           <svg
             className="w-5 h-5"

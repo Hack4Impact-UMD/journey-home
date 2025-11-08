@@ -130,11 +130,11 @@ export default function Step3Review() {
           <p className="text-gray-500">No donation items added</p>
         </div>
       ) : (
-        <div className="border border-gray-300 rounded mb-6">
+        <div className="rounded mb-6">
           {formState.donationItems.map((item, index) => (
             <div
               key={item.id}
-              className={index > 0 ? "border-t border-gray-200 mt-6 pt-6" : ""}
+              className="border border-[#D9D9D9] mt-6"
             >
               <div className="bg-gray-100 px-6 py-4">
                 <h3 className="font-semibold text-gray-900">Item {index + 1}</h3>

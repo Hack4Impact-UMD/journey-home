@@ -22,8 +22,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${openSans.variable} ${raleway.variable} ${roboto.variable} w-full`}>
-      <body className="w-full font-family-roboto">
+    <html lang="en" className={`${openSans.variable} ${raleway.variable} ${roboto.variable} w-full h-full overscroll-none`}>
+      <body className="w-full h-full font-family-roboto">
         {children}
       </body>
     </html>

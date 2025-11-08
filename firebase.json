@@ -30,10 +30,7 @@
       "enabled": true,
       "port": 4000
     },
-    "singleProjectMode": true,
-    "hosting": {
-      "port": 6001
-    }
+    "singleProjectMode": true
   },
   "hosting": {
     "public": "out",
