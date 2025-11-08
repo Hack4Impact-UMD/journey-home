@@ -1,6 +1,6 @@
 "use client";
 
-import Button from "../components/Button";
+import Button from "../../../components/form/Button";
 
 export default function Step4Confirmation() {
   return (

@@ -7,6 +7,7 @@ interface FormInputProps {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   type?: string;
   className?: string;
+  min?: number;
 }
 
 export default function FormInput({
@@ -16,6 +17,7 @@ export default function FormInput({
   onChange,
   type = "text",
   className = "",
+  min,
 }: FormInputProps) {
   return (
     <div className={className}>
@@ -27,6 +29,7 @@ export default function FormInput({
         type={type}
         value={value}
         onChange={onChange}
+        min={min}
         className="w-full border border-gray-300 rounded px-3 py-2"
       />
     </div>

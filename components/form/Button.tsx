@@ -21,7 +21,7 @@ export default function Button({
     <button
       type={type}
       onClick={onClick}
-      className={`px-4 py-2 rounded border ${
+      className={`px-4 py-2 rounded border cursor-pointer ${
         isPrimary
           ? "bg-primary border-primary text-white"
           : "bg-white border-gray-300 text-gray-700"

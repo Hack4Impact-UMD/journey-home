@@ -5,7 +5,7 @@ interface FormSelectProps {
   required?: boolean;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  options: { value: string; label: string }[];
+  options: string[];
   className?: string;
 }
 
@@ -30,8 +30,8 @@ export default function FormSelect({
       >
         <option value="">Select</option>
         {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
+          <option key={option} value={option}>
+            {option}
           </option>
         ))}
       </select>

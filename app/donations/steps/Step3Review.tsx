@@ -1,20 +1,11 @@
 "use client";
 
 import { useDonorForm } from "../DonorFormContext";
-import StepIndicator from "../components/StepIndicator";
-import Button from "../components/Button";
+import StepIndicator from "../../../components/form/StepIndicator";
+import Button from "../../../components/form/Button";
 import { Timestamp } from "firebase/firestore";
 import { createDonationRequest } from "../../../lib/services/donations";
 import { DonationRequest, DonationItem } from "../../../types/donations";
-
-type FormDonationItem = {
-  name?: string;
-  category?: string;
-  size?: string;
-  quantity?: number;
-  notes?: string;
-  photos?: string[];
-};
 
 export default function Step3Review() {
   const { formState, setCurrentStep } = useDonorForm();
@@ -40,20 +31,25 @@ export default function Step3Review() {
 
       const validSizes = ["Small", "Medium", "Large"];
       const items: DonationItem[] = formState.donationItems.map((donationItem) => {
-        const formItem = donationItem as FormDonationItem;
-        const size = formItem.size && validSizes.includes(formItem.size) ? formItem.size : "Medium";
-        
+        const size =
+          donationItem.size && validSizes.includes(donationItem.size)
+            ? donationItem.size
+            : "Medium";
+
         return {
           item: {
             id: crypto.randomUUID(),
-            name: formItem.name ?? "",
-            category: formItem.category ?? "",
+            name: donationItem.name ?? "",
+            category: donationItem.category ?? "",
             size: size as "Small" | "Medium" | "Large",
-            quantity: formItem.quantity ?? 1,
-            notes: formItem.notes ?? "",
+            quantity: donationItem.quantity ?? 1,
+            notes: donationItem.notes ?? "",
             dateAdded: Timestamp.now(),
             donorEmail: donor.email,
-            photos: (formItem.photos ?? []).map((p: string) => ({ url: p, altText: formItem.name ?? "" })),
+            photos: (donationItem.photos ?? []).map((photo) => ({
+              url: photo,
+              altText: donationItem.name ?? "",
+            })),
           },
           status: "Not Reviewed" as const,
         };
@@ -136,35 +132,40 @@ export default function Step3Review() {
       ) : (
         <div className="border border-gray-300 rounded mb-6">
           {formState.donationItems.map((item, index) => (
-            <div key={index} className={index > 0 ? "border-t" : ""}>
+            <div
+              key={item.id}
+              className={index > 0 ? "border-t border-gray-200 mt-6 pt-6" : ""}
+            >
               <div className="bg-gray-100 px-6 py-4">
                 <h3 className="font-semibold text-gray-900">Item {index + 1}</h3>
               </div>
               <div className="grid grid-cols-2 gap-y-6 p-6">
                 <div className="font-semibold text-gray-900">Short Description</div>
-                <div className="text-gray-700">{(item as FormDonationItem).name || "N/A"}</div>
+                <div className="text-gray-700">{item.name || "N/A"}</div>
                 
                 <div className="font-semibold text-gray-900">Category</div>
-                <div className="text-gray-700">{(item as FormDonationItem).category || "N/A"}</div>
+                <div className="text-gray-700">{item.category || "N/A"}</div>
                 
                 <div className="font-semibold text-gray-900">Size</div>
-                <div className="text-gray-700">{(item as FormDonationItem).size || "N/A"}</div>
+                <div className="text-gray-700">{item.size || "N/A"}</div>
                 
                 <div className="font-semibold text-gray-900">Quantity</div>
-                <div className="text-gray-700">{(item as FormDonationItem).quantity || "N/A"}</div>
+                <div className="text-gray-700">
+                  {typeof item.quantity === "number" ? item.quantity : "N/A"}
+                </div>
                 
-                {(item as FormDonationItem).notes && (
+                {item.notes && (
                   <>
                     <div className="font-semibold text-gray-900">Notes</div>
-                    <div className="text-gray-700">{(item as FormDonationItem).notes}</div>
+                    <div className="text-gray-700">{item.notes}</div>
                   </>
                 )}
                 
-                {(item as FormDonationItem).photos && (item as FormDonationItem).photos!.length > 0 && (
+                {item.photos && item.photos.length > 0 && (
                   <>
                     <div className="font-semibold text-gray-900">Photos</div>
                     <div className="flex gap-4">
-                      {(item as FormDonationItem).photos!.slice(0, 3).map((photo: string, photoIndex: number) => (
+                      {item.photos.slice(0, 3).map((photo: string, photoIndex: number) => (
                         <div key={photoIndex} className="w-24 h-24 border rounded overflow-hidden">
                           <img
                             src={photo}
@@ -183,10 +184,10 @@ export default function Step3Review() {
       )}
 
       <div className="flex justify-center gap-4 mt-8">
-        <Button onClick={handleBack} variant="secondary" className="min-w-[150px]">
+        <Button onClick={handleBack} variant="secondary" className="min-w-[9.375em]">
           Back
         </Button>
-        <Button onClick={handleSubmit} variant="primary" className="min-w-[150px]">
+        <Button onClick={handleSubmit} variant="primary" className="min-w-[9.375em]">
           Submit
         </Button>
       </div>

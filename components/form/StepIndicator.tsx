@@ -22,12 +22,33 @@ export default function StepIndicator({ currentStep }: StepIndicatorProps) {
             {index !== 0 && <div className={`h-px w-24 ${isCompleted ? "bg-primary" : "bg-gray-200"}`} />}
             
             <div className="flex items-center gap-2">
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                isActive ? "bg-primary text-white" : 
-                isCompleted ? "bg-primary text-white" : 
-                "border border-gray-300 text-gray-400"
-              }`}>
-                <span className="text-sm">{isCompleted ? "✓" : step.number}</span>
+              <div
+                className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                  isActive
+                    ? "bg-primary text-white"
+                    : isCompleted
+                    ? "bg-primary text-white"
+                    : "border border-gray-300 text-gray-400"
+                }`}
+              >
+                {isCompleted ? (
+                  <svg
+                    className="w-3.5 h-3.5"
+                    viewBox="0 0 16 12"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M1.5 6.5L5.5 10.5L14.5 1.5"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                ) : (
+                  <span className="text-sm">{step.number}</span>
+                )}
               </div>
               
               <span className={`text-base ${

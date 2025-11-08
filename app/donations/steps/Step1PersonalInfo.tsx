@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useDonorForm } from "../DonorFormContext";
-import StepIndicator from "../components/StepIndicator";
-import FormInput from "../components/FormInput";
-import FormSelect from "../components/FormSelect";
-import FormTextarea from "../components/FormTextarea";
-import FormCheckbox from "../components/FormCheckbox";
-import Button from "../components/Button";
+import StepIndicator from "../../../components/form/StepIndicator";
+import FormInput from "../../../components/form/FormInput";
+import FormSelect from "../../../components/form/FormSelect";
+import FormTextarea from "../../../components/form/FormTextarea";
+import FormCheckbox from "../../../components/form/FormCheckbox";
+import Button from "../../../components/form/Button";
 
 export default function Step1PersonalInfo() {
   const { formState, updateDonorInfo, updateAdditionalInfo, updateAcknowledgements, setCurrentStep } = useDonorForm();
@@ -65,22 +65,39 @@ export default function Step1PersonalInfo() {
     }
   };
 
-  const firstTimeDonorOptions = [
-    { value: "yes", label: "Yes" },
-    { value: "no", label: "No" },
-  ];
+  const firstTimeDonorOptions = ["Yes", "No"];
 
   const howDidYouHearOptions = [
-    { value: "friend", label: "Friend" },
-    { value: "social-media", label: "Social Media" },
-    { value: "website", label: "Website" },
-    { value: "flyer", label: "Flyer" },
-    { value: "other", label: "Other" },
+    "Friend",
+    "Social Media",
+    "Website",
+    "Flyer",
+    "Other",
   ];
 
-  const canDropOffOptions = [
-    { value: "yes", label: "Yes" },
-    { value: "no", label: "No" },
+  const canDropOffOptions = ["Yes", "No"];
+
+  const cityOptions = [
+    "Avon",
+    "Bloomfield",
+    "Canton",
+    "East Granby",
+    "East Hartford",
+    "East Windsor",
+    "Farmington",
+    "Glastonbury",
+    "Granby",
+    "Hartford",
+    "Manchester",
+    "Newington",
+    "Rocky Hill",
+    "Simsbury",
+    "South Windsor",
+    "Vernon",
+    "West Hartford",
+    "Wethersfield",
+    "Windsor",
+    "Windsor Locks",
   ];
 
   return (
@@ -193,28 +210,7 @@ export default function Step1PersonalInfo() {
                 },
               })
             }
-            options={[
-              { value: "avon", label: "Avon" },
-              { value: "bloomfield", label: "Bloomfield" },
-              { value: "canton", label: "Canton" },
-              { value: "east-granby", label: "East Granby" },
-              { value: "east-hartford", label: "East Hartford" },
-              { value: "east-windsor", label: "East Windsor" },
-              { value: "farmington", label: "Farmington" },
-              { value: "glastonbury", label: "Glastonbury" },
-              { value: "granby", label: "Granby" },
-              { value: "hartford", label: "Hartford" },
-              { value: "manchester", label: "Manchester" },
-              { value: "newington", label: "Newington" },
-              { value: "rocky-hill", label: "Rocky Hill" },
-              { value: "simsbury", label: "Simsbury" },
-              { value: "south-windsor", label: "South Windsor" },
-              { value: "vernon", label: "Vernon" },
-              { value: "west-hartford", label: "West Hartford" },
-              { value: "wethersfield", label: "Wethersfield" },
-              { value: "windsor", label: "Windsor" },
-              { value: "windsor-locks", label: "Windsor Locks" },
-            ]}
+            options={cityOptions}
           />
           <div>
             <p className="text-sm text-gray-700 pb-2">State</p>
@@ -255,12 +251,17 @@ export default function Step1PersonalInfo() {
             formState.firstTimeDonor === null
               ? ""
               : formState.firstTimeDonor
-              ? "yes"
-              : "no"
+              ? "No"
+              : "Yes"
           }
           onChange={(e) =>
             updateAdditionalInfo({
-              firstTimeDonor: e.target.value === "yes" ? false : e.target.value === "no" ? true : null,
+              firstTimeDonor:
+                e.target.value === "Yes"
+                  ? false
+                  : e.target.value === "No"
+                  ? true
+                  : null,
             })
           }
           options={firstTimeDonorOptions}
@@ -277,7 +278,7 @@ export default function Step1PersonalInfo() {
           options={howDidYouHearOptions}
         />
 
-        {formState.howDidYouHear === "other" && (
+        {formState.howDidYouHear === "Other" && (
           <FormInput label="If other, please specify." />
         )}
 
@@ -289,12 +290,17 @@ export default function Step1PersonalInfo() {
               formState.canDropOff === null
                 ? ""
                 : formState.canDropOff
-                ? "yes"
-                : "no"
+                ? "Yes"
+                : "No"
             }
             onChange={(e) => {
               updateAdditionalInfo({
-                canDropOff: e.target.value === "yes" ? true : e.target.value === "no" ? false : null,
+                canDropOff:
+                  e.target.value === "Yes"
+                    ? true
+                    : e.target.value === "No"
+                    ? false
+                    : null,
               });
               if (errors.canDropOff) setErrors({ ...errors, canDropOff: "" });
             }}
