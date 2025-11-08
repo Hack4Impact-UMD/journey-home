@@ -1,3 +1,4 @@
+// app/inventory/warehouse/page.tsx
 "use client";
 
 import GalleryItem from "@/components/GalleryItem";
@@ -6,7 +7,7 @@ import CategorySelect from "@/components/CategorySelect";
 import SizeSelect from "@/components/SizeSelect";
 import SortToggle, { SortKeyToggle } from "@/components/SortToggle";
 import NewItemButton from "@/components/NewItemButton";
-
+import Link from "next/link";
 import type { InventoryRecord, SearchParams } from "@/types/inventory";
 import { Timestamp } from "firebase/firestore";
 import { useCallback, useMemo, useState } from "react";
@@ -59,7 +60,7 @@ export default function WarehousePage() {
         const data = await searchBackend(q, params);
         setResults(data);
       } catch {
-        setResults(localFilterAndSort(q, params)); // fallback to local data
+        setResults(localFilterAndSort(q, params));
       }
     },
     [params, localFilterAndSort]
@@ -69,7 +70,6 @@ export default function WarehousePage() {
 
   return (
     <div className="p-6 flex flex-1 flex-col h-[calc(80vh-5rem)] min-h-0 overflow-hidden">
-      {/* toolbar: tight alignment */}
       <div className="mb-6 flex items-center gap-3">
         <div className="flex-1 max-w-lg">
           <SearchBar onSearch={onSearch} />
@@ -81,13 +81,11 @@ export default function WarehousePage() {
           ascending={ascending}
           onChange={(k, asc) => { setSortKey(k); setAscending(asc); }}
         />
-        {/* New Item button pinned to the right */}
         <div className="ml-auto">
-          <NewItemButton
-            onCreated={(record) => {
-              setResults((prev) => [record, ...(prev ?? ITEMS)]);
-            }}
-          />
+          {/* Match the folder path under /app */}
+          <Link href="/inventory/warehouse/new">
+            <NewItemButton />
+          </Link>
         </div>
       </div>
 
