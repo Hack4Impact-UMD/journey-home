@@ -10,7 +10,7 @@ import {
 } from "@/types/donations";
 
 import { db } from "../firebase";
-import { collection, addDoc, doc, getDoc, setDoc, getDocs, deleteDoc, query, where, updateDoc } from "firebase/firestore";
+import { collection, doc, getDoc, setDoc, getDocs, deleteDoc } from "firebase/firestore";
 
 
 export async function setDonationRequest(
