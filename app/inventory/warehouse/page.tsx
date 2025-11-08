@@ -1,3 +1,4 @@
+// app/inventory/warehouse/page.tsx
 "use client";
 
 import GalleryItem from "@/components/GalleryItem";
@@ -6,7 +7,7 @@ import CategorySelect from "@/components/CategorySelect";
 import SizeSelect from "@/components/SizeSelect";
 import SortToggle, { SortKeyToggle } from "@/components/SortToggle";
 import NewItemButton from "@/components/NewItemButton";
-
+import Link from "next/link";
 import type { InventoryRecord, SearchParams } from "@/types/inventory";
 import { Timestamp } from "firebase/firestore";
 import { useCallback, useMemo, useState } from "react";
@@ -59,7 +60,7 @@ export default function WarehousePage() {
         const data = await searchBackend(q, params);
         setResults(data);
       } catch {
-        setResults(localFilterAndSort(q, params)); // fallback to local data
+        setResults(localFilterAndSort(q, params));
       }
     },
     [params, localFilterAndSort]
