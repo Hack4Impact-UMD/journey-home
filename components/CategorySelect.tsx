@@ -18,7 +18,7 @@ export default function CategorySelect({ value, onChange, categories }: Props) {
           h-10 min-w-[150px] pr-8
           appearance-none rounded-[2px] border border-gray-300 bg-white
           px-3 text-sm font-medium text-gray-900
-          shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500
+          shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 cursor-pointer
         "
         style={{ WebkitAppearance: "none" }}
       >

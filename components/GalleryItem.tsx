@@ -10,7 +10,7 @@ type GalleryItemProps = {
 
 export default function GalleryItem({item}: GalleryItemProps) {
     return (
-        <div className="w-full max-w-md aspect-[15/21] flex flex-col justify-start p-[1.25em] bg-white border-1 relative border-gray-200 shadow-lg rounded-[.75em]">
+        <div className="w-full max-w-md aspect-[15/21] flex flex-col justify-start p-[1.25em] bg-white border-1 relative border-gray-200 shadow-lg rounded-[.75em] cursor-pointer">
             <div className="relative w-full aspect-square bg-white border border-grey rounded-[.75em]"> 
                 <div className="w-[1.5em] aspect-square bg-white border border-black absolute top-[0.75em] right-[0.75em] flex items-center justify-center pt-[1em]"> 
 

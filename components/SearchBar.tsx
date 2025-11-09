@@ -24,7 +24,7 @@ export default function SearchBar({
       <button
         type="submit"
         onClick={() => onSearch(q)}
-        className="h-10 rounded-r-[2px] border border-l-0 border-gray-300 bg-white px-3 text-sm hover:bg-gray-50"
+        className="h-10 rounded-r-[2px] border border-l-0 border-gray-300 bg-white px-3 text-sm hover:bg-gray-50 cursor-pointer"
         aria-label="Search"
       >
         {/*SVG from figma*/}

@@ -10,10 +10,11 @@ import type { InventoryRecord } from "@/types/inventory";
 interface AddItemProps {
   isOpen: boolean;
   onClose: () => void;
+  onCreated?: (record: InventoryRecord) => void;
 }
 
 
-const AddItem: React.FC<AddItemProps> = ({ isOpen, onClose, }) => {
+const AddItem: React.FC<AddItemProps> = ({ isOpen, onClose, onCreated }) => {
   if (!isOpen) return null;
   const router = useRouter();
 
@@ -53,9 +54,8 @@ const AddItem: React.FC<AddItemProps> = ({ isOpen, onClose, }) => {
             >
               X
             </button>
-
            
-            <h2 className="text-[2em] font-bold mt-[1em] mb-[1em]">Edit Item</h2>
+            <h2 className="text-[2em] font-bold mt-[1em] mb-[1em]">Add Item</h2>
 
             
             <form className="space-y-[1em]">
@@ -69,7 +69,6 @@ const AddItem: React.FC<AddItemProps> = ({ isOpen, onClose, }) => {
                 />
               </div>
 
-             
               <div>
                 <label className="block text-sm font-medium text-black-600">* Category</label>
                 <select 
@@ -82,7 +81,6 @@ const AddItem: React.FC<AddItemProps> = ({ isOpen, onClose, }) => {
                 </select>
               </div>
 
-              
               <div className="flex gap-4">
                 <div className="flex-1">
                   <label className="block text-sm font-medium text-black-600">* Size</label>
@@ -105,7 +103,6 @@ const AddItem: React.FC<AddItemProps> = ({ isOpen, onClose, }) => {
                 </div>
               </div>
 
-            
               <div>
                 <label className="block text-sm font-medium">Notes</label>
                 <textarea
@@ -114,7 +111,6 @@ const AddItem: React.FC<AddItemProps> = ({ isOpen, onClose, }) => {
                   onChange={(e) => setNotes(e.target.value)}
                 ></textarea>
               </div>
-
    
               <div className="flex gap-[1em]">
                 <div className="w-[8em] h-[8em] bg-gray-100 rounded flex items-center justify-center cursor-pointer">
@@ -126,7 +122,7 @@ const AddItem: React.FC<AddItemProps> = ({ isOpen, onClose, }) => {
                 type="submit"
                 className="mt-[1em] h-[4em] w-full bg-primary text-white px-[1em] py-[.5em] rounded hover:bg-cyan-600"
               >
-                Edit Item
+                Add Item
               </button>
             </form>
           </div>
@@ -134,4 +130,5 @@ const AddItem: React.FC<AddItemProps> = ({ isOpen, onClose, }) => {
       )}
     </>
   );
-}
+};
+export default AddItem;

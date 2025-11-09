@@ -21,8 +21,10 @@ function PlusIcon() {
 
 export default function NewItemButton({
   onCreated,
+  onClick,
 }: {
   onCreated?: (record: InventoryRecord) => void;
+  onClick?: () => void;
 }) {
   const [busy, setBusy] = useState(false);
 
@@ -57,7 +59,7 @@ export default function NewItemButton({
   return (
     <button
       type="button"
-      onClick={handleClick}
+      onClick={onClick}
       disabled={busy}
       className={[
         "w-[112px] h-[32px]",
@@ -67,9 +69,11 @@ export default function NewItemButton({
         "bg-[#02AFC7] text-white",
         "border border-[#1890FF]",
         "text-base font-medium",
+        "cursor-pointer",
         "hover:opacity-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-0 focus-visible:ring-[#1890FF]/60 disabled:opacity-60",
         "shadow-sm",
       ].join(" ")}
+
       aria-label="Add new item"
     >
       <span className="whitespace-nowrap">New item</span>

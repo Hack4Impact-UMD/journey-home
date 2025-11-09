@@ -6,12 +6,14 @@ import SearchBar from "@/components/SearchBar";
 import CategorySelect from "@/components/CategorySelect";
 import SizeSelect from "@/components/SizeSelect";
 import SortToggle, { SortKeyToggle } from "@/components/SortToggle";
-import NewItemButton from "@/components/NewItemButton";
+import AddItem from "@/components/AddItem";
 import Link from "next/link";
 import type { InventoryRecord, SearchParams } from "@/types/inventory";
 import { Timestamp } from "firebase/firestore";
 import { useCallback, useMemo, useState } from "react";
 import { search as searchBackend } from "@/lib/services/inventory";
+import EditItem from "@/components/EditItem";
+import NewItemButton from "@/components/NewItemButton";
 
 const ITEMS: InventoryRecord[] = [
   { id: "1", name: "item1", photos: [], category: "Couches", notes: "N/A", quantity: 2, size: "Large",  dateAdded: Timestamp.fromDate(new Date("2025-10-27T16:00:00Z")), donorEmail: null },
@@ -27,6 +29,10 @@ export default function WarehousePage() {
   const [size, setSize] = useState("Any");
   const [sortKey, setSortKey] = useState<SortKeyToggle>("Quantity");
   const [ascending, setAscending] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<InventoryRecord | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
 
   const params: SearchParams = useMemo(
     () => ({
@@ -82,22 +88,38 @@ export default function WarehousePage() {
           ascending={ascending}
           onChange={(k, asc) => { setSortKey(k); setAscending(asc); }}
         />
-        {/* New Item button pinned to the right */}
-        
-        <NewItemButton
+        <NewItemButton onClick={() => setIsAddModalOpen(true)} />
+        <AddItem
+          isOpen={isAddModalOpen}
+          onClose={() => setIsAddModalOpen(false)}
           onCreated={(record) => {
             setResults((prev) => [record, ...(prev ?? ITEMS)]);
+            setIsAddModalOpen(false);
           }}
-        />
+        />      
 
       </div>
-
+      
       <div className="flex-1 flex-wrap overflow-y-auto min-h-0">
         <div className="grid grid-cols-4 gap-6">
           {itemsToDisplay.map((item) => (
-            <GalleryItem key={item.id} item={item} />
+            <div
+              key={item.id}
+              onClick={() => {
+                setSelectedItem(item);
+                setIsEditModalOpen(true);
+              }}
+              className="cursor-pointer hover:scale-[1.02] transition-transform duration-150"
+            >
+              <GalleryItem item={item} />
+            </div>
           ))}
         </div>
+        <EditItem
+        item={selectedItem}
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+      />
       </div>
     </div>
   );

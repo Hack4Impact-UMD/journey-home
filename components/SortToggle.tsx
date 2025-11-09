@@ -33,7 +33,7 @@ export default function SortToggle({
       <button
         type="button"
         onClick={() => onChange(label, nextAsc)}
-        className={cx(base, borderClass, "text-gray-900")}
+        className={cx(base, borderClass, "text-gray-900 cursor-pointer")}
         aria-pressed={active}
       >
         {label === "Quantity" ? "Qnt" : "Date"}{" "}
