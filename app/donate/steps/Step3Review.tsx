@@ -46,10 +46,14 @@ export default function Step3Review() {
             notes: donationItem.notes ?? "",
             dateAdded: Timestamp.now(),
             donorEmail: donor.email,
-            photos: (donationItem.photos ?? []).map((photo) => ({
-              url: photo,
-              altText: donationItem.name ?? "",
-            })),
+            // photos: (donationItem.photos ?? []).map((photo) => ({
+            //   url: photo,
+            //   altText: donationItem.name ?? "",
+            // })),
+            photos: [{
+              url: "https://m.media-amazon.com/images/I/81hUDQuMkuL.jpg",
+              altText: ""
+          }] // TODO: Implement photo inputs again
           },
           status: "Not Reviewed" as const,
         };
