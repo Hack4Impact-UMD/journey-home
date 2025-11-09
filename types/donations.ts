@@ -22,6 +22,7 @@ export type DonationItem = {
 }
 
 export type DonationRequest = {
+    id: string,
     donor: DonorInfo,
     firstTimeDonor: boolean,
     howDidYouHear: string,

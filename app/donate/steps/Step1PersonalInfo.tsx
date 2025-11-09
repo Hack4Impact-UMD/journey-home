@@ -278,10 +278,6 @@ export default function Step1PersonalInfo() {
           options={howDidYouHearOptions}
         />
 
-        {formState.howDidYouHear === "Other" && (
-          <FormInput label="If other, please specify." />
-        )}
-
         <div>
           <FormSelect
             label="Can you drop off items at our warehouse located in West Hartford?"

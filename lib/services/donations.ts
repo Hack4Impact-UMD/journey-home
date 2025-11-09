@@ -32,6 +32,7 @@ export async function createDonationRequest(request: DonationRequest): Promise<s
 
   // Items already have IDs generated in Step3Review
   const donationDoc = {
+    id: request.id,
     donor: request.donor,
     firstTimeDonor: request.firstTimeDonor,
     howDidYouHear: request.howDidYouHear,

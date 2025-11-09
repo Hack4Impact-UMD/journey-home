@@ -58,6 +58,7 @@ export default function Step3Review() {
       const isFirstTimeDonor = formState.firstTimeDonor === null ? true : formState.firstTimeDonor;
 
       const request: DonationRequest = {
+        id: crypto.randomUUID(),
         donor,
         firstTimeDonor: isFirstTimeDonor,
         howDidYouHear: formState.howDidYouHear ?? "",
@@ -69,7 +70,8 @@ export default function Step3Review() {
 
       await createDonationRequest(request);
       setCurrentStep(4);
-    } catch {
+    } catch (e){
+      console.error(e);
       alert("There was a problem submitting your donation. Please try again.");
     }
   };
