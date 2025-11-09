@@ -20,13 +20,27 @@ export async function setDonationRequest(
 
 export async function getDonationRequest(id: string): Promise<DonationRequest | null> {
     const docRef = doc(db, DONATIONS_COLLECTION, id);
-    return (await getDoc(docRef)).data() as DonationRequest;
+    const document = await getDoc(docRef);
+
+    if (!document.exists()) {
+        return null;
+    }
+
+    return (document.data() as DonationRequest);
+
 };
 
 
-export async function deleteDonationRequest(id: string): Promise<void> {
+export async function deleteDonationRequest(id: string): Promise<boolean> {
     const docRef = doc(db, DONATIONS_COLLECTION, id);
-    await deleteDoc(docRef)
+    const document = await getDoc(docRef);
+
+    if(!document.exists()) {
+        return false;
+    }
+
+    await deleteDoc(docRef);
+    return true;
 }
 
 export async function acceptRequestItem(requestId: string, itemId: string): Promise<boolean> {
@@ -55,7 +69,7 @@ export async function acceptRequestItem(requestId: string, itemId: string): Prom
     //add to the Pickup Dashboard [LATER]
 }
 
-export async function deleteRequestItem(requestId: string, itemId: string): Promise<boolean> {
+export async function denyRequestItem(requestId: string, itemId: string): Promise<boolean> {
 
     const request = await getDonationRequest(requestId);
     if (!request) {
