@@ -1,8 +1,4 @@
-const DONATIONS_COLLECTION = "donation-requests";
-const DONORS_COLLECTION = "donors";
-
 import {
-    DonorAddress,
     DonorInfo,
     DonationItem,
     DonationRequest,
@@ -10,8 +6,10 @@ import {
 } from "@/types/donations";
 
 import { db } from "../firebase";
-import { collection, doc, getDoc, setDoc, getDocs, deleteDoc } from "firebase/firestore";
+import { collection, doc, getDoc, setDoc, getDocs, deleteDoc, Timestamp, addDoc } from "firebase/firestore";
 
+const DONATIONS_COLLECTION = "donation-requests";
+const DONORS_COLLECTION = "donors";
 
 export async function setDonationRequest(
     record: DonationRequest
@@ -147,3 +145,45 @@ export async function searchRequest(query: string, params: DonationSearchParams)
     - accept/reject functionality? i guess just based on if input is approve or deny for each donation item? 
         donationitem.status basically within the donation request which has person info and then the items too
 */
+
+
+export async function addDonorIfNotExists(
+  donor: DonorInfo & {
+    firstTimeDonor: boolean;
+    howDidYouHear: string;
+    canDropOff: boolean;
+    notes?: string;
+  }
+): Promise<void> {
+  const donorRef = doc(db, DONORS_COLLECTION, donor.email);
+  const donorSnap = await getDoc(donorRef);
+
+  if (!donorSnap.exists()) {
+    await setDoc(donorRef, donor);
+  }
+}
+
+export async function createDonationRequest(request: DonationRequest): Promise<string> {
+  await addDonorIfNotExists({
+    ...request.donor,
+    firstTimeDonor: request.firstTimeDonor,
+    howDidYouHear: request.howDidYouHear,
+    canDropOff: request.canDropOff,
+    notes: request.notes,
+  });
+
+  // Items already have IDs generated in Step3Review
+  const donationDoc = {
+    id: request.id,
+    donor: request.donor,
+    firstTimeDonor: request.firstTimeDonor,
+    howDidYouHear: request.howDidYouHear,
+    canDropOff: request.canDropOff,
+    notes: request.notes ?? "",
+    date: request.date ?? Timestamp.now(),
+    items: request.items,
+  };
+
+  const docRef = await addDoc(collection(db, DONATIONS_COLLECTION, request.id), donationDoc);
+  return docRef.id;
+}

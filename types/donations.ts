@@ -22,7 +22,7 @@ export type DonationItem = {
 }
 
 export type DonationRequest = {
-    id: string, //added, would firebase still automatically generate it into here?
+    id: string,
     donor: DonorInfo,
     firstTimeDonor: boolean,
     howDidYouHear: string,
