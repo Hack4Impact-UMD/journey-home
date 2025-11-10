@@ -1,8 +1,6 @@
 "use client";
 
 import { DonationItem, DonationRequest } from "@/types/donations";
-import { InventoryRecord } from "@/types/inventory";
-import { Timestamp } from "firebase/firestore";
 import { Badge } from "../Badge";
 import { useState } from "react";
 import { ViewIcon } from "../ViewIcon";
@@ -49,7 +47,7 @@ export function DRContentsTable({
 }
 
 function DRContentsTableRow({ item }: { item: DonationItem }) {
-    let [selected, setSelected] = useState<boolean>(false);
+    const [selected, setSelected] = useState<boolean>(false);
 
 
     return (

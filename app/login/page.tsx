@@ -46,7 +46,7 @@ export default function LoginPage() {
         >
           <div className="flex justify-center">
             <img
-              src="journey-home-logo.png"
+              src="/journey-home-logo.png"
               alt="Journey Home"
               className="h-[6em] w-[22em]"
             />

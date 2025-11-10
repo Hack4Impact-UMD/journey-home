@@ -1,8 +1,6 @@
 "use client";
 
 import { DonationRequest } from "@/types/donations";
-import { InventoryRecord } from "@/types/inventory";
-import { Timestamp } from "firebase/firestore";
 import { Badge } from "../Badge";
 import { useState } from "react";
 import { ViewIcon } from "../ViewIcon";
@@ -48,9 +46,9 @@ export function DRTable({
 }
 
 function DRTableRow({ request, onOpen }: { request: DonationRequest, onOpen: () => void }) {
-    let [selected, setSelected] = useState<boolean>(false);
+    const [selected, setSelected] = useState<boolean>(false);
 
-    let numNotReviewed = request.items.filter(
+    const numNotReviewed = request.items.filter(
         (item) => item.status == "Not Reviewed"
     ).length;
     let statusText: string = "Unfinished";

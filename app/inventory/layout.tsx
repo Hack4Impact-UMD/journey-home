@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
 
 export default function InventoryLayout({ children }: { children: ReactNode }) {
-    let pathname = usePathname();
+    const pathname = usePathname();
 
     return (
         <>
