@@ -2,14 +2,16 @@
 
 import { DRContentsTable } from "@/components/donation-requests/DRContentsTable";
 import { DRTable } from "@/components/donation-requests/DRTable";
+import { ItemReviewModal } from "@/components/donation-requests/ItemReviewModal";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { SortOption } from "@/components/inventory/SortOption";
 import { searchRequest } from "@/lib/services/donations";
-import { DonationRequest, DonationSearchParams } from "@/types/donations";
+import { DonationItem, DonationRequest, DonationSearchParams } from "@/types/donations";
 import { useEffect, useState } from "react";
 
 export default function DonationRequestsPage() {
     const [selectedDR, setSelectedDR] = useState<DonationRequest | null>(null);
+    const [selectedItem, setSelectedItem] = useState<DonationItem | null>(null);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [searchParams, setSearchParams] = useState<DonationSearchParams>({status: [], sortBy: "Date", ascending:false})
     const [donationRequests, setDonationRequests] = useState<DonationRequest[]>([]);
@@ -26,6 +28,7 @@ export default function DonationRequestsPage() {
 
     return selectedDR ? (
         <>
+            {selectedItem && <ItemReviewModal dr={selectedDR} item={selectedDR.items[0]} onClose={() => setSelectedItem(null)}/>}
             <div className="flex flex-col">
                 <div className="flex gap-3">
                     <button 
@@ -43,7 +46,7 @@ export default function DonationRequestsPage() {
                     {selectedDR.donor.firstName} {selectedDR.donor.lastName}
                 </span>
             </div>
-            <DRContentsTable request={selectedDR} />
+            <DRContentsTable request={selectedDR} openItem={setSelectedItem}/>
         </>
     ) : (
         <>

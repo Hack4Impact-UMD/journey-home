@@ -6,8 +6,10 @@ import { TrashIcon } from "../icons/TrashIcon";
 
 export function DRContentsTable({
     request,
+    openItem,
 }: {
     request: DonationRequest;
+    openItem: (item: DonationItem) => void;
 }) {
     return (
         <>
@@ -37,14 +39,14 @@ export function DRContentsTable({
                     
                 </div>
                 {request.items.map((item) => (
-                    <DRContentsTableRow item={item} key={item.item.id+request.id}/>
+                    <DRContentsTableRow item={item} key={item.item.id+request.id} onOpen={() => openItem(item)}/>
                 ))}
             </div>
         </>
     );
 }
 
-function DRContentsTableRow({ item }: { item: DonationItem }) {
+function DRContentsTableRow({ item, onOpen }: { item: DonationItem, onOpen: () => void }) {
     const [selected, setSelected] = useState<boolean>(false);
 
 
@@ -52,6 +54,7 @@ function DRContentsTableRow({ item }: { item: DonationItem }) {
         <>
             <div 
                 className="h-10 border-light-border border-b border-x flex items-center font-family-roboto text-sm text-text-1 hover:bg-blue-50 cursor-pointer"
+                onClick={onOpen}
             >
                 <div className="w-[25%] px-4 flex items-center">
                     <input
