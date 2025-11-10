@@ -34,6 +34,6 @@ export type DonationRequest = {
 
 export type DonationSearchParams = {
   status: string[]
-  sortBy: "Quantity" | "Date" | "Name",
+  sortBy: "Quantity" | "Date",
   ascending: boolean
 };

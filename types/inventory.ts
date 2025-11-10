@@ -23,3 +23,5 @@ export type SearchParams = {
   sortBy: "Quantity" | "Date" | "Name",
   ascending: boolean
 };
+
+export type SortStatus = "asc" | "desc" | "none";

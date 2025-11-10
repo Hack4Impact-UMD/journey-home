@@ -198,6 +198,6 @@ export async function createDonationRequest(request: DonationRequest): Promise<s
     items: request.items,
   };
 
-  const docRef = await addDoc(collection(db, DONATIONS_COLLECTION, request.id), donationDoc);
-  return docRef.id;
+  const docRef = await setDoc(doc(db, DONATIONS_COLLECTION, request.id), donationDoc);
+  return request.id;
 }

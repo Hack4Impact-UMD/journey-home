@@ -1,10 +1,8 @@
-"use client";
-
 import { DonationItem, DonationRequest } from "@/types/donations";
 import { Badge } from "../Badge";
 import { useState } from "react";
-import { ViewIcon } from "../ViewIcon";
-import { TrashIcon } from "../TrashIcon";
+import { ViewIcon } from "../icons/ViewIcon";
+import { TrashIcon } from "../icons/TrashIcon";
 
 export function DRContentsTable({
     request,
