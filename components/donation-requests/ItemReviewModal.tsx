@@ -1,4 +1,8 @@
-import { DonationItem, DonationRequest } from "@/types/donations";
+import {
+    DonationItem,
+    DonationItemStatus,
+    DonationRequest,
+} from "@/types/donations";
 import { InventoryRecord } from "@/types/inventory";
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
@@ -9,9 +13,15 @@ type ItemReviewModalProps = {
     item: DonationItem;
     dr: DonationRequest;
     onClose: () => void;
+    setStatus: (status: DonationItemStatus) => void;
 };
 
-export function ItemReviewModal({ dr, item, onClose }: ItemReviewModalProps) {
+export function ItemReviewModal({
+    dr,
+    item,
+    onClose,
+    setStatus,
+}: ItemReviewModalProps) {
     return createPortal(
         <>
             <div className="fixed inset-0 z-50 flex items-center justify-center font-family-roboto">
@@ -99,8 +109,18 @@ export function ItemReviewModal({ dr, item, onClose }: ItemReviewModalProps) {
                         </span>
 
                         <div className="flex gap-2 mt-8">
-                            <button className="text-sm bg-primary rounded-xs h-8 px-4 text-white">Approve</button>
-                            <button className="text-sm rounded-xs h-8 px-4 border border-light-border">Deny</button>
+                            <button
+                                className="text-sm bg-primary rounded-xs h-8 px-4 text-white"
+                                onClick={() => setStatus("Approved")}
+                            >
+                                Approve
+                            </button>
+                            <button
+                                className="text-sm rounded-xs h-8 px-4 border border-light-border"
+                                onClick={() => setStatus("Denied")}
+                            >
+                                Deny
+                            </button>
                         </div>
                     </div>
                 </div>

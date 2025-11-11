@@ -5,8 +5,8 @@ import { DRTable } from "@/components/donation-requests/DRTable";
 import { ItemReviewModal } from "@/components/donation-requests/ItemReviewModal";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { SortOption } from "@/components/inventory/SortOption";
-import { searchRequest } from "@/lib/services/donations";
-import { DonationItem, DonationRequest, DonationSearchParams } from "@/types/donations";
+import { searchRequest, setRequestItemStatus } from "@/lib/services/donations";
+import { DonationItem, DonationItemStatus, DonationRequest, DonationSearchParams } from "@/types/donations";
 import { useEffect, useState } from "react";
 
 export default function DonationRequestsPage() {
@@ -16,10 +16,39 @@ export default function DonationRequestsPage() {
     const [searchParams, setSearchParams] = useState<DonationSearchParams>({status: [], sortBy: "Date", ascending:false})
     const [donationRequests, setDonationRequests] = useState<DonationRequest[]>([]);
 
-    const search = () => {
+    function search() {
         searchRequest(searchQuery, searchParams).then((res) => {
             setDonationRequests(res);
         });
+    };
+
+    function changeItemStatus(drID: string, itemID: string, status: DonationItemStatus) {
+        setDonationRequests(prevRequests =>
+            prevRequests.map(request =>
+              request.id == drID
+                ? {
+                    ...request,
+                    items: request.items.map(donationItem =>
+                      donationItem.item.id == itemID
+                        ? { ...donationItem, status: status }
+                        : donationItem
+                    )
+                  }
+                : request
+            )
+        );
+        setSelectedDR(request => 
+            request
+                ? {
+                    ...request,
+                    items: request.items.map(donationItem =>
+                      donationItem.item.id == itemID
+                        ? { ...donationItem, status: status }
+                        : donationItem
+                    )
+                  }
+                : null
+        );
     }
 
     useEffect(() => {
@@ -28,7 +57,23 @@ export default function DonationRequestsPage() {
 
     return selectedDR ? (
         <>
-            {selectedItem && <ItemReviewModal dr={selectedDR} item={selectedDR.items[0]} onClose={() => setSelectedItem(null)}/>}
+            {selectedItem && 
+            <ItemReviewModal 
+                dr={selectedDR} 
+                item={selectedItem} 
+                onClose={() => setSelectedItem(null)}
+                setStatus={(status) => {
+                    setRequestItemStatus(selectedDR.id, selectedItem.item.id, status)
+                    .then((res) => {
+                        if(res) {
+                            changeItemStatus(selectedDR.id, selectedItem.item.id, status);
+                            setSelectedItem(null);
+                        } else {
+                            console.error(`Setting Request Item Status failed. ${selectedDR.id} ${selectedItem.item.id}`);
+                        }
+                    });
+                }}
+            />}
             <div className="flex flex-col">
                 <div className="flex gap-3">
                     <button 
