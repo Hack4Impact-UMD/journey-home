@@ -30,11 +30,11 @@ export async function createDonationRequest(request: DonationRequest): Promise<s
     notes: request.notes,
   });
 
-  const donationRef = doc(db, DONATIONS_COLLECTION, request.id); // use request.id as doc ID
+  const donationRef = doc(db, DONATIONS_COLLECTION, request.id);
   await setDoc(donationRef, {
     ...request,
     date: request.date ?? Timestamp.now(),
   });
 
-  return request.id; // matches the doc ID now
+  return request.id;
 }
