@@ -14,6 +14,8 @@ import { useCallback, useMemo, useState } from "react";
 import { search as searchBackend } from "@/lib/services/inventory";
 import EditItem from "@/components/EditItem";
 import NewItemButton from "@/components/NewItemButton";
+import { DonationRequest } from "@/types/donations";
+import { TableView } from "@/components/TableView";
 
 const ITEMS: InventoryRecord[] = [
   { id: "1", name: "item1", photos: [], category: "Couches", notes: "N/A", quantity: 2, size: "Large",  dateAdded: Timestamp.fromDate(new Date("2025-10-27T16:00:00Z")), donorEmail: null },
@@ -32,8 +34,8 @@ export default function WarehousePage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<InventoryRecord | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-
-
+  const [viewMode, setViewMode] = useState<"gallery" | "table">("gallery");
+  
   const params: SearchParams = useMemo(
     () => ({
       categories: category === "Any" ? [] : [category],
@@ -76,7 +78,6 @@ export default function WarehousePage() {
 
   return (
     <div className="p-6 flex flex-wrap flex-1 flex-col h-[calc(80vh-5rem)] min-h-0 overflow-hidden">
-      {/* toolbar: tight alignment */}
       <div className="mb-6 flex gap-2 flex-row items-center justify-start">
         <div>
           <SearchBar onSearch={onSearch} />
@@ -96,30 +97,64 @@ export default function WarehousePage() {
             setResults((prev) => [record, ...(prev ?? ITEMS)]);
             setIsAddModalOpen(false);
           }}
-        />      
+        />
+        <div className="flex flex-1 justify-end gap-2">
+          <button
+            onClick={() => setViewMode("table")}
+            className={`p-1 rounded hover:bg-gray-200"}`}
+          >
+            <svg width="23" height="20" viewBox="0 0 23 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect y="0.5" width="23" height="4" fill={viewMode === "table" ? "#505050" : "#C0C0C0"}/>
+              <rect y="5.5" width="23" height="4" fill={viewMode === "table" ? "#505050" : "#C0C0C0"}/>
+              <rect y="10.5" width="23" height="4" fill={viewMode === "table" ? "#505050" : "#C0C0C0"}/>
+              <rect y="15.5" width="23" height="4" fill={viewMode === "table" ? "#505050" : "#C0C0C0"} />
+            </svg>
+          </button>
+
+          <button
+            onClick={() => setViewMode("gallery")}
+            className={`p-1 rounded hover:bg-gray-200"}`}
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="6" height="6" fill={viewMode === "gallery" ? "#505050" : "#C0C0C0"}/>
+              <rect x="7" width="6" height="6" fill={viewMode === "gallery" ? "#505050" : "#C0C0C0"}/>
+              <rect x="14" width="6" height="6" fill={viewMode === "gallery" ? "#505050" : "#C0C0C0"}/>
+              <rect y="7" width="6" height="6" fill={viewMode === "gallery" ? "#505050" : "#C0C0C0"}/>
+              <rect x="7" y="7" width="6" height="6" fill={viewMode === "gallery" ? "#505050" : "#C0C0C0"}/>
+              <rect x="14" y="7" width="6" height="6" fill={viewMode === "gallery" ? "#505050" : "#C0C0C0"}/>
+              <rect y="14" width="6" height="6" fill={viewMode === "gallery" ? "#505050" : "#C0C0C0"}/>
+              <rect x="7" y="14" width="6" height="6" fill={viewMode === "gallery" ? "#505050" : "#C0C0C0"}/>
+              <rect x="14" y="14" width="6" height="6" fill={viewMode === "gallery" ? "#505050" : "#C0C0C0"}/>
+            </svg>
+          </button>
+        </div>
 
       </div>
       
-      <div className="flex-1 flex-wrap overflow-y-auto min-h-0">
-        <div className="grid grid-cols-4 gap-6">
-          {itemsToDisplay.map((item) => (
-            <div
-              key={item.id}
-              onClick={() => {
-                setSelectedItem(item);
-                setIsEditModalOpen(true);
-              }}
-              className="cursor-pointer hover:scale-[1.02] transition-transform duration-150"
-            >
-              <GalleryItem item={item} />
-            </div>
-          ))}
-        </div>
+      <div className="flex-1 flex-wrap overflow-y-auto min-h-0 min-w-0">
+        {viewMode === "gallery" ? (
+          <div className="grid grid-cols-4 gap-6">
+            {itemsToDisplay.map((item) => (
+              <div
+                key={item.id}
+                onClick={() => {
+                  setSelectedItem(item);
+                  setIsEditModalOpen(true);
+                }}
+                className="cursor-pointer hover:scale-[1.02] transition-transform duration-150">
+                <GalleryItem item={item} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <TableView
+            inventoryRecords={itemsToDisplay} 
+            openItem={(item) => console.log("Open item:", item)}/>
+        )}
         <EditItem
         item={selectedItem}
         isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-      />
+        onClose={() => setIsEditModalOpen(false)}/>
       </div>
     </div>
   );
