@@ -140,15 +140,19 @@ export const editUserInfo = async (
 ) => {
   const userRef = doc(db, "Users", uid);
 
-  const dataToUpdate: any = {};
+  const dataToUpdate: Record<string, unknown> = {};
 
   if (updates.firstName !== undefined) dataToUpdate.firstName = updates.firstName;
   if (updates.lastName !== undefined) dataToUpdate.lastName = updates.lastName;
+
   if (updates.dob !== undefined) {
-    dataToUpdate.dob =
-      updates.dob instanceof Timestamp
-        ? updates.dob
-        : new Timestamp(new Date(updates.dob).getTime() / 1000, 0);
+    if (updates.dob instanceof Timestamp) {
+      dataToUpdate.dob = updates.dob;
+    } else {
+      const parsedDate =
+        updates.dob instanceof Date ? updates.dob : new Date(updates.dob);
+      dataToUpdate.dob = Timestamp.fromDate(parsedDate);
+    }
   }
 
   if (updates.role !== undefined) {
