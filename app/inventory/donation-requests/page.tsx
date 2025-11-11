@@ -5,7 +5,7 @@ import { DRTable } from "@/components/donation-requests/DRTable";
 import { ItemReviewModal } from "@/components/donation-requests/ItemReviewModal";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { SortOption } from "@/components/inventory/SortOption";
-import { searchRequest } from "@/lib/services/donations";
+import { searchRequest, setRequestItemStatus } from "@/lib/services/donations";
 import { DonationItem, DonationItemStatus, DonationRequest, DonationSearchParams } from "@/types/donations";
 import { useEffect, useState } from "react";
 
@@ -36,7 +36,19 @@ export default function DonationRequestsPage() {
                   }
                 : request
             )
-          );
+        );
+        setSelectedDR(request => 
+            request
+                ? {
+                    ...request,
+                    items: request.items.map(donationItem =>
+                      donationItem.item.id == itemID
+                        ? { ...donationItem, status: status }
+                        : donationItem
+                    )
+                  }
+                : null
+        );
     }
 
     useEffect(() => {
@@ -45,7 +57,23 @@ export default function DonationRequestsPage() {
 
     return selectedDR ? (
         <>
-            {selectedItem && <ItemReviewModal dr={selectedDR} item={selectedItem} onClose={() => setSelectedItem(null)}/>}
+            {selectedItem && 
+            <ItemReviewModal 
+                dr={selectedDR} 
+                item={selectedItem} 
+                onClose={() => setSelectedItem(null)}
+                setStatus={(status) => {
+                    setRequestItemStatus(selectedDR.id, selectedItem.item.id, status)
+                    .then((res) => {
+                        if(res) {
+                            changeItemStatus(selectedDR.id, selectedItem.item.id, status);
+                            setSelectedItem(null);
+                        } else {
+                            console.error(`Setting Request Item Status failed. ${selectedDR.id} ${selectedItem.item.id}`);
+                        }
+                    });
+                }}
+            />}
             <div className="flex flex-col">
                 <div className="flex gap-3">
                     <button 

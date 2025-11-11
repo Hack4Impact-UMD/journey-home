@@ -2,7 +2,8 @@ import {
     DonorInfo,
     DonationItem,
     DonationRequest,
-    DonationSearchParams
+    DonationSearchParams,
+    DonationItemStatus
 } from "@/types/donations";
 
 import { db } from "../firebase";
@@ -43,7 +44,7 @@ export async function deleteDonationRequest(id: string): Promise<boolean> {
     return true;
 }
 
-export async function acceptRequestItem(requestId: string, itemId: string): Promise<boolean> {
+export async function setRequestItemStatus(requestId: string, itemId: string, status: DonationItemStatus): Promise<boolean> {
     //get the record we're working with
     const request = await getDonationRequest(requestId);
     if (!request) {
@@ -53,7 +54,7 @@ export async function acceptRequestItem(requestId: string, itemId: string): Prom
     //update the accept for the specific item -> get the id of the inventory record when calling this func?
     //to actually access the specific item -> iterate through the items and see for which one the id matches? 
     const updatedItems = request.items.map(itemy => itemy.item.id === itemId
-        ? {...itemy, status: "Approved"} as DonationItem
+        ? {...itemy, status: status} as DonationItem
         : itemy );
 
     //update this item in the request itself
@@ -66,30 +67,6 @@ export async function acceptRequestItem(requestId: string, itemId: string): Prom
 
     return true;
 
-    //add to the Pickup Dashboard [LATER]
-}
-
-export async function denyRequestItem(requestId: string, itemId: string): Promise<boolean> {
-
-    const request = await getDonationRequest(requestId);
-    if (!request) {
-        return false;
-    }
-
-    const updatedItems = request.items.map(itemy => itemy.item.id === itemId
-        ? {...itemy, status: "Denied"} as DonationItem
-        : itemy );
-
-    await setDonationRequest({
-        ...request,
-        items: updatedItems,
-        id: requestId
-
-    });
-
-    return true;
-
-    //"delete" from requests, go into rejection dashboard, also later
 }
 
 //do search based on name
