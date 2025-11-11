@@ -1,7 +1,7 @@
 "use client";
 
 import { db } from "../firebase";
-import { collection, doc, getDocs, setDoc, updateDoc, Timestamp, deleteDoc} from "firebase/firestore";
+import { collection, doc, getDocs, setDoc, updateDoc, Timestamp, deleteDoc, query, where, orderBy} from "firebase/firestore";
 import { UserData, UserRole } from "../../types/user";
 
 const usersCol = collection(db, "Users");
@@ -45,6 +45,25 @@ export const fetchUsersByStatus = async (
     if (data.status === status) users.push(data);
   });
   return users;
+};
+
+
+/**
+ * Fetch pending users sorted by date requested
+ */
+export const fetchPendingUsersByDate = async (): Promise<UserData[]> => {
+  const usersCol = collection(db, "Users");
+
+  // Query for users with status = "pending", ordered by createdAt
+  const q = query(usersCol, where("status", "==", "pending"), orderBy("createdAt", "asc"));
+  const snapshot = await getDocs(q);
+
+  const pendingUsers: UserData[] = [];
+  snapshot.forEach((doc) => {
+    pendingUsers.push(doc.data() as UserData & { status: string; createdAt: any });
+  });
+
+  return pendingUsers;
 };
 
 /**
