@@ -2,9 +2,9 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { User, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
-import { auth } from "../firebase/firebase";
-import { UserData, UserRole, AuthContextType } from "../types/d";
-import { createUserInDB, fetchAllUsers } from "../lib/services/userService";
+import { auth } from "../lib/firebase";
+import { UserData, UserRole, AuthContextType } from "../types/user";
+import { createUserInDB, fetchAllUsers } from "../lib/services/users";
 import { Timestamp } from "firebase/firestore";
 
 const AuthContext = createContext<AuthContextType | null>(null);

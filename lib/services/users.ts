@@ -60,7 +60,7 @@ export const fetchPendingUsersByDate = async (): Promise<UserData[]> => {
 
   const pendingUsers: UserData[] = [];
   snapshot.forEach((doc) => {
-    pendingUsers.push(doc.data() as UserData & { status: string; createdAt: any });
+    pendingUsers.push(doc.data() as UserData & { status: string; createdAt: Timestamp });
   });
 
   return pendingUsers;

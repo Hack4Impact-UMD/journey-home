@@ -3,7 +3,7 @@
 import { User } from "firebase/auth";
 import { Timestamp } from "firebase/firestore"
 
-export type UserRole = "Admin" | "Case Manager" | "Volunteer";
+export type UserRole = "Admin" | "Donor" | "Recipient" | "Pending";
 
 export type UserData = {
     uid: string,
