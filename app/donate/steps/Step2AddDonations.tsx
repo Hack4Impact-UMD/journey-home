@@ -7,6 +7,7 @@ import FormInput from "../../../components/form/FormInput";
 import FormSelect from "../../../components/form/FormSelect";
 import FormTextarea from "../../../components/form/FormTextarea";
 import Button from "../../../components/form/Button";
+import { v4 as uuidv4 } from "uuid";
 
 export default function Step2AddDonations() {
   const { formState, setCurrentStep, addDonationItem, removeDonationItem, updateDonationItem } =

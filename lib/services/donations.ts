@@ -30,18 +30,11 @@ export async function createDonationRequest(request: DonationRequest): Promise<s
     notes: request.notes,
   });
 
-  // Items already have IDs generated in Step3Review
-  const donationDoc = {
-    id: request.id,
-    donor: request.donor,
-    firstTimeDonor: request.firstTimeDonor,
-    howDidYouHear: request.howDidYouHear,
-    canDropOff: request.canDropOff,
-    notes: request.notes ?? "",
+  const donationRef = doc(db, DONATIONS_COLLECTION, request.id); // use request.id as doc ID
+  await setDoc(donationRef, {
+    ...request,
     date: request.date ?? Timestamp.now(),
-    items: request.items,
-  };
+  });
 
-  const docRef = await addDoc(collection(db, DONATIONS_COLLECTION), donationDoc);
-  return docRef.id;
+  return request.id; // matches the doc ID now
 }
