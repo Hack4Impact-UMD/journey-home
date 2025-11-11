@@ -16,9 +16,11 @@ export type DonorInfo = {
     address: DonorAddress
 }
 
+export type DonationItemStatus = "Not Reviewed" | "Approved" | "Denied"
+
 export type DonationItem = {
     item: InventoryRecord, 
-    status: "Not Reviewed" | "Approved" | "Denied" | "Acquired";
+    status: DonationItemStatus;
 }
 
 export type DonationRequest = {
