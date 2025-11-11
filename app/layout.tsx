@@ -1,5 +1,6 @@
 import "./globals.css";
 import localFont from "next/font/local";
+import { AuthProvider } from "../contexts/AuthContext";
 
 const openSans = localFont({
   src: '../public/fonts/OpenSans/OpenSans.ttf',
@@ -24,7 +25,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${openSans.variable} ${raleway.variable} ${roboto.variable} w-full h-full overscroll-none`}>
       <body className="w-full h-full font-family-roboto">
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );
