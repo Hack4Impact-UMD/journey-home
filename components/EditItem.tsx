@@ -36,7 +36,9 @@ const EditItem: React.FC<EditItemProps> = ({ item, isOpen, onClose }) => {
               </div>
              
               <div>
-                <label className="block text-sm font-medium text-black-600">* Category</label>
+                <label className="block text-sm font-medium text-black-600">
+                    <span className="text-red-500">*</span> Category
+                </label>
                 <select className="mt-1 w-full border border-gray-300 rounded px-[.75em] py-[.5em] focus:outline-none focus:ring-2 focus:ring-blue-400">
                   <option>Sofa</option>
                   <option>Chair</option>
@@ -46,7 +48,9 @@ const EditItem: React.FC<EditItemProps> = ({ item, isOpen, onClose }) => {
               
               <div className="flex gap-4">
                 <div className="flex-1">
-                  <label className="block text-sm font-medium text-black-600">* Size</label>
+                  <label className="block text-sm font-medium text-black-600">
+                    <span className="text-red-500">*</span> Size
+                    </label>
                   <select className="mt-1 w-full border border-gray-300 rounded px-[.75em] py-[.5em] focus:outline-none focus:ring-2 focus:ring-blue-400">
                     <option>Small</option>
                     <option>Medium</option>
@@ -54,7 +58,9 @@ const EditItem: React.FC<EditItemProps> = ({ item, isOpen, onClose }) => {
                   </select>
                 </div>
                 <div className="flex-1">
-                  <label className="block text-sm font-medium text-black-600">* Quantity</label>
+                  <label className="block text-sm font-medium text-black-600">
+                    <span className="text-red-500">*</span> Quantity
+                  </label>
                   <input
                     type="number"
                     className="mt-[.25em] w-full border border-gray-300 rounded px-[.75em] py-[.5em] focus:outline-none focus:ring-2 focus:ring-blue-400"

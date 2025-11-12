@@ -59,6 +59,5 @@ export default function StockSidebar() {
                 ></div>
             )}
     </div>
-
     )
 }

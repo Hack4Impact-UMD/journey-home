@@ -14,8 +14,9 @@ import { useCallback, useMemo, useState } from "react";
 import { search as searchBackend } from "@/lib/services/inventory";
 import EditItem from "@/components/EditItem";
 import NewItemButton from "@/components/NewItemButton";
-import { DonationRequest } from "@/types/donations";
+import { DonationItem, DonationRequest } from "@/types/donations";
 import { TableView } from "@/components/TableView";
+import { InventoryItemView } from "@/components/InventoryItemView";
 
 const ITEMS: InventoryRecord[] = [
   { id: "1", name: "item1", photos: [], category: "Couches", notes: "N/A", quantity: 2, size: "Large",  dateAdded: Timestamp.fromDate(new Date("2025-10-27T16:00:00Z")), donorEmail: null },
@@ -24,6 +25,32 @@ const ITEMS: InventoryRecord[] = [
   { id: "4", name: "item4", photos: [], category: "Tables",  notes: "N/A", quantity: 1, size: "Small",  dateAdded: Timestamp.fromDate(new Date("2025-10-30T16:00:00Z")), donorEmail: null },
   { id: "5", name: "item5", photos: [], category: "Tables",  notes: "N/A", quantity: 5, size: "Small",  dateAdded: Timestamp.fromDate(new Date("2025-10-31T16:00:00Z")), donorEmail: null },
 ];
+const MOCK_DONATION_REQUEST: DonationRequest = {
+  id: "1",
+  donor: {
+    firstName: "John",
+    lastName: "Doe",
+    email: "john@example.com",
+    phoneNumber: "123-456-7890",
+    address: {
+      streetAddress: "123 Main St",
+      city: "Anytown",
+      state: "NY",
+      zipCode: "12345",
+    },
+  },
+  items: [],
+  firstTimeDonor: false,
+  howDidYouHear: "",
+  canDropOff: false,
+  notes: "",
+  date: Timestamp.now()
+};
+
+const MOCK_DONATION_ITEM = (record: InventoryRecord): DonationItem => ({
+  item: record,
+  status: "Not Reviewed"
+});
 
 export default function WarehousePage() {
   const [results, setResults] = useState<InventoryRecord[] | null>(null);
@@ -32,9 +59,12 @@ export default function WarehousePage() {
   const [sortKey, setSortKey] = useState<SortKeyToggle>("Quantity");
   const [ascending, setAscending] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<InventoryRecord | null>(null);
+  const [selectedItem, setSelectedItem] = useState<DonationItem | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"gallery" | "table">("gallery");
+  const [selectedDR, setSelectedDR] = useState<DonationRequest | null>(null);
+  const [selectedRecord, setSelectedRecord] = useState<InventoryRecord | null>(null);
+  const [isItemModalOpen, setIsItemModalOpen] = useState(false);
   
   const params: SearchParams = useMemo(
     () => ({
@@ -134,28 +164,48 @@ export default function WarehousePage() {
       <div className="flex-1 flex-wrap overflow-y-auto min-h-0 min-w-0">
         {viewMode === "gallery" ? (
           <div className="grid grid-cols-4 gap-6">
-            {itemsToDisplay.map((item) => (
+            {itemsToDisplay.map((record) => (
               <div
-                key={item.id}
+                key={record.id}
                 onClick={() => {
-                  setSelectedItem(item);
-                  setIsEditModalOpen(true);
+                  setSelectedItem(MOCK_DONATION_ITEM(record));
+                  setSelectedDR(MOCK_DONATION_REQUEST);  
+                  setIsItemModalOpen(true);
                 }}
                 className="cursor-pointer hover:scale-[1.02] transition-transform duration-150">
-                <GalleryItem item={item} />
+                <GalleryItem item={record} />
               </div>
             ))}
           </div>
         ) : (
           <TableView
             inventoryRecords={itemsToDisplay} 
-            openItem={(item) => console.log("Open item:", item)}/>
+            openItem={(record) => {
+                setSelectedItem(MOCK_DONATION_ITEM(record)); 
+                setSelectedDR(MOCK_DONATION_REQUEST);      
+                setIsItemModalOpen(true);  
+            }}/>
         )}
-        <EditItem
-        item={selectedItem}
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}/>
       </div>
+      {selectedItem && selectedDR && isItemModalOpen && (
+        <InventoryItemView
+          dr={selectedDR}
+          //currently using frontend implementation to test item view, will implement backend later
+          onClose={() => setIsItemModalOpen(false)} item={{
+            item: {
+              id: "",
+              name: "Testing furniture",
+              photos: [],
+              category: "Couches",
+              notes: "N/A",
+              quantity: 3,
+              size: "Large",
+              dateAdded: Timestamp.now(),
+              donorEmail: "tester@gmail.com",
+            },
+            status: "Not Reviewed"
+          }}        />
+      )}
     </div>
   );
 }

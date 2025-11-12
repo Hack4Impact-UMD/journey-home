@@ -70,7 +70,9 @@ const AddItem: React.FC<AddItemProps> = ({ isOpen, onClose, onCreated }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-black-600">* Category</label>
+                <label className="block text-sm font-medium text-black-600">
+                    <span className="text-red-500">*</span> Category
+                </label>
                 <select 
                   className="mt-1 w-full border border-gray-300 rounded px-[.75em] py-[.5em] focus:outline-none focus:ring-2 focus:ring-blue-400"
                   onChange={(e) => setCategory(e.target.value)}
@@ -83,39 +85,43 @@ const AddItem: React.FC<AddItemProps> = ({ isOpen, onClose, onCreated }) => {
 
               <div className="flex gap-4">
                 <div className="flex-1">
-                  <label className="block text-sm font-medium text-black-600">* Size</label>
-                  <select 
+                    <label className="block text-sm font-medium text-black-600">
+                        <span className="text-red-500">*</span> Size
+                    </label>
+                    <select 
                     className="mt-1 w-full border border-gray-300 rounded px-[.75em] py-[.5em] focus:outline-none focus:ring-2 focus:ring-blue-400"
                     onChange={(e) => setSize(e.target.value as "Small" | "Medium" | "Large")}
-                  >
-                    <option>Small</option>
-                    <option>Medium</option>
-                    <option>Large</option>
-                  </select>
+                    >
+                        <option>Small</option>
+                        <option>Medium</option>
+                        <option>Large</option>
+                    </select>
                 </div>
                 <div className="flex-1">
-                  <label className="block text-sm font-medium text-black-600">* Quantity</label>
-                  <input
+                    <label className="block text-sm font-medium text-black-600">
+                        <span className="text-red-500">*</span> Quantity
+                    </label>
+                    <input
                     type="number"
                     className="mt-[.25em] w-full border border-gray-300 rounded px-[.75em] py-[.5em] focus:outline-none focus:ring-2 focus:ring-blue-400"
                     onChange={(e) => setQuantity(parseInt(e.target.value || "1", 10))}
-                  />
+                    />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium">Notes</label>
-                <textarea
-                  className="mt-[.25em] w-full border border-gray-300 rounded px-[.75em] py-[.5em] focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  rows={4}
-                  onChange={(e) => setNotes(e.target.value)}
-                ></textarea>
+                    <label className="block text-sm font-medium">Notes</label>
+                    <textarea
+                    className="mt-[.25em] w-full border border-gray-300 rounded px-[.75em] py-[.5em] focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    rows={4}
+                    onChange={(e) => setNotes(e.target.value)}
+                    ></textarea>
               </div>
    
               <div className="flex gap-[1em]">
-                <div className="w-[8em] h-[8em] bg-gray-100 rounded flex items-center justify-center cursor-pointer">
-                  <span>Add a photo +</span>
-                </div>
+                    <div className="w-[8em] h-[8em] bg-gray-100 rounded flex items-center justify-center cursor-pointer">
+                    <span>Add a photo +</span>
+                    </div>
               </div>
 
               <button
