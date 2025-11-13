@@ -30,7 +30,7 @@ const AddItem: React.FC<AddItemProps> = ({ isOpen, onClose, onCreated }) => {
     const record: InventoryRecord = {
       id: crypto.randomUUID(),
       name: name.trim(),
-      photos: [],            // wire your uploader later
+      photos: [],       
       category,
       size: size as "Small" | "Medium" | "Large",
       quantity,
@@ -39,8 +39,8 @@ const AddItem: React.FC<AddItemProps> = ({ isOpen, onClose, onCreated }) => {
       dateAdded: Timestamp.now(),
     };
 
-    await setInventoryRecord(record);     // <-- write to Firestore
-    router.push("/warehouse");            // back to list
+    await setInventoryRecord(record);  
+    router.push("/warehouse");    
   }
 
   return (
