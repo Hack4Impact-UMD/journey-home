@@ -5,8 +5,10 @@ import {
     signOut,
     User,
 } from "firebase/auth";
-import { auth, db } from "../firebase";
-import { doc, setDoc, Timestamp } from "firebase/firestore";
+import { auth } from "../firebase";
+import { Timestamp } from "firebase/firestore";
+import { createUserInDB } from "./users";
+import { UserData } from "@/types/user";
 
 export async function signUp(
     email: string,
@@ -23,15 +25,24 @@ export async function signUp(
     );
     const user = userCredential.user;
 
-    await setDoc(doc(db, "users", user.uid), {
+    // Use the existing createUserInDB function to ensure consistency
+    // This creates user in "Users" collection with the selected role and status="pending"
+    const roleStr = role as string;
+    const mappedRole: UserRole = 
+      roleStr === "Administrator" ? "Admin" :
+      role as UserRole; 
+    
+    const userRecord: UserData = {
         uid: user.uid,
-        email: email,
-        firstName: firstName,
-        lastName: lastName,
+        firstName,
+        lastName,
+        email: user.email!,
         dob: dob ? Timestamp.fromDate(new Date(dob)) : null,
-        role: role,
-        emailVerified: false,
-    });
+        role: mappedRole, 
+        emailVerified: user.emailVerified,
+    };
+
+    await createUserInDB(userRecord);
 
     return user;
     // let err = error as FirebaseError;

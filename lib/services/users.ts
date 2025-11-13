@@ -8,14 +8,13 @@ const usersCol = collection(db, "Users");
 
 /**
  * Create a new user in Firestore
- * Default role = "Pending", status = "pending"
+ * Stores the actual role from signup, status = "pending" until approved
  */
 export const createUserInDB = async (user: UserData) => {
   const userRef = doc(db, "Users", user.uid);
   await setDoc(userRef, {
     ...user,
-    role: "Pending",
-    status: "pending",
+    status: "pending", // Status is pending until admin approval
     createdAt: Timestamp.now(),
   });
 };
@@ -85,6 +84,7 @@ export const updateUserRole = async (
 
 /**
  * Admin-only: approve pending account
+ * Keeps the existing role, just changes status to "active"
  */
 export const approveAccount = async (
   currentUserRole: UserRole,
@@ -95,7 +95,7 @@ export const approveAccount = async (
 
   const userRef = doc(db, "Users", uid);
   await updateDoc(userRef, {
-    role,
+    role, // Update role if admin wants to change it during approval
     status: "active",
   });
 };
