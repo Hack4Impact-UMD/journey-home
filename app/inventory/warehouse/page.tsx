@@ -19,12 +19,63 @@ import { TableView } from "@/components/TableView";
 import { InventoryItemView } from "@/components/InventoryItemView";
 
 const ITEMS: InventoryRecord[] = [
-  { id: "1", name: "item1", photos: [], category: "Couches", notes: "N/A", quantity: 2, size: "Large",  dateAdded: Timestamp.fromDate(new Date("2025-10-27T16:00:00Z")), donorEmail: null },
-  { id: "2", name: "item2", photos: [], category: "Chairs",  notes: "N/A", quantity: 1, size: "Medium", dateAdded: Timestamp.fromDate(new Date("2025-10-28T16:00:00Z")), donorEmail: null },
-  { id: "3", name: "item3", photos: [], category: "Tables",  notes: "N/A", quantity: 3, size: "Small",  dateAdded: Timestamp.fromDate(new Date("2025-10-29T16:00:00Z")), donorEmail: null },
-  { id: "4", name: "item4", photos: [], category: "Tables",  notes: "N/A", quantity: 1, size: "Small",  dateAdded: Timestamp.fromDate(new Date("2025-10-30T16:00:00Z")), donorEmail: null },
-  { id: "5", name: "item5", photos: [], category: "Tables",  notes: "N/A", quantity: 5, size: "Small",  dateAdded: Timestamp.fromDate(new Date("2025-10-31T16:00:00Z")), donorEmail: null },
+  {
+    id: "1",
+    name: "item1",
+    photos: [],
+    category: "Couches",
+    notes: "N/A",
+    quantity: 2,
+    size: "Large",
+    dateAdded: Timestamp.fromDate(new Date("2025-10-27T16:00:00Z")),
+    donorEmail: null,
+  },
+  {
+    id: "2",
+    name: "item2",
+    photos: [],
+    category: "Chairs",
+    notes: "N/A",
+    quantity: 1,
+    size: "Medium",
+    dateAdded: Timestamp.fromDate(new Date("2025-10-28T16:00:00Z")),
+    donorEmail: null,
+  },
+  {
+    id: "3",
+    name: "item3",
+    photos: [],
+    category: "Tables",
+    notes: "N/A",
+    quantity: 3,
+    size: "Small",
+    dateAdded: Timestamp.fromDate(new Date("2025-10-29T16:00:00Z")),
+    donorEmail: null,
+  },
+  {
+    id: "4",
+    name: "item4",
+    photos: [],
+    category: "Tables",
+    notes: "N/A",
+    quantity: 1,
+    size: "Small",
+    dateAdded: Timestamp.fromDate(new Date("2025-10-30T16:00:00Z")),
+    donorEmail: null,
+  },
+  {
+    id: "5",
+    name: "item5",
+    photos: [],
+    category: "Tables",
+    notes: "N/A",
+    quantity: 5,
+    size: "Small",
+    dateAdded: Timestamp.fromDate(new Date("2025-10-31T16:00:00Z")),
+    donorEmail: null,
+  },
 ];
+
 const MOCK_DONATION_REQUEST: DonationRequest = {
   id: "1",
   donor: {
@@ -44,12 +95,12 @@ const MOCK_DONATION_REQUEST: DonationRequest = {
   howDidYouHear: "",
   canDropOff: false,
   notes: "",
-  date: Timestamp.now()
+  date: Timestamp.now(),
 };
 
 const MOCK_DONATION_ITEM = (record: InventoryRecord): DonationItem => ({
   item: record,
-  status: "Not Reviewed"
+  status: "Not Reviewed",
 });
 
 export default function WarehousePage() {
@@ -63,9 +114,10 @@ export default function WarehousePage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"gallery" | "table">("gallery");
   const [selectedDR, setSelectedDR] = useState<DonationRequest | null>(null);
-  const [selectedRecord, setSelectedRecord] = useState<InventoryRecord | null>(null);
+  const [selectedRecord, setSelectedRecord] =
+    useState<InventoryRecord | null>(null);
   const [isItemModalOpen, setIsItemModalOpen] = useState(false);
-  
+
   const params: SearchParams = useMemo(
     () => ({
       categories: category === "Any" ? [] : [category],
@@ -79,7 +131,8 @@ export default function WarehousePage() {
   const localFilterAndSort = useCallback((q: string, p: SearchParams) => {
     const query = q.toLowerCase().trim();
     return ITEMS.filter((r) => {
-      if (p.categories.length && !p.categories.includes(r.category)) return false;
+      if (p.categories.length && !p.categories.includes(r.category))
+        return false;
       if (p.sizes.length && !p.sizes.includes(r.size)) return false;
       const keys = `${r.name} ${r.category} ${r.notes} ${r.size}`.toLowerCase();
       return keys.includes(query);
@@ -117,7 +170,10 @@ export default function WarehousePage() {
         <SortToggle
           sortBy={sortKey}
           ascending={ascending}
-          onChange={(k, asc) => { setSortKey(k); setAscending(asc); }}
+          onChange={(k, asc) => {
+            setSortKey(k);
+            setAscending(asc);
+          }}
         />
         <NewItemButton onClick={() => setIsAddModalOpen(true)} />
         <AddItem
@@ -133,11 +189,37 @@ export default function WarehousePage() {
             onClick={() => setViewMode("table")}
             className={`p-1 rounded hover:bg-gray-200"}`}
           >
-            <svg width="23" height="20" viewBox="0 0 23 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect y="0.5" width="23" height="4" fill={viewMode === "table" ? "#505050" : "#C0C0C0"}/>
-              <rect y="5.5" width="23" height="4" fill={viewMode === "table" ? "#505050" : "#C0C0C0"}/>
-              <rect y="10.5" width="23" height="4" fill={viewMode === "table" ? "#505050" : "#C0C0C0"}/>
-              <rect y="15.5" width="23" height="4" fill={viewMode === "table" ? "#505050" : "#C0C0C0"} />
+            <svg
+              width="23"
+              height="20"
+              viewBox="0 0 23 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect
+                y="0.5"
+                width="23"
+                height="4"
+                fill={viewMode === "table" ? "#505050" : "#C0C0C0"}
+              />
+              <rect
+                y="5.5"
+                width="23"
+                height="4"
+                fill={viewMode === "table" ? "#505050" : "#C0C0C0"}
+              />
+              <rect
+                y="10.5"
+                width="23"
+                height="4"
+                fill={viewMode === "table" ? "#505050" : "#C0C0C0"}
+              />
+              <rect
+                y="15.5"
+                width="23"
+                height="4"
+                fill={viewMode === "table" ? "#505050" : "#C0C0C0"}
+              />
             </svg>
           </button>
 
@@ -145,22 +227,75 @@ export default function WarehousePage() {
             onClick={() => setViewMode("gallery")}
             className={`p-1 rounded hover:bg-gray-200"}`}
           >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="6" height="6" fill={viewMode === "gallery" ? "#505050" : "#C0C0C0"}/>
-              <rect x="7" width="6" height="6" fill={viewMode === "gallery" ? "#505050" : "#C0C0C0"}/>
-              <rect x="14" width="6" height="6" fill={viewMode === "gallery" ? "#505050" : "#C0C0C0"}/>
-              <rect y="7" width="6" height="6" fill={viewMode === "gallery" ? "#505050" : "#C0C0C0"}/>
-              <rect x="7" y="7" width="6" height="6" fill={viewMode === "gallery" ? "#505050" : "#C0C0C0"}/>
-              <rect x="14" y="7" width="6" height="6" fill={viewMode === "gallery" ? "#505050" : "#C0C0C0"}/>
-              <rect y="14" width="6" height="6" fill={viewMode === "gallery" ? "#505050" : "#C0C0C0"}/>
-              <rect x="7" y="14" width="6" height="6" fill={viewMode === "gallery" ? "#505050" : "#C0C0C0"}/>
-              <rect x="14" y="14" width="6" height="6" fill={viewMode === "gallery" ? "#505050" : "#C0C0C0"}/>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect
+                width="6"
+                height="6"
+                fill={viewMode === "gallery" ? "#505050" : "#C0C0C0"}
+              />
+              <rect
+                x="7"
+                width="6"
+                height="6"
+                fill={viewMode === "gallery" ? "#505050" : "#C0C0C0"}
+              />
+              <rect
+                x="14"
+                width="6"
+                height="6"
+                fill={viewMode === "gallery" ? "#505050" : "#C0C0C0"}
+              />
+              <rect
+                y="7"
+                width="6"
+                height="6"
+                fill={viewMode === "gallery" ? "#505050" : "#C0C0C0"}
+              />
+              <rect
+                x="7"
+                y="7"
+                width="6"
+                height="6"
+                fill={viewMode === "gallery" ? "#505050" : "#C0C0C0"}
+              />
+              <rect
+                x="14"
+                y="7"
+                width="6"
+                height="6"
+                fill={viewMode === "gallery" ? "#505050" : "#C0C0C0"}
+              />
+              <rect
+                y="14"
+                width="6"
+                height="6"
+                fill={viewMode === "gallery" ? "#505050" : "#C0C0C0"}
+              />
+              <rect
+                x="7"
+                y="14"
+                width="6"
+                height="6"
+                fill={viewMode === "gallery" ? "#505050" : "#C0C0C0"}
+              />
+              <rect
+                x="14"
+                y="14"
+                width="6"
+                height="6"
+                fill={viewMode === "gallery" ? "#505050" : "#C0C0C0"}
+              />
             </svg>
           </button>
         </div>
-
       </div>
-      
+
       <div className="flex-1 flex-wrap overflow-y-auto min-h-0 min-w-0">
         {viewMode === "gallery" ? (
           <div className="grid grid-cols-4 gap-6">
@@ -169,31 +304,50 @@ export default function WarehousePage() {
                 key={record.id}
                 onClick={() => {
                   setSelectedItem(MOCK_DONATION_ITEM(record));
-                  setSelectedDR(MOCK_DONATION_REQUEST);  
+                  setSelectedDR(MOCK_DONATION_REQUEST);
                   setIsItemModalOpen(true);
                 }}
-                className="cursor-pointer hover:scale-[1.02] transition-transform duration-150">
-                <GalleryItem item={record} />
+                className="cursor-pointer hover:scale-[1.02] transition-transform duration-150"
+              >
+                <GalleryItem
+                  item={record}
+                  onDeleted={(id) => {
+                    // update backend results state so gallery refreshes
+                    setResults((prev) => {
+                      const base = prev ?? itemsToDisplay;
+                      return base.filter((r) => r.id !== id);
+                    });
+                  }}
+                />
               </div>
             ))}
           </div>
         ) : (
           <TableView
-            inventoryRecords={itemsToDisplay} 
-            openItem={(record) => {
-                setSelectedItem(MOCK_DONATION_ITEM(record)); 
-                setSelectedDR(MOCK_DONATION_REQUEST);      
-                setIsItemModalOpen(true);  
-            }}/>
+          inventoryRecords={itemsToDisplay}
+          openItem={(record) => {
+            setSelectedItem(MOCK_DONATION_ITEM(record));
+          setSelectedDR(MOCK_DONATION_REQUEST);
+          setIsItemModalOpen(true);
+          }}
+          onDeleted={(id) => {
+            setResults((prev) => {
+          const base = prev ?? itemsToDisplay;
+          return base.filter((r) => r.id !== id);
+      });
+  }}
+/>
+
         )}
       </div>
       {selectedItem && selectedDR && isItemModalOpen && (
         <InventoryItemView
           dr={selectedDR}
           //currently using frontend implementation to test item view, will implement backend later
-          onClose={() => setIsItemModalOpen(false)} item={{
+          onClose={() => setIsItemModalOpen(false)}
+          item={{
             item: {
-              id: "",
+              id: "5",
               name: "Testing furniture",
               photos: [],
               category: "Couches",
@@ -203,8 +357,9 @@ export default function WarehousePage() {
               dateAdded: Timestamp.now(),
               donorEmail: "tester@gmail.com",
             },
-            status: "Not Reviewed"
-          }}        />
+            status: "Not Reviewed",
+          }}
+        />
       )}
     </div>
   );

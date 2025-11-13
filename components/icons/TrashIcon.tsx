@@ -1,3 +1,4 @@
+// components/icons/TrashIcon.tsx
 "use client";
 
 import { useState, MouseEvent } from "react";
@@ -10,11 +11,17 @@ type TrashIconProps = {
   className?: string;
 };
 
-export function TrashIcon({ id, onDeleted, confirm = true, className = "" }: TrashIconProps) {
+export function TrashIcon({
+  id,
+  onDeleted,
+  confirm = true,
+  className = "",
+}: TrashIconProps) {
   const [busy, setBusy] = useState(false);
 
   async function handleClick(e: MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
+    e.stopPropagation();
     if (busy) return;
 
     if (confirm) {
@@ -24,7 +31,9 @@ export function TrashIcon({ id, onDeleted, confirm = true, className = "" }: Tra
 
     try {
       setBusy(true);
+      // actually delete from Firestore
       await deleteInventoryRecord(id);
+      // tell parent which item was deleted
       onDeleted?.(id);
     } catch (err) {
       console.error(err);
