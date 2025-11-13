@@ -3,6 +3,7 @@
 import { InventoryRecord } from "../types/inventory";
 import InventoryItem from "../app/inventory/warehouse/page";
 import ItemTag, { categoryColors, quantityColors, sizeColors } from "./ItemTag";
+import { Badge } from "./Badge";
 
 type GalleryItemProps = {
     item: InventoryRecord;
@@ -19,9 +20,16 @@ export default function GalleryItem({item}: GalleryItemProps) {
             </div>
             <div className="justify-start pt-[1.5em] font-bold text-[1.5em]">{item.name}</div>
             <div className="text-[1.125em] flex flex-wrap gap-[0.5em] pt-[0.5em] pb-[0.5em]">
-                <ItemTag name={item.size} color={sizeColors[item.size]} />
-                <ItemTag name={item.category} color={categoryColors(item.category)} />
-                <ItemTag name={`${item.quantity}`} color={quantityColors(item.quantity)} />
+                <Badge text={item.category} color="blue" />
+                <Badge text={item.size} color={
+                        (item.size == "Large") ? "pink" :
+                        (item.size == "Medium") ? "purple" :
+                        "yellow"
+                    }/>
+                <Badge
+                    text={item.quantity.toString()}
+                    color="orange"
+                />
             </div>
             <div className=" text-[1.25em] text-gray-400">{item.dateAdded.toDate().toLocaleDateString()}</div>
         </div>

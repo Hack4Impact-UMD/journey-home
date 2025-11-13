@@ -28,9 +28,9 @@ const ITEMS: InventoryRecord[] = [
 const MOCK_DONATION_REQUEST: DonationRequest = {
   id: "1",
   donor: {
-    firstName: "John",
-    lastName: "Doe",
-    email: "john@example.com",
+    firstName: "TEST",
+    lastName: "TEST",
+    email: "TEST@example.com",
     phoneNumber: "123-456-7890",
     address: {
       streetAddress: "123 Main St",
@@ -191,20 +191,8 @@ export default function WarehousePage() {
         <InventoryItemView
           dr={selectedDR}
           //currently using frontend implementation to test item view, will implement backend later
-          onClose={() => setIsItemModalOpen(false)} item={{
-            item: {
-              id: "",
-              name: "Testing furniture",
-              photos: [],
-              category: "Couches",
-              notes: "N/A",
-              quantity: 3,
-              size: "Large",
-              dateAdded: Timestamp.now(),
-              donorEmail: "tester@gmail.com",
-            },
-            status: "Not Reviewed"
-          }}        />
+          item={MOCK_DONATION_ITEM(ITEMS[0])}
+          onClose={() => setIsItemModalOpen(false)}     />
       )}
     </div>
   );
