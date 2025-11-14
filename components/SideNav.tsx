@@ -66,7 +66,7 @@ export default function SideNavbar() {
     ]
 
     return (
-        <div className="h-full w-50 p-4 bg-[#FFFFFF] border-r flex flex-col font-family-roboto">
+        <div className="h-full w-50 p-4 bg-[#FFFFFF] flex flex-col font-family-roboto">
             <div className= "pb-4">
             <span className="text-primary font-extrabold pb-4">Admin</span>
             </div>
