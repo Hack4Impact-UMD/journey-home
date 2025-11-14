@@ -1,4 +1,4 @@
-import { UserRole } from "@/types/user";
+import { UserRole, UserStatus } from "@/types/user";
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
@@ -17,7 +17,7 @@ export async function signUp(
     lastName: string,
     dob: string,
     role: UserRole
-): Promise<User> {
+): Promise<{ user: User; status: UserStatus }> {
     const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
@@ -25,12 +25,17 @@ export async function signUp(
     );
     const user = userCredential.user;
 
-    // Use the existing createUserInDB function to ensure consistency
-    // This creates user in "Users" collection with the selected role and status="pending"
+    // Map role consistently
     const roleStr = role as string;
     const mappedRole: UserRole = 
       roleStr === "Administrator" ? "Admin" :
-      role as UserRole; 
+      role as UserRole;
+    
+    // Determine status based on role
+    const status: UserStatus = 
+      mappedRole === "Admin" || role === "Case Manager"
+        ? "pending" 
+        : "approved";
     
     const userRecord: UserData = {
         uid: user.uid,
@@ -38,23 +43,15 @@ export async function signUp(
         lastName,
         email: user.email!,
         dob: dob ? Timestamp.fromDate(new Date(dob)) : null,
-        role: mappedRole, 
+        role: mappedRole,
+        status: status,  // Add status here
         emailVerified: user.emailVerified,
+        createdAt: new Date().toISOString(),  // Add timestamp
     };
 
     await createUserInDB(userRecord);
 
-    return user;
-    // let err = error as FirebaseError;
-    // if (err.code === "auth/email-already-in-use") {
-    //     return "This email is already registered.";
-    // } else if (err.code === "auth/weak-password") {
-    //     return "Password must be 6 characters or longer.";
-    // } else if (err.code === "auth/invalid-email") {
-    //     return "Invalid Email Address";
-    // } else {
-    //     return err.message;
-    // }
+    return { user, status };
 }
 
 export async function login(email: string, password: string): Promise<User> {

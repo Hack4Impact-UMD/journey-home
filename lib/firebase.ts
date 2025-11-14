@@ -12,14 +12,22 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+// Debug: Check if config is loaded
+console.log('Firebase Config:', {
+  apiKey: firebaseConfig.apiKey ? 'exists' : 'missing',
+  projectId: firebaseConfig.projectId,
+  useEmulator: process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR
+});
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app); 
-
 const auth = getAuth(app);
 
-
+// TEMPORARILY DISABLED - Force production Firebase
+/*
 if(process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true' && typeof window !== 'undefined') {
+  console.log('Using Firebase Emulators');
   connectFirestoreEmulator(
     db, 
     process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_HOST ?? 'localhost', 
@@ -33,11 +41,14 @@ if(process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true' && typeof window !==
   );
 
   connectAuthEmulator(
-  auth,
-  `http://${process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_HOST ?? 'localhost'}:${process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_AUTH_PORT ?? '9099'}`
+    auth,
+    `http://${process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_HOST ?? 'localhost'}:${process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_AUTH_PORT ?? '9099'}`
   );
-
-}
+} else {
+*/
+  console.log('Using Production Firebase');
+// }
 
 export { app, db, storage, auth};
 export default app;
+

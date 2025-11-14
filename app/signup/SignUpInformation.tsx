@@ -34,10 +34,13 @@ export default function SignUpInformation({
 
         setLoading(true);
         try {
-
-            await signUp(email, pw, first, last, dob, selectedRole);
-            router.push("/inventory");
-
+            const { status } = await signUp(email, pw, first, last, dob, selectedRole);
+            
+            if (status === "pending") {
+                router.push("/status?type=pending");
+            } else {
+                router.push("/status?type=created");
+            }
         } catch (e: unknown) {
             console.error("Signup failed:", e);
             setErr((e as FirebaseError).message);
@@ -47,7 +50,7 @@ export default function SignUpInformation({
     }
 
     return (
-        <div className="">
+        <div>
             <div className="relative mb-9">
                 <button onClick={onBack} className="absolute left-0 text-2xl">
                     ←
@@ -127,7 +130,7 @@ export default function SignUpInformation({
                 />
 
                 <div className="mt-6 flex justify-center mb-3 flex-col">
-                    {err ? <span className="text-red-500 text-center mb-2">{err}</span> : null}
+                    {err && <span className="text-red-500 text-center mb-2">{err}</span>}
                     <button
                         type="submit"
                         disabled={loading}
@@ -138,14 +141,7 @@ export default function SignUpInformation({
                 </div>
 
                 <p className="text-center">
-                    Already have an account?{" "}
-                    <a
-                        href="/login"
-                        className="font-semibold hover:underline"
-                        style={{ color: "var(--color-primary)" }}
-                    >
-                        Login
-                    </a>
+                    Already have an account? <a href="/login" className="font-semibold hover:underline" style={{ color: "var(--color-primary)" }}>Login</a>
                 </p>
             </form>
         </div>

@@ -5,6 +5,8 @@ import { Timestamp } from "firebase/firestore"
 
 export type UserRole = "Admin" | "Donor" | "Recipient" | "Pending" | "Case Manager" | "Volunteer" | "Administrator";
 
+export type UserStatus = "pending" | "approved" | "rejected" | "previous";
+
 export type UserData = {
     uid: string,
     firstName: string,
@@ -12,7 +14,11 @@ export type UserData = {
     email: string,
     dob: Timestamp | null,
     role: UserRole,
-    emailVerified: boolean
+    status?: UserStatus,  
+    emailVerified: boolean,
+    createdAt?: string,
+    approvedAt?: string,
+    rejectedAt?: string
 }
 
 export interface AuthContextType {
@@ -26,10 +32,10 @@ export interface AuthContextType {
         lastName: string,
         dob: string,
         role: UserRole
-    ) => Promise<User>;
+    ) => Promise<{ user: User; status: UserStatus }>;  // Update return type
     login: (
         email: string, 
         password: string
     ) => Promise<User>;
     logout: () => Promise<void>;
-  }
+}

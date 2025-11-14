@@ -14,7 +14,7 @@ export const createUserInDB = async (user: UserData) => {
   const userRef = doc(db, "Users", user.uid);
   await setDoc(userRef, {
     ...user,
-    status: "pending", // Status is pending until admin approval
+    // Status is already set in the user object from signup (either "pending" or "approved")
     createdAt: Timestamp.now(),
   });
 };
@@ -33,9 +33,10 @@ export const fetchAllUsers = async (): Promise<UserData[]> => {
 
 /**
  * Fetch users filtered by status for tab population
+ * Updated to use "approved" instead of "active"
  */
 export const fetchUsersByStatus = async (
-  status: "active" | "pending" | "previous"
+  status: "approved" | "pending" | "previous"
 ): Promise<UserData[]> => {
   const snapshot = await getDocs(usersCol);
   const users: UserData[] = [];
@@ -67,6 +68,7 @@ export const fetchPendingUsersByDate = async (): Promise<UserData[]> => {
 
 /**
  * Admin-only: update a user's role
+ * Sets status to "approved" when role is updated
  */
 export const updateUserRole = async (
   currentUserRole: UserRole,
@@ -78,13 +80,13 @@ export const updateUserRole = async (
   const userRef = doc(db, "Users", uid);
   await updateDoc(userRef, {
     role: newRole,
-    status: "active", // activating user when role is updated
+    status: "approved", // Changed from "active" to "approved"
   });
 };
 
 /**
  * Admin-only: approve pending account
- * Keeps the existing role, just changes status to "active"
+ * Changes status to "approved" and updates role if needed
  */
 export const approveAccount = async (
   currentUserRole: UserRole,
@@ -96,19 +98,22 @@ export const approveAccount = async (
   const userRef = doc(db, "Users", uid);
   await updateDoc(userRef, {
     role, // Update role if admin wants to change it during approval
-    status: "active",
+    status: "approved", // Changed from "active" to "approved"
+    approvedAt: Timestamp.now(), // Track when account was approved
   });
 };
 
 /**
  * Admin-only: reject pending account
+ * Sets status to "rejected"
  */
 export const rejectAccount = async (currentUserRole: UserRole, uid: string) => {
   if (currentUserRole !== "Admin") throw new Error("Unauthorized: only admins can reject accounts");
 
   const userRef = doc(db, "Users", uid);
   await updateDoc(userRef, {
-    status: "previous",
+    status: "rejected", // Changed from "previous" to "rejected"
+    rejectedAt: Timestamp.now(), // Track when account was rejected
   });
 };
 
