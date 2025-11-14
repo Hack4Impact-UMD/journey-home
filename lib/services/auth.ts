@@ -1,12 +1,14 @@
-import { UserRole } from "@/types/user";
+import { UserRole, UserStatus } from "@/types/user";
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     signOut,
     User,
 } from "firebase/auth";
-import { auth, db } from "../firebase";
-import { doc, setDoc, Timestamp } from "firebase/firestore";
+import { auth } from "../firebase";
+import { Timestamp } from "firebase/firestore";
+import { createUserInDB } from "./users";
+import { UserData } from "@/types/user";
 
 export async function signUp(
     email: string,
@@ -15,7 +17,7 @@ export async function signUp(
     lastName: string,
     dob: string,
     role: UserRole
-): Promise<User> {
+): Promise<{ user: User; status: UserStatus }> {
     const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
@@ -23,27 +25,33 @@ export async function signUp(
     );
     const user = userCredential.user;
 
-    await setDoc(doc(db, "users", user.uid), {
+    // Map role consistently
+    const roleStr = role as string;
+    const mappedRole: UserRole = 
+      roleStr === "Administrator" ? "Admin" :
+      role as UserRole;
+    
+    // Determine status based on role
+    const status: UserStatus = 
+      mappedRole === "Admin" || role === "Case Manager"
+        ? "pending" 
+        : "approved";
+    
+    const userRecord: UserData = {
         uid: user.uid,
-        email: email,
-        firstName: firstName,
-        lastName: lastName,
+        firstName,
+        lastName,
+        email: user.email!,
         dob: dob ? Timestamp.fromDate(new Date(dob)) : null,
-        role: role,
-        emailVerified: false,
-    });
+        role: mappedRole,
+        status: status,  // Add status here
+        emailVerified: user.emailVerified,
+        createdAt: new Date().toISOString(),  // Add timestamp
+    };
 
-    return user;
-    // let err = error as FirebaseError;
-    // if (err.code === "auth/email-already-in-use") {
-    //     return "This email is already registered.";
-    // } else if (err.code === "auth/weak-password") {
-    //     return "Password must be 6 characters or longer.";
-    // } else if (err.code === "auth/invalid-email") {
-    //     return "Invalid Email Address";
-    // } else {
-    //     return err.message;
-    // }
+    await createUserInDB(userRecord);
+
+    return { user, status };
 }
 
 export async function login(email: string, password: string): Promise<User> {
