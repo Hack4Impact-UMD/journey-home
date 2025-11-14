@@ -32,9 +32,14 @@ const EditItem: React.FC<EditItemProps> = ({ item, isOpen, onClose, onUpdated })
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!item || !item.id) {
+    console.error("Item or item.id is missing");
+    return;
+    }
 
     const updated: InventoryRecord = {
       ...item,
+      id: item?.id,
       name: name.trim(),
       category,
       size: size as "Small" | "Medium" | "Large",

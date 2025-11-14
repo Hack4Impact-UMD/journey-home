@@ -2,101 +2,19 @@
 "use client";
 
 import GalleryItem from "@/components/GalleryItem";
-import SearchBar from "@/components/SearchBar";
-import CategorySelect from "@/components/CategorySelect";
-import SizeSelect from "@/components/SizeSelect";
 import SortToggle, { SortKeyToggle } from "@/components/SortToggle";
 import AddItem from "@/components/AddItem";
-import Link from "next/link";
 import type { InventoryRecord, SearchParams } from "@/types/inventory";
 import { Timestamp } from "firebase/firestore";
-import { useCallback, useMemo, useState } from "react";
-import { search as searchBackend } from "@/lib/services/inventory";
-import EditItem from "@/components/EditItem";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { deleteInventoryRecord, search, search as searchBackend, setInventoryRecord } from "@/lib/services/inventory";
 import NewItemButton from "@/components/NewItemButton";
 import { DonationItem, DonationRequest } from "@/types/donations";
 import { TableView } from "@/components/TableView";
 import { InventoryItemView } from "@/components/InventoryItemView";
-
-const ITEMS: InventoryRecord[] = [
-  {
-    id: "1",
-    name: "item1",
-    photos: [],
-    category: "Couches",
-    notes: "N/A",
-    quantity: 2,
-    size: "Large",
-    dateAdded: Timestamp.fromDate(new Date("2025-10-27T16:00:00Z")),
-    donorEmail: null,
-  },
-  {
-    id: "2",
-    name: "item2",
-    photos: [],
-    category: "Chairs",
-    notes: "N/A",
-    quantity: 1,
-    size: "Medium",
-    dateAdded: Timestamp.fromDate(new Date("2025-10-28T16:00:00Z")),
-    donorEmail: null,
-  },
-  {
-    id: "3",
-    name: "item3",
-    photos: [],
-    category: "Tables",
-    notes: "N/A",
-    quantity: 3,
-    size: "Small",
-    dateAdded: Timestamp.fromDate(new Date("2025-10-29T16:00:00Z")),
-    donorEmail: null,
-  },
-  {
-    id: "4",
-    name: "item4",
-    photos: [],
-    category: "Tables",
-    notes: "N/A",
-    quantity: 1,
-    size: "Small",
-    dateAdded: Timestamp.fromDate(new Date("2025-10-30T16:00:00Z")),
-    donorEmail: null,
-  },
-  {
-    id: "5",
-    name: "item5",
-    photos: [],
-    category: "Tables",
-    notes: "N/A",
-    quantity: 5,
-    size: "Small",
-    dateAdded: Timestamp.fromDate(new Date("2025-10-31T16:00:00Z")),
-    donorEmail: null,
-  },
-];
-
-const MOCK_DONATION_REQUEST: DonationRequest = {
-  id: "1",
-  donor: {
-    firstName: "TEST",
-    lastName: "TEST",
-    email: "TEST@example.com",
-    phoneNumber: "123-456-7890",
-    address: {
-      streetAddress: "123 Main St",
-      city: "Anytown",
-      state: "NY",
-      zipCode: "12345",
-    },
-  },
-  items: [],
-  firstTimeDonor: false,
-  howDidYouHear: "",
-  canDropOff: false,
-  notes: "",
-  date: Timestamp.now(),
-};
+import { SearchBox } from "@/components/inventory/SearchBox";
+import { SortOption } from "@/components/inventory/SortOption";
+import { getDonationRequest } from "@/lib/services/donations";
 
 const MOCK_DONATION_ITEM = (record: InventoryRecord): DonationItem => ({
   item: record,
@@ -109,78 +27,95 @@ export default function WarehousePage() {
   const [size, setSize] = useState("Any");
   const [sortKey, setSortKey] = useState<SortKeyToggle>("Quantity");
   const [ascending, setAscending] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<DonationItem | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"gallery" | "table">("gallery");
   const [selectedDR, setSelectedDR] = useState<DonationRequest | null>(null);
-  const [selectedRecord, setSelectedRecord] =
-    useState<InventoryRecord | null>(null);
   const [isItemModalOpen, setIsItemModalOpen] = useState(false);
+  const [searchParams, setSearchParams] = useState<SearchParams>({ categories:[], sizes:[], sortBy: "Date", ascending:false})
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const params: SearchParams = useMemo(
-    () => ({
-      categories: category === "Any" ? [] : [category],
-      sizes: size === "Any" ? [] : [size],
-      sortBy: sortKey === "Quantity" ? "Quantity" : "Date",
-      ascending,
-    }),
-    [category, size, sortKey, ascending]
-  );
+  useEffect(() => {
+    searchBackend("", searchParams)
+      .then((data) => setResults(data))
+      .catch(() => setResults([]));
+  }, [searchParams]);
 
-  const localFilterAndSort = useCallback((q: string, p: SearchParams) => {
-    const query = q.toLowerCase().trim();
-    return ITEMS.filter((r) => {
-      if (p.categories.length && !p.categories.includes(r.category))
-        return false;
-      if (p.sizes.length && !p.sizes.includes(r.size)) return false;
-      const keys = `${r.name} ${r.category} ${r.notes} ${r.size}`.toLowerCase();
-      return keys.includes(query);
-    }).sort((a, b) => {
-      let d = 0;
-      if (p.sortBy === "Date") d = a.dateAdded.seconds - b.dateAdded.seconds;
-      else if (p.sortBy === "Quantity") d = a.quantity - b.quantity;
-      else d = a.name.localeCompare(b.name);
-      return p.ascending ? d : -d;
-    });
-  }, []);
+  const itemsToDisplay = results && results.length > 0 ? results : [];
 
-  const onSearch = useCallback(
-    async (q: string) => {
-      try {
-        const data = await searchBackend(q, params);
-        setResults(data);
-      } catch {
-        setResults(localFilterAndSort(q, params));
-      }
-    },
-    [params, localFilterAndSort]
-  );
-
-  const itemsToDisplay = results ?? ITEMS;
+  const handleOpenItem = async (record: InventoryRecord) => {
+  try {
+    let dr = await getDonationRequest(record.id); 
+    //since there aren't any donationRequests in the backend, item view will not show up unless there is a pre-existing donation request in firebase
+    //so we've added a default one for now and will re-implement later
+    if (!dr) {
+      dr = {
+        id: record.id,
+        donor: {
+          firstName: "Hack", lastName: "4Impact", email: "hack4impact",
+          phoneNumber: "",
+          address: {
+            streetAddress: "UMD",
+            city: "College Park",
+            state: "MD",
+            zipCode: ""
+          }
+        },
+        date: Timestamp.now(),
+        items: [MOCK_DONATION_ITEM(record)],
+        firstTimeDonor: false,
+        howDidYouHear: "",
+        canDropOff: false,
+        notes: "",
+      };
+    }
+    setSelectedDR(dr); 
+    setSelectedItem(MOCK_DONATION_ITEM(record)); 
+    setIsItemModalOpen(true); 
+    
+  } catch (err) {
+    console.error("Failed to load donation request", err);
+  }
+};
 
   return (
-    <div className="p-6 flex flex-wrap flex-1 flex-col h-[calc(80vh-5rem)] min-h-0 overflow-hidden">
-      <div className="mb-6 flex gap-2 flex-row items-center justify-start">
-        <div>
-          <SearchBar onSearch={onSearch} />
-        </div>
-        <CategorySelect value={category} onChange={setCategory} />
-        <SizeSelect value={size} onChange={setSize} />
-        <SortToggle
-          sortBy={sortKey}
-          ascending={ascending}
-          onChange={(k, asc) => {
-            setSortKey(k);
-            setAscending(asc);
-          }}
-        />
-        <NewItemButton onClick={() => setIsAddModalOpen(true)} />
+    <div className="p-3 flex flex-wrap flex-1 flex-col h-[calc(80vh-5rem)] min-h-0 overflow-hidden">
+      <div className="flex items-center justify-between gap-3 mb-6">
+      <div className="flex gap-3">
+          <SearchBox value={searchQuery} onChange={setSearchQuery} 
+            onSubmit={() => {
+              search(searchQuery, searchParams).then((res) => {
+              setResults(res);
+            })
+          }}/>
+          <SortOption 
+            label="Date" 
+            status={
+                (searchParams.sortBy != "Date") ? "none" :
+                (searchParams.ascending) ? "asc" : "desc"
+            }
+            onChange={status => {
+                  setSearchParams(prev => ({...prev, sortBy: "Date", ascending: (status == "asc")}));
+            }}
+          />
+          <SortOption 
+            label="Qnt" 
+            status={
+                (searchParams.sortBy != "Quantity") ? "none" :
+                (searchParams.ascending) ? "asc" : "desc"
+            }
+            onChange={status => {
+                setSearchParams(prev => ({...prev, sortBy: "Quantity", ascending: (status == "asc")}));
+            }}
+          />
+          <NewItemButton onClick={() => setIsAddModalOpen(true)} />
+      </div>
+      <div className="flex-col mb-6 gap-3">
         <AddItem
           isOpen={isAddModalOpen}
           onClose={() => setIsAddModalOpen(false)}
           onCreated={(record) => {
-            setResults((prev) => [record, ...(prev ?? ITEMS)]);
+            setResults((prev) => [record, ...(prev ?? [])]);
             setIsAddModalOpen(false);
           }}
         />
@@ -295,6 +230,7 @@ export default function WarehousePage() {
           </button>
         </div>
       </div>
+    </div>
 
       <div className="flex-1 flex-wrap overflow-y-auto min-h-0 min-w-0">
         {viewMode === "gallery" ? (
@@ -302,15 +238,11 @@ export default function WarehousePage() {
             {itemsToDisplay.map((record) => (
               <div
                 key={record.id}
-                onClick={() => {
-                  setSelectedItem(MOCK_DONATION_ITEM(record));
-                  setSelectedDR(MOCK_DONATION_REQUEST);
-                  setIsItemModalOpen(true);
-                }}
                 className="cursor-pointer hover:scale-[1.02] transition-transform duration-150"
               >
                 <GalleryItem
                   item={record}
+                  onClick={() => void handleOpenItem(record)}
                   onDeleted={(id) => {
                     // update backend results state so gallery refreshes
                     setResults((prev) => {
@@ -325,28 +257,24 @@ export default function WarehousePage() {
         ) : (
           <TableView
           inventoryRecords={itemsToDisplay}
-          openItem={(record) => {
-            setSelectedItem(MOCK_DONATION_ITEM(record));
-          setSelectedDR(MOCK_DONATION_REQUEST);
-          setIsItemModalOpen(true);
-          }}
-          onDeleted={(id) => {
+          openItem={(record) => void handleOpenItem(record)}
+          onDelete={async (id: string) => {
+            await deleteInventoryRecord(id);
             setResults((prev) => {
-          const base = prev ?? itemsToDisplay;
-          return base.filter((r) => r.id !== id);
-      });
-  }}
-/>
-
+              const base = prev ?? itemsToDisplay;
+              return base.filter((r) => r.id !== id);
+            });
+          }}
+          />
         )}
       </div>
       {selectedItem && selectedDR && isItemModalOpen && (
         <InventoryItemView
           dr={selectedDR}
-          //currently using frontend implementation to test item view, will implement backend later
-          item={MOCK_DONATION_ITEM(ITEMS[0])}
+          item={selectedItem}
           onClose={() => setIsItemModalOpen(false)}     />
       )}
     </div>
+    
   );
 }
