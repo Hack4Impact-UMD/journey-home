@@ -34,20 +34,20 @@ export default function StockSidebar() {
     })();
   }, [isOpen]);
 
-  const FALLBACK: InventoryRecord[] = [
-    { id: "1", name: "item1", photos: [], category: "Couches", notes: "N/A", quantity: 2, size: "Large",  dateAdded: Timestamp.fromDate(new Date("2025-10-27T16:00:00Z")), donorEmail: null },
-    { id: "2", name: "item2", photos: [], category: "Chairs",  notes: "N/A", quantity: 1, size: "Medium", dateAdded: Timestamp.fromDate(new Date("2025-10-28T16:00:00Z")), donorEmail: null },
-    { id: "3", name: "item3", photos: [], category: "Tables",  notes: "N/A", quantity: 3, size: "Small",  dateAdded: Timestamp.fromDate(new Date("2025-10-29T16:00:00Z")), donorEmail: null },
-    { id: "4", name: "item4", photos: [], category: "Tables",  notes: "N/A", quantity: 1, size: "Small",  dateAdded: Timestamp.fromDate(new Date("2025-10-30T16:00:00Z")), donorEmail: null },
-    { id: "5", name: "item5", photos: [], category: "Tables",  notes: "N/A", quantity: 5, size: "Small",  dateAdded: Timestamp.fromDate(new Date("2025-10-31T16:00:00Z")), donorEmail: null },
-  ];
+  const ITEMS = items ?? [];
 
-  const ITEMS = items ?? FALLBACK;
 
-  // Progress bar scale (avoid divide-by-zero)
-  const maxQty = useMemo(() => {
-    const m = Math.max(1, ...ITEMS.map(i => i.quantity ?? 0));
-    // Keep a gentle cap so the bar doesn’t look full for tiny numbers
+  const itemsByCategory = useMemo(() => {
+    const grouped: Record<string, number> = {}; // now storing total quantity per category
+    for (const item of ITEMS) {
+        const category = item.category || "Uncategorized";
+        grouped[category] = (grouped[category] || 0) + (item.quantity ?? 0);
+    }
+    return grouped;
+  }, [ITEMS]);
+
+  const maxQuantity = useMemo(() => {
+    const m = Math.max(1, ...Object.values(itemsByCategory));
     return Math.max(m, 21);
   }, [ITEMS]);
 
@@ -83,17 +83,17 @@ export default function StockSidebar() {
             <div className="text-sm text-gray-500">No items found.</div>
           )}
           {!loading &&
-            ITEMS.map((item) => (
-              <div key={item.id} className="space-y-1">
-                <span className="block text-sm font-medium text-gray-800">{item.name}</span>
+            Object.entries(itemsByCategory).map(([category, totalQuantity]) => (
+              <div key={category} className="space-y-1">
+                <span className="block text-sm font-medium text-gray-800">{category}</span>
                 <div className="flex items-center space-x-2">
                   <div className="flex-1 h-2 bg-gray-100 rounded">
                     <div
-                      className={`h-2 rounded ${item.quantity < 5 ? "bg-red-500" : "bg-green-500"}`}
-                      style={{ width: `${Math.min(100, (item.quantity / maxQty) * 100)}%` }}
+                      className={`h-2 rounded ${totalQuantity < 5 ? "bg-red-500" : "bg-green-500"}`}
+                      style={{ width: `${Math.min(100, (totalQuantity / maxQuantity) * 100)}%` }}
                     />
                   </div>
-                  <span className="text-sm text-gray-700">{item.quantity}</span>
+                  <span className="text-sm text-gray-700">{totalQuantity}</span>
                 </div>
               </div>
             ))}

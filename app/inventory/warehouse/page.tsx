@@ -348,10 +348,13 @@ export default function WarehousePage() {
           item={selectedItem}
           onClose={() => setIsItemModalOpen(false)}
           onUpdatedItem={(updated) => {
+            // update list feeding GalleryItem/TableView
             setResults((prev) => {
               const base = prev ?? itemsToDisplay;
               return base.map((r) => (r.id === updated.id ? updated : r));
             });
+
+            // also update the selectedItem (so modal shows fresh data if reopened)
             setSelectedItem((prev) =>
               prev ? { ...prev, item: updated } : prev
             );

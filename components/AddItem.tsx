@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Timestamp } from "firebase/firestore";
-import { setInventoryRecord } from "@/lib/services/inventory";
+import { collection, doc, Timestamp } from "firebase/firestore";
+import { setInventoryRecord, WAREHOUSE_COLLECTION } from "@/lib/services/inventory";
 import type { InventoryRecord } from "@/types/inventory";
+import { db } from "@/lib/firebase";
 
 interface AddItemProps {
   isOpen: boolean;
@@ -17,28 +18,33 @@ const AddItem: React.FC<AddItemProps> = ({ isOpen, onClose, onCreated }) => {
   const [name, setName] = useState("");
   const [category, setCategory] = useState<string>("");
   const [size, setSize] = useState<"Small" | "Medium" | "Large" | "">("");
-  const [quantity, setQuantity] = useState<number>(1);
+  const [quantity, setQuantity] = useState<number | null>(1);
   const [notes, setNotes] = useState("");
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    const record: InventoryRecord = {
-      id: crypto.randomUUID(),
+    const recordData: Omit<InventoryRecord, "id"> = {
       name: name.trim(),
       photos: [],
       category,
       size: size as "Small" | "Medium" | "Large",
-      quantity,
+      quantity: quantity ?? 1,
       notes: notes.trim() || "N/A",
       donorEmail: null,
       dateAdded: Timestamp.now(),
     };
 
+      
+    const docRef = doc(collection(db, WAREHOUSE_COLLECTION));
+
+    const record: InventoryRecord = {
+      ...recordData,
+      id: docRef.id,
+    };
     await setInventoryRecord(record);
 
     onCreated?.(record);
-
     onClose();
   }
 
@@ -109,11 +115,10 @@ const AddItem: React.FC<AddItemProps> = ({ isOpen, onClose, onCreated }) => {
               <input
                 type="number"
                 className="mt-[.25em] w-full border border-gray-300 rounded px-[.75em] py-[.5em] focus:outline-none focus:ring-2 focus:ring-blue-400"
-                value={quantity}
-                min={1}
-                onChange={(e) =>
-                  setQuantity(parseInt(e.target.value || "1", 10))
-                }
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setQuantity(val === "" ? 1 : Number(val));
+                }}
               />
             </div>
           </div>

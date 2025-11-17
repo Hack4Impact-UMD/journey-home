@@ -2,30 +2,20 @@
 "use client";
 
 import type { InventoryRecord } from "@/types/inventory";
-import ItemTag, {
-  categoryColors,
-  quantityColors,
-  sizeColors,
-} from "./ItemTag";
-import { TrashIcon } from "./icons/TrashIcon";
+import { Badge } from "./Badge";
 
 type GalleryItemProps = {
   item: InventoryRecord;
   onDeleted?: (id: string) => void;
+  onClick?: () => void;
 };
 
-export default function GalleryItem({ item, onDeleted }: GalleryItemProps) {
+export default function GalleryItem({ item, onDeleted, onClick }: GalleryItemProps) {
   return (
-    <div className="group w-full max-w-md aspect-[15/21] flex flex-col justify-start p-[1.25em] bg-white border-1 relative border-gray-200 shadow-lg rounded-[.75em] cursor-pointer">
+    <div onClick={onClick} className="group w-full max-w-md aspect-[15/21] flex flex-col justify-start p-[1.25em] bg-white border-1 relative border-gray-200 shadow-lg rounded-[.75em] cursor-pointer">
       <div className="relative w-full aspect-square bg-white border border-grey rounded-[.75em]">
         {/* top-right icons */}
-        <div className="absolute top-[0.5em] right-[0.5em] flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          {/* you can add an Edit icon/link here too if you want */}
-          <TrashIcon
-            id={item.id}
-            onDeleted={onDeleted}
-            className="w-[1.25em] h-[1.25em]"
-          />
+        <div className="w-[1.5em] aspect-square bg-white border border-black absolute top-[0.75em] right-[0.75em] flex items-center justify-center pt-[1em]">
         </div>
         
       </div>
@@ -33,11 +23,20 @@ export default function GalleryItem({ item, onDeleted }: GalleryItemProps) {
         {item.name}
       </div>
       <div className="text-[1.125em] flex flex-wrap gap-[0.5em] pt-[0.5em] pb-[0.5em]">
-        <ItemTag name={item.size} color={sizeColors[item.size]} />
-        <ItemTag name={item.category} color={categoryColors(item.category)} />
-        <ItemTag
-          name={`${item.quantity}`}
-          color={quantityColors(item.quantity)}
+        <Badge text={item.category} color="blue" />
+        <Badge
+            text={item.size}
+            color={
+                item.size == "Large"
+                ? "pink"
+                : item.size == "Medium"
+                ? "purple"
+                : "yellow"
+            }
+        />
+        <Badge
+            text={item.quantity.toString()}
+            color="orange"
         />
       </div>
       <div className="text-[1.25em] text-gray-400">
