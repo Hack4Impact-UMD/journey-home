@@ -7,12 +7,10 @@ import CategorySelect from "@/components/CategorySelect";
 import SizeSelect from "@/components/SizeSelect";
 import SortToggle, { SortKeyToggle } from "@/components/SortToggle";
 import AddItem from "@/components/AddItem";
-import Link from "next/link";
 import type { InventoryRecord, SearchParams } from "@/types/inventory";
 import { Timestamp } from "firebase/firestore";
 import { useCallback, useMemo, useState } from "react";
 import { search as searchBackend } from "@/lib/services/inventory";
-import EditItem from "@/components/EditItem";
 import NewItemButton from "@/components/NewItemButton";
 import { DonationItem, DonationRequest } from "@/types/donations";
 import { TableView } from "@/components/TableView";
@@ -109,13 +107,10 @@ export default function WarehousePage() {
   const [size, setSize] = useState("Any");
   const [sortKey, setSortKey] = useState<SortKeyToggle>("Quantity");
   const [ascending, setAscending] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<DonationItem | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"gallery" | "table">("gallery");
   const [selectedDR, setSelectedDR] = useState<DonationRequest | null>(null);
-  const [selectedRecord, setSelectedRecord] =
-    useState<InventoryRecord | null>(null);
+  const [selectedItem, setSelectedItem] = useState<DonationItem | null>(null);
   const [isItemModalOpen, setIsItemModalOpen] = useState(false);
 
   const params: SearchParams = useMemo(
@@ -161,6 +156,7 @@ export default function WarehousePage() {
 
   return (
     <div className="p-6 flex flex-wrap flex-1 flex-col h-[calc(80vh-5rem)] min-h-0 overflow-hidden">
+      {/* Top controls */}
       <div className="mb-6 flex gap-2 flex-row items-center justify-start">
         <div>
           <SearchBar onSearch={onSearch} />
@@ -180,14 +176,18 @@ export default function WarehousePage() {
           isOpen={isAddModalOpen}
           onClose={() => setIsAddModalOpen(false)}
           onCreated={(record) => {
-            setResults((prev) => [record, ...(prev ?? ITEMS)]);
+            // use whatever is currently displayed as base (backend or mock)
+            setResults((prev) => {
+              const base = prev ?? itemsToDisplay;
+              return [record, ...base];
+            });
             setIsAddModalOpen(false);
           }}
         />
         <div className="flex flex-1 justify-end gap-2">
           <button
             onClick={() => setViewMode("table")}
-            className={`p-1 rounded hover:bg-gray-200"}`}
+            className="p-1 rounded hover:bg-gray-200"
           >
             <svg
               width="23"
@@ -225,7 +225,7 @@ export default function WarehousePage() {
 
           <button
             onClick={() => setViewMode("gallery")}
-            className={`p-1 rounded hover:bg-gray-200"}`}
+            className="p-1 rounded hover:bg-gray-200"
           >
             <svg
               width="20"
@@ -296,6 +296,7 @@ export default function WarehousePage() {
         </div>
       </div>
 
+      {/* Main content: gallery or table */}
       <div className="flex-1 flex-wrap overflow-y-auto min-h-0 min-w-0">
         {viewMode === "gallery" ? (
           <div className="grid grid-cols-4 gap-6">
@@ -324,40 +325,36 @@ export default function WarehousePage() {
           </div>
         ) : (
           <TableView
-          inventoryRecords={itemsToDisplay}
-          openItem={(record) => {
-            setSelectedItem(MOCK_DONATION_ITEM(record));
-          setSelectedDR(MOCK_DONATION_REQUEST);
-          setIsItemModalOpen(true);
-          }}
-          onDeleted={(id) => {
-            setResults((prev) => {
-          const base = prev ?? itemsToDisplay;
-          return base.filter((r) => r.id !== id);
-      });
-  }}
-/>
-
+            inventoryRecords={itemsToDisplay}
+            openItem={(record) => {
+              setSelectedItem(MOCK_DONATION_ITEM(record));
+              setSelectedDR(MOCK_DONATION_REQUEST);
+              setIsItemModalOpen(true);
+            }}
+            onDeleted={(id) => {
+              setResults((prev) => {
+                const base = prev ?? itemsToDisplay;
+                return base.filter((r) => r.id !== id);
+              });
+            }}
+          />
         )}
       </div>
+
+      {/* Item details + edit modal */}
       {selectedItem && selectedDR && isItemModalOpen && (
         <InventoryItemView
           dr={selectedDR}
-          //currently using frontend implementation to test item view, will implement backend later
+          item={selectedItem}
           onClose={() => setIsItemModalOpen(false)}
-          item={{
-            item: {
-              id: "5",
-              name: "Testing furniture",
-              photos: [],
-              category: "Couches",
-              notes: "N/A",
-              quantity: 3,
-              size: "Large",
-              dateAdded: Timestamp.now(),
-              donorEmail: "tester@gmail.com",
-            },
-            status: "Not Reviewed",
+          onUpdatedItem={(updated) => {
+            setResults((prev) => {
+              const base = prev ?? itemsToDisplay;
+              return base.map((r) => (r.id === updated.id ? updated : r));
+            });
+            setSelectedItem((prev) =>
+              prev ? { ...prev, item: updated } : prev
+            );
           }}
         />
       )}

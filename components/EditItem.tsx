@@ -8,19 +8,23 @@ interface EditItemProps {
   item: InventoryRecord | null;
   isOpen: boolean;
   onClose: () => void;
-  onUpdated?: (record: InventoryRecord) => void; // ⭐ NEW
+  onUpdated?: (record: InventoryRecord) => void;
 }
 
-const EditItem: React.FC<EditItemProps> = ({ item, isOpen, onClose, onUpdated }) => {
+const EditItem: React.FC<EditItemProps> = ({
+  item,
+  isOpen,
+  onClose,
+  onUpdated,
+}) => {
   const [name, setName] = useState("");
   const [category, setCategory] = useState<string>("");
   const [size, setSize] = useState<"Small" | "Medium" | "Large" | "">("");
   const [quantity, setQuantity] = useState<number>(1);
   const [notes, setNotes] = useState("");
 
-  // preload values when modal opens
   useEffect(() => {
-    if (!item) return;
+    if (!item || !isOpen) return;
     setName(item.name ?? "");
     setCategory(item.category ?? "");
     setSize((item.size as "Small" | "Medium" | "Large") ?? "");
@@ -42,11 +46,13 @@ const EditItem: React.FC<EditItemProps> = ({ item, isOpen, onClose, onUpdated })
       notes: notes.trim() || "N/A",
     };
 
-    await setInventoryRecord(updated);
-
-    onUpdated?.(updated); // ⭐ notify WarehousePage
-
-    onClose();
+    try {
+      await setInventoryRecord(updated); 
+      onUpdated?.(updated);       
+      onClose();
+    } catch (err) {
+      console.error("Error updating inventory record:", err);
+    }
   }
 
   return (
@@ -64,7 +70,9 @@ const EditItem: React.FC<EditItemProps> = ({ item, isOpen, onClose, onUpdated })
 
         <form className="space-y-[1em]" onSubmit={onSubmit}>
           <div>
-            <label className="block text-sm font-medium">Short description (1-3 words)</label>
+            <label className="block text-sm font-medium">
+              Short description (1-3 words)
+            </label>
             <input
               type="text"
               className="mt-1 w-full border border-gray-300 rounded px-[.75em] py-[.5em] focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -84,10 +92,12 @@ const EditItem: React.FC<EditItemProps> = ({ item, isOpen, onClose, onUpdated })
               onChange={(e) => setCategory(e.target.value)}
               required
             >
-              <option value="" disabled>Select a category</option>
-              <option value="Sofa">Sofa</option>
-              <option value="Chair">Chair</option>
-              <option value="Table">Table</option>
+              <option value="" disabled>
+                Select a category
+              </option>
+              <option value="Couches">Couches</option>
+              <option value="Chairs">Chairs</option>
+              <option value="Tables">Tables</option>
             </select>
           </div>
 
@@ -99,10 +109,14 @@ const EditItem: React.FC<EditItemProps> = ({ item, isOpen, onClose, onUpdated })
               <select
                 className="mt-1 w-full border border-gray-300 rounded px-[.75em] py-[.5em] focus:outline-none focus:ring-2 focus:ring-blue-400"
                 value={size}
-                onChange={(e) => setSize(e.target.value as "Small" | "Medium" | "Large")}
+                onChange={(e) =>
+                  setSize(e.target.value as "Small" | "Medium" | "Large")
+                }
                 required
               >
-                <option value="" disabled>Select a size</option>
+                <option value="" disabled>
+                  Select a size
+                </option>
                 <option value="Small">Small</option>
                 <option value="Medium">Medium</option>
                 <option value="Large">Large</option>
@@ -118,7 +132,9 @@ const EditItem: React.FC<EditItemProps> = ({ item, isOpen, onClose, onUpdated })
                 min={0}
                 className="mt-[.25em] w-full border border-gray-300 rounded px-[.75em] py-[.5em] focus:outline-none focus:ring-2 focus:ring-blue-400"
                 value={Number.isFinite(quantity) ? quantity : 0}
-                onChange={(e) => setQuantity(parseInt(e.target.value || "0", 10))}
+                onChange={(e) =>
+                  setQuantity(parseInt(e.target.value || "0", 10))
+                }
                 required
               />
             </div>
