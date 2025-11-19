@@ -1,6 +1,6 @@
 import { db } from "../firebase";
 import { collection, doc, getDocs, getDoc, setDoc, deleteDoc, updateDoc } from "firebase/firestore";
-import { Pickup, Delivery, PickupOrDelivery } from "../../types/pickupsdeliveries";
+import { Pickup, Delivery, PickupOrDelivery } from "../../types/pickupsDeliveries";
 
 export const PICKUPS_COLLECTION = "pickups";
 export const DELIVERIES_COLLECTION = "deliveries";
