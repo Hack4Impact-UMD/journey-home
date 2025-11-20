@@ -1,5 +1,5 @@
 import { db } from "../firebase";
-import { collection, doc, getDocs, getDoc, updateDoc, Timestamp } from "firebase/firestore";
+import { collection, doc, getDocs, getDoc, setDoc, updateDoc, deleteDoc, Timestamp } from "firebase/firestore";
 import { PickupOrDelivery, VolunteerTimeBlock } from "../../types/pickupsDeliveries";
 
 export const TIMEBLOCKS_COLLECTION = "volunteerTimeBlocks";
@@ -14,10 +14,8 @@ export async function getTimeBlock(id: string): Promise<VolunteerTimeBlock | nul
     return snap.exists() ? (snap.data() as VolunteerTimeBlock) : null;
 }
 
-export async function addTaskToTimeBlock(
-    blockId: string,
-    task: PickupOrDelivery
-): Promise<VolunteerTimeBlock> {
+//used for scheduling
+export async function addTaskToTimeBlock(blockId: string, task: PickupOrDelivery): Promise<void> {
     const ref = doc(db, TIMEBLOCKS_COLLECTION, blockId);
     const snap = await getDoc(ref);
     if (!snap.exists()) throw new Error("Time block not found");
@@ -25,16 +23,11 @@ export async function addTaskToTimeBlock(
     const block = snap.data() as VolunteerTimeBlock;
     if ((block.tasks?.length || 0) >= block.maxTasks) throw new Error("Time block is full");
 
-    const updatedTasks = [...(block.tasks || []), task];
-    await updateDoc(ref, { tasks: updatedTasks });
-
-    return { ...block, tasks: updatedTasks };
+    await updateDoc(ref, { tasks: [...(block.tasks || []), task] });
 }
 
-export async function removeTaskFromTimeBlock(
-    blockId: string,
-    taskId: string
-): Promise<VolunteerTimeBlock> {
+// used for rescheduling 
+export async function removeTaskFromTimeBlock(blockId: string, taskId: string): Promise<void> {
     const ref = doc(db, TIMEBLOCKS_COLLECTION, blockId);
     const snap = await getDoc(ref);
     if (!snap.exists()) throw new Error("Time block not found");
@@ -42,18 +35,16 @@ export async function removeTaskFromTimeBlock(
     const block = snap.data() as VolunteerTimeBlock;
     const updatedTasks = (block.tasks || []).filter(t => t.id !== taskId);
     await updateDoc(ref, { tasks: updatedTasks });
-
-    return { ...block, tasks: updatedTasks };
 }
 
+// scheduling
 export async function scheduleTask(
     blockId: string,
     task: PickupOrDelivery,
     previousBlockId?: string
-): Promise<VolunteerTimeBlock> {
+): Promise<void> {
     if (previousBlockId) {
         await removeTaskFromTimeBlock(previousBlockId, task.id);
     }
-    const updatedBlock = await addTaskToTimeBlock(blockId, task);
-    return updatedBlock;
+    await addTaskToTimeBlock(blockId, task);
 }
