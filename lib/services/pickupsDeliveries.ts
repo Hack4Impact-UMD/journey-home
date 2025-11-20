@@ -1,60 +1,49 @@
 import { db } from "../firebase";
-import { collection, doc, getDocs, getDoc, setDoc, deleteDoc, updateDoc } from "firebase/firestore";
+import { collection, doc, getDocs, getDoc, setDoc, deleteDoc } from "firebase/firestore";
 import { Pickup, Delivery, PickupOrDelivery } from "../../types/pickupsDeliveries";
 
 export const PICKUPS_COLLECTION = "pickups";
 export const DELIVERIES_COLLECTION = "deliveries";
 
-/* Get all pickups */
+/* Pickups */
 export async function getAllPickups(): Promise<Pickup[]> {
     const snapshot = await getDocs(collection(db, PICKUPS_COLLECTION));
     return snapshot.docs.map(doc => doc.data() as Pickup);
 }
 
-/*Create / update a pickup */
 export async function setPickup(pickup: Pickup): Promise<void> {
-    const ref = doc(db, PICKUPS_COLLECTION, pickup.id);
-    await setDoc(ref, pickup);
+    await setDoc(doc(db, PICKUPS_COLLECTION, pickup.id), pickup);
 }
 
-/*Delete a pickup */
 export async function deletePickup(id: string): Promise<void> {
-    const ref = doc(db, PICKUPS_COLLECTION, id);
-    await deleteDoc(ref);
+    await deleteDoc(doc(db, PICKUPS_COLLECTION, id));
 }
 
-/*Get all deliveries */
+/* Deliveries */
 export async function getAllDeliveries(): Promise<Delivery[]> {
     const snapshot = await getDocs(collection(db, DELIVERIES_COLLECTION));
     return snapshot.docs.map(doc => doc.data() as Delivery);
 }
 
-/*Create / update a delivery */
 export async function setDelivery(delivery: Delivery): Promise<void> {
-    const ref = doc(db, DELIVERIES_COLLECTION, delivery.id);
-    await setDoc(ref, delivery);
+    await setDoc(doc(db, DELIVERIES_COLLECTION, delivery.id), delivery);
 }
 
-/*Delete a delivery */
 export async function deleteDelivery(id: string): Promise<void> {
-    const ref = doc(db, DELIVERIES_COLLECTION, id);
-    await deleteDoc(ref);
+    await deleteDoc(doc(db, DELIVERIES_COLLECTION, id));
 }
 
-/*Get all pickups and deliveries together */
+/* All pickups & deliveries */
 export async function getAllPickupsAndDeliveries(): Promise<PickupOrDelivery[]> {
     const [pickups, deliveries] = await Promise.all([getAllPickups(), getAllDeliveries()]);
     return [...pickups, ...deliveries];
 }
 
-/*Get a single PickupOrDelivery by ID */
 export async function getPickupOrDelivery(id: string): Promise<PickupOrDelivery | null> {
-    const pickupRef = doc(db, PICKUPS_COLLECTION, id);
-    const deliveryRef = doc(db, DELIVERIES_COLLECTION, id);
-
-    const [pickupSnap, deliverySnap] = await Promise.all([getDoc(pickupRef), getDoc(deliveryRef)]);
-
+    const pickupSnap = await getDoc(doc(db, PICKUPS_COLLECTION, id));
     if (pickupSnap.exists()) return pickupSnap.data() as Pickup;
+
+    const deliverySnap = await getDoc(doc(db, DELIVERIES_COLLECTION, id));
     if (deliverySnap.exists()) return deliverySnap.data() as Delivery;
 
     return null;
