@@ -10,17 +10,6 @@ import { Timestamp } from "firebase/firestore";
 
 type UserTableProps = {
   users: (UserData & { status?: string })[];
-  onRoleChange?: (uid: string, newRole: UserRole) => void;
-  onApprove?: (uid: string, role: UserRole) => void;
-  onReject?: (uid: string) => void;
-  onDelete?: (uid: string) => void;
-  onEdit?: (uid: string, updates: Partial<{
-    firstName: string;
-    lastName: string;
-    role: UserRole;
-    dob: Date | string;
-  }>) => void;
-  currentUserRole: UserRole | null;
 };
 
 export function UserTable({
