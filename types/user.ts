@@ -12,6 +12,7 @@ export type UserData = {
     email: string,
     dob: Timestamp | null,
     role: UserRole,
+    pending: boolean,
     emailVerified: boolean
 }
 

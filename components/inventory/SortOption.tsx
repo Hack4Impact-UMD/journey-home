@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { SortIcon } from "../icons/SortIcon";
 import { SortStatus } from "@/types/inventory";
 
