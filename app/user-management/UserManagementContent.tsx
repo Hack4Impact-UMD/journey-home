@@ -234,7 +234,7 @@ export default function UserManagementContent() {
 
   const handleExportAll = () => {
     //MUST IMPLEMENT: export functionality
-    console.log("Export all users");
+    alert("Export functionality is not implemented yet!")
   };
 
   const userTypeOptions = ["All", "Admin", "Case Manager", "Volunteer"];
