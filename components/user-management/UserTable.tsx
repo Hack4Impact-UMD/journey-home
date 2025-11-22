@@ -1,25 +1,15 @@
 "use client";
 
-import { UserData, UserRole } from "@/types/user";
-import { Badge } from "@/components/Badge";
-import { ExportIcon } from "@/components/icons/ExportIcon";
-import { EditIcon } from "@/components/icons/EditIcon";
-import { TrashIcon } from "@/components/icons/TrashIcon";
-import { useState, useRef, useEffect } from "react";
-import { Timestamp } from "firebase/firestore";
+import { UserData } from "@/types/user";
+
+
 
 type UserTableProps = {
-  users: (UserData & { status?: string })[];
+  users: UserData[];
 };
 
 export function UserTable({
   users,
-  onRoleChange,
-  onApprove,
-  onReject,
-  onDelete,
-  onEdit,
-  currentUserRole,
 }: UserTableProps) {
   return (
     <div className="w-full h-full min-w-3xl">
@@ -49,12 +39,6 @@ export function UserTable({
         <UserTableRow
           user={user}
           key={user.uid}
-          onRoleChange={onRoleChange}
-          onApprove={onApprove}
-          onReject={onReject}
-          onDelete={onDelete}
-          onEdit={onEdit}
-          currentUserRole={currentUserRole}
         />
       ))}
     </div>
@@ -63,61 +47,13 @@ export function UserTable({
 
 function UserTableRow({
   user,
-  onRoleChange,
-  onApprove,
-  onReject,
-  onDelete,
-  onEdit,
-  currentUserRole,
 }: {
-  user: UserData & { status?: string };
-  onRoleChange?: (uid: string, newRole: UserRole) => void;
-  onApprove?: (uid: string, role: UserRole) => void;
-  onReject?: (uid: string) => void;
-  onDelete?: (uid: string) => void;
-  onEdit?: (uid: string, updates: Partial<{
-    firstName: string;
-    lastName: string;
-    role: UserRole;
-    dob: Date | string;
-  }>) => void;
-  currentUserRole: UserRole | null;
+  user: UserData;
 }) {
-  const [showRoleDropdown, setShowRoleDropdown] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<UserRole>(user.role);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const isAdmin = currentUserRole === "Admin";
-  const isPending = user.status === "pending";
-
-  // Display role name - map database roles to display names
-  const getDisplayRole = (role: UserRole | string) => {
-    const roleStr = role as string;
-    if (roleStr === "Admin" || roleStr === "Administrator") return "Admin";
-    if (roleStr === "Case Manager") return "Case Manager";
-    if (roleStr === "Volunteer") return "Volunteer";
-    // Handle legacy "Recipient" role - display as "Case Manager"
-    if (roleStr === "Recipient") return "Case Manager";
-    return roleStr;
-  };
 
   const availableRoles: string[] = ["Admin", "Case Manager", "Volunteer"];
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowRoleDropdown(false);
-      }
-    };
-
-    if (showRoleDropdown) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [showRoleDropdown]);
 
   const handleRoleSelect = (newRole: string) => {
     const dbRole: UserRole = newRole === "Administrator" ? "Admin" : (newRole as UserRole);

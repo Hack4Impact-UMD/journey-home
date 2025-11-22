@@ -3,17 +3,23 @@
 import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { SortOption } from "@/components/inventory/SortOption";
+import { UserTable } from "@/components/user-management/UserTable";
+import { fetchAllUsers } from "@/lib/services/users";
 import { SortStatus } from "@/types/inventory";
-import { UserRole } from "@/types/user";
-import { useState } from "react";
+import { UserData, UserRole } from "@/types/user";
+import { useEffect, useState } from "react";
 
 export default function AllAccountsPage() {
 
-     const roleOptions: UserRole[] = ["Admin", "Case Manager", "Volunteer"];
+    const roleOptions: UserRole[] = ["Admin", "Case Manager", "Volunteer"];
 
     const [searchQuery, setSearchQuery] = useState<string>("");
-    const [selectedRoles, setSelectedRoles] = useState<UserRole[]>(roleOptions)
+    const [selectedRoles, setSelectedRoles] = useState<UserRole[]>(roleOptions);
+    const [allAccounts, setAllAccounts] = useState<UserData[]>([]);
 
+    useEffect(() => {
+        fetchAllUsers().then(setAllAccounts);
+    }, [])
 
     return <>
         <div className="flex flex-col mb-6">
@@ -30,7 +36,7 @@ export default function AllAccountsPage() {
                     setSelected={setSelectedRoles}
                 />
             </div>
-            {selectedRoles}
+            {allAccounts.map(user => user.email)}
         </div>
     </>;
 }

@@ -4,7 +4,7 @@ import { db } from "../firebase";
 import { collection, doc, getDocs, setDoc, updateDoc, Timestamp, deleteDoc, query, where, orderBy} from "firebase/firestore";
 import { UserData, UserRole } from "../../types/user";
 
-const usersCol = collection(db, "Users");
+const usersCol = collection(db, "users");
 
 /**
  * Create a new user in Firestore
@@ -26,9 +26,9 @@ export const fetchAllUsers = async (): Promise<UserData[]> => {
   const snapshot = await getDocs(usersCol);
   const users: UserData[] = [];
   snapshot.forEach((doc) => {
-    users.push(doc.data() as UserData & { status: string });
+    users.push(doc.data() as UserData);
   });
-  return users;
+  return users.filter(user => user.pending == null);
 };
 
 /**
@@ -51,7 +51,7 @@ export const fetchUsersByStatus = async (
  * Fetch pending users sorted by date requested
  */
 export const fetchPendingUsersByDate = async (): Promise<UserData[]> => {
-  const usersCol = collection(db, "Users");
+  const usersCol = collection(db, "users");
 
   // Query for users with status = "pending", ordered by createdAt
   const q = query(usersCol, where("status", "==", "pending"), orderBy("createdAt", "asc"));
