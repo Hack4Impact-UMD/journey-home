@@ -7,6 +7,7 @@ import { UserTable } from "@/components/user-management/UserTable";
 import { fetchAllUsers } from "@/lib/services/users";
 import { SortStatus } from "@/types/inventory";
 import { UserData, UserRole } from "@/types/user";
+import { User } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function AllAccountsPage() {
@@ -27,7 +28,7 @@ export default function AllAccountsPage() {
                 <SearchBox 
                     value={searchQuery}
                     onChange={setSearchQuery}
-                    onSubmit={() => {}}
+                    onSubmit={() => fetchAllUsers().then(setAllAccounts)}
                 />
                 <DropdownMultiselect
                     label="User Type"
@@ -36,7 +37,7 @@ export default function AllAccountsPage() {
                     setSelected={setSelectedRoles}
                 />
             </div>
-            {allAccounts.map(user => user.email)}
         </div>
+        <UserTable users={allAccounts.filter(user => selectedRoles.includes(user.role))}/>
     </>;
 }

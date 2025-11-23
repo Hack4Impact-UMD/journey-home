@@ -24,13 +24,6 @@ export async function signUp(
         password
     );
     const user = userCredential.user;
-
-    // Use the existing createUserInDB function to ensure consistency
-    // This creates user in "Users" collection with the selected role and status="pending"
-    const roleStr = role as string;
-    const mappedRole: UserRole = 
-      roleStr === "Administrator" ? "Admin" :
-      role as UserRole; 
     
     const userRecord: UserData = {
         uid: user.uid,
@@ -38,7 +31,8 @@ export async function signUp(
         lastName,
         email: user.email!,
         dob: dob ? Timestamp.fromDate(new Date(dob)) : null,
-        role: mappedRole, 
+        role: "Volunteer",
+        pending: (role == "Volunteer") ? null : role,
         emailVerified: user.emailVerified,
     };
 

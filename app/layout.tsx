@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${openSans.variable} ${raleway.variable} ${roboto.variable} w-full h-full overscroll-none`}>
-      <body className="w-full h-full font-family-roboto">
+      <body className="w-full h-full font-family-roboto overflow-hidden">
         <AuthProvider>
           {children}
         </AuthProvider>
