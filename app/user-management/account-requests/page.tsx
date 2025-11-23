@@ -9,32 +9,38 @@ import { User } from "firebase/auth";
 import { useEffect, useState } from "react";
 
 export default function AccountRequestsPage() {
+    const requestOpts: UserRole[] = ["Admin", "Case Manager"];
 
-     const requestOpts: UserRole[] = ["Admin", "Case Manager"];
-    
-        const [searchQuery, setSearchQuery] = useState<string>("");
-        const [selectedRoles, setSelectedRoles] = useState<UserRole[]>(requestOpts);
-        const [allRequests, setAllRequests] = useState<UserData[]>([]);
-    
-        useEffect(() => {
-            fetchAllAccountRequests().then(setAllRequests);
-        }, [])
+    const [searchQuery, setSearchQuery] = useState<string>("");
+    const [selectedRoles, setSelectedRoles] = useState<UserRole[]>(requestOpts);
+    const [allRequests, setAllRequests] = useState<UserData[]>([]);
 
-        function onAccept(user: UserData) {
-            if(!window.confirm(`Are you sure you want to give ${user.firstName} ${user.lastName} (${user.email}) the role ${user.pending}?`)) {
-                return;
-            }
-            approveAccount(user.uid, user.pending ?? "Volunteer");
-            setAllRequests(old => old.filter(u => u.uid != user.uid));
+    useEffect(() => {
+        fetchAllAccountRequests().then(setAllRequests);
+    }, []);
+
+    function onAccept(user: UserData) {
+        if (
+            !window.confirm(
+                `Are you sure you want to give ${user.firstName} ${user.lastName} (${user.email}) the role ${user.pending}?`
+            )
+        ) {
+            return;
         }
-    
-        return <>
+        approveAccount(user.uid, user.pending ?? "Volunteer");
+        setAllRequests((old) => old.filter((u) => u.uid != user.uid));
+    }
+
+    return (
+        <>
             <div className="flex flex-col mb-6">
                 <div className="flex gap-3">
-                    <SearchBox 
+                    <SearchBox
                         value={searchQuery}
                         onChange={setSearchQuery}
-                        onSubmit={() => fetchAllAccountRequests().then(setAllRequests)}
+                        onSubmit={() =>
+                            fetchAllAccountRequests().then(setAllRequests)
+                        }
                     />
                     <DropdownMultiselect
                         label="Requesting"
@@ -44,9 +50,14 @@ export default function AccountRequestsPage() {
                     />
                 </div>
             </div>
-            <AccountReqTable 
-                requests={allRequests.filter(user => (user.pending != null) && (selectedRoles.includes(user.pending)))}
+            <AccountReqTable
+                requests={allRequests.filter(
+                    (user) =>
+                        user.pending != null &&
+                        selectedRoles.includes(user.pending)
+                )}
                 onAccept={onAccept}
             />
-        </>;
+        </>
+    );
 }

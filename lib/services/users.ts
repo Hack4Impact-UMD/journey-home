@@ -24,16 +24,17 @@ export const fetchAllUsers = async (): Promise<UserData[]> => {
   snapshot.forEach((doc) => {
     users.push(doc.data() as UserData);
   });
-  return users.filter(user => user.pending == null);
+  return users;
 };
 
+export const fetchAllActiveUsers = async (): Promise<UserData[]> => {
+  let all = await fetchAllUsers();
+  return all.filter(user => user.pending == null);
+}
+
 export const fetchAllAccountRequests = async (): Promise<UserData[]> => {
-  const snapshot = await getDocs(usersCol);
-  const users: UserData[] = [];
-  snapshot.forEach((doc) => {
-    users.push(doc.data() as UserData);
-  });
-  return users.filter(user => user.pending != null);
+  let all = await fetchAllUsers();
+  return all.filter(user => user.pending != null);
 };
 
 /**
