@@ -4,11 +4,13 @@ import { useDonorForm } from "../DonorFormContext";
 import StepIndicator from "../../../components/form/StepIndicator";
 import Button from "../../../components/form/Button";
 import { Timestamp } from "firebase/firestore";
-import { createDonationRequest } from "../../../lib/services/donations";
+import { createDonationRequest, uploadPhotos } from "../../../lib/services/donations";
 import { DonationRequest, DonationItem } from "../../../types/donations";
+import { useState } from "react";
 
 export default function Step3Review() {
   const { formState, setCurrentStep } = useDonorForm();
+  const [itemFiles, setItemFiles] = useState<{ [id: string]: File[] }>({});
 
   const handleBack = () => {
     setCurrentStep(2);
@@ -30,11 +32,19 @@ export default function Step3Review() {
       };
 
       const validSizes = ["Small", "Medium", "Large"];
-      const items: DonationItem[] = formState.donationItems.map((donationItem) => {
+      const items: DonationItem[] =  await Promise.all(formState.donationItems.map( async(donationItem) => {
         const size =
           donationItem.size && validSizes.includes(donationItem.size)
             ? donationItem.size
             : "Medium";
+
+        const files = itemFiles[donationItem.id] || [];
+        console.log("Files for item", donationItem.id, files);
+
+        // generate photos array
+        const photos = await uploadPhotos(donationItem.id,files);
+        console.log("Files being uploaded for item:", donationItem.id, itemFiles[donationItem.id]);
+        console.log(photos);
 
         return {
           item: {
@@ -46,18 +56,19 @@ export default function Step3Review() {
             notes: donationItem.notes ?? "",
             dateAdded: Timestamp.now(),
             donorEmail: donor.email,
-            // photos: (donationItem.photos ?? []).map((photo) => ({
-            //   url: photo,
-            //   altText: donationItem.name ?? "",
-            // })),
-            photos: [{
-              url: "https://m.media-amazon.com/images/I/81hUDQuMkuL.jpg",
-              altText: ""
-          }] // TODO: Implement photo inputs again
+            photos,
+          //   // photos: (donationItem.photos ?? []).map((photo) => ({
+          //   //   url: photo,
+          //   //   altText: donationItem.name ?? "",
+          //   // })),
+          //   photos: [{
+          //     url: "https://m.media-amazon.com/images/I/81hUDQuMkuL.jpg",
+          //     altText: ""
+          // }] // TODO: Implement photo inputs again
           },
           status: "Not Reviewed" as const,
         };
-      });
+      }));
 
       const isFirstTimeDonor = formState.firstTimeDonor === null ? true : formState.firstTimeDonor;
 

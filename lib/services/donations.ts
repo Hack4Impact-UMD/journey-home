@@ -6,7 +6,9 @@ import {
 } from "@/types/donations";
 
 import { db } from "../firebase";
-import { collection, doc, getDoc, setDoc, getDocs, deleteDoc, Timestamp, addDoc } from "firebase/firestore";
+import { collection, doc, getDoc, setDoc, getDocs, deleteDoc, Timestamp, addDoc, getFirestore } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { InventoryPhoto, InventoryRecord } from "@/types/inventory";
 
 const DONATIONS_COLLECTION = "donation-requests";
 const DONORS_COLLECTION = "donors";
@@ -200,4 +202,78 @@ export async function createDonationRequest(request: DonationRequest): Promise<s
 
   const docRef = await setDoc(doc(db, DONATIONS_COLLECTION, request.id), donationDoc);
   return request.id;
+}
+
+export async function uploadPhotos(
+  id: string,
+  files: File[],
+  maxWidth: number = 800,
+  quality: number = 0.85
+
+): Promise<InventoryPhoto[]> {
+  const photos: InventoryPhoto[] = [];
+  const storage = getStorage();
+  const db = getFirestore();
+  console.log("uploadPhotos called with files:", files);
+  for (const file of files) {
+    //go through all the uploaded files and compress the images
+    const blob = await new Promise<Blob>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (event: ProgressEvent<FileReader>) => {
+        const target = event.target;
+        if (!target || !target.result) return reject(new Error("Failed to read file."));
+
+        const img = new Image();
+        //using canvas to compress the image
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          if (!ctx) return reject(new Error("Failed to get canvas context."));
+
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+
+          canvas.toBlob(
+            (b) => {
+              if (b) resolve(b);
+              else reject(new Error("Failed to create Blob from canvas."));
+            },
+            "image/jpeg",
+            quality
+          );
+        };
+
+        img.onerror = () => reject(new Error("Failed to load image."));
+        img.src = target.result as string;
+      };
+
+      reader.onerror = () => reject(new Error("FileReader error."));
+      reader.readAsDataURL(file);
+    });
+
+    // uploading compressed image to firebase
+    const storageRef = ref(storage, `images/${id}/${file.name}`);
+    await uploadBytes(storageRef, blob);
+
+    const url = await getDownloadURL(storageRef);
+    console.log("Got download URL:", url);
+
+    //add all the impacts to the photos array 
+     photos.push({
+      url,
+      altText: file.name,
+    });
+  }
+    console.log(photos);
+    return photos;
+
 }
