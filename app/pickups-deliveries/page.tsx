@@ -1,17 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { usePathname } from "next/navigation";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import FilterDropdown from "@/components/pickups-deliveries/FilterDropdown";
 import TypeFilterButtons, { FilterType } from "@/components/pickups-deliveries/TypeFilterButtons";
 import PickupDeliveryCard, {
     PickupDeliveryCardData,
 } from "@/components/pickups-deliveries/PickupDeliveryCard";
+import { TabType } from "@/types/pickupsDeliveries";
+import { scheduleTask, getTimeBlock } from "@/lib/services/volunteerTimeBlocks";
+import { setPickup, setDelivery, getPickupOrDelivery } from "@/lib/services/pickupsDeliveries";
+import { isPickup } from "./utils";
+import SchedulingModal from "@/components/donation-requests/SchedulingModal";
 
-type TabType = "unscheduled" | "scheduled" | "completed";
-
-// Mock data for testing
+// MOCK DATA FOR DISPLAY
 const mockUnscheduledData: PickupDeliveryCardData[] = [
     {
         id: "1",
@@ -26,7 +28,6 @@ const mockUnscheduledData: PickupDeliveryCardData[] = [
             zipCode: "06511",
         },
         items: ["Striped sofa", "Wooden chairs", "Office chair", "Coffee table"],
-        onSchedule: () => console.log("Schedule pickup 1"),
     },
     {
         id: "2",
@@ -41,7 +42,6 @@ const mockUnscheduledData: PickupDeliveryCardData[] = [
             zipCode: "06511",
         },
         items: ["Leather sofa", "Patio chairs", "Queen mattress"],
-        onSchedule: () => console.log("Schedule pickup 2"),
     },
     {
         id: "3",
@@ -66,7 +66,6 @@ const mockUnscheduledData: PickupDeliveryCardData[] = [
             "Rug",
             "Mirror",
         ],
-        onSchedule: () => console.log("Schedule delivery 1"),
     },
 ];
 
@@ -85,7 +84,6 @@ const mockScheduledData: PickupDeliveryCardData[] = [
         },
         items: ["Striped sofa", "Wooden chairs", "Office chair", "Coffee table"],
         pickupDate: "1/2/25 10AM-1PM",
-        onSchedule: () => console.log("Reschedule pickup 4"),
     },
 ];
 
@@ -113,14 +111,88 @@ export default function PickupsDeliveriesPage() {
     const [filterType, setFilterType] = useState<FilterType>("all");
     const [quantityFilter, setQuantityFilter] = useState<string>("");
     const [dateFilter, setDateFilter] = useState<string>("");
+    const [modalState, setModalState] = useState<{
+        isOpen: boolean;
+        itemId: string | null;
+    }>({ isOpen: false, itemId: null });
 
-    // Get data based on active tab
+    const handleSchedule = (itemId: string) => {
+        setModalState({ isOpen: true, itemId });
+    };
+
+    // REAL FIREBASE SCHEDULING
+    const handleSaveSchedule = async (blockId: string) => {
+        if (!modalState.itemId) return;
+
+        try {
+            console.log("=== Starting Firebase Schedule ===");
+            console.log("Block ID:", blockId);
+            console.log("Item ID:", modalState.itemId);
+
+            // Get the pickup/delivery from Firebase
+            const item = await getPickupOrDelivery(modalState.itemId);
+            if (!item) {
+                console.error("Item not found in Firebase!");
+                alert("Item not found. Make sure it exists in Firebase.");
+                return;
+            }
+            console.log("Found item in Firebase:", item);
+
+            // Schedule the task in the time block
+            console.log("Calling scheduleTask...");
+            await scheduleTask(blockId, item);
+            console.log("scheduleTask complete");
+
+            // Get the time block to get its start time
+            console.log("Getting time block...");
+            const timeBlock = await getTimeBlock(blockId);
+            console.log("Got time block:", timeBlock);
+
+            if (timeBlock) {
+                // Update the pickup/delivery with the scheduled date
+                if (isPickup(item)) {
+                    console.log("Updating pickup in Firebase...");
+                    const updatedRequest = {
+                        ...item.request,
+                        scheduledDate: timeBlock.start,
+                    };
+                    await setPickup({ ...item, request: updatedRequest });
+                    console.log("Pickup updated in Firebase");
+                } else {
+                    console.log("Updating delivery in Firebase...");
+                    const updatedRequest = {
+                        ...item.request,
+                        scheduledDate: timeBlock.start,
+                    };
+                    await setDelivery({ ...item, request: updatedRequest });
+                    console.log("Delivery updated in Firebase");
+                }
+            }
+
+            console.log("=== Schedule Complete ===");
+            alert("✅ Successfully scheduled in Firebase!");
+            setModalState({ isOpen: false, itemId: null });
+        } catch (error) {
+            console.error("=== ERROR ===");
+            console.error("Error scheduling task:", error);
+            console.error("Error message:", error instanceof Error ? error.message : "Unknown error");
+            alert("❌ Failed to schedule. Check console for details.");
+        }
+    };
+
+    // Get mock data based on active tab
     const getDataForTab = (): PickupDeliveryCardData[] => {
         switch (activeTab) {
             case "unscheduled":
-                return mockUnscheduledData;
+                return mockUnscheduledData.map(item => ({
+                    ...item,
+                    onSchedule: () => handleSchedule(item.id)
+                }));
             case "scheduled":
-                return mockScheduledData;
+                return mockScheduledData.map(item => ({
+                    ...item,
+                    onSchedule: () => handleSchedule(item.id)
+                }));
             case "completed":
                 return mockCompletedData;
             default:
@@ -128,9 +200,7 @@ export default function PickupsDeliveriesPage() {
         }
     };
 
-    // Filter data based on search and type filter
     const filteredData = getDataForTab().filter((item) => {
-        // Search filter
         if (searchQuery) {
             const searchLower = searchQuery.toLowerCase();
             const matchesSearch =
@@ -144,21 +214,34 @@ export default function PickupsDeliveriesPage() {
             if (!matchesSearch) return false;
         }
 
-        // Type filter
         if (filterType === "pickups" && item.type !== "pickup") return false;
         if (filterType === "deliveries" && item.type !== "delivery") return false;
 
         return true;
     });
 
+    const sortedData = [...filteredData].sort((a, b) => {
+        if (quantityFilter === "Ascending") {
+            return a.items.length - b.items.length;
+        } else if (quantityFilter === "Descending") {
+            return b.items.length - a.items.length;
+        }
+        return 0;
+    });
+
     const handleSearch = () => {
-        // Search is handled by filteredData
         console.log("Searching for:", searchQuery);
     };
 
     return (
         <div className="flex flex-col flex-1">
-            {/* Tab Navigation */}
+            {/* REAL FIREBASE SCHEDULING MODAL */}
+            <SchedulingModal
+                isOpen={modalState.isOpen}
+                onClose={() => setModalState({ isOpen: false, itemId: null })}
+                onSchedule={handleSaveSchedule}
+            />
+
             <div className="flex gap-8 text-sm">
                 <button
                     type="button"
@@ -195,9 +278,7 @@ export default function PickupsDeliveriesPage() {
                 </button>
             </div>
 
-            {/* Main Content Area */}
             <div className="bg-background rounded-xl my-2 flex-1 py-4 px-6">
-                {/* Search and Filters */}
                 <div className="flex gap-3 items-center mb-6">
                     <SearchBox
                         value={searchQuery}
@@ -224,10 +305,9 @@ export default function PickupsDeliveriesPage() {
                     />
                 </div>
 
-                {/* Cards Grid */}
                 <div className="flex flex-wrap gap-9 items-start">
-                    {filteredData.length > 0 ? (
-                        filteredData.map((item) => (
+                    {sortedData.length > 0 ? (
+                        sortedData.map((item) => (
                             <PickupDeliveryCard key={item.id} data={item} />
                         ))
                     ) : (
@@ -240,4 +320,3 @@ export default function PickupsDeliveriesPage() {
         </div>
     );
 }
-
