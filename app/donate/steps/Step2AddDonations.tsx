@@ -9,7 +9,7 @@ import FormTextarea from "../../../components/form/FormTextarea";
 import Button from "../../../components/form/Button";
 
 export default function Step2AddDonations() {
-  const { formState, setCurrentStep, addDonationItem, removeDonationItem, updateDonationItem } =
+  const { formState, setCurrentStep, addDonationItem, removeDonationItem, updateDonationItem, updateDonationItemFiles } =
     useDonorForm();
   const [showFullList, setShowFullList] = useState(false);
 
@@ -45,7 +45,6 @@ export default function Step2AddDonations() {
 
   const sizeOptions = ["Small", "Medium", "Large"];
 
-  const [itemFiles, setItemFiles] = useState<{ [id: string]: File[] }>({});
 
   return (
     <div className="space-y-6">
@@ -229,7 +228,9 @@ export default function Step2AddDonations() {
                   id={`file-input-${item.id}`}
                   onChange={(e) => {
                   const files = Array.from(e.target.files ?? []).slice(0, 5);
-                  setItemFiles((prev) => ({ ...prev, [item.id]: files }));}}
+                  updateDonationItemFiles(item.id, files);
+                }}
+
                 />
                  <div
                     onClick={() => document.getElementById(`file-input-${item.id}`)?.click()}
@@ -242,13 +243,12 @@ export default function Step2AddDonations() {
                     }}
                     onDrop={(e) => {
                       e.preventDefault();
-                      e.currentTarget.classList.remove('border-blue-500', 'bg-blue-50');
-                      const dropped = Array.from(e.dataTransfer.files).filter(file => file.type.startsWith('image/'));
-                      setItemFiles(prev => {
-                        const existing = prev[item.id] || [];
-                        const combined = [...existing, ...dropped].slice(0, 5);
-                        return { ...prev, [item.id]: combined };
-                      });
+                      e.currentTarget.classList.remove("border-blue-500", "bg-blue-50");
+                      const dropped = Array.from(e.dataTransfer.files)
+                        .filter(file => file.type.startsWith("image/"));
+                      const existing = formState.donationItemFiles[item.id] || [];
+                      const combined = [...existing, ...dropped].slice(0, 5);
+                      updateDonationItemFiles(item.id, combined);
                     }}
                     className="border-2 border-dashed border-gray-300 rounded p-8 text-center cursor-pointer">
                   <div className="flex flex-col items-center justify-center gap-4">
@@ -271,7 +271,7 @@ export default function Step2AddDonations() {
                       <p className="text-sm text-gray-500">Support for a single or bulk upload.</p>
                     </div>
                     <div className="mt-4 flex flex-wrap gap-2 justify-center">
-                      {(itemFiles[item.id] || []).map((file, idx) => (
+                        {(formState.donationItemFiles[item.id] || []).map((file, idx) => (
                         <img
                           key={idx}
                           src={URL.createObjectURL(file)}

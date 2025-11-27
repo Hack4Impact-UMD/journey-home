@@ -10,7 +10,6 @@ import { useState } from "react";
 
 export default function Step3Review() {
   const { formState, setCurrentStep } = useDonorForm();
-  const [itemFiles, setItemFiles] = useState<{ [id: string]: File[] }>({});
 
   const handleBack = () => {
     setCurrentStep(2);
@@ -38,12 +37,12 @@ export default function Step3Review() {
             ? donationItem.size
             : "Medium";
 
-        const files = itemFiles[donationItem.id] || [];
+        const files = formState.donationItemFiles[donationItem.id] || [];
         console.log("Files for item", donationItem.id, files);
 
         // generate photos array
         const photos = await uploadPhotos(donationItem.id,files);
-        console.log("Files being uploaded for item:", donationItem.id, itemFiles[donationItem.id]);
+        console.log("Files being uploaded for item:", donationItem.id, photos);
         console.log(photos);
 
         return {

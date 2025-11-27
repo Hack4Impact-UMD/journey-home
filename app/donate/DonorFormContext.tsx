@@ -17,6 +17,7 @@ interface DonorFormState {
   currentStep: number;
   donorInfo: Partial<DonorInfo>;
   donationItems: FormDonationItem[];
+  donationItemFiles: { [id: string]: File[] };
   firstTimeDonor: boolean | null;
   howDidYouHear: string;
   canDropOff: boolean | null;
@@ -45,12 +46,14 @@ interface DonorFormContextType {
   addDonationItem: () => void;
   removeDonationItem: (id: string) => void;
   updateDonationItem: (id: string, item: Partial<FormDonationItem>) => void;
+  updateDonationItemFiles: (id: string, files: File[]) => void;
 }
 
 const defaultState: DonorFormState = {
   currentStep: 1,
   donorInfo: {},
   donationItems: [],
+  donationItemFiles: {},
   firstTimeDonor: null,
   howDidYouHear: "",
   canDropOff: null,
@@ -132,6 +135,16 @@ export function DonorFormProvider({ children }: { children: ReactNode }) {
       ),
     }));
   };
+  const updateDonationItemFiles = (id: string, files: File[]) => {
+  setFormState((prev) => ({
+    ...prev,
+    donationItemFiles: {
+      ...prev.donationItemFiles,
+      [id]: files,
+    },
+  }));
+};
+
 
   return (
     <DonorFormContext.Provider
@@ -145,6 +158,7 @@ export function DonorFormProvider({ children }: { children: ReactNode }) {
         addDonationItem,
         removeDonationItem,
         updateDonationItem,
+        updateDonationItemFiles,
       }}
     >
       {children}
