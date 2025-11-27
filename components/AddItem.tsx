@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { collection, doc, Timestamp } from "firebase/firestore";
 import { setInventoryRecord, WAREHOUSE_COLLECTION } from "@/lib/services/inventory";
-import type { InventoryRecord } from "@/types/inventory";
+import type { InventoryPhoto, InventoryRecord } from "@/types/inventory";
 import { db } from "@/lib/firebase";
+import { uploadPhotos } from "@/lib/services/donations";
 
 interface AddItemProps {
   isOpen: boolean;
@@ -20,6 +21,11 @@ const AddItem: React.FC<AddItemProps> = ({ isOpen, onClose, onCreated }) => {
   const [size, setSize] = useState<"Small" | "Medium" | "Large" | "">("");
   const [quantity, setQuantity] = useState<number | null>(1);
   const [notes, setNotes] = useState("");
+  const [files, setFiles] = useState<File[]>([]);
+
+  const handleFiles = (selectedFiles: File[]) => {
+    setFiles(prev => [...prev, ...selectedFiles].slice(0, 5)); // max 5 files
+  };
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -35,12 +41,16 @@ const AddItem: React.FC<AddItemProps> = ({ isOpen, onClose, onCreated }) => {
       dateAdded: Timestamp.now(),
     };
 
-      
     const docRef = doc(collection(db, WAREHOUSE_COLLECTION));
+    let uploadedPhotos: InventoryPhoto[] = [];
+    if (files.length > 0) {
+      uploadedPhotos = await uploadPhotos(docRef.id, files);
+    }
 
     const record: InventoryRecord = {
       ...recordData,
       id: docRef.id,
+      photos: uploadedPhotos,
     };
     await setInventoryRecord(record);
 
@@ -134,8 +144,40 @@ const AddItem: React.FC<AddItemProps> = ({ isOpen, onClose, onCreated }) => {
           </div>
 
           <div className="flex gap-[1em]">
-            <div className="w-[8em] h-[8em] bg-gray-100 rounded flex items-center justify-center cursor-pointer">
+            {/*drag and drop feature is also applied to addItem */}
+            <div className="w-[8em] h-[8em] bg-gray-100 rounded flex items-center justify-center cursor-pointer"
+              onClick={() => document.getElementById("file-input")?.click()}
+              onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-blue-500", "bg-blue-50"); }}
+              onDragLeave={(e) => { e.currentTarget.classList.remove("border-blue-500", "bg-blue-50"); }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.currentTarget.classList.remove("border-blue-500", "bg-blue-50");
+                const droppedFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith("image/"));
+                handleFiles(droppedFiles);
+              }}
+            >
+              <input
+                type="file"
+                id="file-input"
+                multiple
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const selectedFiles = Array.from(e.target.files ?? []);
+                  handleFiles(selectedFiles);
+                }}
+              />
               <span>Add a photo +</span>
+            </div>
+            <div className=" flex flex-wrap gap-2 justify-center">
+              {files.map((file, idx) => (
+                <img
+                  key={idx}
+                  src={URL.createObjectURL(file)}
+                  alt={file.name}
+                  className="w-[8em] h-[8em] object-cover rounded border"
+                />
+              ))}
             </div>
           </div>
 
