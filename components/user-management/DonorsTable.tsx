@@ -46,7 +46,7 @@ function DonorsTableRow({ donor }: { donor: DonorInfo }) {
                         {donor.firstName} {donor.lastName}
                     </span>
                 </div>
-                <div className="w-[20%] px-4 text-xs">
+                <div className="w-[20%] px-4">
                     <span>{donor.phoneNumber}</span>
                 </div>
                 <div className="w-[20%] px-4 flex items-center">

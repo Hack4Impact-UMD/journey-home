@@ -2,15 +2,17 @@
 
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function SideNavbar() {
     const pathname = usePathname();
     const [inventoryOpen, setInventoryOpen] = useState(pathname?.startsWith("/inventory") || false);
     const [userManagementOpen, setUserManagementOpen] = useState(pathname?.startsWith("/user-management") || false);
+    const auth = useAuth();
 
     return (
         <div className="h-full w-[12.5em] p-[1em] flex flex-col font-family-roboto">
-            <span className="text-primary font-extrabold pb-[1em]">Admin</span>
+            <span className="text-primary font-extrabold pb-[1em]">{auth.state.userData?.role ?? "Loading..."}</span>
             
             <div className="flex flex-col">
                 <button

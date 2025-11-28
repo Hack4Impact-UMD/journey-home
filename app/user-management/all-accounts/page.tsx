@@ -3,6 +3,7 @@
 import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { SortOption } from "@/components/inventory/SortOption";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { UserTable } from "@/components/user-management/UserTable";
 import { fetchAllActiveUsers } from "@/lib/services/users";
 import { SortStatus } from "@/types/inventory";

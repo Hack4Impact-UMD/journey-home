@@ -1,25 +1,27 @@
-"use client"
+"use client";
 
 import { User } from "firebase/auth";
-import { Timestamp } from "firebase/firestore"
+import { Timestamp } from "firebase/firestore";
 
 export type UserRole = "Admin" | "Case Manager" | "Volunteer";
 
 export type UserData = {
-    uid: string,
-    firstName: string,
-    lastName: string,
-    email: string,
-    dob: Timestamp | null,
-    role: UserRole,
-    pending: UserRole | null,
-    emailVerified: boolean
-}
+    uid: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    dob: Timestamp | null;
+    role: UserRole;
+    pending: UserRole | null;
+    emailVerified: boolean;
+};
 
 export interface AuthContextType {
-    currentUser: User | null;
-    userData: UserData | null;
-    loading: boolean;
+    state: {
+        currentUser: User | null;
+        userData: UserData | null;
+        loading: boolean;
+    };
     signup: (
         email: string,
         password: string,
@@ -28,9 +30,6 @@ export interface AuthContextType {
         dob: string,
         role: UserRole
     ) => Promise<User>;
-    login: (
-        email: string, 
-        password: string
-    ) => Promise<User>;
+    login: (email: string, password: string) => Promise<User>;
     logout: () => Promise<void>;
-  }
+}

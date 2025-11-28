@@ -22,6 +22,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
+      await auth.logout();
       await auth.login(email, password);
       router.push("/");
     } catch (e: unknown) {

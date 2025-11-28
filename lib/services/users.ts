@@ -37,6 +37,20 @@ export const fetchAllAccountRequests = async (): Promise<UserData[]> => {
   return all.filter(user => user.pending != null);
 };
 
+export async function getUserByUID(uid: string): Promise<UserData | null> {
+  const q = query(usersCol, where('uid', '==', uid));
+  
+  const querySnapshot = await getDocs(q);
+  
+  if (querySnapshot.empty) {
+    return null;
+  }
+  
+  // Return first matching document
+  const doc = querySnapshot.docs[0];
+  return doc.data() as UserData;
+}
+
 /**
  * Admin-only: update a user's role
  */

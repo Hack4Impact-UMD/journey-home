@@ -1,5 +1,6 @@
 "use client";
 
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import SideNavbar from "@/components/SideNav";
 import TopNavbar from "@/components/TopNav";
 import { usePathname } from "next/navigation";
@@ -9,7 +10,7 @@ export default function UserManagementLayout({ children }: { children: ReactNode
     const pathname = usePathname();
 
     return (
-        <>
+        <ProtectedRoute allow={["Admin"]}>
             <div className="h-full w-full flex flex-col font-family-roboto">
                 <TopNavbar />
                 <div className="flex flex-1">
@@ -39,7 +40,7 @@ export default function UserManagementLayout({ children }: { children: ReactNode
                                 href="/user-management/previous-donors"
                                 suppressHydrationWarning
                             >
-                                Previous donors
+                                Past Donors
                             </a>
                             <a
                                 className={`py-[12px] font-family-roboto text-[14px] leading-[22px]${
@@ -50,7 +51,7 @@ export default function UserManagementLayout({ children }: { children: ReactNode
                                 href="/user-management/account-requests"
                                 suppressHydrationWarning
                             >
-                                Account requests
+                                Account Requests
                             </a>
                         </div>
                         <div className="bg-background rounded-xl my-2 flex-1 py-4 px-6">
@@ -59,7 +60,7 @@ export default function UserManagementLayout({ children }: { children: ReactNode
                     </div>
                 </div>
             </div>
-        </>
+        </ProtectedRoute>
     );
 }
 

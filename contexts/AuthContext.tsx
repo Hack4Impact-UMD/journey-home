@@ -4,16 +4,23 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 import { User, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import { UserData, UserRole, AuthContextType } from "../types/user";
-import { createUserInDB, fetchAllUsers } from "../lib/services/users";
+import { createUserInDB, fetchAllUsers, getUserByUID } from "../lib/services/users";
 import { Timestamp } from "firebase/firestore";
 import { login, logout, signUp } from "@/lib/services/auth";
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState(true);
+
+  const [authState, setAuthState] = useState<{
+    currentUser: User | null;
+    userData: UserData | null;
+    loading: boolean;
+  }>({
+    currentUser: null,
+    userData: null,
+    loading: true,
+  })
 
 
   /**
@@ -21,23 +28,63 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
    */
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setCurrentUser(user);
-      if (user) {
-        // Fetch user data from Firestore
-        const allUsers = await fetchAllUsers();
-        const foundUser = allUsers.find((u) => u.uid === user.uid) || null;
-        setUserData(foundUser);
-      } else {
-        setUserData(null);
-      }
-      setLoading(false);
+      // setCurrentUser(user);
+      // if (user) {
+      //   // Fetch user data from Firestore
+      //   const foundUser = await getUserByUID(user.uid);
+      //   setUserData(foundUser);
+      // } else {
+      //   setUserData(null);
+      // }
+      // setLoading(false);
+      const foundUser = (user) ? await getUserByUID(user.uid) : null;
+
+      setAuthState({
+        currentUser: user,
+        userData: foundUser,
+        loading: false
+      })
     });
 
     return () => unsubscribe();
   }, []);
+//   signup: (
+//     email: string,
+//     password: string,
+//     firstName: string,
+//     lastName: string,
+//     dob: string,
+//     role: UserRole
+// ) => Promise<User>;
+// login: (email: string, password: string) => Promise<User>;
+// logout: () => Promise<void>;
+  async function _signup(
+    email: string,
+    password: string,
+    firstName: string,
+    lastName: string,
+    dob: string,
+    role: UserRole
+  ): Promise<User> {
+    setAuthState(old => ({...old, loading: true}));
+    return (await signUp(email, password, firstName, lastName, dob, role))
+  }
+
+  async function _login(
+    email: string,
+    password: string
+  ): Promise<User> {
+    setAuthState(old => ({...old, loading: true}));
+    return (await login(email, password))
+  }
+
+  async function _logout(): Promise<void> {
+    setAuthState(old => ({...old, loading: true}));
+    return (await logout())
+  }
 
   return (
-    <AuthContext.Provider value={{ currentUser, userData, loading, signup: signUp, login: login, logout: logout }}>
+    <AuthContext.Provider value={{ state: authState, signup: _signup, login: _login, logout: _logout }}>
       {children}
     </AuthContext.Provider>
   );

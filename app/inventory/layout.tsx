@@ -1,5 +1,6 @@
 "use client";
 
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import SideNavbar from "@/components/SideNav";
 import TopNavbar from "@/components/TopNav";
 import { usePathname } from "next/navigation";
@@ -9,7 +10,7 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
     const pathname = usePathname();
 
     return (
-        <>
+        <ProtectedRoute allow={["Admin"]}>
             <div className="h-full w-full flex flex-col font-family-roboto">
                 <TopNavbar />
                 <div className="flex flex-1">
@@ -76,6 +77,6 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
                     </div>
                 </div>
             </div>
-        </>
+        </ProtectedRoute>
     );
 }

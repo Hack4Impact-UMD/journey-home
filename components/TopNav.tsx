@@ -10,9 +10,9 @@ export default function TopNavbar() {
 
     return (
         <div className="h-12 w-full border-b border-[#EFF3F5] flex items-center justify-end cursor-pointer"
-            onClick={() => auth.logout().then(() => router.push("/login"))}
+            onClick={() => auth.logout()}
         >
-            {auth.userData && <span className="font-family-opensans px-6">{auth.userData.firstName} {auth.userData.lastName}</span>}
+            {auth.state.userData && <span className="font-family-opensans px-6">{auth.state.userData.firstName} {auth.state.userData.lastName}</span>}
         </div>
     )
 }
