@@ -10,10 +10,17 @@ type ItemReviewModalProps = {
     item: DonationItem;
     dr: DonationRequest;
     onClose: () => void;
+    onUpdated?: (updated: InventoryRecord) => void; 
 };
 
-export function InventoryItemView({ dr, item, onClose }: ItemReviewModalProps) {
+export function InventoryItemView({ dr, item: initialItem, onClose, onUpdated }: ItemReviewModalProps) {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [item, setItem] = useState(initialItem);
+    const handleUpdated = (updatedRecord: InventoryRecord) => {
+        setItem(prev => ({ ...prev, item: updatedRecord }));
+        onUpdated?.(updatedRecord);
+    };
+
     return createPortal(
         <>
             <div className="fixed inset-0 z-50 flex items-center justify-center font-family-roboto">
@@ -111,6 +118,8 @@ export function InventoryItemView({ dr, item, onClose }: ItemReviewModalProps) {
                                 item={item.item}
                                 isOpen={isEditModalOpen}
                                 onClose={() => setIsEditModalOpen(false)} 
+                                onUpdated={handleUpdated}
+                                    
                                 />
                             )}
                         </div>

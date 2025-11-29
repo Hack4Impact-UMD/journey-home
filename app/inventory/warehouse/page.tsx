@@ -43,6 +43,15 @@ export default function WarehousePage() {
 
   const itemsToDisplay = results && results.length > 0 ? results : [];
 
+  const handleUpdatedItem = (updated: InventoryRecord) => {
+    setResults((prev) =>
+      prev?.map((item) => (item.id === updated.id ? updated : item)) ?? []
+    );
+    if (selectedItem?.item.id === updated.id) {
+      setSelectedItem({ ...selectedItem, item: updated });
+    }
+};
+
   const handleOpenItem = async (record: InventoryRecord) => {
   try {
     let dr = await getDonationRequest(record.id); 
@@ -272,7 +281,8 @@ export default function WarehousePage() {
         <InventoryItemView
           dr={selectedDR}
           item={selectedItem}
-          onClose={() => setIsItemModalOpen(false)}     />
+          onClose={() => setIsItemModalOpen(false)}     
+          onUpdated={handleUpdatedItem}/>
       )}
     </div>
     
