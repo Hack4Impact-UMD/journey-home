@@ -1,6 +1,7 @@
 "use client";
 
 import SideNavbar from "@/components/SideNav";
+import StockSidebar from "@/components/StockSidebar";
 import TopNavbar from "@/components/TopNav";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
@@ -9,15 +10,13 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
     const pathname = usePathname();
 
     return (
-        <>
-            <div className="h-full w-full flex flex-col font-family-roboto">
-                <TopNavbar />
-                <div className="flex flex-1">
-                    <SideNavbar />
-                    <div className="flex-1  bg-[#F7F7F7] py-4 px-6 flex flex-col">
-                        <span className="text-2xl text-primary font-extrabold block">
-                            Inventory
-                        </span>
+        <>  
+            <div className="h-screen w-full flex flex-col  font-family-roboto overflow-hidden">
+                <TopNavbar/>
+                <div className="flex flex-1 min-h-0">
+                    <SideNavbar/>
+                    <div className="flex-1 bg-[#F7F7F7] py-4 px-6 flex flex-col min-h-0">
+                        <span className="text-2xl text-primary font-extrabold block">Inventory</span>
                         <div className="flex gap-8 text-sm">
                             <a
                                 className={`py-4${
@@ -70,10 +69,11 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
                                 Denied Donations
                             </a>
                         </div>
-                        <div className="bg-background rounded-xl my-2 flex-1 py-4 px-6">
-                            {children}
+                        <div className="bg-background rounded-xl flex-wrap my-2 flex-1 py-4 px-6 min-h-0 overflow-hidden">
+                            { children }
                         </div>
                     </div>
+                    <StockSidebar/>
                 </div>
             </div>
         </>
