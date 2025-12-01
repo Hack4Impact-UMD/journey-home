@@ -1,14 +1,12 @@
 "use client";
 
-import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
 import { SearchBox } from "@/components/inventory/SearchBox";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { DonorsTable } from "@/components/user-management/DonorsTable";
 import { fetchAllDonors } from "@/lib/services/donations";
 import { DonorInfo } from "@/types/donations";
 import { useEffect, useState } from "react";
 
-export default function PreviousDonorsPage() {
+export default function PastDonorsPage() {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [allDonors, setAllDonors] = useState<DonorInfo[]>([]);
 

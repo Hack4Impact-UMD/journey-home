@@ -3,6 +3,7 @@
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import SideNavbar from "@/components/SideNav";
 import TopNavbar from "@/components/TopNav";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
 
@@ -20,7 +21,7 @@ export default function UserManagementLayout({ children }: { children: ReactNode
                             User Management
                         </span>
                         <div className="flex gap-8 text-sm">
-                            <a
+                            <Link
                                 className={`py-4 font-family-roboto text-sm${
                                     pathname.startsWith("/user-management/all-accounts") || pathname === "/user-management"
                                         ? " border-b-2 border-primary text-primary"
@@ -30,19 +31,8 @@ export default function UserManagementLayout({ children }: { children: ReactNode
                                 suppressHydrationWarning
                             >
                                 All Accounts
-                            </a>
-                            <a
-                                className={`py-4 font-family-roboto${
-                                    pathname.startsWith("/user-management/previous-donors")
-                                        ? " border-b-2 border-primary text-primary"
-                                        : ""
-                                }`}
-                                href="/user-management/previous-donors"
-                                suppressHydrationWarning
-                            >
-                                Past Donors
-                            </a>
-                            <a
+                            </Link>
+                            <Link
                                 className={`py-4 font-family-roboto${
                                     pathname.startsWith("/user-management/account-requests")
                                         ? " border-b-2 border-primary text-primary"
@@ -52,7 +42,18 @@ export default function UserManagementLayout({ children }: { children: ReactNode
                                 suppressHydrationWarning
                             >
                                 Account Requests
-                            </a>
+                            </Link>
+                            <Link
+                                className={`py-4 font-family-roboto${
+                                    pathname.startsWith("/user-management/past-donors")
+                                        ? " border-b-2 border-primary text-primary"
+                                        : ""
+                                }`}
+                                href="/user-management/past-donors"
+                                suppressHydrationWarning
+                            >
+                                Past Donors
+                            </Link>
                         </div>
                         <div className="bg-background rounded-xl my-2 flex-1 py-4 px-6">
                             {children}
