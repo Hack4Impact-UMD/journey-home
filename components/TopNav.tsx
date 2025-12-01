@@ -1,10 +1,18 @@
 "use client";
 
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
+
 export default function TopNavbar() {
 
+    const auth = useAuth();
+    const router = useRouter();
+
     return (
-        <div className="h-12 w-full border-b border-[#EFF3F5] flex items-center justify-end">
-            <span className="font-family-opensans px-6">Name</span>
+        <div className="h-12 w-full border-b border-[#EFF3F5] flex items-center justify-end cursor-pointer"
+            onClick={() => auth.logout()}
+        >
+            {auth.state.userData && <span className="font-family-opensans px-6">{auth.state.userData.firstName} {auth.state.userData.lastName}</span>}
         </div>
     )
 }

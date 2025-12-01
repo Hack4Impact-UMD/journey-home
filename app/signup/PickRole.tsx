@@ -20,7 +20,7 @@ export default function PickRole({
       <h1 className="text-2xl font-bold font-family-raleway text-text-1 mb-6">Account Type</h1>
 
       <div className="flex flex-col gap-4">
-        {(["Administrator","Case Manager","Volunteer"] as UserRole[]).map((r) => (
+        {(["Admin","Case Manager","Volunteer"] as UserRole[]).map((r) => (
           <button
             key={r}
             onClick={() => setRole(r)}
