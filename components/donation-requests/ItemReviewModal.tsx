@@ -33,10 +33,10 @@ export function ItemReviewModal({
 
     const [mapError, setMapError] = useState<string | null>(null);
 
-   const geocodeAddress = async (address: string): Promise<[number, number] | null> => {
+   const geocodeAddress = async (address: string, expectedCity: string, expectedState: string): Promise<[number, number] | null> => {
         const token = mapboxgl.accessToken;
         const encoded = encodeURIComponent(address);
-        const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encoded}.json?access_token=${token}`;
+        const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encoded}.json?access_token=${token}&types=address`;
 
         try {
             const res = await fetch(url);
@@ -44,14 +44,22 @@ export function ItemReviewModal({
             if (!data.features?.length) return null;
             
             const feature = data.features[0];
+
+            //making sure it doesn't default to the town as official address if addy isn't found, will default to ct w/ error message this way
+            const hasAddress = feature.place_type?.includes('address');
             
-            const requirements = ['address'];
-            const hasAcceptableType = feature.place_type?.some((type: string) => 
-                requirements.includes(type)
-            );
+            if (!hasAddress) {
+                console.log("geocoding result doesn't have proper address", feature.place_type);
+                return null;
+            }
+
+            //to fix weird case where one word of gibberish things the city is a street name
+            const resultText = feature.place_name.toLowerCase();
+            const cityMatch = resultText.includes(expectedCity.toLowerCase());
+            const stateMatch = resultText.includes(expectedState.toLowerCase());
             
-            if (!hasAcceptableType) {
-                console.log("geocoding result not doing address", feature.place_type);
+            if (!cityMatch || !stateMatch) {
+                console.log("address not in correct city/state")
                 return null;
             }
             
@@ -78,9 +86,13 @@ export function ItemReviewModal({
         mapRef.current = map;
 
         map.on("load", async () => {
+            mapRef.current?.addControl(new mapboxgl.NavigationControl({
+                showCompass: false
+            }));
+
             const fullAddress = `${dr.donor.address.streetAddress}, ${dr.donor.address.city}, ${dr.donor.address.state} ${dr.donor.address.zipCode}`;
 
-            const coords = await geocodeAddress(fullAddress);
+            const coords = await geocodeAddress(fullAddress, dr.donor.address.city, dr.donor.address.state);
 
             if (coords) {
                 map.setCenter(coords);
