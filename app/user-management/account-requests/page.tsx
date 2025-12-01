@@ -55,6 +55,12 @@ export default function AccountRequestsPage() {
                     (user) =>
                         user.pending != null &&
                         selectedRoles.includes(user.pending)
+                ).filter((user) =>
+                    ("" + user.firstName + user.lastName + user.email)
+                        .trim()
+                        .toLowerCase()
+                        .replace(/\s/g, "")
+                        .includes(searchQuery.toLowerCase().trim())
                 )}
                 onAccept={onAccept}
             />

@@ -16,15 +16,15 @@ export default function UserManagementLayout({ children }: { children: ReactNode
                 <div className="flex flex-1">
                     <SideNavbar />
                     <div className="flex-1 bg-[#F7F7F7] py-4 px-6 flex flex-col">
-                        <span className="text-[24px] text-primary font-extrabold block font-family-roboto">
+                        <span className="text-2xl text-primary font-extrabold block font-family-roboto">
                             User Management
                         </span>
-                        <div className="flex gap-[32px]">
+                        <div className="flex gap-8 text-sm">
                             <a
-                                className={`py-[12px] font-family-roboto text-[14px] leading-[22px]${
+                                className={`py-4 font-family-roboto text-sm${
                                     pathname.startsWith("/user-management/all-accounts") || pathname === "/user-management"
                                         ? " border-b-2 border-primary text-primary"
-                                        : " text-black"
+                                        : ""
                                 }`}
                                 href="/user-management/all-accounts"
                                 suppressHydrationWarning
@@ -32,10 +32,10 @@ export default function UserManagementLayout({ children }: { children: ReactNode
                                 All Accounts
                             </a>
                             <a
-                                className={`py-[12px] font-family-roboto text-[14px] leading-[22px]${
+                                className={`py-4 font-family-roboto${
                                     pathname.startsWith("/user-management/previous-donors")
                                         ? " border-b-2 border-primary text-primary"
-                                        : " text-black"
+                                        : ""
                                 }`}
                                 href="/user-management/previous-donors"
                                 suppressHydrationWarning
@@ -43,10 +43,10 @@ export default function UserManagementLayout({ children }: { children: ReactNode
                                 Past Donors
                             </a>
                             <a
-                                className={`py-[12px] font-family-roboto text-[14px] leading-[22px]${
+                                className={`py-4 font-family-roboto${
                                     pathname.startsWith("/user-management/account-requests")
                                         ? " border-b-2 border-primary text-primary"
-                                        : " text-black"
+                                        : ""
                                 }`}
                                 href="/user-management/account-requests"
                                 suppressHydrationWarning
