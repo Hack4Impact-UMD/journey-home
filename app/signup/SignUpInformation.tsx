@@ -5,6 +5,8 @@ import { UserRole } from "@/types/user";
 import { FirebaseError } from "firebase/app";
 import { signUp } from "@/lib/services/auth";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import Link from "next/link";
 
 export default function SignUpInformation({
     selectedRole,
@@ -22,6 +24,7 @@ export default function SignUpInformation({
     const [loading, setLoading] = useState(false);
     const [err, setErr] = useState<string | null>(null);
     const router = useRouter();
+    const auth = useAuth();
 
     async function onSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -35,8 +38,8 @@ export default function SignUpInformation({
         setLoading(true);
         try {
 
-            await signUp(email, pw, first, last, dob, selectedRole);
-            router.push("/inventory");
+            await auth.signup(email, pw, first, last, dob, selectedRole);
+            router.push("/");
 
         } catch (e: unknown) {
             console.error("Signup failed:", e);
@@ -139,13 +142,13 @@ export default function SignUpInformation({
 
                 <p className="text-center">
                     Already have an account?{" "}
-                    <a
+                    <Link
                         href="/login"
                         className="font-semibold hover:underline"
                         style={{ color: "var(--color-primary)" }}
                     >
                         Login
-                    </a>
+                    </Link>
                 </p>
             </form>
         </div>

@@ -19,7 +19,7 @@ const storage = getStorage(app);
 const auth = getAuth(app);
 
 
-if(process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true' && typeof window !== 'undefined') {
+if(process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true') {
   connectFirestoreEmulator(
     db, 
     process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_HOST ?? 'localhost', 
