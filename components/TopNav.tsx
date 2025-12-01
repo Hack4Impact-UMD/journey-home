@@ -20,7 +20,7 @@ export default function TopNavbar() {
             onClick={() => auth.logout()}
         >
             <img
-                src="/defaultprofilepicture.png"
+                src="/DefaultProfilePicture.png"
                 alt="default"
                 className="h-6 w-6 rounded-full"
             />
