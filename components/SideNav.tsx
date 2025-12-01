@@ -58,6 +58,12 @@ export default function SideNavbar() {
                     roles={["Admin"]}
                 />
             </SideNavbarLinkGroup>
+            
+            <SideNavbarLink
+                name="Donation Form"
+                path="/donate"
+                roles={[]}
+            />
         </div>
     );
 }
@@ -77,15 +83,16 @@ function SideNavbarLinkGroup({
     const pathname = usePathname();
     const auth = useAuth();
 
-    
-
     useEffect(() => {
         if (pathname?.startsWith(path)) {
             setGroupOpen(true);
         }
     }, []);
 
-    if (!auth.state.userData || !roles.includes(auth.state.userData.role)) {
+    if (
+        !auth.state.userData ||
+        (roles.length > 0 && !roles.includes(auth.state.userData.role))
+    ) {
         return <></>;
     }
 
@@ -119,7 +126,10 @@ function SideNavbarLink({
     const pathname = usePathname();
     const auth = useAuth();
 
-    if (!auth.state.userData || !roles.includes(auth.state.userData.role)) {
+    if (
+        !auth.state.userData ||
+        (roles.length > 0 && !roles.includes(auth.state.userData.role))
+    ) {
         return <></>;
     }
 
