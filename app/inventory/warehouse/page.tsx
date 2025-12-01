@@ -2,10 +2,6 @@
 "use client";
 
 import GalleryItem from "@/components/GalleryItem";
-import SearchBar from "@/components/SearchBar";
-import CategorySelect from "@/components/CategorySelect";
-import SizeSelect from "@/components/SizeSelect";
-import SortToggle, { SortKeyToggle } from "@/components/SortToggle";
 import AddItem from "@/components/AddItem";
 import type { InventoryRecord, SearchParams } from "@/types/inventory";
 import { Timestamp } from "firebase/firestore";
@@ -15,91 +11,6 @@ import NewItemButton from "@/components/NewItemButton";
 import { DonationItem, DonationRequest } from "@/types/donations";
 import { TableView } from "@/components/TableView";
 import { InventoryItemView } from "@/components/InventoryItemView";
-
-const ITEMS: InventoryRecord[] = [
-  {
-    id: "1",
-    name: "item1",
-    photos: [],
-    category: "Couches",
-    notes: "N/A",
-    quantity: 2,
-    size: "Large",
-    dateAdded: Timestamp.fromDate(new Date("2025-10-27T16:00:00Z")),
-    donorEmail: null,
-  },
-  {
-    id: "2",
-    name: "item2",
-    photos: [],
-    category: "Chairs",
-    notes: "N/A",
-    quantity: 1,
-    size: "Medium",
-    dateAdded: Timestamp.fromDate(new Date("2025-10-28T16:00:00Z")),
-    donorEmail: null,
-  },
-  {
-    id: "3",
-    name: "item3",
-    photos: [],
-    category: "Tables",
-    notes: "N/A",
-    quantity: 3,
-    size: "Small",
-    dateAdded: Timestamp.fromDate(new Date("2025-10-29T16:00:00Z")),
-    donorEmail: null,
-  },
-  {
-    id: "4",
-    name: "item4",
-    photos: [],
-    category: "Tables",
-    notes: "N/A",
-    quantity: 1,
-    size: "Small",
-    dateAdded: Timestamp.fromDate(new Date("2025-10-30T16:00:00Z")),
-    donorEmail: null,
-  },
-  {
-    id: "5",
-    name: "item5",
-    photos: [],
-    category: "Tables",
-    notes: "N/A",
-    quantity: 5,
-    size: "Small",
-    dateAdded: Timestamp.fromDate(new Date("2025-10-31T16:00:00Z")),
-    donorEmail: null,
-  },
-];
-
-const MOCK_DONATION_REQUEST: DonationRequest = {
-  id: "1",
-  donor: {
-    firstName: "John",
-    lastName: "Doe",
-    email: "john@example.com",
-    phoneNumber: "123-456-7890",
-    address: {
-      streetAddress: "123 Main St",
-      city: "Anytown",
-      state: "NY",
-      zipCode: "12345",
-    },
-  },
-  items: [],
-  firstTimeDonor: false,
-  howDidYouHear: "",
-  canDropOff: false,
-  notes: "",
-  date: Timestamp.now(),
-};
-
-const MOCK_DONATION_ITEM = (record: InventoryRecord): DonationItem => ({
-  item: record,
-  status: "Not Reviewed",
-});
 
 export default function WarehousePage() {
   const [results, setResults] = useState<InventoryRecord[] | null>(null);
