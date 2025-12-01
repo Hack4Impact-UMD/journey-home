@@ -6,6 +6,7 @@ import { FirebaseError } from "firebase/app";
 import { signUp } from "@/lib/services/auth";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import Link from "next/link";
 
 export default function SignUpInformation({
     selectedRole,
@@ -141,13 +142,13 @@ export default function SignUpInformation({
 
                 <p className="text-center">
                     Already have an account?{" "}
-                    <a
+                    <Link
                         href="/login"
                         className="font-semibold hover:underline"
                         style={{ color: "var(--color-primary)" }}
                     >
                         Login
-                    </a>
+                    </Link>
                 </p>
             </form>
         </div>

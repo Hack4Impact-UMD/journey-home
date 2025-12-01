@@ -1,129 +1,136 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { UserRole } from "@/types/user";
+import Link from "next/link";
 
 export default function SideNavbar() {
     const pathname = usePathname();
-    const [inventoryOpen, setInventoryOpen] = useState(pathname?.startsWith("/inventory") || false);
-    const [userManagementOpen, setUserManagementOpen] = useState(pathname?.startsWith("/user-management") || false);
     const auth = useAuth();
 
     return (
         <div className="h-full w-[12.5em] p-[1em] flex flex-col font-family-roboto">
-            <span className="text-primary font-extrabold pb-[1em]">{auth.state.userData?.role ?? "Loading..."}</span>
-            
-            <div className="flex flex-col">
-                <button
-                    onClick={() => setInventoryOpen(!inventoryOpen)}
-                    className={`text-left pb-[1em] text-sm flex items-center justify-between ${
-                        pathname?.startsWith("/inventory") ? "text-primary font-semibold" : ""
-                    }`}
-                >
-                    <span>Inventory</span>
-                    <span>{inventoryOpen ? "−" : "+"}</span>
-                </button>
-                {inventoryOpen && (
-                    <div className="pl-[1em] flex flex-col">
-                        <a
-                            href="/inventory/warehouse"
-                            className={`pb-[0.75em] text-sm ${
-                                pathname === "/inventory/warehouse" ? "text-primary font-semibold" : ""
-                            }`}
-                        >
-                            Warehouse
-                        </a>
-                        <a
-                            href="/inventory/donation-requests"
-                            className={`pb-[0.75em] text-sm ${
-                                pathname === "/inventory/donation-requests" ? "text-primary font-semibold" : ""
-                            }`}
-                        >
-                            Donation Requests
-                        </a>
-                        <a
-                            href="/inventory/approved-donations"
-                            className={`pb-[0.75em] text-sm ${
-                                pathname === "/inventory/approved-donations" ? "text-primary font-semibold" : ""
-                            }`}
-                        >
-                            Approved Donations
-                        </a>
-                        <a
-                            href="/inventory/denied-donations"
-                            className={`pb-[0.75em] text-sm ${
-                                pathname === "/inventory/denied-donations" ? "text-primary font-semibold" : ""
-                            }`}
-                        >
-                            Denied Donations
-                        </a>
-                    </div>
-                )}
-            </div>
+            <Link href="/" className="text-primary font-extrabold pb-[1em]">
+                {auth.state.userData?.role ?? "Loading..."}
+            </Link>
 
-            <a
-                href="/volunteers"
-                className={`pb-[1em] text-sm ${
-                    pathname?.startsWith("/volunteers") ? "text-primary font-semibold" : ""
-                }`}
+            <SideNavbarLinkGroup
+                name="Inventory"
+                path="/inventory"
+                roles={["Admin"]}
             >
-                Volunteers
-            </a>
-            
-            <a
-                href="/case-managers"
-                className={`pb-[1em] text-sm ${
-                    pathname?.startsWith("/case-managers") ? "text-primary font-semibold" : ""
-                }`}
-            >
-                Case Managers
-            </a>
+                <SideNavbarLink
+                    name="Warehouse"
+                    path="/inventory/warehouse"
+                    roles={["Admin"]}
+                />
+                <SideNavbarLink
+                    name="Donation Requests"
+                    path="/inventory/donation-requests"
+                    roles={["Admin"]}
+                />
+                <SideNavbarLink
+                    name="Reviewed Donations"
+                    path="/inventory/reviewed-donations"
+                    roles={["Admin"]}
+                />
+            </SideNavbarLinkGroup>
 
-            <div className="flex flex-col">
-                <button
-                    onClick={() => setUserManagementOpen(!userManagementOpen)}
-                    className={`text-left pb-[1em] text-sm flex items-center justify-between ${
-                        pathname?.startsWith("/user-management") ? "text-primary font-semibold" : ""
-                    }`}
-                >
-                    <span>User Management</span>
-                    <span>{userManagementOpen ? "−" : "+"}</span>
-                </button>
-                {userManagementOpen && (
-                    <div className="pl-[1em] flex flex-col">
-                        <a
-                            href="/user-management/all-accounts"
-                            className={`pb-[0.75em] text-sm ${
-                                pathname?.startsWith("/user-management/all-accounts") || pathname === "/user-management"
-                                    ? "text-primary font-semibold" 
-                                    : ""
-                            }`}
-                        >
-                            All Accounts
-                        </a>
-                        <a
-                            href="/user-management/previous-donors"
-                            className={`pb-[0.75em] text-sm ${
-                                pathname?.startsWith("/user-management/previous-donors")
-                                    ? "text-primary font-semibold" 
-                                    : ""
-                            }`}
-                        >
-                            Previous donors
-                        </a>
-                        <a
-                            href="/user-management/account-requests"
-                            className={`pb-[0.75em] text-sm ${
-                                pathname?.startsWith("/user-management/account-requests")
-                                    ? "text-primary font-semibold" 
-                                    : ""
-                            }`}
-                        >
-                            Account requests
-                        </a>
-                    </div>
-                )}
-            </div>
+            <SideNavbarLinkGroup
+                name="User Management"
+                path="/user-management"
+                roles={["Admin"]}
+            >
+                <SideNavbarLink
+                    name="All Accounts"
+                    path="/user-management/all-accounts"
+                    roles={["Admin"]}
+                />
+                <SideNavbarLink
+                    name="Account Requests"
+                    path="/user-management/account-requests"
+                    roles={["Admin"]}
+                />
+                <SideNavbarLink
+                    name="Past Donors"
+                    path="/user-management/past-donors"
+                    roles={["Admin"]}
+                />
+            </SideNavbarLinkGroup>
         </div>
-    )
+    );
+}
+
+function SideNavbarLinkGroup({
+    name,
+    path,
+    roles,
+    children,
+}: {
+    name: string;
+    path: string;
+    roles: UserRole[];
+    children: React.ReactNode;
+}) {
+    const [groupOpen, setGroupOpen] = useState<boolean>(false);
+    const pathname = usePathname();
+    const auth = useAuth();
+
+    
+
+    useEffect(() => {
+        if (pathname?.startsWith(path)) {
+            setGroupOpen(true);
+        }
+    }, []);
+
+    if (!auth.state.userData || !roles.includes(auth.state.userData.role)) {
+        return <></>;
+    }
+
+    return (
+        <div className="flex flex-col">
+            <button
+                onClick={() => setGroupOpen((x) => !x)}
+                className={`text-left pb-4 text-sm flex items-center justify-between ${
+                    pathname?.startsWith(path)
+                        ? "text-primary font-semibold"
+                        : ""
+                }`}
+            >
+                <span>{name}</span>
+                <span>{groupOpen ? "-" : "+"}</span>
+            </button>
+            {groupOpen && <div className="pl-6 flex flex-col">{children}</div>}
+        </div>
+    );
+}
+
+function SideNavbarLink({
+    name,
+    path,
+    roles,
+}: {
+    name: string;
+    path: string;
+    roles: UserRole[];
+}) {
+    const pathname = usePathname();
+    const auth = useAuth();
+
+    if (!auth.state.userData || !roles.includes(auth.state.userData.role)) {
+        return <></>;
+    }
+
+    return (
+        <Link
+            href={path}
+            className={`hover:text-primary pb-3 text-sm ${
+                pathname?.startsWith(path) ? "text-primary font-semibold" : ""
+            }`}
+        >
+            {name}
+        </Link>
+    );
 }
