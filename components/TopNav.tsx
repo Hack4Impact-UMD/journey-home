@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 
 export default function TopNavbar() {
 
-    let auth = useAuth();
-    let router = useRouter();
+    const auth = useAuth();
+    const router = useRouter();
 
     return (
         <div className="h-12 w-full border-b border-[#EFF3F5] flex items-center justify-end cursor-pointer"

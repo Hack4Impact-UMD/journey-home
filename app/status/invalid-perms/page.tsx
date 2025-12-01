@@ -11,7 +11,7 @@ export default function InvalidPerms() {
     return (
         <>
             <div className="w-full h-full flex items-center align-center flex-col p-10 gap-2">
-                <h1>You don't have permissions to view this page</h1>
+                <h1>You don&apos;t have permissions to view this page</h1>
                 <button
                     className="border border-light-border px-8 rounded-xs font-family-roboto"
                     onClick={() => router.push("/")}

@@ -11,7 +11,7 @@ export default function MissingUserData() {
 
     return <>
         <div className="w-full h-full flex items-center align-center flex-col p-10 gap-2">
-                <h1>Error: Couldn't find data for this user</h1>
+                <h1>Error: Couldn&apos;t find data for this user</h1>
 
                 <button
                     className="border border-light-border px-8 rounded-xs font-family-roboto"

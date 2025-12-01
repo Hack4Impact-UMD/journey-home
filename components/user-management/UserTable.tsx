@@ -8,9 +8,10 @@ import { TrashIcon } from "../icons/TrashIcon";
 
 type UserTableProps = {
     users: UserData[];
+    onSelect: (user: UserData) => void;
 };
 
-export function UserTable({ users }: UserTableProps) {
+export function UserTable({ users, onSelect }: UserTableProps) {
     return (
         <div className="w-full h-full min-w-3xl">
             <div className="h-12 bg-[#FAFAFB] border-light-border border flex items-center font-family-roboto font-bold text-sm text-text-1">
@@ -31,17 +32,18 @@ export function UserTable({ users }: UserTableProps) {
                 </span>
             </div>
             {users.map((user) => (
-                <UserTableRow user={user} key={user.uid} />
+                <UserTableRow user={user} key={user.uid} onSelect={() => onSelect(user)} />
             ))}
         </div>
     );
 }
 
-function UserTableRow({ user }: { user: UserData }) {
+function UserTableRow({ user, onSelect }: { user: UserData, onSelect: () => void }) {
     return (
         <>
             <div
                 className="h-10 border-light-border border-b border-x flex items-center font-family-roboto text-sm text-text-1 hover:bg-blue-50 cursor-pointer"
+                onClick={onSelect}
             >
                 <div className="w-[20%] px-4 flex items-center">
                     <input

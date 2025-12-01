@@ -28,12 +28,12 @@ export const fetchAllUsers = async (): Promise<UserData[]> => {
 };
 
 export const fetchAllActiveUsers = async (): Promise<UserData[]> => {
-  let all = await fetchAllUsers();
+  const all = await fetchAllUsers();
   return all.filter(user => user.pending == null);
 }
 
 export const fetchAllAccountRequests = async (): Promise<UserData[]> => {
-  let all = await fetchAllUsers();
+  const all = await fetchAllUsers();
   return all.filter(user => user.pending != null);
 };
 
@@ -52,17 +52,20 @@ export async function getUserByUID(uid: string): Promise<UserData | null> {
 }
 
 /**
- * Admin-only: update a user's role
+ * Admin-only: update a user with new data
  */
-export const updateUserRole = async (
-  uid: string,
-  newRole: UserRole
+export const updateUser = async (
+  updated: UserData
 ) => {
 
-  const userRef = doc(db, "users", uid);
-  await updateDoc(userRef, {
-    role: newRole,
-  });
+  const userRef = doc(db, "users", updated.uid);
+  try {
+    await updateDoc(userRef, updated);
+    return true;
+  } catch (err) {
+    console.error(err);
+  }
+  return false;
 };
 
 /**
