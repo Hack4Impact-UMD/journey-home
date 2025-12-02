@@ -17,25 +17,13 @@ export async function signUp(
     lastName: string,
     dob: string,
     role: UserRole
-): Promise<{ user: User; status: UserStatus }> {
+): Promise<User> {
     const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
         password
     );
     const user = userCredential.user;
-
-    // Map role consistently
-    const roleStr = role as string;
-    const mappedRole: UserRole = 
-      roleStr === "Administrator" ? "Admin" :
-      role as UserRole;
-    
-    // Determine status based on role
-    const status: UserStatus = 
-      mappedRole === "Admin" || role === "Case Manager"
-        ? "pending" 
-        : "approved";
     
     const userRecord: UserData = {
         uid: user.uid,
@@ -43,15 +31,15 @@ export async function signUp(
         lastName,
         email: user.email!,
         dob: dob ? Timestamp.fromDate(new Date(dob)) : null,
-        role: mappedRole,
-        status: status,  // Add status here
+        role: "Volunteer",
+        pending: (role == "Volunteer") ? null : role,
         emailVerified: user.emailVerified,
         createdAt: new Date().toISOString(),  // Add timestamp
     };
 
     await createUserInDB(userRecord);
 
-    return { user, status };
+    return user;
 }
 
 export async function login(email: string, password: string): Promise<User> {

@@ -5,10 +5,7 @@ import { useRouter } from 'next/navigation';
 import LongButton from '@/components/auth/LongButton';
 import InputBox from '../../components/auth/InputBox';
 import { FirebaseError } from 'firebase/app';
-import { login } from '@/lib/services/auth';
-// Import Firestore functions to check user status
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -16,6 +13,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const auth = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,30 +21,9 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // Authenticate user with Firebase Auth
-      const user = await login(email, password);
-      
-      // Fetch user document from Firestore to check their status
-      const userDoc = await getDoc(doc(db, "users", user.uid));
-      
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        
-        // Check status field: pending users can't access the app yet
-        if (userData.status === "pending") {
-          router.push("/status?type=pending");
-          return;
-        } 
-        // Rejected users should see an error message
-        else if (userData.status === "rejected") {
-          setError("Your account request was not approved. Please contact an administrator.");
-          setLoading(false);
-          return;
-        }
-      }
-      
-      // If approved or no status field exists, allow access to inventory
-      router.push("/inventory");
+      await auth.logout();
+      await auth.login(email, password);
+      router.push("/");
     } catch (e: unknown) {
       console.error("Login failed:", e);
       setError((e as FirebaseError).message);

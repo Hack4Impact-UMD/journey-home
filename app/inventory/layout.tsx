@@ -1,7 +1,9 @@
 "use client";
 
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import SideNavbar from "@/components/SideNav";
 import TopNavbar from "@/components/TopNav";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
 
@@ -9,7 +11,7 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
     const pathname = usePathname();
 
     return (
-        <>
+        <ProtectedRoute allow={["Admin"]}>
             <div className="h-full w-full flex flex-col font-family-roboto">
                 <TopNavbar />
                 <div className="flex flex-1">
@@ -19,7 +21,7 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
                             Inventory
                         </span>
                         <div className="flex gap-8 text-sm">
-                            <a
+                            <Link
                                 className={`py-4${
                                     pathname.startsWith("/inventory/warehouse")
                                         ? " border-b-2 border-primary text-primary"
@@ -29,8 +31,8 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
                                 suppressHydrationWarning
                             >
                                 Warehouse
-                            </a>
-                            <a
+                            </Link>
+                            <Link
                                 className={`py-4${
                                     pathname.startsWith(
                                         "/inventory/donation-requests"
@@ -42,33 +44,20 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
                                 suppressHydrationWarning
                             >
                                 Donation Requests
-                            </a>
-                            <a
+                            </Link>
+                            <Link
                                 className={`py-4${
                                     pathname.startsWith(
-                                        "/inventory/approved-donations"
+                                        "/inventory/reviewed-donations"
                                     )
                                         ? " border-b-2 border-primary text-primary"
                                         : ""
                                 }`}
-                                href="/inventory/approved-donations"
+                                href="/inventory/reviewed-donations"
                                 suppressHydrationWarning
                             >
-                                Approved Donations
-                            </a>
-                            <a
-                                className={`py-4${
-                                    pathname.startsWith(
-                                        "/inventory/denied-donations"
-                                    )
-                                        ? " border-b-2 border-primary text-primary"
-                                        : ""
-                                }`}
-                                href="/inventory/denied-donations"
-                                suppressHydrationWarning
-                            >
-                                Denied Donations
-                            </a>
+                                Reviewed Donations
+                            </Link>
                         </div>
                         <div className="bg-background rounded-xl my-2 flex-1 py-4 px-6">
                             {children}
@@ -76,6 +65,6 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
                     </div>
                 </div>
             </div>
-        </>
+        </ProtectedRoute>
     );
 }

@@ -3,32 +3,35 @@ import localFont from "next/font/local";
 import { AuthProvider } from "../contexts/AuthContext";
 
 const openSans = localFont({
-  src: '../public/fonts/OpenSans/OpenSans.ttf',
-  variable: '--font-opensans',
-})
+    src: "../public/fonts/OpenSans/OpenSans.ttf",
+    variable: "--font-opensans",
+});
 
 const raleway = localFont({
-  src: '../public/fonts/Raleway/Raleway.ttf',
-  variable: '--font-raleway',
-})
+    src: "../public/fonts/Raleway/Raleway.ttf",
+    variable: "--font-raleway",
+});
 
 const roboto = localFont({
-  src: '../public/fonts/Roboto/Roboto.ttf',
-  variable: '--font-roboto',
-})
+    src: "../public/fonts/Roboto/Roboto.ttf",
+    variable: "--font-roboto",
+});
 
 export default function RootLayout({
-  children,
+    children,
 }: Readonly<{
-  children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en" className={`${openSans.variable} ${raleway.variable} ${roboto.variable} w-full h-full overscroll-none`}>
-      <body className="w-full h-full font-family-roboto">
+    return (
         <AuthProvider>
-          {children}
+            <html
+                lang="en"
+                className={`${openSans.variable} ${raleway.variable} ${roboto.variable} w-full h-full overscroll-none`}
+            >
+                <body className="w-full h-full font-family-roboto">
+                    {children}
+                </body>
+            </html>
         </AuthProvider>
-      </body>
-    </html>
-  );
+    );
 }

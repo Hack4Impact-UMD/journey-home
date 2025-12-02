@@ -1,17 +1,14 @@
 "use client";
 
-import { UserData } from "@/types/user";
-import { Badge } from "../Badge";
-import { Check, CheckIcon } from "lucide-react";
+import { DonorInfo } from "@/types/donations";
 import { ViewIcon } from "../icons/ViewIcon";
 import { TrashIcon } from "../icons/TrashIcon";
 
-type UserTableProps = {
-    users: UserData[];
-    onSelect: (user: UserData) => void;
+type DonorsTableProps = {
+    donors: DonorInfo[];
 };
 
-export function UserTable({ users, onSelect }: UserTableProps) {
+export function DonorsTable({ donors }: DonorsTableProps) {
     return (
         <div className="w-full h-full min-w-3xl">
             <div className="h-12 bg-[#FAFAFB] border-light-border border flex items-center font-family-roboto font-bold text-sm text-text-1">
@@ -19,59 +16,46 @@ export function UserTable({ users, onSelect }: UserTableProps) {
                     Name
                 </span>
                 <span className="w-[20%] border-l-2 border-light-border px-4">
-                    User Type
+                    Phone
                 </span>
                 <span className="w-[20%] border-l-2 border-light-border px-4">
                     Email
                 </span>
                 <span className="w-[20%] border-l-2 border-light-border px-4">
-                    Date of Birth
+                    Address
                 </span>
                 <span className="w-[20%] border-l-2 border-light-border px-4">
                     Actions
                 </span>
             </div>
-            {users.map((user) => (
-                <UserTableRow user={user} key={user.uid} onSelect={() => onSelect(user)} />
+            {donors.map((donor) => (
+                <DonorsTableRow donor={donor} key={donor.email} />
             ))}
         </div>
     );
 }
 
-function UserTableRow({ user, onSelect }: { user: UserData, onSelect: () => void }) {
+function DonorsTableRow({ donor }: { donor: DonorInfo }) {
     return (
         <>
             <div
                 className="h-10 border-light-border border-b border-x flex items-center font-family-roboto text-sm text-text-1 hover:bg-blue-50 cursor-pointer"
-                onClick={onSelect}
             >
                 <div className="w-[20%] px-4 flex items-center">
-                    <input
-                        type="checkbox"
-                        className="w-4 h-4 mr-4 rounded-xs cursor-pointer border-white"
-                    ></input>
                     <span>
-                        {user.firstName} {user.lastName}
+                        {donor.firstName} {donor.lastName}
                     </span>
                 </div>
-                <div className="w-[20%] px-4 text-xs">
-                    <Badge
-                        text={user.role}
-                        color="gray"
-                    />
+                <div className="w-[20%] px-4">
+                    <span>{donor.phoneNumber}</span>
                 </div>
                 <div className="w-[20%] px-4 flex items-center">
                     <span>
-                        {user.email}
+                        {donor.email}
                     </span>
                 </div>
                 <span className="w-[20%] px-4">
-                    {(user.dob) && user.dob.toDate().toLocaleDateString("en-US", {
-                        month: "2-digit",
-                        day: "2-digit",
-                        year: "numeric",
-                        timeZone: "UTC"
-                    })}
+                    {donor.address.streetAddress}, {donor.address.city} {donor.address.zipCode}
                 </span>
                 <div className="w-[20%] px-4 flex align-center">
                     <ViewIcon />
