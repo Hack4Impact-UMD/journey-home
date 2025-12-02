@@ -7,7 +7,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
 
-export default function InventoryLayout({ children }: { children: ReactNode }) {
+export default function UserManagementLayout({ children }: { children: ReactNode }) {
     const pathname = usePathname();
 
     return (
@@ -16,47 +16,43 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
                 <TopNavbar />
                 <div className="flex flex-1">
                     <SideNavbar />
-                    <div className="flex-1  bg-[#F7F7F7] py-4 px-6 flex flex-col">
-                        <span className="text-2xl text-primary font-extrabold block">
-                            Inventory
+                    <div className="flex-1 bg-[#F7F7F7] py-4 px-6 flex flex-col">
+                        <span className="text-2xl text-primary font-extrabold block font-family-roboto">
+                            User Management
                         </span>
                         <div className="flex gap-8 text-sm">
                             <Link
-                                className={`py-4${
-                                    pathname.startsWith("/inventory/warehouse")
+                                className={`py-4 font-family-roboto text-sm${
+                                    pathname.startsWith("/user-management/all-accounts") || pathname === "/user-management"
                                         ? " border-b-2 border-primary text-primary"
                                         : ""
                                 }`}
-                                href="/inventory/warehouse"
+                                href="/user-management/all-accounts"
                                 suppressHydrationWarning
                             >
-                                Warehouse
+                                All Accounts
                             </Link>
                             <Link
-                                className={`py-4${
-                                    pathname.startsWith(
-                                        "/inventory/donation-requests"
-                                    )
+                                className={`py-4 font-family-roboto${
+                                    pathname.startsWith("/user-management/account-requests")
                                         ? " border-b-2 border-primary text-primary"
                                         : ""
                                 }`}
-                                href="/inventory/donation-requests"
+                                href="/user-management/account-requests"
                                 suppressHydrationWarning
                             >
-                                Donation Requests
+                                Account Requests
                             </Link>
                             <Link
-                                className={`py-4${
-                                    pathname.startsWith(
-                                        "/inventory/reviewed-donations"
-                                    )
+                                className={`py-4 font-family-roboto${
+                                    pathname.startsWith("/user-management/past-donors")
                                         ? " border-b-2 border-primary text-primary"
                                         : ""
                                 }`}
-                                href="/inventory/reviewed-donations"
+                                href="/user-management/past-donors"
                                 suppressHydrationWarning
                             >
-                                Reviewed Donations
+                                Past Donors
                             </Link>
                         </div>
                         <div className="bg-background rounded-xl my-2 flex-1 py-4 px-6">
@@ -68,3 +64,4 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
         </ProtectedRoute>
     );
 }
+

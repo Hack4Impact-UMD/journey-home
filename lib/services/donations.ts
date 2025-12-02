@@ -178,3 +178,12 @@ export async function createDonationRequest(request: DonationRequest): Promise<s
   const docRef = await setDoc(doc(db, DONATIONS_COLLECTION, request.id), donationDoc);
   return request.id;
 }
+
+export const fetchAllDonors = async (): Promise<DonorInfo[]> => {
+  const snapshot = await getDocs(collection(db, DONORS_COLLECTION));
+  const donors: DonorInfo[] = [];
+  snapshot.forEach((doc) => {
+    donors.push(doc.data() as DonorInfo);
+  });
+  return donors;
+};
