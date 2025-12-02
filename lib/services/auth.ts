@@ -34,7 +34,6 @@ export async function signUp(
         role: "Volunteer",
         pending: (role == "Volunteer") ? null : role,
         emailVerified: user.emailVerified,
-        createdAt: new Date().toISOString(),  // Add timestamp
     };
 
     await createUserInDB(userRecord);

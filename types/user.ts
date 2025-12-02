@@ -5,8 +5,6 @@ import { Timestamp } from "firebase/firestore";
 
 export type UserRole = "Admin" | "Case Manager" | "Volunteer";
 
-export type UserStatus = "pending" | "approved" | "rejected" | "previous";
-
 export type UserData = {
     uid: string;
     firstName: string;
