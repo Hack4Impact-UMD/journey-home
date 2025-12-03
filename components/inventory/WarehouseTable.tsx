@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { InventoryRecord } from "@/types/inventory";
 import { Badge } from "./Badge";
 import { ViewIcon } from "../icons/ViewIcon";

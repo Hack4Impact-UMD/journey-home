@@ -29,7 +29,7 @@ export function ItemReviewModal({
                     <div className="flex-1 border-light-border justify-center flex items-center bg-gray-100">
                         {item.item.photos.length > 0 ? (
                             <img
-                                className="max-w-full max-h-full"
+                                className="w-full h-full object-contain"
                                 src={item.item.photos[0].url}
                             />
                         ) : null}

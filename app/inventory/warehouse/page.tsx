@@ -24,6 +24,8 @@ import { WarehouseTable } from "@/components/inventory/WarehouseTable";
 import { SetItemModal } from "@/components/inventory/SetItemModal";
 import { PlusIcon } from "lucide-react";
 import { Timestamp } from "firebase/firestore";
+import { WarehouseGallery } from "@/components/inventory/WarehouseGallery";
+import { ItemViewModal } from "@/components/inventory/ItemViewModal";
 
 export default function WarehousePage() {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -58,10 +60,12 @@ export default function WarehousePage() {
                 if (success) {
                     setEditedItem(null);
                     setNewItem(null);
-                    setAllItems((prevItems) =>
+                    setAllItems((prevItems) => 
+                        (!adding) ? 
                         prevItems.map((item) =>
                             item.id === updated.id ? updated : item
-                        )
+                        ) :
+                        [...prevItems, updated]
                     );
                 } else {
                     throw new Error(adding ? "Error: Couldn't add item" : "Error: Couldn't update item");
@@ -78,6 +82,8 @@ export default function WarehousePage() {
     function deleteItem(deleted: InventoryRecord) {
         if(!window.confirm("Are you sure you want to delete "+deleted.name+"?"))
             return;
+        
+        setOpenedItem(old => old && old.id == deleted.id ? null : old);
 
         toast.promise(
             deleteInventoryRecord(deleted.id).then(() => 
@@ -100,14 +106,42 @@ export default function WarehousePage() {
         });
     }, []);
 
+    const items = allItems.
+        filter(x => selectedCategories.includes(x.category) 
+            && selectedSizes.includes(x.size)
+            && `${x.name}${x.category}${x.notes}${x.size}${x.donorEmail}`.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        .toSorted((a, b) => {
+            if (sortBy === "Date") {
+                return sortAsc
+                    ? a.dateAdded.toDate().getTime() - b.dateAdded.toDate().getTime()
+                    : b.dateAdded.toDate().getTime() - a.dateAdded.toDate().getTime();
+            } else {
+                return sortAsc ? a.quantity - b.quantity : b.quantity - a.quantity;
+            }
+        });
+
     return (
-        <>
+        <>  
             {editedItem !== null && (
                 <SetItemModal
                     item={editedItem}
                     isCreate={false}
                     onClose={() => setEditedItem(null)}
                     editItem={editItem}
+                />
+            )}
+            {openedItem !== null && (
+                <ItemViewModal
+                    item={openedItem}
+                    onClose={() => setOpenedItem(null)}
+                    onEdit={() => {
+                        setEditedItem(openedItem);
+                        setOpenedItem(null);
+                    }}
+                    onDelete={() => {
+                        deleteItem(openedItem);
+                    }}
                 />
             )}
             {newItem !== null && (
@@ -120,7 +154,7 @@ export default function WarehousePage() {
             )}
             <div className="flex flex-col mb-6">
                 <div className="flex">
-                    <div className="flex gap-3">
+                    <div className="flex flex-wrap gap-3">
                         <SearchBox
                             value={searchQuery}
                             onChange={setSearchQuery}
@@ -213,10 +247,13 @@ export default function WarehousePage() {
                 </div>
             </div>
             {isGridDisplay ? 
-                <></>
+                <WarehouseGallery
+                    inventoryRecords={items}
+                    openItem={setOpenedItem}
+                />
                 :
                 <WarehouseTable
-                    inventoryRecords={allItems}
+                    inventoryRecords={items}
                     openItem={setOpenedItem}
                     editItem={setEditedItem}
                     deleteItem={deleteItem}
