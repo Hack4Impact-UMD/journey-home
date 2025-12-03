@@ -38,7 +38,7 @@ export default function PastDonorsPage() {
                         .toLowerCase()
                         .replace(/\s/g, "")
                         .includes(searchQuery.toLowerCase().trim())
-                )}
+                ).sort((a, b) => (a.lastName+a.firstName).toLowerCase().localeCompare((b.lastName+b.firstName).toLowerCase()))}
             />
         </>
     );

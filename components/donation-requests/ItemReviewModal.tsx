@@ -7,7 +7,7 @@ import { InventoryRecord } from "@/types/inventory";
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { CloseIcon } from "../icons/CloseIcon";
-import { Badge } from "../Badge";
+import { Badge } from "../inventory/Badge";
 
 type ItemReviewModalProps = {
     item: DonationItem;

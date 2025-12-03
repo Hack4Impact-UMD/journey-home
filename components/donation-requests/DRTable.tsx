@@ -1,5 +1,5 @@
 import { DonationRequest } from "@/types/donations";
-import { Badge } from "../Badge";
+import { Badge } from "../inventory/Badge";
 import { useState } from "react";
 import { ViewIcon } from "../icons/ViewIcon";
 import { TrashIcon } from "../icons/TrashIcon";

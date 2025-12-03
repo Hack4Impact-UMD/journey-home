@@ -3,7 +3,7 @@
 import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { SortOption } from "@/components/inventory/SortOption";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { ProtectedRoute } from "@/components/general/ProtectedRoute";
 import { EditAccountModal } from "@/components/user-management/EditAccountModal";
 import { UserTable } from "@/components/user-management/UserTable";
 import { fetchAllActiveUsers, updateUser } from "@/lib/services/users";
@@ -11,6 +11,7 @@ import { SortStatus } from "@/types/inventory";
 import { UserData, UserRole } from "@/types/user";
 import { User } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function AllAccountsPage() {
     const roleOptions: UserRole[] = ["Admin", "Case Manager", "Volunteer"];
@@ -24,18 +25,25 @@ export default function AllAccountsPage() {
     );
 
     function editAccount(updated: UserData) {
-        updateUser(updated).then((success) => {
-            if (success) {
-                setSelectedAccount(null);
-                setAllAccounts((prevAccounts) =>
-                    prevAccounts.map((user) =>
-                        user.uid === updated.uid ? updated : user
-                    )
-                );
-            } else {
-                alert("Error: Couldn't update user");
+        toast.promise(
+            updateUser(updated).then((success) => {
+                if (success) {
+                    setSelectedAccount(null);
+                    setAllAccounts((prevAccounts) =>
+                        prevAccounts.map((user) =>
+                            user.uid === updated.uid ? updated : user
+                        )
+                    );
+                } else {
+                    throw new Error("Couldn't update user");
+                }
+            }),
+            {
+                loading: "Updating user...",
+                success: "User updated successfully!",
+                error: "Error: Couldn't update user",
             }
-        });
+        );
     }
 
     useEffect(() => {
@@ -77,6 +85,13 @@ export default function AllAccountsPage() {
                             .toLowerCase()
                             .replace(/\s/g, "")
                             .includes(searchQuery.toLowerCase().trim())
+                    )
+                    .sort((a, b) =>
+                        (a.lastName + a.firstName)
+                            .toLowerCase()
+                            .localeCompare(
+                                (b.lastName + b.firstName).toLowerCase()
+                            )
                     )}
                 onSelect={(user: UserData) => {
                     setSelectedAccount(user);

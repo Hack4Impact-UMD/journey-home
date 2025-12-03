@@ -1,0 +1,146 @@
+import { InventoryRecord, ItemSize } from "@/types/inventory";
+import { useState } from "react";
+import { CloseIcon } from "../icons/CloseIcon";
+import { createPortal } from "react-dom";
+import { useCategories } from "@/lib/services/inventory";
+
+type SetItemModalProps = {
+    item: InventoryRecord;
+    isCreate: boolean;
+    onClose: () => void;
+    editItem: (updated: InventoryRecord) => void;
+};
+
+export function EditItemModal(props: SetItemModalProps) {
+    const [name, setName] = useState<string>("");
+    const [category, setCategory] = useState<string>("");
+    const [notes, setNotes] = useState<string>("");
+    const [quantity, setQuantity] = useState<string>("1");
+    const [size, setSize] = useState<ItemSize>("Small");
+
+    const allCategories = useCategories();
+
+    // TODO: Photos input
+
+    return createPortal(
+        <>
+            <div className="fixed inset-0 z-50 flex items-center justify-center font-family-roboto">
+                <div className="bg-white w-full h-full flex relative justify-center items-center">
+                    <div className="absolute top-8 right-8 text-4xl">
+                        <button onClick={props.onClose}>
+                            <CloseIcon />
+                        </button>
+                    </div>
+                    <div className="max-w-[40em] w-full">
+                        <h1 className="font-family-roboto text-2xl font-bold mb-4">
+                            {props.isCreate ? "Create" : "Edit"} Item
+                        </h1>
+
+                        <p className="text-sm mb-2">
+                            <span className="text-red-400">*</span>{" "}
+                            {"Item Name (Short description 1-3 words)"}
+                        </p>
+                        <input
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            className="rounded-xs h-8 text-sm px-3 border border-light-border outline-0 w-full mb-4"
+                        />
+
+                        <div className="mb-4 flex w-full gap-2">
+                            <div className="w-full">
+                                <p className="text-sm mb-2">
+                                    <span className="text-red-400">*</span>{" "}
+                                    Category
+                                </p>
+                                <select
+                                    value={category}
+                                    onChange={(e) =>
+                                        setCategory(e.target.value)
+                                    }
+                                    className="rounded-xs h-8 text-sm border border-light-border outline-0 w-full px-3"
+                                >
+                                    {allCategories.map((cat) => (
+                                        <option key={cat} value={cat}>
+                                            {cat}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="w-full">
+                                <p className="text-sm mb-2">
+                                    <span className="text-red-400">*</span>{" "}
+                                    Size
+                                </p>
+                                <select
+                                    value={size}
+                                    onChange={(e) =>
+                                        setSize(e.target.value as ItemSize)
+                                    }
+                                    className="rounded-xs h-8 text-sm border border-light-border outline-0 w-full px-3"
+                                >
+                                    {["Small", "Medium", "Large"].map((cat) => (
+                                        <option key={cat} value={cat}>
+                                            {cat}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="w-full">
+                                <p className="text-sm mb-2">
+                                    <span className="text-red-400">*</span>{" "}
+                                    Quantity
+                                </p>
+                                <input
+                                    type="number"
+                                    className="rounded-xs h-8 text-sm px-3 border border-light-border outline-0 w-full"
+                                    value={quantity}
+                                    onChange={(e) =>
+                                        setQuantity(e.target.value)
+                                    }
+                                    onBlur={(e) => {
+                                        const num = parseInt(e.target.value);
+                                        if (!isNaN(num) && num >= 1) {
+                                            setQuantity(num.toString());
+                                        } else {
+                                            setQuantity("1");
+                                        }
+                                    }}
+                                />
+                            </div>
+                        </div>
+
+                        <p className="text-sm mb-2">
+                            Notes
+                        </p>
+                        <textarea
+                            value={notes}
+                            onChange={(e) => setNotes(e.target.value)}
+                            className="rounded-xs h-16 text-sm px-3 py-3 border border-light-border outline-0 w-full mb-4"
+                        />
+
+                        {/* <p className="text-sm mb-2">
+                            Photos
+                        </p> */}
+
+
+                        <div className="w-full flex gap-2">
+                            <button
+                                className="rounded-xs h-8 border border-light-border w-full"
+                                onClick={props.onClose}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className="rounded-xs h-8 bg-primary text-white w-full flex items-center justify-center"
+                                onClick={() => {}}
+                            >
+                                Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>,
+        document.body
+    );
+}

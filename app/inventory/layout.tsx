@@ -1,9 +1,9 @@
 "use client";
 
-import { ProtectedRoute } from "@/components/ProtectedRoute";
-import SideNavbar from "@/components/SideNav";
-import StockSidebar from "@/components/StockSidebar";
-import TopNavbar from "@/components/TopNav";
+import { ProtectedRoute } from "@/components/general/ProtectedRoute";
+import SideNavbar from "@/components/general/SideNav";
+import StockSidebar from "@/components/inventory/StockSidebar";
+import TopNavbar from "@/components/general/TopNav";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
@@ -64,7 +64,6 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
                             { children }
                         </div>
                     </div>
-                    <StockSidebar/>
                 </div>
             </div>
         </ProtectedRoute>

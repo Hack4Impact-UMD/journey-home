@@ -1,11 +1,11 @@
-import { DonationRequest } from "@/types/donations";
-import { Badge } from "./Badge";
-import { useState } from "react";
-import { ViewIcon } from "./icons/ViewIcon";
-import { TrashIcon } from "./icons/TrashIcon";
-import { InventoryRecord } from "@/types/inventory";
 
-export function TableView({
+import { useState } from "react";
+import { InventoryRecord } from "@/types/inventory";
+import { Badge } from "./Badge";
+import { ViewIcon } from "../icons/ViewIcon";
+import { TrashIcon } from "../icons/TrashIcon";
+
+export function WarehouseTable({
     inventoryRecords,
     openItem,
     onDelete,
@@ -39,14 +39,14 @@ export function TableView({
                     
                 </div>
                 {inventoryRecords.map((record) => (
-                    <TableRow record={record} onOpen={() => openItem(record)} key={record.id} onDelete={() => onDelete?.(record.id)} />
+                    <WarehouseTableRow record={record} onOpen={() => openItem(record)} key={record.id} onDelete={() => onDelete?.(record.id)} />
                 ))}
             </div>
         </>
     );
 }
 
-function TableRow({ record, onOpen, onDelete }: { record: InventoryRecord, onOpen: () => void, onDelete?: (id: string) => void;  }) {
+function WarehouseTableRow({ record, onOpen, onDelete }: { record: InventoryRecord, onOpen: () => void, onDelete?: (id: string) => void;  }) {
     return (
         <>
             <div 

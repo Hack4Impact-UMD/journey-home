@@ -2,7 +2,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { UserRole } from "@/types/user";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Spinner } from "./ui/spinner";
+import { Spinner } from "../ui/spinner";
 
 type ProtectedRouteProps = {
     children: React.ReactNode;

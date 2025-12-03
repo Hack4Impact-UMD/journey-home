@@ -1,7 +1,7 @@
 "use client";
 
 import { UserData } from "@/types/user";
-import { Badge } from "../Badge";
+import { Badge } from "../inventory/Badge";
 import { Check, CheckIcon } from "lucide-react";
 import { ViewIcon } from "../icons/ViewIcon";
 import { TrashIcon } from "../icons/TrashIcon";

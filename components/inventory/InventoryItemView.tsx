@@ -2,7 +2,7 @@ import { DonationItem, DonationRequest } from "@/types/donations";
 import { InventoryRecord } from "@/types/inventory";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { CloseIcon } from "./icons/CloseIcon";
+import { CloseIcon } from "../icons/CloseIcon";
 import { Badge } from "./Badge";
 import EditItem from "./EditItem";
 import { getInventoryRecord } from "@/lib/services/inventory";
