@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDonorForm, FormDonationItem } from "../DonorFormContext";
 import StepIndicator from "../../../components/form/StepIndicator";
 import FormInput from "../../../components/form/FormInput";
 import FormSelect from "../../../components/form/FormSelect";
 import FormTextarea from "../../../components/form/FormTextarea";
 import Button from "../../../components/form/Button";
+import { useCategories } from "@/lib/services/inventory";
 
 export default function Step2AddDonations() {
   const { formState, setCurrentStep, addDonationItem, removeDonationItem, updateDonationItem } =
@@ -25,23 +26,7 @@ export default function Step2AddDonations() {
     setCurrentStep(3);
   };
 
-  const categoryOptions = [
-    "Mattresses",
-    "Box Springs",
-    "Sofas",
-    "Loveseats",
-    "Kitchen Tables",
-    "Kitchen Chairs",
-    "Armchairs",
-    "Coffee Tables",
-    "Dressers",
-    "Nightstands/End Tables",
-    "TV's",
-    "TV Stands",
-    "Microwave Stands",
-    "Small Bookshelves",
-    "Area Rugs",
-  ];
+  const categoryOptions = useCategories();
 
   const sizeOptions = ["Small", "Medium", "Large"];
 

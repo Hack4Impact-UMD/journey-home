@@ -1,6 +1,6 @@
 "use client";
 
-import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { ProtectedRoute } from "@/components/general/ProtectedRoute";
 import { useRouter } from "next/navigation";
 
 export default function AccountCreated() {

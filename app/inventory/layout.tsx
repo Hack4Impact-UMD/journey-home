@@ -1,8 +1,8 @@
 "use client";
 
-import { ProtectedRoute } from "@/components/ProtectedRoute";
-import SideNavbar from "@/components/SideNav";
-import TopNavbar from "@/components/TopNav";
+import { ProtectedRoute } from "@/components/general/ProtectedRoute";
+import SideNavbar from "@/components/general/SideNav";
+import TopNavbar from "@/components/general/TopNav";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
@@ -59,8 +59,8 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
                                 Reviewed Donations
                             </Link>
                         </div>
-                        <div className="bg-background rounded-xl my-2 flex-1 py-4 px-6">
-                            {children}
+                        <div className="bg-background rounded-xl flex-wrap my-2 flex-1 py-4 px-6 min-h-0 overflow-hidden">
+                            { children }
                         </div>
                     </div>
                 </div>

@@ -7,6 +7,7 @@ import { approveAccount, fetchAllAccountRequests } from "@/lib/services/users";
 import { UserData, UserRole } from "@/types/user";
 import { User } from "firebase/auth";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function AccountRequestsPage() {
     const requestOpts: UserRole[] = ["Admin", "Case Manager"];
@@ -27,8 +28,14 @@ export default function AccountRequestsPage() {
         ) {
             return;
         }
-        approveAccount(user.uid, user.pending ?? "Volunteer");
-        setAllRequests((old) => old.filter((u) => u.uid != user.uid));
+        toast.promise(
+            approveAccount(user.uid, user.pending ?? "Volunteer").then(() => setAllRequests((old) => old.filter((u) => u.uid != user.uid))),
+            {
+                loading: "Accepting account request...",
+                success: "Request accepted successfully!",
+                error: "Error: Couldn't accept request",
+            }
+        );
     }
 
     return (
@@ -61,7 +68,7 @@ export default function AccountRequestsPage() {
                         .toLowerCase()
                         .replace(/\s/g, "")
                         .includes(searchQuery.toLowerCase().trim())
-                )}
+                ).sort((a, b) => (a.lastName+a.firstName).toLowerCase().localeCompare((b.lastName+b.firstName).toLowerCase()))}
                 onAccept={onAccept}
             />
         </>

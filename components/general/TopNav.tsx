@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 
 export default function TopNavbar() {
     const auth = useAuth();
-    const router = useRouter();
 
     return (
         <div

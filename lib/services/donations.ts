@@ -187,3 +187,14 @@ export const fetchAllDonors = async (): Promise<DonorInfo[]> => {
   });
   return donors;
 };
+
+export async function getDonor(email: string): Promise<DonorInfo | null> {
+  const donorRef = doc(db, DONORS_COLLECTION, email);
+  const donorSnap = await getDoc(donorRef);
+
+  if (donorSnap.exists()) {
+    return donorSnap.data() as DonorInfo;
+  } else {
+    return null;
+  }
+}

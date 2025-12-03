@@ -1,5 +1,5 @@
 import { UserData } from "@/types/user";
-import { Badge } from "../Badge";
+import { Badge } from "../inventory/Badge";
 
 type AccountReqTableProps = {
     requests: UserData[];

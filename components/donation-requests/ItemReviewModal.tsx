@@ -7,7 +7,7 @@ import { InventoryRecord } from "@/types/inventory";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { CloseIcon } from "../icons/CloseIcon";
-import { Badge } from "../Badge";
+import { Badge } from "../inventory/Badge";
 
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -128,7 +128,7 @@ export function ItemReviewModal({
                     <div className="flex-1 border-light-border justify-center flex items-center bg-gray-100">
                         {item.item.photos.length > 0 ? (
                             <img
-                                className="max-w-full max-h-full"
+                                className="w-full h-full object-contain"
                                 src={item.item.photos[0].url}
                             />
                         ) : null}

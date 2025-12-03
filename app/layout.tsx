@@ -1,6 +1,7 @@
 import "./globals.css";
 import localFont from "next/font/local";
 import { AuthProvider } from "../contexts/AuthContext";
+import { Toaster } from "@/components/ui/sonner";
 
 const openSans = localFont({
     src: "../public/fonts/OpenSans/OpenSans.ttf",
@@ -24,6 +25,7 @@ export default function RootLayout({
 }>) {
     return (
         <AuthProvider>
+            <Toaster />
             <html
                 lang="en"
                 className={`${openSans.variable} ${raleway.variable} ${roboto.variable} w-full h-full overscroll-none`}

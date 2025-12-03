@@ -1,8 +1,8 @@
 "use client";
 
-import { ProtectedRoute } from "@/components/ProtectedRoute";
-import SideNavbar from "@/components/SideNav";
-import TopNavbar from "@/components/TopNav";
+import { ProtectedRoute } from "@/components/general/ProtectedRoute";
+import SideNavbar from "@/components/general/SideNav";
+import TopNavbar from "@/components/general/TopNav";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";

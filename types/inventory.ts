@@ -5,6 +5,8 @@ export type InventoryPhoto = {
   altText: string,
 };
 
+export type ItemSize = "Small" | "Medium" | "Large"
+
 export type InventoryRecord = {
   id: string,
   name: string,
@@ -12,16 +14,9 @@ export type InventoryRecord = {
   category: string,
   notes: string,
   quantity: number,
-  size: "Small" | "Medium" | "Large",
+  size: ItemSize,
   dateAdded: Timestamp,
   donorEmail: string | null,
-};
-
-export type SearchParams = {
-  categories: string[],
-  sizes: string[],
-  sortBy: "Quantity" | "Date" | "Name",
-  ascending: boolean
 };
 
 export type SortStatus = "asc" | "desc" | "none";
