@@ -3,13 +3,13 @@
 
 import type {
     InventoryRecord,
-    ItemSize,
-    SearchParams,
+    ItemSize
 } from "@/types/inventory";
 import { use, useEffect, useState } from "react";
 import { GridIcon } from "@/components/icons/GridIcon";
 import { RowsIcon } from "@/components/icons/RowsIcon";
 import {
+    deleteInventoryRecord,
     getAllWarehouseInventoryRecords,
     getCategories,
     setInventoryRecord,
@@ -21,7 +21,7 @@ import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect"
 import { SortOption } from "@/components/inventory/SortOption";
 import { cn } from "@/lib/utils";
 import { WarehouseTable } from "@/components/inventory/WarehouseTable";
-import { EditItemModal } from "@/components/inventory/SetItemModal";
+import { SetItemModal } from "@/components/inventory/SetItemModal";
 import { PlusIcon } from "lucide-react";
 import { Timestamp } from "firebase/firestore";
 
@@ -46,10 +46,10 @@ export default function WarehousePage() {
     const [editedItem, setEditedItem] = useState<InventoryRecord | null>(
         null
     );
-
     const [newItem, setNewItem] = useState<InventoryRecord | null>(
         null
     );
+    const [openedItem, setOpenedItem] = useState<InventoryRecord | null>(null);
 
     function editItem(updated: InventoryRecord) {
         const adding = newItem !== null;
@@ -75,6 +75,24 @@ export default function WarehousePage() {
         );
     }
 
+    function deleteItem(deleted: InventoryRecord) {
+        if(!window.confirm("Are you sure you want to delete "+deleted.name+"?"))
+            return;
+
+        toast.promise(
+            deleteInventoryRecord(deleted.id).then(() => 
+                setAllItems(prevItems =>
+                    prevItems.filter((item) => item.id !== deleted.id)
+                )
+            ),
+            {
+                loading: "Deleting item...",
+                success: "Item deleted successfully!",
+                error: "Error: Couldn't delete item",
+            }
+        );
+    }
+
     useEffect(() => {
         getAllWarehouseInventoryRecords().then(setAllItems);
         getCategories().then((categories) => {
@@ -85,7 +103,7 @@ export default function WarehousePage() {
     return (
         <>
             {editedItem !== null && (
-                <EditItemModal
+                <SetItemModal
                     item={editedItem}
                     isCreate={false}
                     onClose={() => setEditedItem(null)}
@@ -93,7 +111,7 @@ export default function WarehousePage() {
                 />
             )}
             {newItem !== null && (
-                <EditItemModal
+                <SetItemModal
                     item={newItem}
                     isCreate={true}
                     onClose={() => setNewItem(null)}
@@ -199,8 +217,9 @@ export default function WarehousePage() {
                 :
                 <WarehouseTable
                     inventoryRecords={allItems}
-                    openItem={() => {}}
-                    onDelete={() => {}}
+                    openItem={setOpenedItem}
+                    editItem={setEditedItem}
+                    deleteItem={deleteItem}
                 />
                 }
         </>

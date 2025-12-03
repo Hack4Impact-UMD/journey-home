@@ -1,6 +1,6 @@
-import { InventoryRecord, SearchParams } from "@/types/inventory";
+import { InventoryRecord } from "@/types/inventory";
 
-import { db } from "../firebase";
+import { db, storage } from "../firebase";
 import {
     collection,
     doc,
@@ -10,6 +10,7 @@ import {
     deleteDoc,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 export const WAREHOUSE_COLLECTION = "warehouse";
 
@@ -77,4 +78,13 @@ export async function deleteInventoryRecord(id: string): Promise<boolean> {
         console.error(e);
         return false;
     }
+}
+
+export async function uploadImage(file: File): Promise<string> {
+
+    const storageRef = ref(storage, "images/"+crypto.randomUUID()+"-"+file.name);
+    const snapshot = await uploadBytes(storageRef, file);
+    const url = await getDownloadURL(snapshot.ref);
+    return url;
+
 }

@@ -19,11 +19,4 @@ export type InventoryRecord = {
   donorEmail: string | null,
 };
 
-export type SearchParams = {
-  categories: string[],
-  sizes: string[],
-  sortBy: "Quantity" | "Date" | "Name",
-  ascending: boolean
-};
-
 export type SortStatus = "asc" | "desc" | "none";

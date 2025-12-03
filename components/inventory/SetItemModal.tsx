@@ -1,8 +1,10 @@
-import { InventoryRecord, ItemSize } from "@/types/inventory";
-import { useState } from "react";
+import { InventoryPhoto, InventoryRecord, ItemSize } from "@/types/inventory";
+import { useEffect, useRef, useState } from "react";
 import { CloseIcon } from "../icons/CloseIcon";
 import { createPortal } from "react-dom";
-import { useCategories } from "@/lib/services/inventory";
+import { uploadImage, useCategories } from "@/lib/services/inventory";
+import { InboxIcon, PlusIcon, X, XCircle } from "lucide-react";
+import { toast } from "sonner";
 
 type SetItemModalProps = {
     item: InventoryRecord;
@@ -11,8 +13,11 @@ type SetItemModalProps = {
     editItem: (updated: InventoryRecord) => void;
 };
 
-export function EditItemModal(props: SetItemModalProps) {
+type EditImageInput = InventoryPhoto | File;
+
+export function SetItemModal(props: SetItemModalProps) {
     const [name, setName] = useState<string>("");
+    const [photos, setPhotos] = useState<EditImageInput[]>([]);
     const [category, setCategory] = useState<string>("");
     const [notes, setNotes] = useState<string>("");
     const [quantity, setQuantity] = useState<string>("1");
@@ -20,7 +25,18 @@ export function EditItemModal(props: SetItemModalProps) {
 
     const allCategories = useCategories();
 
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
     // TODO: Photos input
+
+    useEffect(() => {
+        setName(props.item.name);
+        setPhotos(props.item.photos);
+        setCategory(props.item.category);
+        setNotes(props.item.notes);
+        setQuantity(props.item.quantity.toString());
+        setSize(props.item.size);
+    }, []);
 
     return createPortal(
         <>
@@ -68,8 +84,7 @@ export function EditItemModal(props: SetItemModalProps) {
                             </div>
                             <div className="w-full">
                                 <p className="text-sm mb-2">
-                                    <span className="text-red-400">*</span>{" "}
-                                    Size
+                                    <span className="text-red-400">*</span> Size
                                 </p>
                                 <select
                                     value={size}
@@ -109,19 +124,91 @@ export function EditItemModal(props: SetItemModalProps) {
                             </div>
                         </div>
 
-                        <p className="text-sm mb-2">
-                            Notes
-                        </p>
+                        <p className="text-sm mb-2">Notes</p>
                         <textarea
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
-                            className="rounded-xs h-16 text-sm px-3 py-3 border border-light-border outline-0 w-full mb-4"
+                            className="rounded-xs h-16 text-sm px-3 py-3 border border-light-border outline-0 w-full mb-4 resize-none"
                         />
 
-                        {/* <p className="text-sm mb-2">
-                            Photos
-                        </p> */}
+                        <p className="text-sm mb-4">Photos {"(4 max)"}</p>
+                        <div className="w-full flex items-center justify-center mb-10 gap-6">
+                            {photos.map((photo, index) => (
+                                <div
+                                    className="relative"
+                                    key={
+                                        photo instanceof File
+                                            ? index + " " + photo.name
+                                            : index + " " + photo.url
+                                    }
+                                >
+                                    <img
+                                        src={
+                                            photo instanceof File
+                                                ? URL.createObjectURL(photo)
+                                                : photo.url
+                                        }
+                                        className="max-h-32 max-w-32 rounded-sm"
+                                    />
+                                    <button
+                                        onClick={() => {
+                                            setPhotos((old) =>
+                                                old.filter(
+                                                    (old) => old !== photo
+                                                )
+                                            );
+                                        }}
+                                        className="absolute top-[-.5em] right-[-.5em] bg-white rounded-full text-white text-lg"
+                                    >
+                                        <CloseIcon />
+                                    </button>
+                                </div>
+                            ))}
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                onChange={(e) =>
+                                    setPhotos((old) => {
+                                        const newPhotos = [
+                                            ...old,
+                                            ...Array.from(e.target.files || []),
+                                        ];
 
+                                        if (newPhotos.length > 4) {
+                                            toast.error(
+                                                "You can only upload up to 4 photos."
+                                            );
+                                        }
+
+                                        return newPhotos.slice(0, 4);
+                                    })
+                                }
+                                className="hidden"
+                            />
+                            <div onClick={() => fileInputRef.current?.click()}>
+                                {photos.length > 0 && photos.length < 4 && (
+                                    <div className="bg-[#E7E7E7] rounded-sm h-32 w-32 flex flex-col items-center justify-center cursor-pointer">
+                                        <span className="text-sm">
+                                            Add Photo
+                                        </span>
+                                        <PlusIcon className="h-8" />
+                                    </div>
+                                )}
+                                {photos.length == 0 && (
+                                    <div className="w-[25em] h-[9em] flex flex-col items-center justify-center border border-light-border bg-[#FAFAFA] rounded-sm cursor-pointer">
+                                        <InboxIcon className="h-10 w-10 text-primary mb-4" />
+                                        <p className="mb-1">
+                                            Click here to upload photos
+                                        </p>
+                                        <p className="text-sm text-gray-500">
+                                            Support for single or bulk upload.
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
 
                         <div className="w-full flex gap-2">
                             <button
@@ -132,7 +219,43 @@ export function EditItemModal(props: SetItemModalProps) {
                             </button>
                             <button
                                 className="rounded-xs h-8 bg-primary text-white w-full flex items-center justify-center"
-                                onClick={() => {}}
+                                onClick={async () => {
+                                    const uploadedPhotos = await toast
+                                        .promise(
+                                            Promise.all(
+                                                photos.map(async (photo) =>
+                                                    photo instanceof File
+                                                        ? ({
+                                                              url: await uploadImage(
+                                                                  photo
+                                                              ),
+                                                              altText:
+                                                                  photo.name,
+                                                          } as InventoryPhoto)
+                                                        : photo
+                                                )
+                                            ),
+                                            {
+                                                loading: "Uploading photos...",
+                                                success:
+                                                    "Photos uploaded successfully!",
+                                                error: "Failed to upload photos.",
+                                            }
+                                        )
+                                        .unwrap();
+
+                                    props.editItem({
+                                        id: props.item.id,
+                                        name,
+                                        photos: uploadedPhotos,
+                                        category,
+                                        notes,
+                                        quantity: parseInt(quantity),
+                                        size,
+                                        dateAdded: props.item.dateAdded,
+                                        donorEmail: props.item.donorEmail,
+                                    } as InventoryRecord);
+                                }}
                             >
                                 Save
                             </button>
