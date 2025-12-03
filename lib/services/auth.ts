@@ -39,16 +39,6 @@ export async function signUp(
     await createUserInDB(userRecord);
 
     return user;
-    // let err = error as FirebaseError;
-    // if (err.code === "auth/email-already-in-use") {
-    //     return "This email is already registered.";
-    // } else if (err.code === "auth/weak-password") {
-    //     return "Password must be 6 characters or longer.";
-    // } else if (err.code === "auth/invalid-email") {
-    //     return "Invalid Email Address";
-    // } else {
-    //     return err.message;
-    // }
 }
 
 export async function login(email: string, password: string): Promise<User> {

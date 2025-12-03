@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import LongButton from '@/components/auth/LongButton';
 import InputBox from '../../components/auth/InputBox';
 import { FirebaseError } from 'firebase/app';
-import { login } from '@/lib/services/auth';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
