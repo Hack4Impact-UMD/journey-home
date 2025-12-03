@@ -2,7 +2,6 @@
 
 import { ProtectedRoute } from "@/components/general/ProtectedRoute";
 import SideNavbar from "@/components/general/SideNav";
-import StockSidebar from "@/components/inventory/StockSidebar";
 import TopNavbar from "@/components/general/TopNav";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
