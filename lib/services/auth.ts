@@ -1,4 +1,4 @@
-import { UserRole, UserStatus } from "@/types/user";
+import { UserRole } from "@/types/user";
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,

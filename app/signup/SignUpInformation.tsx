@@ -39,7 +39,7 @@ export default function SignUpInformation({
         try {
 
             await auth.signup(email, pw, first, last, dob, selectedRole);
-            router.push("/");
+            router.push("/status/account-created");
 
         } catch (e: unknown) {
             console.error("Signup failed:", e);

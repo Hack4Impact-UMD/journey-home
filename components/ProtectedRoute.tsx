@@ -34,6 +34,11 @@ export function ProtectedRoute({children, allow}: ProtectedRouteProps) {
             return
         }
 
+        if (auth.state.userData.pending) {
+            setShow(false);
+            router.push("/status/account-pending");
+        }
+
         if (!allow.includes(auth.state.userData.role)) {
             setShow(false);
             router.push("/status/invalid-perms");

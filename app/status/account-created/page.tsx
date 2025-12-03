@@ -1,12 +1,14 @@
 "use client";
 
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { useRouter } from "next/navigation";
 
 export default function AccountCreated() {
   const router = useRouter();
 
   return (
-    <div className="bg-background flex h-full">
+    <ProtectedRoute allow={["Admin", "Case Manager", "Volunteer"]}>
+      <div className="bg-background flex h-full overflow-hidden">
       {/* Left side - background image */}
       <div className="flex shrink-0 items-start justify-start h-full">
         <img
@@ -40,13 +42,15 @@ export default function AccountCreated() {
 
           {/* Back to Login button */}
           <button
-            onClick={() => router.push("/login")}
+            onClick={() => router.push("/")}
             className="w-full h-10 rounded-xs bg-primary text-white font-medium font-family-roboto"
           >
-            Back to Login
+            Home
           </button>
         </div>
       </div>
     </div>
+    </ProtectedRoute>
+    
   );
 }
