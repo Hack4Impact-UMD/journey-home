@@ -20,7 +20,7 @@ type ItemViewModalProps = {
 
 export function ItemViewModal(props: ItemViewModalProps) {
 
-    let [donor, setDonor] = useState<DonorInfo | null>(null);
+    const [donor, setDonor] = useState<DonorInfo | null>(null);
 
     useEffect(() => {
         if (props.item.donorEmail) {
