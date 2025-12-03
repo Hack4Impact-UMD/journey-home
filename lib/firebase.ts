@@ -41,3 +41,4 @@ if(process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true') {
 
 export { app, db, storage, auth};
 export default app;
+

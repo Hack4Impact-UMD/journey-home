@@ -39,7 +39,7 @@ export default function SignUpInformation({
         try {
 
             await auth.signup(email, pw, first, last, dob, selectedRole);
-            router.push("/");
+            router.push("/status/account-created");
 
         } catch (e: unknown) {
             console.error("Signup failed:", e);
@@ -50,7 +50,7 @@ export default function SignUpInformation({
     }
 
     return (
-        <div className="">
+        <div>
             <div className="relative mb-9">
                 <button onClick={onBack} className="absolute left-0 text-2xl">
                     ←
@@ -130,7 +130,7 @@ export default function SignUpInformation({
                 />
 
                 <div className="mt-6 flex justify-center mb-3 flex-col">
-                    {err ? <span className="text-red-500 text-center mb-2">{err}</span> : null}
+                    {err && <span className="text-red-500 text-center mb-2">{err}</span>}
                     <button
                         type="submit"
                         disabled={loading}

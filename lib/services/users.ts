@@ -70,7 +70,7 @@ export const updateUser = async (
 
 /**
  * Admin-only: approve pending account
- * Keeps the existing role, just changes status to "active"
+ * Changes status to "approved" and updates role if needed
  */
 export const approveAccount = async (
   uid: string,
