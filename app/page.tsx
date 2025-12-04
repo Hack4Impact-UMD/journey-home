@@ -1,11 +1,24 @@
+"use client";
+
+import { ProtectedRoute } from "@/components/general/ProtectedRoute";
+import SideNavbar from "@/components/general/SideNav";
+import TopNavbar from "@/components/general/TopNav";
+
 export default function HomePage() {
-  return (
-    <>
-      <div className="bg-secondary-1">
-        <span className="text-primary font-family-raleway text-3xl font-bold">
-          Journeying to the Home Page!!!
-        </span>
-      </div>
-    </>
-  );
+
+    return (
+        <ProtectedRoute allow={["Admin", "Case Manager", "Volunteer"]}>
+            <div className="h-full w-full flex flex-col font-family-roboto">
+                <TopNavbar />
+                <div className="flex flex-1">
+                    <SideNavbar />
+                    <div className="flex-1  bg-[#F7F7F7] py-4 px-6 flex flex-col">
+                        <span className="text-2xl text-primary font-extrabold block">
+                            Journeying to the Home Page!
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </ProtectedRoute>
+    );
 }

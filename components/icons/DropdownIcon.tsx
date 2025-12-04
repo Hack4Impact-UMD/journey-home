@@ -1,22 +1,15 @@
-"use client";
-
 export function DropdownIcon() {
     return (
         <svg
-            width="12"
-            height="12"
-            viewBox="0 0 12 12"
-            fill="none"
+            width="0.625em"
+            height="0.703125em"
+            viewBox="0 0 10 12"
+            className="fill-text-1"
             xmlns="http://www.w3.org/2000/svg"
         >
             <path
-                d="M3 4.5L6 7.5L9 4.5"
-                stroke="#000000"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                d="M1.68555 3.14262C1.74241 3.14266 1.79565 3.17112 1.8291 3.21684L5 7.58695L8.1709 3.21684C8.2043 3.17119 8.25769 3.14275 8.31445 3.14262H9.15234C9.22463 3.14294 9.26707 3.22616 9.22363 3.28519L5.28809 8.71C5.14634 8.9064 4.85379 8.90642 4.71094 8.71L0.775391 3.28519C0.73298 3.22604 0.776088 3.14262 0.848633 3.14262H1.68555Z"
             />
         </svg>
     );
 }
-

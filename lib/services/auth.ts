@@ -5,8 +5,10 @@ import {
     signOut,
     User,
 } from "firebase/auth";
-import { auth, db } from "../firebase";
-import { doc, setDoc, Timestamp } from "firebase/firestore";
+import { auth } from "../firebase";
+import { Timestamp } from "firebase/firestore";
+import { createUserInDB } from "./users";
+import { UserData } from "@/types/user";
 
 export async function signUp(
     email: string,
@@ -22,28 +24,21 @@ export async function signUp(
         password
     );
     const user = userCredential.user;
-
-    await setDoc(doc(db, "users", user.uid), {
+    
+    const userRecord: UserData = {
         uid: user.uid,
-        email: email,
-        firstName: firstName,
-        lastName: lastName,
+        firstName,
+        lastName,
+        email: user.email!,
         dob: dob ? Timestamp.fromDate(new Date(dob)) : null,
-        role: role,
-        emailVerified: false,
-    });
+        role: "Volunteer",
+        pending: (role == "Volunteer") ? null : role,
+        emailVerified: user.emailVerified,
+    };
+
+    await createUserInDB(userRecord);
 
     return user;
-    // let err = error as FirebaseError;
-    // if (err.code === "auth/email-already-in-use") {
-    //     return "This email is already registered.";
-    // } else if (err.code === "auth/weak-password") {
-    //     return "Password must be 6 characters or longer.";
-    // } else if (err.code === "auth/invalid-email") {
-    //     return "Invalid Email Address";
-    // } else {
-    //     return err.message;
-    // }
 }
 
 export async function login(email: string, password: string): Promise<User> {

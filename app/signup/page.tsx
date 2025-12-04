@@ -11,13 +11,12 @@ export default function SignUpPage() {
   const [role, setRole] = useState<UserRole>("Volunteer");
 
   return (
-    <div className="bg-background flex h-full">
-      {/* image on the left */}
-      <div className="flex shrink-0 items-start justify-start h-full">
+    <div className="flex h-screen overflow-hidden">
+      <div className="h-full max-w-[30em] overflow-hidden flex justify-center items-center">
         <img
           src="/background.png"
           alt="Login Background"
-          className="h-[58em] w-[30em] object-cover object-left overflow-hidden"
+          className="object-cover min-h-full"
         />
       </div>
 

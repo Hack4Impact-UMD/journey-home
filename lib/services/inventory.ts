@@ -1,72 +1,90 @@
-import {
-    InventoryRecord,
-    SearchParams,
-} from "@/types/inventory";
+import { InventoryRecord } from "@/types/inventory";
 
-import { db } from "../firebase";
-import { collection, doc, getDoc, setDoc, getDocs, deleteDoc } from "firebase/firestore";
+import { db, storage } from "../firebase";
+import {
+    collection,
+    doc,
+    getDoc,
+    setDoc,
+    getDocs,
+    deleteDoc,
+} from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 export const WAREHOUSE_COLLECTION = "warehouse";
 
-export async function search(
-    query: string,
-    params: SearchParams
-): Promise<InventoryRecord[]> {
-    
+export function useCategories(): string[] {
+
+    const [allCategories, setAllCategories] = useState<string[]>(["Other",]);
+
+    useEffect(() => {
+        getCategories().then(categories => setAllCategories(categories));
+      }, []);
+
+    return allCategories;
+
+}
+
+export async function getCategories(): Promise<string[]> {
+    const categoriesDoc = doc(db, "config", "categories");
+    const categoriesSnapshot = await getDoc(categoriesDoc);
+    if (!categoriesSnapshot.exists()) {
+        return ["Other"];
+    }
+    return categoriesSnapshot.data().categories || ["Other"];
+}
+
+export async function getAllWarehouseInventoryRecords(): Promise<InventoryRecord[]> {
     const querySnapshot = await getDocs(collection(db, WAREHOUSE_COLLECTION));
-    const records: InventoryRecord[] = querySnapshot.docs.map(doc => (
-        doc.data()as InventoryRecord
-    ));
+    const records: InventoryRecord[] = querySnapshot.docs.map(
+        (doc) => doc.data() as InventoryRecord
+    );
 
-    return records.filter(record => {
-
-        if (params.categories.length != 0 && !params.categories.includes(record.category)) {
-            return false;
-        }
-
-        if (params.sizes.length != 0 && !params.sizes.includes(record.size)) {
-            return false;
-        }
-
-        const keywords = `${record.name} ${record.category} ${record.notes} ${record.size}`.toLowerCase();
-        query = query.toLowerCase().trim();
-
-        return keywords.includes(query);
-
-    }).sort((rec1, rec2) => {
-
-        let diff;
-        if(params.sortBy == "Date") {
-            diff = rec1.dateAdded.seconds - rec2.dateAdded.seconds;
-        } else if(params.sortBy == "Quantity") {
-            diff = rec1.quantity - rec2.quantity;
-        } else {
-            diff = rec1.name.localeCompare(rec2.name);
-        }
-
-        if (!params.ascending) {
-            diff *= -1;
-        }
-
-        return diff
-    });
+    return records;
 }
 
 export async function setInventoryRecord(
     record: InventoryRecord
-): Promise<void> {
-    const docRef = doc(db, WAREHOUSE_COLLECTION, record.id);
-    await setDoc(docRef, record);
+): Promise<boolean> {
+    try {
+        const docRef = doc(db, WAREHOUSE_COLLECTION, record.id);
+        await setDoc(docRef, record);
+        return true;
+    } catch (e) {
+        console.error(e);
+        return false;
+    }
 }
 
+export async function getInventoryRecord(
+    id: string
+): Promise<InventoryRecord | null> {
+    try {
+        const docRef = doc(db, WAREHOUSE_COLLECTION, id);
+        return (await getDoc(docRef)).data() as InventoryRecord;
+    } catch (e) {
+        console.error(e);
+        return null;
+    }
+}
 
-export async function getInventoryRecord(id: string): Promise<InventoryRecord | null> {
-    const docRef = doc(db, WAREHOUSE_COLLECTION, id);
-    return (await getDoc(docRef)).data() as InventoryRecord;
-};
+export async function deleteInventoryRecord(id: string): Promise<boolean> {
+    try {
+        const docRef = doc(db, WAREHOUSE_COLLECTION, id);
+        await deleteDoc(docRef);
+        return true;
+    } catch (e) {
+        console.error(e);
+        return false;
+    }
+}
 
+export async function uploadImage(file: File): Promise<string> {
 
-export async function deleteInventoryRecord(id: string): Promise<void> {
-    const docRef = doc(db, WAREHOUSE_COLLECTION, id);
-    await deleteDoc(docRef)
+    const storageRef = ref(storage, "images/"+crypto.randomUUID()+"-"+file.name);
+    const snapshot = await uploadBytes(storageRef, file);
+    const url = await getDownloadURL(snapshot.ref);
+    return url;
+
 }

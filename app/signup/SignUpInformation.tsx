@@ -5,6 +5,8 @@ import { UserRole } from "@/types/user";
 import { FirebaseError } from "firebase/app";
 import { signUp } from "@/lib/services/auth";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import Link from "next/link";
 
 export default function SignUpInformation({
     selectedRole,
@@ -22,6 +24,7 @@ export default function SignUpInformation({
     const [loading, setLoading] = useState(false);
     const [err, setErr] = useState<string | null>(null);
     const router = useRouter();
+    const auth = useAuth();
 
     async function onSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -35,8 +38,8 @@ export default function SignUpInformation({
         setLoading(true);
         try {
 
-            await signUp(email, pw, first, last, dob, selectedRole);
-            router.push("/inventory");
+            await auth.signup(email, pw, first, last, dob, selectedRole);
+            router.push("/status/account-created");
 
         } catch (e: unknown) {
             console.error("Signup failed:", e);
@@ -47,7 +50,7 @@ export default function SignUpInformation({
     }
 
     return (
-        <div className="">
+        <div>
             <div className="relative mb-9">
                 <button onClick={onBack} className="absolute left-0 text-2xl">
                     ←
@@ -127,7 +130,7 @@ export default function SignUpInformation({
                 />
 
                 <div className="mt-6 flex justify-center mb-3 flex-col">
-                    {err ? <span className="text-red-500 text-center mb-2">{err}</span> : null}
+                    {err && <span className="text-red-500 text-center mb-2">{err}</span>}
                     <button
                         type="submit"
                         disabled={loading}
@@ -139,13 +142,13 @@ export default function SignUpInformation({
 
                 <p className="text-center">
                     Already have an account?{" "}
-                    <a
+                    <Link
                         href="/login"
                         className="font-semibold hover:underline"
                         style={{ color: "var(--color-primary)" }}
                     >
                         Login
-                    </a>
+                    </Link>
                 </p>
             </form>
         </div>

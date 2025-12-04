@@ -1,6 +1,7 @@
 "use client";
 
 import { UserRole } from "@/types/user";
+import Link from "next/link";
 
 export default function PickRole({
   role,
@@ -20,7 +21,7 @@ export default function PickRole({
       <h1 className="text-2xl font-bold font-family-raleway text-text-1 mb-6">Account Type</h1>
 
       <div className="flex flex-col gap-4">
-        {(["Administrator","Case Manager","Volunteer"] as UserRole[]).map((r) => (
+        {(["Admin","Case Manager","Volunteer"] as UserRole[]).map((r) => (
           <button
             key={r}
             onClick={() => setRole(r)}
@@ -45,9 +46,9 @@ export default function PickRole({
 
       <p className="mt-6 text-center font-family-opensans text-text-1">
         Already have an account?{" "}
-        <a href="/login" className="font-semibold hover:underline" style={{ color: "var(--color-primary)" }}>
+        <Link href="/login" className="font-semibold hover:underline" style={{ color: "var(--color-primary)" }}>
           Login
-        </a>
+        </Link>
       </p>
     </div>
 );

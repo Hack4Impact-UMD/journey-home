@@ -4,10 +4,13 @@ import {
     DonationRequest,
 } from "@/types/donations";
 import { InventoryRecord } from "@/types/inventory";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { CloseIcon } from "../icons/CloseIcon";
-import { Badge } from "../Badge";
+import { Badge } from "../inventory/Badge";
+
+import mapboxgl from 'mapbox-gl'
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 type ItemReviewModalProps = {
     item: DonationItem;
@@ -21,20 +24,116 @@ export function ItemReviewModal({
     item,
     onClose,
     setStatus,
+    
 }: ItemReviewModalProps) {
+
+    const mapRef = useRef<mapboxgl.Map | null>(null);
+    const mapContainerRef = useRef<HTMLDivElement | null>(null);
+    const markerRef = useRef<mapboxgl.Marker | null>(null);
+
+    const [mapError, setMapError] = useState<string | null>(null);
+
+   const geocodeAddress = async (address: string, expectedCity: string, expectedState: string): Promise<[number, number] | null> => {
+        const token = mapboxgl.accessToken;
+        const encoded = encodeURIComponent(address);
+        const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encoded}.json?access_token=${token}&types=address`;
+
+        try {
+            const res = await fetch(url);
+            const data = await res.json();
+            if (!data.features?.length) return null;
+            
+            const feature = data.features[0];
+
+            //making sure it doesn't default to the town as official address if addy isn't found, will default to ct w/ error message this way
+            const hasAddress = feature.place_type?.includes('address');
+            
+            if (!hasAddress) {
+                console.log("geocoding result doesn't have proper address", feature.place_type);
+                return null;
+            }
+
+            //to fix weird case where one word of gibberish things the city is a street name
+            const resultText = feature.place_name.toLowerCase();
+            const cityMatch = resultText.includes(expectedCity.toLowerCase());
+            const stateMatch = resultText.includes(expectedState.toLowerCase());
+            
+            if (!cityMatch || !stateMatch) {
+                console.log("address not in correct city/state")
+                return null;
+            }
+            
+            return feature.center as [number, number];
+
+        } catch (err) {
+            console.error("geocoding failed:", err);
+            return null;
+        }
+    };
+   
+    useEffect(() => {
+        if (!mapContainerRef.current) return;
+
+        mapboxgl.accessToken = "pk.eyJ1Ijoic2FyYWozMyIsImEiOiJjbWlodWUxdjEwZm8zM2twcHhwY2ZkZzlyIn0.GDgfh2-z2vMiUG_tgvTRGA";
+
+        const map = new mapboxgl.Map({
+            container: mapContainerRef.current,
+            style: "mapbox://styles/mapbox/streets-v12",
+            center: [-72.7, 41.5], //default to connecticut
+            zoom: 8,
+        });
+        
+        mapRef.current = map;
+
+        map.on("load", async () => {
+            mapRef.current?.addControl(new mapboxgl.NavigationControl({
+                showCompass: false
+            }));
+
+            const fullAddress = `${dr.donor.address.streetAddress}, ${dr.donor.address.city}, ${dr.donor.address.state} ${dr.donor.address.zipCode}`;
+
+            const coords = await geocodeAddress(fullAddress, dr.donor.address.city, dr.donor.address.state);
+
+            if (coords) {
+                map.setCenter(coords);
+                map.setZoom(15);
+
+                if (markerRef.current) {
+                    markerRef.current.remove();
+                }
+                
+                markerRef.current = new mapboxgl.Marker()
+                    .setLngLat(coords)
+                    .addTo(map);
+
+            } else {
+                setMapError("Unable to locate address on map.");
+            }
+        });
+
+        return () => {
+            if (markerRef.current) {
+                markerRef.current.remove();
+                markerRef.current = null;
+            }
+            map.remove();
+            mapRef.current = null;
+        }
+    }, [dr.donor.address]);
+    
     return createPortal(
         <>
-            <div className="fixed inset-0 z-50 flex items-center justify-center font-family-roboto">
+            <div className="fixed inset-0 z-50 flex items-center justify-center font-family-roboto overflow-y-auto">
                 <div className="bg-white w-full h-full flex">
                     <div className="flex-1 border-light-border justify-center flex items-center bg-gray-100">
                         {item.item.photos.length > 0 ? (
                             <img
-                                className="max-w-full max-h-full"
+                                className="w-full h-full object-contain"
                                 src={item.item.photos[0].url}
                             />
                         ) : null}
                     </div>
-                    <div className="w-[30em] p-10 flex flex-col">
+                    <div className="w-[30em] p-10 flex flex-col overflow-y-auto">
                         <div className="flex">
                             <span className="font-semibold text-xl">
                                 {item.item.name}
@@ -107,6 +206,20 @@ export function ItemReviewModal({
                             {dr.donor.address.city}, {dr.donor.address.state}{" "}
                             {dr.donor.address.zipCode}
                         </span>
+                        
+                        {/*map*/}
+                        <div className="mt-5 w-full h-60 relative rounded-md overflow-hidden border border-gray-300">
+                            <div
+                                id="map-container"
+                                ref={mapContainerRef}
+                                className="w-full h-full"
+                            />
+                            {mapError && (
+                                <div className="absolute top-2 left-2 bg-red-100 text-red-700 px-3 py-1 rounded text-xs">
+                                    {mapError}
+                                </div>
+                            )}
+                        </div>
 
                         <div className="flex gap-2 mt-8">
                             <button
