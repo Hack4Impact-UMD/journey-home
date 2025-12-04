@@ -30,11 +30,11 @@ export default function SideNavbar() {
                     path="/inventory/donation-requests"
                     roles={["Admin"]}
                 />
-                <SideNavbarLink
+                {/* <SideNavbarLink
                     name="Reviewed Donations"
                     path="/inventory/reviewed-donations"
                     roles={["Admin"]}
-                />
+                /> */}
             </SideNavbarLinkGroup>
 
             <SideNavbarLinkGroup
@@ -58,6 +58,12 @@ export default function SideNavbar() {
                     roles={["Admin"]}
                 />
             </SideNavbarLinkGroup>
+
+            <SideNavbarLink
+                name="Pickups/Deliveries"
+                path="/pickups-deliveries"
+                roles={["Admin"]}
+            />
             
             <SideNavbarLink
                 name="Donation Form"

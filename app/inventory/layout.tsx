@@ -45,7 +45,7 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
                             >
                                 Donation Requests
                             </Link>
-                            <Link
+                            {/* <Link
                                 className={`py-4${
                                     pathname.startsWith(
                                         "/inventory/reviewed-donations"
@@ -57,7 +57,7 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
                                 suppressHydrationWarning
                             >
                                 Reviewed Donations
-                            </Link>
+                            </Link> */}
                         </div>
                         <div className="bg-background rounded-xl flex-wrap my-2 flex-1 py-4 px-6 min-h-0 overflow-hidden">
                             { children }
