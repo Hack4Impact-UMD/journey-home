@@ -10,7 +10,7 @@ export type FormDonationItem = {
   size: string;
   quantity: number | null;
   notes: string;
-  photos: string[];
+  photos: File[];
 };
 
 interface DonorFormState {
