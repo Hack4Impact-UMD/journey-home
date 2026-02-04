@@ -7,7 +7,7 @@
     "build": "next build --turbopack",
     "lint": "eslint",
     "test": "playwright test",
-    "fb-emulator": "firebase emulators:start"
+    "firebase-emulator": "firebase emulators:start --import=./emulator-data"
   },
   "dependencies": {
     "@mapbox/mapbox-gl-geocoder": "^5.1.2",
