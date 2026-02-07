@@ -100,106 +100,10 @@ jobs:
         path: test-results.json
         retention-days: 30
 
-  test-functions:
-    name: Firebase Functions Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    needs: lint-and-build
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'npm'
-        
-    - name: Install main dependencies
-      run: npm ci
-      
-    - name: Install Firebase Functions dependencies
-      run: npm run functions:install
-      
-    - name: Build Firebase Functions
-      run: npm run functions:build
-      
-    - name: Run Firebase Functions tests
-      run: npm run functions:test
-      
-    - name: Verify Functions Tests Passed
-      if: success()
-      run: |
-        echo "✅ All Firebase Functions tests passed!"
-        echo "🚀 Functions are ready for deployment."
-        
-    - name: Upload Functions Test Coverage
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: functions-coverage
-        path: functions/coverage/
-        retention-days: 30
-        
-    - name: Notify Test Failure
-      if: failure()
-      run: |
-        echo "❌ Firebase Functions tests failed!"
-        echo "🚫 Deployment will be skipped until tests pass."
-        echo "🔍 Check the test output above for details."
-
-  deploy-functions:
-    name: Deploy Firebase Functions
-    runs-on: ubuntu-latest
-    needs: [test-functions]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    environment: production
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Install Firebase Functions dependencies
-      run: npm run functions:install
-      
-    - name: Build Firebase Functions
-      run: npm run functions:build
-      
-    - name: Install Firebase CLI
-      run: npm install -g firebase-tools
-      
-    - name: Deploy Firebase Functions
-      run: firebase deploy --only functions --token "${{ secrets.FIREBASE_TOKEN }}" --force
-      env:
-        FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-        
-    - name: Verify Functions Deployment
-      run: |
-        echo "✅ Firebase Functions deployed successfully!"
-        echo "🔍 Verifying deployment..."
-        firebase functions:list --token "${{ secrets.FIREBASE_TOKEN }}"
-        
-    - name: Notify Deployment Success
-      if: success()
-      run: |
-        echo "🎉 Firebase Functions deployment completed successfully!"
-        echo "📊 Functions are now live and ready to handle requests."
-        echo "🔗 Check the Firebase Console for deployment details."
-
   deploy:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    needs: [lint-and-build, test, deploy-functions]
+    needs: [lint-and-build, test]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     
     steps:

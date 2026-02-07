@@ -34,7 +34,7 @@ export function SetItemModal(props: SetItemModalProps) {
         setNotes(props.item.notes);
         setQuantity(props.item.quantity.toString());
         setSize(props.item.size);
-    }, [props]);
+    }, [props.item]);
 
     return createPortal(
         <>

@@ -4,13 +4,13 @@ This repository contains the source code for Journey Home's donation management 
 
 ## 📚 Table of Contents
 
-- [👥 Meet the Team](#meet-the-team)
+- [👥 Meet the Team](#-meet-the-team)
 
-- [🛠️ Project Setup](#project-setup)
+- [🛠️ Project Setup](#-project-setup)
 
-- [🏗️ System Design](#system-design)
+- [🏗️ System Design](#-system-design)
 
-- [📝 PR Instructions](#pr-instructions)
+- [📝 PR Instructions](#-pr-instructions)
 
 ## 👥 Meet the Team
 
@@ -234,11 +234,11 @@ npm install
 > ❗❗❗ **IMPORTANT**: There are some environment secrets that the project needs to run that are stored in a `.env` file. If you've been provided a `.env` file to use, just put this directly in your project directory. If not, copy the `env.example` file to `.env` and then configure the secrets in there.
 
 For development, we will be using the Firebase emulator and some other Firebase CLI tools that are from the `firebase-tools` package. This package will be installed globally on your system so you can run the commands from anywhere.
-```
+```bash
 npm install -g firebase-tools
 ```
 Authenticate the Firebase Tools CLI with the Firebase account you associated with the Journey Home project.
-```
+```bash
 firebase login
 ```
 Congratulations! At this point your project environment is fully set up! Now we will get into how to run the project for development. 

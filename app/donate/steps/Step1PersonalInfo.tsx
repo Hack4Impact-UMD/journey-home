@@ -108,7 +108,7 @@ export default function Step1PersonalInfo() {
           src="/journey-home-logo.png"
           alt="Journey Home Logo"
           height={96}
-          width={0}
+          width={350}
           className="h-24 w-auto"
         />
       </div>
