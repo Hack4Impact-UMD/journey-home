@@ -1,7 +1,7 @@
 "use client";
 
 import { db } from "../firebase";
-import { collection, doc, getDocs, setDoc, updateDoc, Timestamp, deleteDoc, query, where, orderBy} from "firebase/firestore";
+import { collection, doc, getDocs, setDoc, updateDoc, deleteDoc, query, where} from "firebase/firestore";
 import { UserData, UserRole } from "../../types/user";
 
 const usersCol = collection(db, "users");

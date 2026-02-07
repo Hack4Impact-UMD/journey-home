@@ -8,6 +8,7 @@ import FormSelect from "../../../components/form/FormSelect";
 import FormTextarea from "../../../components/form/FormTextarea";
 import FormCheckbox from "../../../components/form/FormCheckbox";
 import Button from "../../../components/form/Button";
+import Image from "next/image";
 
 export default function Step1PersonalInfo() {
   const { formState, updateDonorInfo, updateAdditionalInfo, updateAcknowledgements, setCurrentStep } = useDonorForm();
@@ -103,10 +104,12 @@ export default function Step1PersonalInfo() {
   return (
     <div className="space-y-6">
       <div className="flex justify-center mb-8">
-        <img
+        <Image
           src="/journey-home-logo.png"
           alt="Journey Home Logo"
-          className="h-24"
+          height={96}
+          width={350}
+          className="h-24 w-auto"
         />
       </div>
 
@@ -359,7 +362,7 @@ export default function Step1PersonalInfo() {
         </div>
 
         <div className="flex justify-center mt-8">
-          <Button type="submit" variant="primary" className="min-w-[200px]">
+          <Button type="submit" variant="primary" className="min-w-50">
             Next
           </Button>
         </div>

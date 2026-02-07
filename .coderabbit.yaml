@@ -152,11 +152,11 @@ reviews:
 
     # Automatic Review - Automatic code review
     # Default: true
-    enabled: false
+    enabled: true
 
     # Automatic Incremental Review - Automatic incremental code review on each push
     # Default: true
-    auto_incremental_review: false
+    auto_incremental_review: true
 
     # Ignore reviewing if the title of the pull request contains any of these keywords (case-insensitive).
     # Default: []
@@ -168,7 +168,7 @@ reviews:
 
     # Review draft PRs/MRs.
     # Default: false
-    drafts: false
+    drafts: true
 
     # Base branches (other than the default branch) to review. Accepts regex patterns. Use '.*' to match all branches.
     # Default: []

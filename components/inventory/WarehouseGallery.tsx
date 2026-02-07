@@ -1,8 +1,5 @@
 import { InventoryRecord } from "@/types/inventory";
 import { Badge } from "./Badge";
-import { ViewIcon } from "../icons/ViewIcon";
-import { TrashIcon } from "../icons/TrashIcon";
-import { EditIcon } from "../icons/EditIcon";
 
 export function WarehouseGallery({
     inventoryRecords,

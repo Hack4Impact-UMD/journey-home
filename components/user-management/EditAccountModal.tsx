@@ -2,8 +2,6 @@ import { UserData, UserRole } from "@/types/user";
 import { createPortal } from "react-dom";
 import { CloseIcon } from "../icons/CloseIcon";
 import { useEffect, useState } from "react";
-import InputBox from "../auth/InputBox";
-import { Spinner } from "../ui/spinner";
 
 type EditAccountModalProps = {
     account: UserData;

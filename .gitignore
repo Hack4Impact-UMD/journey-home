@@ -24,6 +24,7 @@ test-results.xml
 # Misc
 .DS_Store
 *.pem
+.claude/
 
 # Debug
 npm-debug.log*
