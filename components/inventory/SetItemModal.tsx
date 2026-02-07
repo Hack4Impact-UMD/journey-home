@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { CloseIcon } from "../icons/CloseIcon";
 import { createPortal } from "react-dom";
 import { uploadImage, useCategories } from "@/lib/services/inventory";
-import { InboxIcon, PlusIcon, X, XCircle } from "lucide-react";
+import { InboxIcon, PlusIcon } from "lucide-react";
 import { toast } from "sonner";
 
 type SetItemModalProps = {
@@ -27,8 +27,6 @@ export function SetItemModal(props: SetItemModalProps) {
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // TODO: Photos input
-
     useEffect(() => {
         setName(props.item.name);
         setPhotos(props.item.photos);
@@ -36,7 +34,7 @@ export function SetItemModal(props: SetItemModalProps) {
         setNotes(props.item.notes);
         setQuantity(props.item.quantity.toString());
         setSize(props.item.size);
-    }, []);
+    }, [props]);
 
     return createPortal(
         <>

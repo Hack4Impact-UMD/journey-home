@@ -7,7 +7,7 @@ import {
 } from "@/types/donations";
 
 import { db } from "../firebase";
-import { collection, doc, getDoc, setDoc, getDocs, deleteDoc, Timestamp, addDoc } from "firebase/firestore";
+import { collection, doc, getDoc, setDoc, getDocs, deleteDoc, Timestamp } from "firebase/firestore";
 
 const DONATIONS_COLLECTION = "donation-requests";
 const DONORS_COLLECTION = "donors";
@@ -175,7 +175,7 @@ export async function createDonationRequest(request: DonationRequest): Promise<s
     items: request.items,
   };
 
-  const docRef = await setDoc(doc(db, DONATIONS_COLLECTION, request.id), donationDoc);
+  await setDoc(doc(db, DONATIONS_COLLECTION, request.id), donationDoc);
   return request.id;
 }
 

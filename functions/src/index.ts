@@ -67,7 +67,7 @@ export const getUserData = functions.https.onCall(async (request) => {
 export const dailyCleanup = onSchedule({
   schedule: '0 0 * * *',
   timeZone: 'UTC'
-}, async (event) => {
+}, async () => {
   functions.logger.info('Running daily cleanup task');
   
   // Add your cleanup logic here

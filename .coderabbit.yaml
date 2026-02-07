@@ -168,7 +168,7 @@ reviews:
 
     # Review draft PRs/MRs.
     # Default: false
-    drafts: false
+    drafts: true
 
     # Base branches (other than the default branch) to review. Accepts regex patterns. Use '.*' to match all branches.
     # Default: []

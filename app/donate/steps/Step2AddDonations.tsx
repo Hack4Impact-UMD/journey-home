@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useDonorForm, FormDonationItem } from "../DonorFormContext";
 import StepIndicator from "../../../components/form/StepIndicator";
 import FormInput from "../../../components/form/FormInput";

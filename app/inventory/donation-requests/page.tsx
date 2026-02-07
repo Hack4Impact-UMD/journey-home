@@ -51,9 +51,7 @@ export default function DonationRequestsPage() {
         );
     }
 
-    useEffect(() => {
-        search();
-    }, [searchParams])
+    useEffect(search, [searchParams])
 
     return selectedDR ? (
         <>
