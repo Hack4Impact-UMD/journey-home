@@ -139,8 +139,8 @@ Meet our wonderful team comprised of Product Managers, Designers, Tech Leads, En
         <tr>
           <td align="center" width="150">
             <a href="https://umd.hack4impact.org/">
-            <img src="public/team-photos/alisha_wu.jpeg" alt = "Picture of Engineer Alisha"height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
-            <b>Alisha</b><br/><br/>
+            <img src="public/team-photos/alisha_wu.jpeg" alt = "Picture of Engineer Alisha" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
+            <b>Alisha Wu</b><br/><br/>
             <img src="https://img.shields.io/badge/💻_engineer-27AE60?style=flat-square"/>
             </a>
           </td>
