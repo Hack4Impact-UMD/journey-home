@@ -38,6 +38,34 @@ export default function SideNavbar() {
             </SideNavbarLinkGroup>
 
             <SideNavbarLinkGroup
+                name="Pickups & deliveries"
+                path="/pickups-deliveries"
+                roles={["Admin"]}
+            >
+                <SideNavbarLink
+                    name="Unscheduled"
+                    path="/pickups-deliveries/unscheduled"
+                    roles={["Admin"]}
+                />
+                <SideNavbarLink
+                    name="Scheduled"
+                    path="/pickups-deliveres/scheduled"
+                    roles={["Admin"]}
+                />
+                <SideNavbarLink
+                    name="Completed"
+                    path="/pickups-deliveries/completed"
+                    roles={["Admin"]}
+                />
+            </SideNavbarLinkGroup>
+            
+            <SideNavbarLink
+                name="Donation Form"
+                path="/donate"
+                roles={[]}
+            />
+
+            <SideNavbarLinkGroup
                 name="User Management"
                 path="/user-management"
                 roles={["Admin"]}
