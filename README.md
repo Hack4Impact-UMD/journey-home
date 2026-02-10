@@ -117,9 +117,9 @@ Meet our wonderful team comprised of Product Managers, Designers, Tech Leads, En
             </td>
             <td align="center" width="150">
                 <a href="https://umd.hack4impact.org/">
-                <img src="public/team-photos/shreyas-thirumale.jpg" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
-                <b>Shreyas</b><br/><br/>
-                <img src="https://img.shields.io/badge/💻_engineer-27AE60?style=flat-square"/>
+                <img src="public/team-photos/shreyas-thirumale.jpg" alt="Picture of Shreyas" height="100" width="100" style="border-radius:50%;object-fit:cover;"/><br/>
+                <b>Shreyas Thirumale</b><br/><br/>
+                <img src="https://img.shields.io/badge/💻_engineer-27AE60?style=flat-square" alt="Engineer"/>
                 </a>
             </td>
             <td align="center" width="150">
