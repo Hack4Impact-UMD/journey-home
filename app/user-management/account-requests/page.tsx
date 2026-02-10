@@ -5,7 +5,6 @@ import { SearchBox } from "@/components/inventory/SearchBox";
 import { AccountReqTable } from "@/components/user-management/AccountReqTable";
 import { approveAccount, fetchAllAccountRequests } from "@/lib/services/users";
 import { UserData, UserRole } from "@/types/user";
-import { User } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 

@@ -3,7 +3,6 @@ import {
     DonationItemStatus,
     DonationRequest,
 } from "@/types/donations";
-import { InventoryRecord } from "@/types/inventory";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { CloseIcon } from "../icons/CloseIcon";

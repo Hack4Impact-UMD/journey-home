@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { UserRole } from "@/types/user";
 import { FirebaseError } from "firebase/app";
-import { signUp } from "@/lib/services/auth";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";

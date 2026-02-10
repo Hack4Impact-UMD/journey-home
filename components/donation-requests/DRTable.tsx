@@ -44,7 +44,6 @@ export function DRTable({
 }
 
 function DRTableRow({ request, onOpen }: { request: DonationRequest, onOpen: () => void }) {
-    const [selected, setSelected] = useState<boolean>(false);
 
     const numNotReviewed = request.items.filter(
         (item) => item.status == "Not Reviewed"

@@ -47,7 +47,6 @@ export function DRContentsTable({
 }
 
 function DRContentsTableRow({ item, onOpen }: { item: DonationItem, onOpen: () => void }) {
-    const [selected, setSelected] = useState<boolean>(false);
 
 
     return (
