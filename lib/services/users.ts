@@ -59,13 +59,7 @@ export const updateUser = async (
 ) => {
 
   const userRef = doc(db, "users", updated.uid);
-  try {
-    await updateDoc(userRef, updated);
-    return true;
-  } catch (err) {
-    console.error(err);
-  }
-  return false;
+  await updateDoc(userRef, updated);
 };
 
 /**
