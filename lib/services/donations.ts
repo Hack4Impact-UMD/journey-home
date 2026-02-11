@@ -2,7 +2,6 @@ import {
     DonorInfo,
     DonationItem,
     DonationRequest,
-    DonationSearchParams,
     DonationItemStatus
 } from "@/types/donations";
 
@@ -72,60 +71,14 @@ export async function setRequestItemStatus(requestId: string, itemId: string, st
 //do search based on name
 //sort filters based on what's there for inventory records already.
 
-export async function searchRequest(query: string, params: DonationSearchParams): Promise<DonationRequest[]> {
+export async function getAllDonationRequests(): Promise<DonationRequest[]> {
     
     const querySnapshot = await getDocs(collection(db, DONATIONS_COLLECTION));
     const requests: DonationRequest[] = querySnapshot.docs.map(doc => (
         doc.data() as DonationRequest
     ));
 
-    return requests
-    .filter(request => {
-        const donorFullName = `${request.donor.firstName} ${request.donor.lastName}`.toLowerCase();
-        const searchq = query.toLowerCase();
-
-        //status depends on the donationitems, need to map through that array to define the status. 
-        if (params.status.length != 0) {
-            const startedRequest = request.items.some(donItem => donItem.status === "Approved" || donItem.status === "Denied");
-            const completedRequest = request.items.every(donItem => donItem.status === "Approved" || donItem.status === "Denied");
-            
-            let requestStat: "Not Reviewed" | "Unfinished" | "Finished";
-
-            if (!startedRequest){
-                requestStat = "Not Reviewed"
-            } else if (!completedRequest){
-                requestStat = "Unfinished"
-            } else{ 
-                requestStat = "Finished"
-            };
-            
-            if (!params.status.includes(requestStat)) {
-                return false;
-            }
-        }
-
-        return donorFullName.includes(searchq);     
-    })
-
-    //still need to sort by category
-
-    .sort((req1, req2) => {
-        let diff;
-        if(params.sortBy == "Date") {
-            diff = req1.date.seconds - req2.date.seconds;
-        } else if (params.sortBy == "Quantity") {
-            diff = req1.items.length - req2.items.length;
-        } else {
-            // Sort by donor name
-            diff = `${req1.donor.lastName} ${req1.donor.firstName}`.localeCompare(`${req2.donor.lastName} ${req2.donor.firstName}`);
-        }
-
-        if (!params.ascending) {
-            diff *= -1;
-        }
-
-        return diff
-    });
+    return requests;
 }
 
 /* 
