@@ -8,43 +8,25 @@ import { fetchAllActiveUsers, updateUser } from "@/lib/services/users";
 import { UserData, UserRole } from "@/types/user";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useAllActiveAccounts } from "@/lib/queries/users";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function AllAccountsPage() {
     const roleOptions: UserRole[] = ["Admin", "Case Manager", "Volunteer"];
 
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [selectedRoles, setSelectedRoles] = useState<UserRole[]>(roleOptions);
-    const [allAccounts, setAllAccounts] = useState<UserData[]>([]);
+
+    const {
+        allAccounts,
+        editAccount,
+        refetch: refetchAllAccounts,
+        isLoading,
+    } = useAllActiveAccounts();
 
     const [selectedAccount, setSelectedAccount] = useState<UserData | null>(
-        null
+        null,
     );
-
-    function editAccount(updated: UserData) {
-        toast.promise(
-            updateUser(updated).then((success) => {
-                if (success) {
-                    setSelectedAccount(null);
-                    setAllAccounts((prevAccounts) =>
-                        prevAccounts.map((user) =>
-                            user.uid === updated.uid ? updated : user
-                        )
-                    );
-                } else {
-                    throw new Error("Couldn't update user");
-                }
-            }),
-            {
-                loading: "Updating user...",
-                success: "User updated successfully!",
-                error: "Error: Couldn't update user",
-            }
-        );
-    }
-
-    useEffect(() => {
-        fetchAllActiveUsers().then(setAllAccounts);
-    }, []);
 
     return (
         <>
@@ -60,9 +42,7 @@ export default function AllAccountsPage() {
                     <SearchBox
                         value={searchQuery}
                         onChange={setSearchQuery}
-                        onSubmit={() =>
-                            fetchAllActiveUsers().then(setAllAccounts)
-                        }
+                        onSubmit={refetchAllAccounts}
                     />
                     <DropdownMultiselect
                         label="User Type"
@@ -70,6 +50,11 @@ export default function AllAccountsPage() {
                         selected={selectedRoles}
                         setSelected={setSelectedRoles}
                     />
+                    {isLoading && (
+                        <div className="flex items-center">
+                            <Spinner className="size-5 text-primary" />
+                        </div>
+                    )}
                 </div>
             </div>
             <UserTable
@@ -80,14 +65,14 @@ export default function AllAccountsPage() {
                             .trim()
                             .toLowerCase()
                             .replace(/\s/g, "")
-                            .includes(searchQuery.toLowerCase().trim())
+                            .includes(searchQuery.toLowerCase().trim()),
                     )
                     .sort((a, b) =>
                         (a.lastName + a.firstName)
                             .toLowerCase()
                             .localeCompare(
-                                (b.lastName + b.firstName).toLowerCase()
-                            )
+                                (b.lastName + b.firstName).toLowerCase(),
+                            ),
                     )}
                 onSelect={(user: UserData) => {
                     setSelectedAccount(user);
