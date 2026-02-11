@@ -12,7 +12,7 @@ import { UserData, UserRole } from "@/types/user";
 import { User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useAllAccounts } from "@/lib/queries/users";
+import { useAllActiveAccounts } from "@/lib/queries/users";
 import { Spinner } from "@/components/ui/spinner";
 
 export default function AllAccountsPage() {
@@ -26,7 +26,7 @@ export default function AllAccountsPage() {
         editAccount,
         refetch: refetchAllAccounts,
         isLoading,
-    } = useAllAccounts();
+    } = useAllActiveAccounts();
 
     const [selectedAccount, setSelectedAccount] = useState<UserData | null>(
         null,

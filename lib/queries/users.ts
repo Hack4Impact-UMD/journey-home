@@ -3,12 +3,23 @@ import { fetchAllUsers, updateUser } from "../services/users";
 import { UserData } from "@/types/user";
 import { toast } from "sonner";
 
-export function useAllAccounts() {
+export function useAllActiveAccounts() {
+    return useAllAccounts(true);
+}
+
+export function useAllAccountRequests() {
+    return useAllAccounts(false);
+}
+
+function useAllAccounts(onlyActive: boolean) {
     const queryClient = useQueryClient();
 
     const query = useQuery({
-        queryKey: ["users"],
-        queryFn: fetchAllUsers,
+        queryKey: ["users", onlyActive],
+        queryFn: async () => {
+            const allUsers = await fetchAllUsers();
+            return allUsers.filter(user => ((user.pending == null) == onlyActive));
+        },
     });
 
     const updateMutation = useMutation({
@@ -19,7 +30,8 @@ export function useAllAccounts() {
             await queryClient.cancelQueries({ queryKey: ["users"] });
             const prevData = queryClient.getQueryData<UserData[]>(["users"]);
 
-            queryClient.setQueryData(["users"], (oldData: UserData[]) => {
+            queryClient.setQueryData(["users"], (oldData: UserData[] | undefined) => {
+                if (!oldData) return [newUserData];
                 return oldData.map((user) =>
                     user.uid === newUserData.uid ? newUserData : user,
                 );
@@ -32,14 +44,19 @@ export function useAllAccounts() {
                 queryClient.setQueryData(["users"], context.prevData);
             }
         },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["users"] });
+        }
     });
 
     const updateAccount = async (newUserData: UserData) => {
-        await toast.promise(updateMutation.mutateAsync(newUserData), {
+        const promise = updateMutation.mutateAsync(newUserData);
+        toast.promise(promise, {
             loading: "Updating user...",
             success: "User updated successfully!",
             error: "Error: Couldn't update user",
         });
+        await promise;
     };
 
     return {
