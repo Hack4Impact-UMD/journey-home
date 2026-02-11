@@ -72,7 +72,7 @@ function WarehouseTableRow({
                         className="w-4 h-4 mr-4 rounded-xs cursor-pointer border-white"
                     ></input>
                     <div className="w-7 h-7 flex items-center mr-3 justify-center">
-                        {(record.photos.length > 0) ? <img className="max-w-7 max-h-7" src={record.photos[0].url}/> : null}
+                        {(record.photos.length > 0) ? <img className="max-w-7 max-h-7" src={record.photos[0].url} alt="Record photo"/> : null}
                     </div>
                     <span>{record.name}</span>
                 </div>

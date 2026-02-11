@@ -6,7 +6,6 @@ import { UserRole } from "@/types/user";
 import Link from "next/link";
 
 export default function SideNavbar() {
-    const pathname = usePathname();
     const auth = useAuth();
 
     return (

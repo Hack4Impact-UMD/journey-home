@@ -1,6 +1,5 @@
 import { DonationItem, DonationRequest } from "@/types/donations";
 import { Badge } from "../inventory/Badge";
-import { useState } from "react";
 import { ViewIcon } from "../icons/ViewIcon";
 import { TrashIcon } from "../icons/TrashIcon";
 
@@ -61,7 +60,7 @@ function DRContentsTableRow({ item, onOpen }: { item: DonationItem, onOpen: () =
                         className="w-4 h-4 mr-3 rounded-xs cursor-pointer border-white"
                     ></input>
                     <div className="w-7 h-7 flex items-center mr-3 justify-center">
-                        {(item.item.photos.length > 0) ? <img className="max-w-7 max-h-7" src={item.item.photos[0].url}/> : null}
+                        {(item.item.photos.length > 0) ? <img className="max-w-7 max-h-7" src={item.item.photos[0].url} alt="Item photo"/> : null}
                     </div>
                     <span>
                         {item.item.name}

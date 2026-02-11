@@ -129,6 +129,7 @@ export function ItemReviewModal({
                             <img
                                 className="w-full h-full object-contain"
                                 src={item.item.photos[0].url}
+                                alt="Item photo"
                             />
                         ) : null}
                     </div>
@@ -179,6 +180,7 @@ export function ItemReviewModal({
                                 <img
                                     className="h-16 w-16"
                                     src="/DefaultProfilePicture.png"
+                                    alt="Profile photo"
                                 />
                             </div>
                             <div className="flex flex-col gap-2 text-sm">

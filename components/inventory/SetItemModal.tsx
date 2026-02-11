@@ -147,6 +147,7 @@ export function SetItemModal(props: SetItemModalProps) {
                                                 : photo.url
                                         }
                                         className="max-h-32 max-w-32 rounded-sm"
+                                        alt="Item photo"
                                     />
                                     <button
                                         onClick={() => {
