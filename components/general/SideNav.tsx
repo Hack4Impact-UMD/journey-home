@@ -86,7 +86,7 @@ function SideNavbarLinkGroup({
         if (pathname?.startsWith(path)) {
             setGroupOpen(true);
         }
-    }, []);
+    }, [path, pathname]);
 
     if (
         !auth.state.userData ||
