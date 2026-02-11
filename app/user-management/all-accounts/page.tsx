@@ -4,10 +4,8 @@ import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect"
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { EditAccountModal } from "@/components/user-management/EditAccountModal";
 import { UserTable } from "@/components/user-management/UserTable";
-import { fetchAllActiveUsers, updateUser } from "@/lib/services/users";
 import { UserData, UserRole } from "@/types/user";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { useState } from "react";
 import { useAllActiveAccounts } from "@/lib/queries/users";
 import { Spinner } from "@/components/ui/spinner";
 
