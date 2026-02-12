@@ -36,6 +36,7 @@ export function ProtectedRoute({children, allow}: ProtectedRouteProps) {
         if (authState.userData.pending) {
             setShow(false);
             router.push("/status/account-pending");
+            return;
         }
 
         if (!allow.includes(authState.userData.role)) {

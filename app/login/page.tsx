@@ -42,11 +42,6 @@ export default function LoginPage() {
           width={0}
           className='object-cover min-h-full'
         />
-        <img
-          src="/background.png"
-          alt="Login Background"
-          className="object-cover min-h-full"
-        />
       </div>
 
       <div className="flex-1 flex items-center justify-center">
