@@ -11,35 +11,35 @@ type ProtectedRouteProps = {
 
 export function ProtectedRoute({children, allow}: ProtectedRouteProps) {
 
-    const auth = useAuth();
+    const { state: authState } = useAuth();
     const router = useRouter();
 
     const [show, setShow] = useState<boolean>(false);
 
     useEffect(() => {
-        console.log(auth)
-        if (auth.state.loading) {
+        if (authState.loading) {
             setShow(false);
             return;
         }
-        if (!auth.state.currentUser) {
+        if (!authState.currentUser) {
             setShow(false);
             router.push("/login");
             return;
         }
 
-        if (!auth.state.userData) {
+        if (!authState.userData) {
             setShow(false);
             router.push("/status/missing-user-data");
             return
         }
 
-        if (auth.state.userData.pending) {
+        if (authState.userData.pending) {
             setShow(false);
             router.push("/status/account-pending");
+            return;
         }
 
-        if (!allow.includes(auth.state.userData.role)) {
+        if (!allow.includes(authState.userData.role)) {
             setShow(false);
             router.push("/status/invalid-perms");
             return
@@ -47,7 +47,7 @@ export function ProtectedRoute({children, allow}: ProtectedRouteProps) {
 
         setShow(true);
 
-    }, [auth.state, allow])
+    }, [authState, allow, router])
 
     if(!show) {
         return <>

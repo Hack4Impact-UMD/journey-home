@@ -1,11 +1,8 @@
 import {
-    DonationItem,
-    DonationItemStatus,
-    DonationRequest,
     DonorInfo,
 } from "@/types/donations";
 import { InventoryRecord } from "@/types/inventory";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { CloseIcon } from "../icons/CloseIcon";
 import { Badge } from "./Badge";
@@ -37,6 +34,7 @@ export function ItemViewModal(props: ItemViewModalProps) {
                             <img
                                 className="w-full h-full object-contain"
                                 src={props.item.photos[0].url}
+                                alt="Item photo"
                             />
                         ) : null}
                     </div>
@@ -91,6 +89,7 @@ export function ItemViewModal(props: ItemViewModalProps) {
                                         <img
                                             className="h-16 w-16"
                                             src="/DefaultProfilePicture.png"
+                                            alt="Profile photo"
                                         />
                                     </div>
                                     <div className="flex flex-col gap-2 text-sm">

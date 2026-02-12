@@ -6,7 +6,6 @@ import { UserRole } from "@/types/user";
 import Link from "next/link";
 
 export default function SideNavbar() {
-    const pathname = usePathname();
     const auth = useAuth();
 
     return (
@@ -87,7 +86,7 @@ function SideNavbarLinkGroup({
         if (pathname?.startsWith(path)) {
             setGroupOpen(true);
         }
-    }, []);
+    }, [path, pathname]);
 
     if (
         !auth.state.userData ||

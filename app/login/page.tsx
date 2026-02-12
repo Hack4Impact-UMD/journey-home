@@ -6,6 +6,7 @@ import LongButton from '@/components/auth/LongButton';
 import InputBox from '../../components/auth/InputBox';
 import { FirebaseError } from 'firebase/app';
 import { useAuth } from '@/contexts/AuthContext';
+import Image from 'next/image';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -34,10 +35,12 @@ export default function LoginPage() {
   return (
     <div className="flex h-screen overflow-hidden">
       <div className="h-full max-w-[30em] overflow-hidden flex justify-center items-center">
-        <img
+        <Image
           src="/background.png"
           alt="Login Background"
-          className="object-cover min-h-full"
+          height={0}
+          width={0}
+          className='object-cover min-h-full'
         />
       </div>
 
