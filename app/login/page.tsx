@@ -35,12 +35,10 @@ export default function LoginPage() {
   return (
     <div className="flex h-screen overflow-hidden">
       <div className="h-full max-w-[30em] overflow-hidden flex justify-center items-center">
-        <Image
+        <img
           src="/background.png"
           alt="Login Background"
-          height={0}
-          width={0}
-          className='object-cover min-h-full'
+          className="object-cover min-h-full"
         />
       </div>
 
