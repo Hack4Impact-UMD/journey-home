@@ -1,5 +1,7 @@
-import { Package } from "lucide-react";
-import { ChevronRight } from "lucide-react";
+"use client";  
+
+import { Package, ChevronRight} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface CategoryStock{
     category:string; 
@@ -15,13 +17,14 @@ interface SidebarProps{
     categoryStocks: CategoryStock[];
 }
 
-export default function Sidebar({isOpen, onClose, onOpen, categoryStocks,}: SidebarProps}){
+export function Sidebar({isOpen, onClose, onOpen, categoryStocks,}: SidebarProps){
 
 
 
     return(
-        <div>
-
-        </div>
+       <>
+        <div className ={cn()} />
+            testing
+       </>
     );
 }
