@@ -1,6 +1,6 @@
 import { Timestamp } from "firebase/firestore";
-import { ClientRequest } from "http";
 import { DonationRequest } from "./donations";
+import { ClientRequest } from "./client-requests";
 
 export type TimeBlock = {
     id: string;
