@@ -6,7 +6,6 @@ import LongButton from '@/components/auth/LongButton';
 import InputBox from '../../components/auth/InputBox';
 import { FirebaseError } from 'firebase/app';
 import { useAuth } from '@/contexts/AuthContext';
-import Image from 'next/image';
 
 export default function LoginPage() {
   const router = useRouter();

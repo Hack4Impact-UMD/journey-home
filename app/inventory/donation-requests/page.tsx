@@ -11,10 +11,10 @@ import {
 } from "@/lib/services/donations";
 import {
     DonationItem,
-    DonationItemStatus,
     DonationRequest,
     DonationSearchParams,
 } from "@/types/donations";
+import { ReviewStatus } from "@/types/general";
 import { useEffect, useState } from "react";
 
 export default function DonationRequestsPage() {
@@ -40,7 +40,7 @@ export default function DonationRequestsPage() {
     function changeItemStatus(
         drID: string,
         itemID: string,
-        status: DonationItemStatus,
+        status: ReviewStatus,
     ) {
         setAllDonationRequests((prevRequests) =>
             prevRequests.map((request) =>

@@ -1,12 +1,10 @@
-import {
-    DonorInfo,
-} from "@/types/donations";
 import { InventoryRecord } from "@/types/inventory";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { CloseIcon } from "../icons/CloseIcon";
 import { Badge } from "./Badge";
 import { getDonor } from "@/lib/services/donations";
+import { LocationContact } from "@/types/general";
 
 type ItemViewModalProps = {
     item: InventoryRecord;
@@ -17,7 +15,7 @@ type ItemViewModalProps = {
 
 export function ItemViewModal(props: ItemViewModalProps) {
 
-    const [donor, setDonor] = useState<DonorInfo | null>(null);
+    const [donor, setDonor] = useState<LocationContact | null>(null);
 
     useEffect(() => {
         if (props.item.donorEmail) {

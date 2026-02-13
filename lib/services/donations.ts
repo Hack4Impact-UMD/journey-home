@@ -1,12 +1,11 @@
 import {
-    DonorInfo,
     DonationItem,
     DonationRequest,
-    DonationItemStatus
 } from "@/types/donations";
 
 import { db } from "../firebase";
 import { collection, doc, getDoc, setDoc, getDocs, deleteDoc, Timestamp } from "firebase/firestore";
+import { LocationContact, ReviewStatus } from "@/types/general";
 
 const DONATIONS_COLLECTION = "donation-requests";
 const DONORS_COLLECTION = "donors";
@@ -43,7 +42,7 @@ export async function deleteDonationRequest(id: string): Promise<boolean> {
     return true;
 }
 
-export async function setRequestItemStatus(requestId: string, itemId: string, status: DonationItemStatus): Promise<boolean> {
+export async function setRequestItemStatus(requestId: string, itemId: string, status: ReviewStatus): Promise<boolean> {
     //get the record we're working with
     const request = await getDonationRequest(requestId);
     if (!request) {
@@ -92,7 +91,7 @@ export async function getAllDonationRequests(): Promise<DonationRequest[]> {
 
 
 export async function addDonorIfNotExists(
-  donor: DonorInfo & {
+  donor: LocationContact & {
     firstTimeDonor: boolean;
     howDidYouHear: string;
     canDropOff: boolean;
@@ -132,21 +131,21 @@ export async function createDonationRequest(request: DonationRequest): Promise<s
   return request.id;
 }
 
-export const fetchAllDonors = async (): Promise<DonorInfo[]> => {
+export const fetchAllDonors = async (): Promise<LocationContact[]> => {
   const snapshot = await getDocs(collection(db, DONORS_COLLECTION));
-  const donors: DonorInfo[] = [];
+  const donors: LocationContact[] = [];
   snapshot.forEach((doc) => {
-    donors.push(doc.data() as DonorInfo);
+    donors.push(doc.data() as LocationContact);
   });
   return donors;
 };
 
-export async function getDonor(email: string): Promise<DonorInfo | null> {
+export async function getDonor(email: string): Promise<LocationContact | null> {
   const donorRef = doc(db, DONORS_COLLECTION, email);
   const donorSnap = await getDoc(donorRef);
 
   if (donorSnap.exists()) {
-    return donorSnap.data() as DonorInfo;
+    return donorSnap.data() as LocationContact;
   } else {
     return null;
   }
