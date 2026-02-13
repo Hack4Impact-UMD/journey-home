@@ -1,6 +1,5 @@
 import {
     DonationItem,
-    DonationItemStatus,
     DonationRequest,
 } from "@/types/donations";
 import { useEffect, useRef, useState } from "react";
@@ -10,12 +9,13 @@ import { Badge } from "../inventory/Badge";
 
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { ReviewStatus } from "@/types/general";
 
 type ItemReviewModalProps = {
     item: DonationItem;
     dr: DonationRequest;
     onClose: () => void;
-    setStatus: (status: DonationItemStatus) => void;
+    setStatus: (status: ReviewStatus) => void;
 };
 
 export function ItemReviewModal({
