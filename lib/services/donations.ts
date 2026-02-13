@@ -99,11 +99,7 @@ export async function addDonorIfNotExists(
   }
 ): Promise<void> {
   const donorRef = doc(db, DONORS_COLLECTION, donor.email);
-  const donorSnap = await getDoc(donorRef);
-
-  if (!donorSnap.exists()) {
-    await setDoc(donorRef, donor);
-  }
+  await setDoc(donorRef, donor);
 }
 
 export async function createDonationRequest(request: DonationRequest): Promise<string> {
