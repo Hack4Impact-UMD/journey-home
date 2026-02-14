@@ -1,11 +1,8 @@
 // app/inventory/warehouse/page.tsx
 "use client";
 
-import type {
-    InventoryRecord,
-    ItemSize
-} from "@/types/inventory";
-import { useEffect, useState } from "react";
+import type { InventoryRecord, ItemSize } from "@/types/inventory";
+import { useEffect, useRef, useState } from "react";
 import { GridIcon } from "@/components/icons/GridIcon";
 import { RowsIcon } from "@/components/icons/RowsIcon";
 import {
@@ -15,6 +12,7 @@ import {
     setInventoryRecord,
     useCategories,
 } from "@/lib/services/inventory";
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
@@ -26,9 +24,11 @@ import { PlusIcon } from "lucide-react";
 import { Timestamp } from "firebase/firestore";
 import { WarehouseGallery } from "@/components/inventory/WarehouseGallery";
 import { ItemViewModal } from "@/components/inventory/ItemViewModal";
+import {StockSidebar } from "@/components/inventory/StockSidebar";
 
 export default function WarehousePage() {
     const [searchQuery, setSearchQuery] = useState<string>("");
+    const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
 
     const allCategories = useCategories();
 
@@ -42,16 +42,23 @@ export default function WarehousePage() {
     const [sortBy, setSortBy] = useState<"Quantity" | "Date">("Date");
     const [sortAsc, setSortAsc] = useState<boolean>(false);
 
-    const [allItems, setAllItems] = useState<InventoryRecord[]>([]);
     const [isGridDisplay, setIsGridDisplay] = useState<boolean>(true);
 
-    const [editedItem, setEditedItem] = useState<InventoryRecord | null>(
-        null
-    );
-    const [newItem, setNewItem] = useState<InventoryRecord | null>(
-        null
-    );
+    const [editedItem, setEditedItem] = useState<InventoryRecord | null>(null);
+    const [newItem, setNewItem] = useState<InventoryRecord | null>(null);
     const [openedItem, setOpenedItem] = useState<InventoryRecord | null>(null);
+
+    //Gets list of inventory items
+    const { data: allItems = [], refetch: refetchItems } = useQuery({
+        queryKey: ["warehouseInventory"],
+        queryFn: getAllWarehouseInventoryRecords,
+    });
+
+    //Gets list of inventory categories
+    const { data: sidebarCategories = [], refetch: refetchCategories} = useQuery({
+        queryKey: ["categories"],
+        queryFn: getCategories,
+    });
 
     function editItem(updated: InventoryRecord) {
         const adding = newItem !== null;
@@ -60,69 +67,133 @@ export default function WarehousePage() {
                 if (success) {
                     setEditedItem(null);
                     setNewItem(null);
-                    setAllItems((prevItems) => 
-                        (!adding) ? 
-                        prevItems.map((item) =>
-                            item.id === updated.id ? updated : item
-                        ) :
-                        [...prevItems, updated]
-                    );
+                    refetchItems();
                 } else {
-                    throw new Error(adding ? "Error: Couldn't add item" : "Error: Couldn't update item");
+                    throw new Error(
+                        adding
+                            ? "Error: Couldn't add item"
+                            : "Error: Couldn't update item",
+                    );
                 }
             }),
             {
                 loading: adding ? "Adding item..." : "Updating item...",
-                success: adding ?"Item added successfully!" : "Item updated successfully!",
-                error: adding ? "Error: Couldn't add item" : "Error: Couldn't update item",
-            }
+                success: adding
+                    ? "Item added successfully!"
+                    : "Item updated successfully!",
+                error: adding
+                    ? "Error: Couldn't add item"
+                    : "Error: Couldn't update item",
+            },
         );
     }
 
     function deleteItem(deleted: InventoryRecord) {
-        if(!window.confirm("Are you sure you want to delete "+deleted.name+"?"))
+        if (
+            !window.confirm(
+                "Are you sure you want to delete " + deleted.name + "?",
+            )
+        )
             return;
-        
-        setOpenedItem(old => old && old.id == deleted.id ? null : old);
+
+        setOpenedItem((old) => (old && old.id == deleted.id ? null : old));
 
         toast.promise(
-            deleteInventoryRecord(deleted.id).then(() => 
-                setAllItems(prevItems =>
-                    prevItems.filter((item) => item.id !== deleted.id)
-                )
-            ),
+            deleteInventoryRecord(deleted.id).then((success) => {
+                if (success){
+                    refetchItems();
+                }
+                else{
+                    throw new Error("Error:Couldn't delete item");
+                }
+            }),
             {
                 loading: "Deleting item...",
                 success: "Item deleted successfully!",
                 error: "Error: Couldn't delete item",
-            }
+            },
         );
     }
+    const categoriesInitialized = useRef(false);
 
     useEffect(() => {
-        getAllWarehouseInventoryRecords().then(setAllItems);
-        getCategories().then((categories) => {
-            setSelectedCategories(categories);
-        });
-    }, []);
+        if(sidebarCategories.length >0 && !categoriesInitialized.current){
+            setSelectedCategories(sidebarCategories);
+            categoriesInitialized.current = true;
+        }
+    }, [sidebarCategories]);
 
-    const items = allItems.
-        filter(x => selectedCategories.includes(x.category) 
-            && selectedSizes.includes(x.size)
-            && `${x.name}${x.category}${x.notes}${x.size}${x.donorEmail}`.toLowerCase().includes(searchQuery.toLowerCase())
+    //Refetches data when sidebar is opened
+    const handleSidebarOpen = () => {
+        setIsSidebarOpen(true);
+        refetchItems();
+        refetchCategories();
+    }
+
+    //Gets count of each category stock
+    const categoryStocks = sidebarCategories.map((category) => {
+        const count = allItems
+            .filter((item) => item.category == category)
+            .reduce((sum, item) => sum + item.quantity, 0);
+
+        let color;
+        if (count <= 5) {
+            color = "#F02A18";
+        } else if (count <= 15) {
+            color = "#F09618";
+        } else {
+            color = "#DEF018";
+        }
+
+        const maxCount = Math.max(
+            ...sidebarCategories.map((cat) =>
+                allItems
+                    .filter((item) => item.category === cat)
+                    .reduce((sum, item) => sum + item.quantity, 0),
+            ),
+            1,
+        );
+
+        return {
+            category,
+            count,
+            maxCount,
+            color,
+        };
+    });
+
+    const items = allItems
+        .filter(
+            (x) =>
+                selectedCategories.includes(x.category) &&
+                selectedSizes.includes(x.size) &&
+                `${x.name}${x.category}${x.notes}${x.size}${x.donorEmail}`
+                    .toLowerCase()
+                    .includes(searchQuery.toLowerCase()),
         )
         .toSorted((a, b) => {
             if (sortBy === "Date") {
                 return sortAsc
-                    ? a.dateAdded.toDate().getTime() - b.dateAdded.toDate().getTime()
-                    : b.dateAdded.toDate().getTime() - a.dateAdded.toDate().getTime();
+                    ? a.dateAdded.toDate().getTime() -
+                          b.dateAdded.toDate().getTime()
+                    : b.dateAdded.toDate().getTime() -
+                          a.dateAdded.toDate().getTime();
             } else {
-                return sortAsc ? a.quantity - b.quantity : b.quantity - a.quantity;
+                return sortAsc
+                    ? a.quantity - b.quantity
+                    : b.quantity - a.quantity;
             }
         });
 
     return (
-        <>  
+        <>
+            {/*Sidebar item*/}
+            <StockSidebar
+                isOpen={isSidebarOpen}
+                onClose={() => setIsSidebarOpen(false)}
+                onOpen={handleSidebarOpen}
+                categoryStocks={categoryStocks}
+            />
             {editedItem !== null && (
                 <SetItemModal
                     item={editedItem}
@@ -159,9 +230,7 @@ export default function WarehousePage() {
                             value={searchQuery}
                             onChange={setSearchQuery}
                             onSubmit={() =>
-                                getAllWarehouseInventoryRecords().then(
-                                    setAllItems
-                                )
+                                refetchItems()
                             }
                         />
                         <DropdownMultiselect
@@ -182,8 +251,8 @@ export default function WarehousePage() {
                                 sortBy != "Date"
                                     ? "none"
                                     : sortAsc
-                                    ? "asc"
-                                    : "desc"
+                                      ? "asc"
+                                      : "desc"
                             }
                             onChange={(status) => {
                                 setSortBy("Date");
@@ -196,15 +265,15 @@ export default function WarehousePage() {
                                 sortBy != "Quantity"
                                     ? "none"
                                     : sortAsc
-                                    ? "asc"
-                                    : "desc"
+                                      ? "asc"
+                                      : "desc"
                             }
                             onChange={(status) => {
                                 setSortBy("Quantity");
                                 setSortAsc(status == "asc");
                             }}
                         />
-                        <button 
+                        <button
                             className="bg-primary text-white font-family-roboto rounded-xs flex gap-2.5 items-center justify-center text-sm px-3"
                             onClick={() => {
                                 setNewItem({
@@ -217,18 +286,18 @@ export default function WarehousePage() {
                                     size: "Small",
                                     dateAdded: Timestamp.now(),
                                     donorEmail: null,
-                                } as InventoryRecord)
+                                } as InventoryRecord);
                             }}
                         >
                             <span>New Item</span>
-                            <PlusIcon className="h-4 w-4"/>
+                            <PlusIcon className="h-4 w-4" />
                         </button>
                     </div>
                     <div className="ml-auto flex gap-2">
                         <button
                             className={cn(
                                 "fill-light-border",
-                                isGridDisplay && "fill-[#505050]"
+                                isGridDisplay && "fill-[#505050]",
                             )}
                             onClick={() => setIsGridDisplay(true)}
                         >
@@ -237,7 +306,7 @@ export default function WarehousePage() {
                         <button
                             className={cn(
                                 "fill-light-border",
-                                !isGridDisplay && "fill-[#505050]"
+                                !isGridDisplay && "fill-[#505050]",
                             )}
                             onClick={() => setIsGridDisplay(false)}
                         >
@@ -246,19 +315,19 @@ export default function WarehousePage() {
                     </div>
                 </div>
             </div>
-            {isGridDisplay ? 
+            {isGridDisplay ? (
                 <WarehouseGallery
                     inventoryRecords={items}
                     openItem={setOpenedItem}
                 />
-                :
+            ) : (
                 <WarehouseTable
                     inventoryRecords={items}
                     openItem={setOpenedItem}
                     editItem={setEditedItem}
                     deleteItem={deleteItem}
                 />
-                }
+            )}
         </>
     );
 }
