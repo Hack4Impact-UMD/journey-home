@@ -1,8 +1,30 @@
-"use client";
+"use client";  
 
-export function StockSidebar() {
+import { Package, ChevronRight} from "lucide-react";
+import { cn } from "@/lib/utils";
 
-    return (
-        <p>Stock Sidebar goes here!</p>
+interface CategoryStock{
+    category:string; 
+    count:number;
+    maxCount:number;
+    color:string;
+}
+
+interface SidebarProps{
+    isOpen: boolean;
+    onClose: () => void;
+    onOpen: () => void;
+    categoryStocks: CategoryStock[];
+}
+
+export function StockSidebar({isOpen, onClose, onOpen, categoryStocks,}: SidebarProps){
+
+
+
+    return(
+       <>
+        <div className ={cn()} />
+            testing
+       </>
     );
 }
