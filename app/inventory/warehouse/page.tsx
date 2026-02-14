@@ -24,7 +24,7 @@ import { PlusIcon } from "lucide-react";
 import { Timestamp } from "firebase/firestore";
 import { WarehouseGallery } from "@/components/inventory/WarehouseGallery";
 import { ItemViewModal } from "@/components/inventory/ItemViewModal";
-import { Sidebar, StockSidebar } from "@/components/inventory/StockSidebar";
+import {StockSidebar } from "@/components/inventory/StockSidebar";
 
 export default function WarehousePage() {
     const [searchQuery, setSearchQuery] = useState<string>("");
