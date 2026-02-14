@@ -24,7 +24,7 @@ import { PlusIcon } from "lucide-react";
 import { Timestamp } from "firebase/firestore";
 import { WarehouseGallery } from "@/components/inventory/WarehouseGallery";
 import { ItemViewModal } from "@/components/inventory/ItemViewModal";
-import { Sidebar } from "@/components/inventory/Sidebar";
+import { Sidebar, StockSidebar } from "@/components/inventory/StockSidebar";
 
 export default function WarehousePage() {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -50,13 +50,13 @@ export default function WarehousePage() {
     const [openedItem, setOpenedItem] = useState<InventoryRecord | null>(null);
 
     //Gets list of inventory items
-    const { data: sidebarItems = [] } = useQuery({
+    const { data: sidebarItems = [], refetch: refetchItems } = useQuery({
         queryKey: ["warehouseInventory"],
         queryFn: getAllWarehouseInventoryRecords,
     });
 
     //Gets list of inventory categories
-    const { data: sidebarCategories = [] } = useQuery({
+    const { data: sidebarCategories = [], refetch: refetchCategories} = useQuery({
         queryKey: ["categories"],
         queryFn: getCategories,
     });
@@ -119,12 +119,20 @@ export default function WarehousePage() {
         );
     }
 
+
     useEffect(() => {
         getAllWarehouseInventoryRecords().then(setAllItems);
         getCategories().then((categories) => {
             setSelectedCategories(categories);
         });
     }, []);
+
+    //Refetches data when sidebar is opened
+    const handleSidebarOpen = () => {
+        setIsSidebarOpen(true);
+        refetchItems();
+        refetchCategories();
+    }
 
     //Gets count of each category stock
     const categoryStocks = sidebarCategories.map((category) => {
@@ -184,10 +192,10 @@ export default function WarehousePage() {
     return (
         <>
             {/*Sidebar item*/}
-            <Sidebar
+            <StockSidebar
                 isOpen={isSidebarOpen}
                 onClose={() => setIsSidebarOpen(false)}
-                onOpen={() => setIsSidebarOpen(true)}
+                onOpen={() => handleSidebarOpen()}
                 categoryStocks={categoryStocks}
             />
             {editedItem !== null && (
