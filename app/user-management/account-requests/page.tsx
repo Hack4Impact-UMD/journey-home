@@ -4,12 +4,9 @@ import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect"
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { Spinner } from "@/components/ui/spinner";
 import { AccountReqTable } from "@/components/user-management/AccountReqTable";
-import { useAllAccountRequests, useAllActiveAccounts } from "@/lib/queries/users";
-import { approveAccount, fetchAllAccountRequests } from "@/lib/services/users";
+import { useAllAccountRequests } from "@/lib/queries/users";
 import { UserData, UserRole } from "@/types/user";
-import { User } from "firebase/auth";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { useState } from "react";
 
 export default function AccountRequestsPage() {
     const requestOpts: UserRole[] = ["Admin", "Case Manager"];

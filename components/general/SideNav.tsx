@@ -6,7 +6,6 @@ import { UserRole } from "@/types/user";
 import Link from "next/link";
 
 export default function SideNavbar() {
-    const pathname = usePathname();
     const auth = useAuth();
 
     return (
@@ -58,12 +57,38 @@ export default function SideNavbar() {
                     roles={["Admin"]}
                 />
             </SideNavbarLinkGroup>
-            
+
+            <SideNavbarLink
+                name="Client Requests"
+                path="/client-requests"
+                roles={["Admin", "Case Manager"]}
+            />
+
+            <SideNavbarLink
+                name="Pickups & Deliveries"
+                path="/pickups-deliveries"
+                roles={["Admin"]}
+            />
+
+            <SideNavbarLink
+                name="Control Panel"
+                path="/control-panel"
+                roles={["Admin"]}
+            />
+
             <SideNavbarLink
                 name="Donation Form"
                 path="/donate"
                 roles={[]}
             />
+
+            <SideNavbarLink
+                name="Profile"
+                path="/profile"
+                roles={["Admin", "Case Manager", "Volunteer"]}
+            />
+
+
         </div>
     );
 }
@@ -87,7 +112,7 @@ function SideNavbarLinkGroup({
         if (pathname?.startsWith(path)) {
             setGroupOpen(true);
         }
-    }, []);
+    }, [path, pathname]);
 
     if (
         !auth.state.userData ||

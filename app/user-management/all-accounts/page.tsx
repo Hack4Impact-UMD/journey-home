@@ -2,16 +2,10 @@
 
 import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
 import { SearchBox } from "@/components/inventory/SearchBox";
-import { SortOption } from "@/components/inventory/SortOption";
-import { ProtectedRoute } from "@/components/general/ProtectedRoute";
 import { EditAccountModal } from "@/components/user-management/EditAccountModal";
 import { UserTable } from "@/components/user-management/UserTable";
-import { fetchAllActiveUsers, updateUser } from "@/lib/services/users";
-import { SortStatus } from "@/types/inventory";
 import { UserData, UserRole } from "@/types/user";
-import { User } from "lucide-react";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { useState } from "react";
 import { useAllActiveAccounts } from "@/lib/queries/users";
 import { Spinner } from "@/components/ui/spinner";
 
