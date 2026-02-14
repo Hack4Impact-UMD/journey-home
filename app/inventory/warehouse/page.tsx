@@ -2,7 +2,7 @@
 "use client";
 
 import type { InventoryRecord, ItemSize } from "@/types/inventory";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { GridIcon } from "@/components/icons/GridIcon";
 import { RowsIcon } from "@/components/icons/RowsIcon";
 import {
@@ -24,7 +24,7 @@ import { PlusIcon } from "lucide-react";
 import { Timestamp } from "firebase/firestore";
 import { WarehouseGallery } from "@/components/inventory/WarehouseGallery";
 import { ItemViewModal } from "@/components/inventory/ItemViewModal";
-import { StockSidebar } from "@/components/inventory/StockSidebar";
+import {StockSidebar } from "@/components/inventory/StockSidebar";
 
 export default function WarehousePage() {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -55,11 +55,10 @@ export default function WarehousePage() {
     });
 
     //Gets list of inventory categories
-    const { data: sidebarCategories = [], refetch: refetchCategories } =
-        useQuery({
-            queryKey: ["categories"],
-            queryFn: getCategories,
-        });
+    const { data: sidebarCategories = [], refetch: refetchCategories} = useQuery({
+        queryKey: ["categories"],
+        queryFn: getCategories,
+    });
 
     function editItem(updated: InventoryRecord) {
         const adding = newItem !== null;
@@ -100,7 +99,14 @@ export default function WarehousePage() {
         setOpenedItem((old) => (old && old.id == deleted.id ? null : old));
 
         toast.promise(
-            deleteInventoryRecord(deleted.id).then(() => refetchItems()),
+            deleteInventoryRecord(deleted.id).then((success) => {
+                if (success){
+                    refetchItems();
+                }
+                else{
+                    throw new Error("Error:Couldn't delete item");
+                }
+            }),
             {
                 loading: "Deleting item...",
                 success: "Item deleted successfully!",
@@ -108,10 +114,12 @@ export default function WarehousePage() {
             },
         );
     }
+    const categoriesInitialized = useRef(false);
 
     useEffect(() => {
-        if (sidebarCategories.length > 0 && selectedCategories.length == 0) {
+        if(sidebarCategories.length >0 && !categoriesInitialized.current){
             setSelectedCategories(sidebarCategories);
+            categoriesInitialized.current = true;
         }
     }, [sidebarCategories]);
 
@@ -120,7 +128,7 @@ export default function WarehousePage() {
         setIsSidebarOpen(true);
         refetchItems();
         refetchCategories();
-    };
+    }
 
     //Gets count of each category stock
     const categoryStocks = sidebarCategories.map((category) => {
@@ -221,7 +229,9 @@ export default function WarehousePage() {
                         <SearchBox
                             value={searchQuery}
                             onChange={setSearchQuery}
-                            onSubmit={() => refetchItems()}
+                            onSubmit={() =>
+                                refetchItems()
+                            }
                         />
                         <DropdownMultiselect
                             label="Categories"

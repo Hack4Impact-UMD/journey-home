@@ -73,8 +73,8 @@ export function StockSidebar({
                 <div className="flex-1 overflow-y-auto px-4 py-3">
                     <div className="space-y-3">
                         {categoryStocks.map((stock) => {
-                            const percentage =
-                                (stock.count / stock.maxCount) * 100;
+                            const percentage = stock.maxCount >0 ?
+                                (stock.count / stock.maxCount) * 100 : 0;
                             return (
                                 <div key={stock.category} className="space-y-1">
                                     {/* Text identifier */}
