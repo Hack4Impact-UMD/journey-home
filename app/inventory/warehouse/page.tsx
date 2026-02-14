@@ -24,7 +24,7 @@ import { PlusIcon } from "lucide-react";
 import { Timestamp } from "firebase/firestore";
 import { WarehouseGallery } from "@/components/inventory/WarehouseGallery";
 import { ItemViewModal } from "@/components/inventory/ItemViewModal";
-import {StockSidebar } from "@/components/inventory/StockSidebar";
+import { StockSidebar } from "@/components/inventory/StockSidebar";
 
 export default function WarehousePage() {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -42,7 +42,6 @@ export default function WarehousePage() {
     const [sortBy, setSortBy] = useState<"Quantity" | "Date">("Date");
     const [sortAsc, setSortAsc] = useState<boolean>(false);
 
-    const [allItems, setAllItems] = useState<InventoryRecord[]>([]);
     const [isGridDisplay, setIsGridDisplay] = useState<boolean>(true);
 
     const [editedItem, setEditedItem] = useState<InventoryRecord | null>(null);
@@ -50,16 +49,17 @@ export default function WarehousePage() {
     const [openedItem, setOpenedItem] = useState<InventoryRecord | null>(null);
 
     //Gets list of inventory items
-    const { data: sidebarItems = [], refetch: refetchItems } = useQuery({
+    const { data: allItems = [], refetch: refetchItems } = useQuery({
         queryKey: ["warehouseInventory"],
         queryFn: getAllWarehouseInventoryRecords,
     });
 
     //Gets list of inventory categories
-    const { data: sidebarCategories = [], refetch: refetchCategories} = useQuery({
-        queryKey: ["categories"],
-        queryFn: getCategories,
-    });
+    const { data: sidebarCategories = [], refetch: refetchCategories } =
+        useQuery({
+            queryKey: ["categories"],
+            queryFn: getCategories,
+        });
 
     function editItem(updated: InventoryRecord) {
         const adding = newItem !== null;
@@ -68,13 +68,7 @@ export default function WarehousePage() {
                 if (success) {
                     setEditedItem(null);
                     setNewItem(null);
-                    setAllItems((prevItems) =>
-                        !adding
-                            ? prevItems.map((item) =>
-                                  item.id === updated.id ? updated : item,
-                              )
-                            : [...prevItems, updated],
-                    );
+                    refetchItems();
                 } else {
                     throw new Error(
                         adding
@@ -106,11 +100,7 @@ export default function WarehousePage() {
         setOpenedItem((old) => (old && old.id == deleted.id ? null : old));
 
         toast.promise(
-            deleteInventoryRecord(deleted.id).then(() =>
-                setAllItems((prevItems) =>
-                    prevItems.filter((item) => item.id !== deleted.id),
-                ),
-            ),
+            deleteInventoryRecord(deleted.id).then(() => refetchItems()),
             {
                 loading: "Deleting item...",
                 success: "Item deleted successfully!",
@@ -119,24 +109,22 @@ export default function WarehousePage() {
         );
     }
 
-
     useEffect(() => {
-        getAllWarehouseInventoryRecords().then(setAllItems);
-        getCategories().then((categories) => {
-            setSelectedCategories(categories);
-        });
-    }, []);
+        if (sidebarCategories.length > 0 && selectedCategories.length == 0) {
+            setSelectedCategories(sidebarCategories);
+        }
+    }, [sidebarCategories]);
 
     //Refetches data when sidebar is opened
     const handleSidebarOpen = () => {
         setIsSidebarOpen(true);
         refetchItems();
         refetchCategories();
-    }
+    };
 
     //Gets count of each category stock
     const categoryStocks = sidebarCategories.map((category) => {
-        const count = sidebarItems
+        const count = allItems
             .filter((item) => item.category == category)
             .reduce((sum, item) => sum + item.quantity, 0);
 
@@ -151,7 +139,7 @@ export default function WarehousePage() {
 
         const maxCount = Math.max(
             ...sidebarCategories.map((cat) =>
-                sidebarItems
+                allItems
                     .filter((item) => item.category === cat)
                     .reduce((sum, item) => sum + item.quantity, 0),
             ),
@@ -195,7 +183,7 @@ export default function WarehousePage() {
             <StockSidebar
                 isOpen={isSidebarOpen}
                 onClose={() => setIsSidebarOpen(false)}
-                onOpen={() => handleSidebarOpen()}
+                onOpen={handleSidebarOpen}
                 categoryStocks={categoryStocks}
             />
             {editedItem !== null && (
@@ -233,11 +221,7 @@ export default function WarehousePage() {
                         <SearchBox
                             value={searchQuery}
                             onChange={setSearchQuery}
-                            onSubmit={() =>
-                                getAllWarehouseInventoryRecords().then(
-                                    setAllItems,
-                                )
-                            }
+                            onSubmit={() => refetchItems()}
                         />
                         <DropdownMultiselect
                             label="Categories"
