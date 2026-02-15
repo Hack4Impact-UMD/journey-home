@@ -1,11 +1,11 @@
 "use client";
 
-import { DonorInfo } from "@/types/donations";
 import { ViewIcon } from "../icons/ViewIcon";
 import { TrashIcon } from "../icons/TrashIcon";
+import { LocationContact } from "@/types/general";
 
 type DonorsTableProps = {
-    donors: DonorInfo[];
+    donors: LocationContact[];
 };
 
 export function DonorsTable({ donors }: DonorsTableProps) {
@@ -35,7 +35,7 @@ export function DonorsTable({ donors }: DonorsTableProps) {
     );
 }
 
-function DonorsTableRow({ donor }: { donor: DonorInfo }) {
+function DonorsTableRow({ donor }: { donor: LocationContact }) {
     return (
         <>
             <div

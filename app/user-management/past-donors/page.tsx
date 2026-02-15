@@ -3,12 +3,12 @@
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { DonorsTable } from "@/components/user-management/DonorsTable";
 import { fetchAllDonors } from "@/lib/services/donations";
-import { DonorInfo } from "@/types/donations";
+import { LocationContact } from "@/types/general";
 import { useEffect, useState } from "react";
 
 export default function PastDonorsPage() {
     const [searchQuery, setSearchQuery] = useState<string>("");
-    const [allDonors, setAllDonors] = useState<DonorInfo[]>([]);
+    const [allDonors, setAllDonors] = useState<LocationContact[]>([]);
 
     useEffect(() => {
         fetchAllDonors().then(setAllDonors);

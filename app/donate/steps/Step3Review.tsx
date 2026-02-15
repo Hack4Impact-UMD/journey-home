@@ -10,6 +10,8 @@ import { InventoryPhoto } from "@/types/inventory";
 import { uploadImage } from "@/lib/services/inventory";
 import { useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
+import Image from "next/image";
+
 
 export default function Step3Review() {
     const { formState, setCurrentStep } = useDonorForm();
@@ -97,10 +99,12 @@ export default function Step3Review() {
     return (
         <div className="space-y-6">
             <div className="flex justify-center mb-8">
-                <img
+                <Image
                     src="/journey-home-logo.png"
                     alt="Journey Home Logo"
-                    className="h-24"
+                    height={96}
+                    width={350}
+                    className="h-24 w-auto"
                 />
             </div>
 
@@ -240,11 +244,12 @@ export default function Step3Review() {
                                                             key={photo.name+" "+photoIndex}
                                                             className="w-24 h-24 border rounded overflow-hidden"
                                                         >
-                                                            <img
-                                                                src={URL.createObjectURL(
-                                                                    photo
-                                                                )}
-                                                                className="max-h-32 max-w-32 rounded-sm"
+                                                            <Image
+                                                                src={URL.createObjectURL(photo)}
+                                                                height={96}
+                                                                width={96}
+                                                                alt={`Item Photo`}
+                                                                className="max-h-32 max-w-32 rounded-sm object-cover object-center"
                                                             />
                                                         </div>
                                                     )

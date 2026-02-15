@@ -2,23 +2,19 @@
 
 import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
 import { SearchBox } from "@/components/inventory/SearchBox";
+import { Spinner } from "@/components/ui/spinner";
 import { AccountReqTable } from "@/components/user-management/AccountReqTable";
-import { approveAccount, fetchAllAccountRequests } from "@/lib/services/users";
+import { useAllAccountRequests } from "@/lib/queries/users";
 import { UserData, UserRole } from "@/types/user";
-import { User } from "firebase/auth";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { useState } from "react";
 
 export default function AccountRequestsPage() {
     const requestOpts: UserRole[] = ["Admin", "Case Manager"];
 
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [selectedRoles, setSelectedRoles] = useState<UserRole[]>(requestOpts);
-    const [allRequests, setAllRequests] = useState<UserData[]>([]);
 
-    useEffect(() => {
-        fetchAllAccountRequests().then(setAllRequests);
-    }, []);
+    const { allAccounts: allRequests, refetch: refetchAllRequests, isLoading, editAccount } = useAllAccountRequests();
 
     function onAccept(user: UserData) {
         if (
@@ -28,14 +24,7 @@ export default function AccountRequestsPage() {
         ) {
             return;
         }
-        toast.promise(
-            approveAccount(user.uid, user.pending ?? "Volunteer").then(() => setAllRequests((old) => old.filter((u) => u.uid != user.uid))),
-            {
-                loading: "Accepting account request...",
-                success: "Request accepted successfully!",
-                error: "Error: Couldn't accept request",
-            }
-        );
+        editAccount({...user, role: user.pending ?? "Volunteer",pending: null});
     }
 
     return (
@@ -45,9 +34,7 @@ export default function AccountRequestsPage() {
                     <SearchBox
                         value={searchQuery}
                         onChange={setSearchQuery}
-                        onSubmit={() =>
-                            fetchAllAccountRequests().then(setAllRequests)
-                        }
+                        onSubmit={refetchAllRequests}
                     />
                     <DropdownMultiselect
                         label="Requesting"
@@ -55,6 +42,11 @@ export default function AccountRequestsPage() {
                         selected={selectedRoles}
                         setSelected={setSelectedRoles}
                     />
+                    {isLoading && (
+                        <div className="flex items-center">
+                            <Spinner className="size-5 text-primary" />
+                        </div>
+                    )}
                 </div>
             </div>
             <AccountReqTable
