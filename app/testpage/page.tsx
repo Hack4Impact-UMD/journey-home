@@ -3,11 +3,14 @@
 
 import { createDonationRequest } from "@/lib/services/donations"
 import { setInventoryRecord, uploadImage } from "@/lib/services/inventory";
-import { DonationItem, DonationRequest, DonorInfo } from "@/types/donations";
+import { DonationItem, DonationRequest } from "@/types/donations";
 import { InventoryPhoto } from "@/types/inventory";
 import { Timestamp } from "@firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { LocationContact } from "@/types/general";
 
-export const SEED_DONORS: DonorInfo[] = [
+export const SEED_DONORS: LocationContact[] = [
   {
     firstName: "Michael",
     lastName: "Donovan",
@@ -442,33 +445,14 @@ async function seedImageToPhotos(
   ];
 }
 
-function getRandomFiles(
-  pool: readonly SeedImage[],
-  max = 1
-): SeedImage[] {
-  const count = Math.floor(Math.random() * max) + 1;
 
-  return Array.from({ length: count }, () =>
-    pool[Math.floor(Math.random() * pool.length)]
-  );
-}
 
-async function filesToInventoryPhotos(
-  files: readonly SeedImage[]
-): Promise<InventoryPhoto[]> {
-  return Promise.all(
-    files.map(async (file) => ({
-      url: await uploadImage(file.file),
-      altText: file.title,
-    }))
-  );
-}
-async function addDonationRequests(category: string, count: number = 5) {
+async function addDonationRequests(category: string) {
     const validSizes = ["Small", "Medium", "Large"] as const;
     const time = randomTimestamp();
     const imagePool = await getSeedImagePool(category);
 
-    const donor: DonorInfo = randomFrom(SEED_DONORS);
+    const donor: LocationContact = randomFrom(SEED_DONORS);
 
     const items: DonationItem[] = [];
 
@@ -535,7 +519,7 @@ async function addInventoryRecord(category: string) {
     const time = randomTimestamp();
     const imagePool = await getSeedImagePool(category);
   for (const image of imagePool) {
-    const donor:DonorInfo = randomFrom(SEED_DONORS);
+    const donor:LocationContact = randomFrom(SEED_DONORS);
 
     await setInventoryRecord({
       id: crypto.randomUUID(),
@@ -573,8 +557,6 @@ async function loadSeedImages(category: string): Promise<SeedImage[]> {
   return filesWithDescriptions;
 }
 
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 
 
 const DEFAULT_CATEGORIES = [
@@ -632,13 +614,13 @@ export default function page() {
     return(
         <>
         <button onClick={() => {
-            addDonationRequests("Sofas", 4)
+            addDonationRequests("Sofas")
         }}>add sofas</button>
         <button onClick={() => {
-            addDonationRequests("Dressers", 4)
+            addDonationRequests("Dressers")
         }}>add dressers</button>
         <button onClick={() => {
-            addDonationRequests("Kitchen Tables", 2)
+            addDonationRequests("Kitchen Tables")
         }}>add tables</button>
 
         <button onClick={() => {
@@ -660,7 +642,7 @@ export default function page() {
         <button onClick={ () => {
             const promises = DEFAULT_CATEGORIES
       .filter(category => category !== "Other")
-      .map(category => addDonationRequests(category, 4));
+      .map(category => addDonationRequests(category));
 
     Promise.all(promises);
         }}> Epic Mega Button to Add All Different Donation Requests</button>
