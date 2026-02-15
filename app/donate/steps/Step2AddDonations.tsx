@@ -302,10 +302,8 @@ export default function Step2AddDonations() {
                                                     }
                                                 >   
                                                 
-                                                    <Image
+                                                    <img
                                                         src={URL.createObjectURL(photo)}
-                                                        width={128}
-                                                        height={128}
                                                         alt={`Item Photo`}
                                                         className="max-h-32 max-w-32 rounded-sm object-contain"
                                                     />
@@ -433,14 +431,14 @@ export default function Step2AddDonations() {
                 <Button
                     onClick={handleBack}
                     variant="secondary"
-                    className="min-w-[150px]"
+                    className="min-w-37.5"
                 >
                     Back
                 </Button>
                 <Button
                     onClick={handleNext}
                     variant="primary"
-                    className="min-w-[150px]"
+                    className="min-w-37.5"
                 >
                     Next
                 </Button>
