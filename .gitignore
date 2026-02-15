@@ -25,6 +25,7 @@ test-results.xml
 .DS_Store
 *.pem
 .claude/
+CLAUDE.md
 
 # Debug
 npm-debug.log*
