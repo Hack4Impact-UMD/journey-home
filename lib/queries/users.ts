@@ -71,6 +71,11 @@ function useAllAccounts(onlyActive: boolean) {
     };
 }
 
+/**
+ * Hook for fetching and updating a single user account
+ * @param uid - User ID to fetch
+ * @returns account data, edit function, and loading states
+ */
 export function useAccount(uid: string) {
     const queryClient = useQueryClient();
 

@@ -68,6 +68,7 @@ export default function ProfilePage() {
     }
 
     const handleSave = async () => {
+        // Convert date string to Firestore Timestamp
         const dobTimestamp = dob ? Timestamp.fromDate(new Date(dob)) : null;
         await editAccount({
             ...account,
@@ -134,6 +135,7 @@ export default function ProfilePage() {
                             <p className="text-gray-700 mb-4">{account.role}</p>
                             <hr className="mb-6 -mx-8" />
 
+                            {/* Conditional rendering: show profile form or password reset form */}
                             <div className="px-12">
                                 {!showPasswordReset ? (
                                     <>
