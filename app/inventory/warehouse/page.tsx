@@ -11,9 +11,7 @@ import { RowsIcon } from "@/components/icons/RowsIcon";
 import {
     deleteInventoryRecord,
     getAllWarehouseInventoryRecords,
-    getCategories,
     setInventoryRecord,
-    useCategories,
 } from "@/lib/services/inventory";
 import { toast } from "sonner";
 import { SearchBox } from "@/components/inventory/SearchBox";
@@ -26,11 +24,12 @@ import { PlusIcon } from "lucide-react";
 import { Timestamp } from "firebase/firestore";
 import { WarehouseGallery } from "@/components/inventory/WarehouseGallery";
 import { ItemViewModal } from "@/components/inventory/ItemViewModal";
+import { useCategories } from "@/lib/queries/categories";
 
 export default function WarehousePage() {
     const [searchQuery, setSearchQuery] = useState<string>("");
 
-    const allCategories = useCategories();
+    const { allCategories, isLoading: categoriesLoading } = useCategories();
 
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [selectedSizes, setSelectedSizes] = useState<ItemSize[]>([
@@ -101,10 +100,11 @@ export default function WarehousePage() {
 
     useEffect(() => {
         getAllWarehouseInventoryRecords().then(setAllItems);
-        getCategories().then((categories) => {
-            setSelectedCategories(categories);
-        });
     }, []);
+
+    useEffect(() => {
+        setSelectedCategories(allCategories);
+    }, [categoriesLoading])
 
     const items = allItems.
         filter(x => selectedCategories.includes(x.category) 
