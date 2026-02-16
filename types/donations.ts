@@ -15,7 +15,8 @@ export type DonationRequest = {
     canDropOff: boolean,
     notes: string,
     date: Timestamp,
-    items: DonationItem[]
+    items: DonationItem[],
+    associatedTimeBlockID: string | null
 }
 
 export type DonationSearchParams = {
