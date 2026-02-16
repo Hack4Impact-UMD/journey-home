@@ -10,7 +10,7 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { LocationContact } from "@/types/general";
 import { ClientRequest } from "@/types/client-requests";
-import { AuthContextType } from "@/types/user";
+import { AuthContextType, UserData } from "@/types/user";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { TimeBlock } from "@/types/schedule";
 import { collection, getDocs } from "firebase/firestore";
@@ -971,7 +971,7 @@ async function addCaseManagerRequests(count: number) {
       console.log("No available time blocks left");
       break;
     }
-
+    const randomCaseManager = await getRandomCaseManagerID();
     // base location contact
     const baseClient: LocationContact = randomFrom(SEED_DONORS);
 
@@ -1011,7 +1011,7 @@ async function addCaseManagerRequests(count: number) {
         },
       },
 
-      caseManagerID: crypto.randomUUID(),
+      caseManagerID: randomCaseManager?? "",
       notes: randomFrom(desc),
       status: "Not Reviewed",
 
@@ -1035,6 +1035,22 @@ async function addCaseManagerRequests(count: number) {
 
     console.log("Created case manager request:", request.id);
   }
+}
+
+
+async function getRandomCaseManagerID(): Promise<string | null> {
+  const snapshot = await getDocs(collection(db, "users"));
+
+  const caseManagers = snapshot.docs
+    .map(doc => doc.data() as UserData)
+    .filter(user => user.role === "Case Manager");
+
+  if (caseManagers.length === 0) return null;
+
+  const random =
+    caseManagers[Math.floor(Math.random() * caseManagers.length)];
+
+  return random.uid;
 }
 
 const CLIENT_NOTES = [
