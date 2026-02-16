@@ -4,7 +4,7 @@ import { ClientRequest } from "./client-requests";
 
 export type TimeBlock = {
     id: string;
-    task: Delivery | Pickup | null;
+    tasks: Task[];
     startTime: Timestamp;
     endTime: Timestamp;
     volunteerIDs: string[];
@@ -12,5 +12,6 @@ export type TimeBlock = {
     published: boolean;
 };
 
+export type Task = Pickup | Delivery;
 export type Delivery = ClientRequest;
 export type Pickup = DonationRequest;

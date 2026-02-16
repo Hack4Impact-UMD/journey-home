@@ -1,4 +1,4 @@
-import { InventoryRecord } from "@/types/inventory";
+import { CategoryAttributes, InventoryRecord } from "@/types/inventory";
 
 import { db, storage } from "../firebase";
 import {
@@ -9,30 +9,20 @@ import {
     getDocs,
     deleteDoc,
 } from "firebase/firestore";
-import { useEffect, useState } from "react";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 export const WAREHOUSE_COLLECTION = "warehouse";
 
-export function useCategories(): string[] {
 
-    const [allCategories, setAllCategories] = useState<string[]>(["Other",]);
-
-    useEffect(() => {
-        getCategories().then(categories => setAllCategories(categories));
-      }, []);
-
-    return allCategories;
-
+export async function setCategoryAttributes(attrs: CategoryAttributes[]) {
+    const categoriesDoc = doc(db, "config", "categories");
+    await setDoc(categoriesDoc, {categories: attrs});
 }
 
-export async function getCategories(): Promise<string[]> {
+export async function getCategoryAttributes(): Promise<CategoryAttributes[]> {
     const categoriesDoc = doc(db, "config", "categories");
-    const categoriesSnapshot = await getDoc(categoriesDoc);
-    if (!categoriesSnapshot.exists()) {
-        return ["Other"];
-    }
-    return categoriesSnapshot.data().categories || ["Other"];
+    const docSnap = await getDoc(categoriesDoc);
+    return docSnap?.data()?.["categories"] ?? [];
 }
 
 export async function getAllWarehouseInventoryRecords(): Promise<InventoryRecord[]> {
