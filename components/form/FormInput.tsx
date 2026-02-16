@@ -3,10 +3,11 @@
 interface FormInputProps {
   label: string;
   required?: boolean;
-  value?: string;
+  value?: string | number;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   type?: string;
   className?: string;
+  disabled?: boolean;
   min?: number;
 }
 

@@ -13,27 +13,28 @@ export type ClientRequest = {
 
 export type Client = LocationContact & {
     hmis: string,
-    secondaryContact: ClientSecondaryContact,
+    secondaryContact: ClientSecondaryContact, //made optional
     questions: ClientQuestions
 }
 
 export type ClientSecondaryContact = {
-    name: string,
-    relationship: string,
+    // name: string,
+    // relationship: string,
+    nameAndRelationship: string, //combined because one text input
     phone: string
 }
 
 export type ClientQuestions = {
-    clientSpeaksEnglish: boolean,
-    adultsInFamily: number,
-    childrenInFamily: number,
-    isVeteran: boolean,
-    canPickUp: boolean,
-    wasChronic: boolean,
-    hasMovedIn: boolean,
-    moveInDate: Timestamp,
-    hasElevator: boolean,
-    notes: string
+    clientSpeaksEnglish: boolean | undefined,
+    adultsInFamily: number | undefined,
+    childrenInFamily: number | undefined,
+    isVeteran: boolean | undefined,
+    canPickUp: boolean | undefined,
+    wasChronic: boolean | undefined,
+    hasMovedIn: boolean | undefined,
+    moveInDate: Timestamp | undefined,
+    hasElevator: boolean | undefined,
+    notes?: string //made optional
 }
 
 export type ItemRequest = {
