@@ -7,11 +7,11 @@ import FormInput from "../../../components/form/FormInput";
 import FormSelect from "../../../components/form/FormSelect";
 import FormTextarea from "../../../components/form/FormTextarea";
 import Button from "../../../components/form/Button";
-import { useCategories } from "@/lib/services/inventory";
 import { CloseIcon } from "@/components/icons/CloseIcon";
 import { toast } from "sonner";
 import { PlusIcon } from "lucide-react";
 import Image from "next/image";
+import { useCategories } from "@/lib/queries/categories";
 
 
 export default function Step2AddDonations() {
@@ -39,7 +39,7 @@ export default function Step2AddDonations() {
         setCurrentStep(3);
     };
 
-    const categoryOptions = useCategories();
+    const {allCategories: categoryOptions} = useCategories();
 
     const fileInputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
 
