@@ -1,13 +1,11 @@
 import {
-    DonorInfo,
     DonationItem,
     DonationRequest,
-    DonationSearchParams,
-    DonationItemStatus
 } from "@/types/donations";
 
 import { db } from "../firebase";
 import { collection, doc, getDoc, setDoc, getDocs, deleteDoc, Timestamp } from "firebase/firestore";
+import { LocationContact, ReviewStatus } from "@/types/general";
 
 const DONATIONS_COLLECTION = "donation-requests";
 const DONORS_COLLECTION = "donors";
@@ -44,7 +42,7 @@ export async function deleteDonationRequest(id: string): Promise<boolean> {
     return true;
 }
 
-export async function setRequestItemStatus(requestId: string, itemId: string, status: DonationItemStatus): Promise<boolean> {
+export async function setRequestItemStatus(requestId: string, itemId: string, status: ReviewStatus): Promise<boolean> {
     //get the record we're working with
     const request = await getDonationRequest(requestId);
     if (!request) {
@@ -72,60 +70,14 @@ export async function setRequestItemStatus(requestId: string, itemId: string, st
 //do search based on name
 //sort filters based on what's there for inventory records already.
 
-export async function searchRequest(query: string, params: DonationSearchParams): Promise<DonationRequest[]> {
+export async function getAllDonationRequests(): Promise<DonationRequest[]> {
     
     const querySnapshot = await getDocs(collection(db, DONATIONS_COLLECTION));
     const requests: DonationRequest[] = querySnapshot.docs.map(doc => (
         doc.data() as DonationRequest
     ));
 
-    return requests
-    .filter(request => {
-        const donorFullName = `${request.donor.firstName} ${request.donor.lastName}`.toLowerCase();
-        const searchq = query.toLowerCase();
-
-        //status depends on the donationitems, need to map through that array to define the status. 
-        if (params.status.length != 0) {
-            const startedRequest = request.items.some(donItem => donItem.status === "Approved" || donItem.status === "Denied");
-            const completedRequest = request.items.every(donItem => donItem.status === "Approved" || donItem.status === "Denied");
-            
-            let requestStat: "Not Reviewed" | "Unfinished" | "Finished";
-
-            if (!startedRequest){
-                requestStat = "Not Reviewed"
-            } else if (!completedRequest){
-                requestStat = "Unfinished"
-            } else{ 
-                requestStat = "Finished"
-            };
-            
-            if (!params.status.includes(requestStat)) {
-                return false;
-            }
-        }
-
-        return donorFullName.includes(searchq);     
-    })
-
-    //still need to sort by category
-
-    .sort((req1, req2) => {
-        let diff;
-        if(params.sortBy == "Date") {
-            diff = req1.date.seconds - req2.date.seconds;
-        } else if (params.sortBy == "Quantity") {
-            diff = req1.items.length - req2.items.length;
-        } else {
-            // Sort by donor name
-            diff = `${req1.donor.lastName} ${req1.donor.firstName}`.localeCompare(`${req2.donor.lastName} ${req2.donor.firstName}`);
-        }
-
-        if (!params.ascending) {
-            diff *= -1;
-        }
-
-        return diff
-    });
+    return requests;
 }
 
 /* 
@@ -139,7 +91,7 @@ export async function searchRequest(query: string, params: DonationSearchParams)
 
 
 export async function addDonorIfNotExists(
-  donor: DonorInfo & {
+  donor: LocationContact & {
     firstTimeDonor: boolean;
     howDidYouHear: string;
     canDropOff: boolean;
@@ -147,11 +99,7 @@ export async function addDonorIfNotExists(
   }
 ): Promise<void> {
   const donorRef = doc(db, DONORS_COLLECTION, donor.email);
-  const donorSnap = await getDoc(donorRef);
-
-  if (!donorSnap.exists()) {
-    await setDoc(donorRef, donor);
-  }
+  await setDoc(donorRef, donor);
 }
 
 export async function createDonationRequest(request: DonationRequest): Promise<string> {
@@ -179,21 +127,21 @@ export async function createDonationRequest(request: DonationRequest): Promise<s
   return request.id;
 }
 
-export const fetchAllDonors = async (): Promise<DonorInfo[]> => {
+export const fetchAllDonors = async (): Promise<LocationContact[]> => {
   const snapshot = await getDocs(collection(db, DONORS_COLLECTION));
-  const donors: DonorInfo[] = [];
+  const donors: LocationContact[] = [];
   snapshot.forEach((doc) => {
-    donors.push(doc.data() as DonorInfo);
+    donors.push(doc.data() as LocationContact);
   });
   return donors;
 };
 
-export async function getDonor(email: string): Promise<DonorInfo | null> {
+export async function getDonor(email: string): Promise<LocationContact | null> {
   const donorRef = doc(db, DONORS_COLLECTION, email);
   const donorSnap = await getDoc(donorRef);
 
   if (donorSnap.exists()) {
-    return donorSnap.data() as DonorInfo;
+    return donorSnap.data() as LocationContact;
   } else {
     return null;
   }

@@ -1,7 +1,7 @@
 "use client";
 
+import { LocationContact } from "@/types/general";
 import React, { createContext, useContext, useState, ReactNode } from "react";
-import { DonorInfo } from "@/types/donations";
 
 export type FormDonationItem = {
   id: string;
@@ -15,7 +15,7 @@ export type FormDonationItem = {
 
 interface DonorFormState {
   currentStep: number;
-  donorInfo: Partial<DonorInfo>;
+  donorInfo: Partial<LocationContact>;
   donationItems: FormDonationItem[];
   firstTimeDonor: boolean | null;
   howDidYouHear: string;
@@ -28,7 +28,7 @@ interface DonorFormState {
 
 interface DonorFormContextType {
   formState: DonorFormState;
-  updateDonorInfo: (info: Partial<DonorInfo>) => void;
+  updateDonorInfo: (info: Partial<LocationContact>) => void;
   updateDonationItems: (items: FormDonationItem[]) => void;
   updateAdditionalInfo: (
     data: Partial<Pick<DonorFormState, "firstTimeDonor" | "howDidYouHear" | "canDropOff" | "notes">>
@@ -65,7 +65,7 @@ const DonorFormContext = createContext<DonorFormContextType | undefined>(undefin
 export function DonorFormProvider({ children }: { children: ReactNode }) {
   const [formState, setFormState] = useState<DonorFormState>(defaultState);
 
-  const updateDonorInfo = (info: Partial<DonorInfo>) => {
+  const updateDonorInfo = (info: Partial<LocationContact>) => {
     setFormState((prev) => ({
       ...prev,
       donorInfo: { ...prev.donorInfo, ...info },

@@ -1,6 +1,4 @@
 import { DropdownIcon } from "../icons/DropdownIcon";
-import { SortIcon } from "../icons/SortIcon";
-import { SortStatus } from "@/types/inventory";
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
@@ -34,9 +32,12 @@ export function DropdownMultiselect<T extends string>({ label, options, selected
                             className="text-xs cursor-pointer"
                             checked={allSelected}
                             onCheckedChange={checked => {
-                                checked ? 
-                                setSelected([...options]) :
-                                setSelected([]);
+                                if(checked) {
+                                    setSelected([...options]);
+                                } else {
+                                    setSelected([]);
+                                }
+                                
                             }}
                             onSelect={(event) => event.preventDefault()}
                         >
@@ -48,14 +49,16 @@ export function DropdownMultiselect<T extends string>({ label, options, selected
                             className="text-xs cursor-pointer"
                             checked={selected.includes(option) && !allSelected}
                             onCheckedChange={checked => {
-                                checked ? 
-                                (
-                                    allSelected ?
-                                    setSelected([option,]) :
-                                    setSelected(prev => [...prev, option])
-                                )
-                                 :
-                                setSelected(prev => prev.filter(x => x !== option))
+                                if(checked) {
+                                    if(allSelected) {
+                                        setSelected([option,]);
+                                    } else {
+                                        setSelected(prev => [...prev, option]);
+                                    }
+                                } else {
+                                    setSelected(prev => prev.filter(x => x !== option));
+                                }
+                                
                             }}
                             onSelect={(event) => event.preventDefault()}
                         >

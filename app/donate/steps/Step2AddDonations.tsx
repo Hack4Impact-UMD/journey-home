@@ -11,6 +11,8 @@ import { useCategories } from "@/lib/services/inventory";
 import { CloseIcon } from "@/components/icons/CloseIcon";
 import { toast } from "sonner";
 import { PlusIcon } from "lucide-react";
+import Image from "next/image";
+
 
 export default function Step2AddDonations() {
     const {
@@ -46,11 +48,13 @@ export default function Step2AddDonations() {
     return (
         <div className="space-y-6">
             <div className="flex justify-center mb-8">
-                <img
-                    src="/journey-home-logo.png"
-                    alt="Journey Home Logo"
-                    className="h-24"
-                />
+                <Image
+                   src="/journey-home-logo.png"
+                   alt="Journey Home Logo"
+                   height={96}
+                   width={350}
+                   className="h-24 w-auto"
+               />
             </div>
 
             <StepIndicator currentStep={2} />
@@ -296,13 +300,14 @@ export default function Step2AddDonations() {
                                                     key={
                                                         index + " " + photo.name
                                                     }
-                                                >
+                                                >   
+                                                
                                                     <img
-                                                        src={URL.createObjectURL(
-                                                            photo
-                                                        )}
-                                                        className="max-h-32 max-w-32 rounded-sm"
+                                                        src={URL.createObjectURL(photo)}
+                                                        alt={`Item Photo`}
+                                                        className="max-h-32 max-w-32 rounded-sm object-contain"
                                                     />
+                                                    
                                                     <button
                                                         onClick={() => {
                                                             updateDonationInput(
@@ -426,14 +431,14 @@ export default function Step2AddDonations() {
                 <Button
                     onClick={handleBack}
                     variant="secondary"
-                    className="min-w-[150px]"
+                    className="min-w-37.5"
                 >
                     Back
                 </Button>
                 <Button
                     onClick={handleNext}
                     variant="primary"
-                    className="min-w-[150px]"
+                    className="min-w-37.5"
                 >
                     Next
                 </Button>

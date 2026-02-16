@@ -5,7 +5,7 @@ import type {
     InventoryRecord,
     ItemSize
 } from "@/types/inventory";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { GridIcon } from "@/components/icons/GridIcon";
 import { RowsIcon } from "@/components/icons/RowsIcon";
 import {

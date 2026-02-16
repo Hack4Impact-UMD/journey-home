@@ -1,15 +1,18 @@
 "use client";
 
 import Button from "../../../components/form/Button";
+import Image from "next/image";
 
 export default function Step4Confirmation() {
   return (
     <div className="space-y-6 text-center py-12">
       <div className="flex justify-center mb-8">
-        <img
+        <Image
           src="/journey-home-logo.png"
           alt="Journey Home Logo"
-          className="h-24"
+          height={96}
+          width={350}
+          className="h-24 w-auto"
         />
       </div>
 
