@@ -84,6 +84,7 @@ export default function Step3Review() {
                 notes: formState.notes ?? "",
                 date: Timestamp.now(),
                 items,
+                associatedTimeBlockID: null // Placeholder for now, need to replace to create a Time Block 
             };
 
             await createDonationRequest(request);
