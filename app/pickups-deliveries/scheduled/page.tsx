@@ -1,24 +1,21 @@
 "use client"
+import Request from "@/components/pickups-deliveries/Request";
 import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { SortOption } from "@/components/inventory/SortOption";
-import Request from "@/components/pickups-deliveries/Request";
-import { getPickups } from "@/lib/services/pickups-deliveries";
 import { useState } from "react";
 
-export default function Unscheduled() {
-    const { data: approvedItems = [] } = getPickups();
-     const [searchQuery, setSearchQuery] = useState<string>("");
-            const [selectedOptions, setSelectedOptions] = useState<string[]>([
-                "Pickups & Deliveries",
-                "Pickups",
-                "Large"
-            ]);
-            const [sortBy, setSortBy] = useState<"Quantity" | "Date">("Date");
-            const [sortAsc, setSortAsc] = useState<boolean>(false);
-    return (
-        
-        <div>
+export default function scheduled() {
+    const [searchQuery, setSearchQuery] = useState<string>("");
+        const [selectedOptions, setSelectedOptions] = useState<string[]>([
+            "Pickups & Deliveries",
+            "Pickups",
+            "Large"
+        ]);
+        const [sortBy, setSortBy] = useState<"Quantity" | "Date">("Date");
+        const [sortAsc, setSortAsc] = useState<boolean>(false);
+        return (
+            <div>
             <div className="flex flex-col mb-6">
                 <div className="flex">
                     <div className="flex flex-wrap gap-3">
@@ -67,11 +64,8 @@ export default function Unscheduled() {
                 </div>
                                     
             </div>
-            {approvedItems.map((donation) => (
-                <Request 
-                    donation={donation}
-                    key={donation.id}/>
-            ))}
-        </div>
-    )
-}
+            <div>
+                {/* <Request/> */}
+            </div>
+            </div>
+)}
