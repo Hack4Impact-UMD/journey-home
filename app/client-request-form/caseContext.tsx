@@ -1,13 +1,9 @@
 "use client";
 
-import { LocationContact } from "@/types/general";
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { Client, ClientQuestions, ClientSecondaryContact } from "@/types/client-requests"; 
-import { Timestamp } from "firebase/firestore";
 
-// allow positive numbers only -> create a component <input type="number" id="positive-number-input" min="0" step="any" />
 export type Bedding = {
-  id: string;
   twinbeds: number;
   fullbeds: number;
   queenbeds: number;
@@ -17,7 +13,6 @@ export type Bedding = {
 };
 
 export type Tables = {
-  id: string;
   sofa: number;
   armchair: number;
   kitchenchair: number;
@@ -27,7 +22,6 @@ export type Tables = {
 };
 
 export type Kitchen = {
-  id: string;
   sofa: number;
   armchair: number;
   kitchenchair: number;
@@ -37,7 +31,6 @@ export type Kitchen = {
 };
 
 export type Other = {
-  id: string;
   dresser: number;
   fan: number;
   heater: number;
@@ -94,7 +87,6 @@ const defaultState: CaseFormState = {
     }
   },
   bedding: {
-    id: "",
     twinbeds: 0,
     fullbeds: 0,
     queenbeds: 0,
@@ -103,7 +95,6 @@ const defaultState: CaseFormState = {
     pillows: 0
   },
   tables: {
-    id: "",
     sofa: 0,
     armchair: 0,
     kitchenchair: 0,
@@ -112,7 +103,6 @@ const defaultState: CaseFormState = {
     endtable: 0
   },
   kitchen: {
-    id: "",
     sofa: 0,
     armchair: 0,
     kitchenchair: 0,
@@ -121,7 +111,6 @@ const defaultState: CaseFormState = {
     endtable: 0
   },
   other: {
-    id: "",
     dresser: 0,
     fan: 0,
     heater: 0,
