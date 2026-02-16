@@ -121,6 +121,7 @@ export async function createDonationRequest(request: DonationRequest): Promise<s
     notes: request.notes ?? "",
     date: request.date ?? Timestamp.now(),
     items: request.items,
+    associatedTimeBlockID: request.associatedTimeBlockID
   };
 
   await setDoc(doc(db, DONATIONS_COLLECTION, request.id), donationDoc);

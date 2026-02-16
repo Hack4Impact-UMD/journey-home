@@ -2,9 +2,10 @@ import { InventoryPhoto, InventoryRecord, ItemSize } from "@/types/inventory";
 import { useEffect, useRef, useState } from "react";
 import { CloseIcon } from "../icons/CloseIcon";
 import { createPortal } from "react-dom";
-import { uploadImage, useCategories } from "@/lib/services/inventory";
+import { uploadImage } from "@/lib/services/inventory";
 import { InboxIcon, PlusIcon } from "lucide-react";
 import { toast } from "sonner";
+import { useCategories } from "@/lib/queries/categories";
 
 type SetItemModalProps = {
     item: InventoryRecord;
@@ -23,7 +24,7 @@ export function SetItemModal(props: SetItemModalProps) {
     const [quantity, setQuantity] = useState<string>("1");
     const [size, setSize] = useState<ItemSize>("Small");
 
-    const allCategories = useCategories();
+    const {allCategories} = useCategories();
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 

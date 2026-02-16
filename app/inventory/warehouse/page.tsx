@@ -2,17 +2,14 @@
 "use client";
 
 import type { InventoryRecord, ItemSize } from "@/types/inventory";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { GridIcon } from "@/components/icons/GridIcon";
 import { RowsIcon } from "@/components/icons/RowsIcon";
 import {
     deleteInventoryRecord,
     getAllWarehouseInventoryRecords,
-    getCategories,
     setInventoryRecord,
-    useCategories,
 } from "@/lib/services/inventory";
-import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
@@ -24,13 +21,12 @@ import { PlusIcon } from "lucide-react";
 import { Timestamp } from "firebase/firestore";
 import { WarehouseGallery } from "@/components/inventory/WarehouseGallery";
 import { ItemViewModal } from "@/components/inventory/ItemViewModal";
-import {StockSidebar } from "@/components/inventory/StockSidebar";
+import { useCategories } from "@/lib/queries/categories";
 
 export default function WarehousePage() {
     const [searchQuery, setSearchQuery] = useState<string>("");
-    const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
 
-    const allCategories = useCategories();
+    const { allCategories } = useCategories();
 
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [selectedSizes, setSelectedSizes] = useState<ItemSize[]>([
@@ -42,23 +38,12 @@ export default function WarehousePage() {
     const [sortBy, setSortBy] = useState<"Quantity" | "Date">("Date");
     const [sortAsc, setSortAsc] = useState<boolean>(false);
 
+    const [allItems, setAllItems] = useState<InventoryRecord[]>([]);
     const [isGridDisplay, setIsGridDisplay] = useState<boolean>(true);
 
     const [editedItem, setEditedItem] = useState<InventoryRecord | null>(null);
     const [newItem, setNewItem] = useState<InventoryRecord | null>(null);
     const [openedItem, setOpenedItem] = useState<InventoryRecord | null>(null);
-
-    //Gets list of inventory items
-    const { data: allItems = [], refetch: refetchItems } = useQuery({
-        queryKey: ["warehouseInventory"],
-        queryFn: getAllWarehouseInventoryRecords,
-    });
-
-    //Gets list of inventory categories
-    const { data: sidebarCategories = [], refetch: refetchCategories} = useQuery({
-        queryKey: ["categories"],
-        queryFn: getCategories,
-    });
 
     function editItem(updated: InventoryRecord) {
         const adding = newItem !== null;
@@ -67,12 +52,18 @@ export default function WarehousePage() {
                 if (success) {
                     setEditedItem(null);
                     setNewItem(null);
-                    refetchItems();
+                    setAllItems((prevItems) =>
+                        !adding
+                            ? prevItems.map((item) =>
+                                  item.id === updated.id ? updated : item
+                              )
+                            : [...prevItems, updated]
+                    );
                 } else {
                     throw new Error(
                         adding
                             ? "Error: Couldn't add item"
-                            : "Error: Couldn't update item",
+                            : "Error: Couldn't update item"
                     );
                 }
             }),
@@ -84,14 +75,14 @@ export default function WarehousePage() {
                 error: adding
                     ? "Error: Couldn't add item"
                     : "Error: Couldn't update item",
-            },
+            }
         );
     }
 
     function deleteItem(deleted: InventoryRecord) {
         if (
             !window.confirm(
-                "Are you sure you want to delete " + deleted.name + "?",
+                "Are you sure you want to delete " + deleted.name + "?"
             )
         )
             return;
@@ -99,68 +90,26 @@ export default function WarehousePage() {
         setOpenedItem((old) => (old && old.id == deleted.id ? null : old));
 
         toast.promise(
-            deleteInventoryRecord(deleted.id).then((success) => {
-                if (success){
-                    refetchItems();
-                }
-                else{
-                    throw new Error("Error:Couldn't delete item");
-                }
-            }),
+            deleteInventoryRecord(deleted.id).then(() =>
+                setAllItems((prevItems) =>
+                    prevItems.filter((item) => item.id !== deleted.id)
+                )
+            ),
             {
                 loading: "Deleting item...",
                 success: "Item deleted successfully!",
                 error: "Error: Couldn't delete item",
-            },
+            }
         );
     }
-    const categoriesInitialized = useRef(false);
 
     useEffect(() => {
-        if(sidebarCategories.length >0 && !categoriesInitialized.current){
-            setSelectedCategories(sidebarCategories);
-            categoriesInitialized.current = true;
-        }
-    }, [sidebarCategories]);
+        getAllWarehouseInventoryRecords().then(setAllItems);
+    }, []);
 
-    //Refetches data when sidebar is opened
-    const handleSidebarOpen = () => {
-        setIsSidebarOpen(true);
-        refetchItems();
-        refetchCategories();
-    }
-
-    //Gets count of each category stock
-    const categoryStocks = sidebarCategories.map((category) => {
-        const count = allItems
-            .filter((item) => item.category == category)
-            .reduce((sum, item) => sum + item.quantity, 0);
-
-        let color;
-        if (count <= 5) {
-            color = "#F02A18";
-        } else if (count <= 15) {
-            color = "#F09618";
-        } else {
-            color = "#DEF018";
-        }
-
-        const maxCount = Math.max(
-            ...sidebarCategories.map((cat) =>
-                allItems
-                    .filter((item) => item.category === cat)
-                    .reduce((sum, item) => sum + item.quantity, 0),
-            ),
-            1,
-        );
-
-        return {
-            category,
-            count,
-            maxCount,
-            color,
-        };
-    });
+    useEffect(() => {
+        setSelectedCategories(allCategories);
+    }, [allCategories]);
 
     const items = allItems
         .filter(
@@ -169,7 +118,7 @@ export default function WarehousePage() {
                 selectedSizes.includes(x.size) &&
                 `${x.name}${x.category}${x.notes}${x.size}${x.donorEmail}`
                     .toLowerCase()
-                    .includes(searchQuery.toLowerCase()),
+                    .includes(searchQuery.toLowerCase())
         )
         .toSorted((a, b) => {
             if (sortBy === "Date") {
@@ -187,13 +136,6 @@ export default function WarehousePage() {
 
     return (
         <>
-            {/*Sidebar item*/}
-            <StockSidebar
-                isOpen={isSidebarOpen}
-                onClose={() => setIsSidebarOpen(false)}
-                onOpen={handleSidebarOpen}
-                categoryStocks={categoryStocks}
-            />
             {editedItem !== null && (
                 <SetItemModal
                     item={editedItem}
@@ -230,7 +172,9 @@ export default function WarehousePage() {
                             value={searchQuery}
                             onChange={setSearchQuery}
                             onSubmit={() =>
-                                refetchItems()
+                                getAllWarehouseInventoryRecords().then(
+                                    setAllItems
+                                )
                             }
                         />
                         <DropdownMultiselect
@@ -251,8 +195,8 @@ export default function WarehousePage() {
                                 sortBy != "Date"
                                     ? "none"
                                     : sortAsc
-                                      ? "asc"
-                                      : "desc"
+                                    ? "asc"
+                                    : "desc"
                             }
                             onChange={(status) => {
                                 setSortBy("Date");
@@ -265,8 +209,8 @@ export default function WarehousePage() {
                                 sortBy != "Quantity"
                                     ? "none"
                                     : sortAsc
-                                      ? "asc"
-                                      : "desc"
+                                    ? "asc"
+                                    : "desc"
                             }
                             onChange={(status) => {
                                 setSortBy("Quantity");
@@ -297,7 +241,7 @@ export default function WarehousePage() {
                         <button
                             className={cn(
                                 "fill-light-border",
-                                isGridDisplay && "fill-[#505050]",
+                                isGridDisplay && "fill-[#505050]"
                             )}
                             onClick={() => setIsGridDisplay(true)}
                         >
@@ -306,7 +250,7 @@ export default function WarehousePage() {
                         <button
                             className={cn(
                                 "fill-light-border",
-                                !isGridDisplay && "fill-[#505050]",
+                                !isGridDisplay && "fill-[#505050]"
                             )}
                             onClick={() => setIsGridDisplay(false)}
                         >

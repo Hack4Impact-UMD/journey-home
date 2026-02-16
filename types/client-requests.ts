@@ -8,7 +8,8 @@ export type ClientRequest = {
     caseManagerID: string,
     notes: string,
     status: ReviewStatus
-    items: ItemRequest[]
+    items: ItemRequest[],
+    associatedTimeBlockID: string | null
 };
 
 export type Client = LocationContact & {
