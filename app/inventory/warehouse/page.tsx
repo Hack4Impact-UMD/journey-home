@@ -1,10 +1,7 @@
 // app/inventory/warehouse/page.tsx
 "use client";
 
-import type {
-    InventoryRecord,
-    ItemSize
-} from "@/types/inventory";
+import type { InventoryRecord, ItemSize } from "@/types/inventory";
 import { useEffect, useState } from "react";
 import { GridIcon } from "@/components/icons/GridIcon";
 import { RowsIcon } from "@/components/icons/RowsIcon";
@@ -29,7 +26,7 @@ import { useCategories } from "@/lib/queries/categories";
 export default function WarehousePage() {
     const [searchQuery, setSearchQuery] = useState<string>("");
 
-    const { allCategories, isLoading: categoriesLoading } = useCategories();
+    const { allCategories } = useCategories();
 
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [selectedSizes, setSelectedSizes] = useState<ItemSize[]>([
@@ -44,12 +41,8 @@ export default function WarehousePage() {
     const [allItems, setAllItems] = useState<InventoryRecord[]>([]);
     const [isGridDisplay, setIsGridDisplay] = useState<boolean>(true);
 
-    const [editedItem, setEditedItem] = useState<InventoryRecord | null>(
-        null
-    );
-    const [newItem, setNewItem] = useState<InventoryRecord | null>(
-        null
-    );
+    const [editedItem, setEditedItem] = useState<InventoryRecord | null>(null);
+    const [newItem, setNewItem] = useState<InventoryRecord | null>(null);
     const [openedItem, setOpenedItem] = useState<InventoryRecord | null>(null);
 
     function editItem(updated: InventoryRecord) {
@@ -59,34 +52,46 @@ export default function WarehousePage() {
                 if (success) {
                     setEditedItem(null);
                     setNewItem(null);
-                    setAllItems((prevItems) => 
-                        (!adding) ? 
-                        prevItems.map((item) =>
-                            item.id === updated.id ? updated : item
-                        ) :
-                        [...prevItems, updated]
+                    setAllItems((prevItems) =>
+                        !adding
+                            ? prevItems.map((item) =>
+                                  item.id === updated.id ? updated : item
+                              )
+                            : [...prevItems, updated]
                     );
                 } else {
-                    throw new Error(adding ? "Error: Couldn't add item" : "Error: Couldn't update item");
+                    throw new Error(
+                        adding
+                            ? "Error: Couldn't add item"
+                            : "Error: Couldn't update item"
+                    );
                 }
             }),
             {
                 loading: adding ? "Adding item..." : "Updating item...",
-                success: adding ?"Item added successfully!" : "Item updated successfully!",
-                error: adding ? "Error: Couldn't add item" : "Error: Couldn't update item",
+                success: adding
+                    ? "Item added successfully!"
+                    : "Item updated successfully!",
+                error: adding
+                    ? "Error: Couldn't add item"
+                    : "Error: Couldn't update item",
             }
         );
     }
 
     function deleteItem(deleted: InventoryRecord) {
-        if(!window.confirm("Are you sure you want to delete "+deleted.name+"?"))
+        if (
+            !window.confirm(
+                "Are you sure you want to delete " + deleted.name + "?"
+            )
+        )
             return;
-        
-        setOpenedItem(old => old && old.id == deleted.id ? null : old);
+
+        setOpenedItem((old) => (old && old.id == deleted.id ? null : old));
 
         toast.promise(
-            deleteInventoryRecord(deleted.id).then(() => 
-                setAllItems(prevItems =>
+            deleteInventoryRecord(deleted.id).then(() =>
+                setAllItems((prevItems) =>
                     prevItems.filter((item) => item.id !== deleted.id)
                 )
             ),
@@ -104,25 +109,33 @@ export default function WarehousePage() {
 
     useEffect(() => {
         setSelectedCategories(allCategories);
-    }, [categoriesLoading])
+    }, [allCategories]);
 
-    const items = allItems.
-        filter(x => selectedCategories.includes(x.category) 
-            && selectedSizes.includes(x.size)
-            && `${x.name}${x.category}${x.notes}${x.size}${x.donorEmail}`.toLowerCase().includes(searchQuery.toLowerCase())
+    const items = allItems
+        .filter(
+            (x) =>
+                selectedCategories.includes(x.category) &&
+                selectedSizes.includes(x.size) &&
+                `${x.name}${x.category}${x.notes}${x.size}${x.donorEmail}`
+                    .toLowerCase()
+                    .includes(searchQuery.toLowerCase())
         )
         .toSorted((a, b) => {
             if (sortBy === "Date") {
                 return sortAsc
-                    ? a.dateAdded.toDate().getTime() - b.dateAdded.toDate().getTime()
-                    : b.dateAdded.toDate().getTime() - a.dateAdded.toDate().getTime();
+                    ? a.dateAdded.toDate().getTime() -
+                          b.dateAdded.toDate().getTime()
+                    : b.dateAdded.toDate().getTime() -
+                          a.dateAdded.toDate().getTime();
             } else {
-                return sortAsc ? a.quantity - b.quantity : b.quantity - a.quantity;
+                return sortAsc
+                    ? a.quantity - b.quantity
+                    : b.quantity - a.quantity;
             }
         });
 
     return (
-        <>  
+        <>
             {editedItem !== null && (
                 <SetItemModal
                     item={editedItem}
@@ -204,7 +217,7 @@ export default function WarehousePage() {
                                 setSortAsc(status == "asc");
                             }}
                         />
-                        <button 
+                        <button
                             className="bg-primary text-white font-family-roboto rounded-xs flex gap-2.5 items-center justify-center text-sm px-3"
                             onClick={() => {
                                 setNewItem({
@@ -217,11 +230,11 @@ export default function WarehousePage() {
                                     size: "Small",
                                     dateAdded: Timestamp.now(),
                                     donorEmail: null,
-                                } as InventoryRecord)
+                                } as InventoryRecord);
                             }}
                         >
                             <span>New Item</span>
-                            <PlusIcon className="h-4 w-4"/>
+                            <PlusIcon className="h-4 w-4" />
                         </button>
                     </div>
                     <div className="ml-auto flex gap-2">
@@ -246,19 +259,19 @@ export default function WarehousePage() {
                     </div>
                 </div>
             </div>
-            {isGridDisplay ? 
+            {isGridDisplay ? (
                 <WarehouseGallery
                     inventoryRecords={items}
                     openItem={setOpenedItem}
                 />
-                :
+            ) : (
                 <WarehouseTable
                     inventoryRecords={items}
                     openItem={setOpenedItem}
                     editItem={setEditedItem}
                     deleteItem={deleteItem}
                 />
-                }
+            )}
         </>
     );
 }

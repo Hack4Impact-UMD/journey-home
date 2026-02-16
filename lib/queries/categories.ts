@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getCategoryAttributes, setCategoryAttributes } from "../services/inventory";
 import { CategoryAttributes } from "@/types/inventory";
 import { toast } from "sonner";
+import { useMemo } from "react";
 
 export function useCategories() {
 
@@ -49,7 +50,7 @@ export function useCategories() {
 
     return {
         allAttrs: query.data ?? [fallback,],
-        allCategories: query.data?.map(attr => attr.name) ?? [fallback.name,],
+        allCategories: useMemo(() => query.data?.map(attr => attr.name) ?? [fallback.name,], [query.data, fallback.name]),
 
         setCategories: setMutation.mutateAsync,
         setCategoriesWithToast,
