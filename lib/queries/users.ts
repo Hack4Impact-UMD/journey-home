@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchAllUsers, updateUser } from "../services/users";
+import { fetchAllUsers, getUserByUID, updateUser } from "../services/users";
 import { UserData } from "@/types/user";
 import { toast } from "sonner";
 
@@ -64,6 +64,59 @@ function useAllAccounts(onlyActive: boolean) {
 
         editAccount: updateAccount,
 
+        isLoading: query.isLoading,
+        isError: query.isError,
+        error: query.error,
+        refetch: query.refetch,
+    };
+}
+
+export function useAccount(uid: string) {
+    const queryClient = useQueryClient();
+
+    const query = useQuery({
+        queryKey: ["user", uid],
+        queryFn: async () => {
+            return await getUserByUID(uid);
+        },
+        enabled: !!uid,
+    }) 
+
+    const updateMutation = useMutation({
+        mutationFn: async (newUserData: UserData) => {
+            await updateUser(newUserData);
+        },
+        onMutate: async (newUserData: UserData) => {
+            await queryClient.cancelQueries({ queryKey: ["user", uid] });
+            const prevData = queryClient.getQueryData<UserData>(["user", uid]);
+
+            queryClient.setQueryData(["user", uid], newUserData);
+
+            return { prevData };
+        },
+        onError: (error, newUserData, context) => {
+            if (context?.prevData) {
+                queryClient.setQueryData(["user", uid], context.prevData);
+            }
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["user", uid] });
+            queryClient.invalidateQueries({ queryKey: ["users"] });
+        }
+    });
+    const editAccount = async (newUserData: UserData) => {
+        const promise = updateMutation.mutateAsync(newUserData);
+        toast.promise(promise, {
+            loading: "Updating account...",
+            success: "Account updated successfully!",
+            error: "Error: Couldn't update account",
+        });
+        await promise;
+    };
+
+    return {
+        account: query.data ?? null,
+        editAccount,
         isLoading: query.isLoading,
         isError: query.isError,
         error: query.error,
