@@ -19,7 +19,7 @@ export function useCategories() {
             await queryClient.cancelQueries({queryKey: ["categories"]});
             const prevData = queryClient.getQueryData<CategoryAttributes[]>(["categories"]);
 
-            queryClient.setQueryData(["users"], attrs);
+            queryClient.setQueryData(["categories"], attrs);
             return { prevData }
         },
         onError: (error, attrs, context) => {
