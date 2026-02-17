@@ -50,13 +50,17 @@ function useAllAccounts(onlyActive: boolean) {
     });
 
     const updateAccount = async (newUserData: UserData) => {
-        const promise = updateMutation.mutateAsync(newUserData);
-        toast.promise(promise, {
-            loading: "Updating user...",
-            success: "User updated successfully!",
-            error: "Error: Couldn't update user",
-        });
-        await promise;
+        try {
+            const promise = updateMutation.mutateAsync(newUserData);
+            toast.promise(promise, {
+                loading: "Updating user...",
+                success: "User updated successfully!",
+                error: "Error: Couldn't update user",
+            });
+            await promise;
+        } catch (error) {
+            // Error already handled by toast.promise
+        }
     };
 
     return {
@@ -85,7 +89,7 @@ export function useAccount(uid: string) {
             return await getUserByUID(uid);
         },
         enabled: !!uid,
-    }) 
+    }); 
 
     const updateMutation = useMutation({
         mutationFn: async (newUserData: UserData) => {
@@ -110,13 +114,17 @@ export function useAccount(uid: string) {
         }
     });
     const editAccount = async (newUserData: UserData) => {
-        const promise = updateMutation.mutateAsync(newUserData);
-        toast.promise(promise, {
-            loading: "Updating account...",
-            success: "Account updated successfully!",
-            error: "Error: Couldn't update account",
-        });
-        await promise;
+        try {
+            const promise = updateMutation.mutateAsync(newUserData);
+            toast.promise(promise, {
+                loading: "Updating account...",
+                success: "Account updated successfully!",
+                error: "Error: Couldn't update account",
+            });
+            await promise;
+        } catch (error) {
+            // Error already handled by toast.promise
+        }
     };
 
     return {

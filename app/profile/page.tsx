@@ -37,18 +37,20 @@ export default function ProfilePage() {
         if (account) {
             setFirstName(account.firstName || "");
             setLastName(account.lastName || "");
-            setDob(
-                account.dob
-                    ? new Date(account.dob.seconds * 1000)
-                          .toISOString()
-                          .split("T")[0]
-                    : "",
-            );
+            if (account.dob) {
+                const date = new Date(account.dob.seconds * 1000);
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, "0");
+                const day = String(date.getDate()).padStart(2, "0");
+                setDob(`${year}-${month}-${day}`);
+            } else {
+                setDob("");
+            }
             setPhoneNumber(account.phoneNumber || "");
         }
     }, [account]);
 
-    if (isLoading || !account) {
+    if (isLoading) {
         return (
             <ProtectedRoute allow={["Admin", "Case Manager", "Volunteer"]}>
                 <div className="h-full w-full flex flex-col font-family-roboto">
@@ -67,16 +69,70 @@ export default function ProfilePage() {
         );
     }
 
+    if (!account) {
+        return (
+            <ProtectedRoute allow={["Admin", "Case Manager", "Volunteer"]}>
+                <div className="h-full w-full flex flex-col font-family-roboto">
+                    <TopNavbar />
+                    <div className="flex flex-1">
+                        <SideNavbar />
+                        <div className="flex-1 bg-[#F7F7F7] py-4 px-6 flex flex-col">
+                            <h1 className="text-2xl text-primary font-extrabold">
+                                Profile
+                            </h1>
+                            <p className="text-red-600">User not found</p>
+                        </div>
+                    </div>
+                </div>
+            </ProtectedRoute>
+        );
+    }
+
     const handleSave = async () => {
-        // Convert date string to Firestore Timestamp
-        const dobTimestamp = dob ? Timestamp.fromDate(new Date(dob)) : null;
-        await editAccount({
-            ...account,
-            firstName,
-            lastName,
-            dob: dobTimestamp,
-            phoneNumber,
-        });
+        // Validation
+        if (!firstName.trim()) {
+            toast.error("First name is required");
+            return;
+        }
+        if (!lastName.trim()) {
+            toast.error("Last name is required");
+            return;
+        }
+        if (phoneNumber && !/^\+?[\d\s\-()]+$/.test(phoneNumber)) {
+            toast.error("Invalid phone number format");
+            return;
+        }
+
+        try {
+            // Convert date string to Firestore Timestamp
+            const dobTimestamp = dob ? Timestamp.fromDate(new Date(dob)) : null;
+            await editAccount({
+                ...account,
+                firstName: firstName.trim(),
+                lastName: lastName.trim(),
+                dob: dobTimestamp,
+                phoneNumber: phoneNumber.trim(),
+            });
+        } catch (error) {
+            // Error already handled by toast.promise in editAccount
+        }
+    };
+
+    const handleCancel = () => {
+        if (account) {
+            setFirstName(account.firstName || "");
+            setLastName(account.lastName || "");
+            if (account.dob) {
+                const date = new Date(account.dob.seconds * 1000);
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, "0");
+                const day = String(date.getDate()).padStart(2, "0");
+                setDob(`${year}-${month}-${day}`);
+            } else {
+                setDob("");
+            }
+            setPhoneNumber(account.phoneNumber || "");
+        }
     };
 
     const handlePasswordReset = async () => {
@@ -105,19 +161,27 @@ export default function ProfilePage() {
             await updatePassword(state.currentUser, newPassword);
 
             toast.success("Password updated successfully!");
-            setShowPasswordReset(false);
-            setCurrentPassword("");
-            setNewPassword("");
-            setConfirmPassword("");
-        } catch (error: any) {
-            if (error.code === "auth/wrong-password") {
+            resetPasswordForm();
+        } catch (error: unknown) {
+            const firebaseError = error as { code?: string };
+            if (
+                firebaseError.code === "auth/wrong-password" ||
+                firebaseError.code === "auth/invalid-credential"
+            ) {
                 toast.error("Current password is incorrect");
-            } else if (error.code === "auth/weak-password") {
+            } else if (firebaseError.code === "auth/weak-password") {
                 toast.error("New password is too weak");
             } else {
                 toast.error("Error updating password");
             }
         }
+    };
+
+    const resetPasswordForm = () => {
+        setShowPasswordReset(false);
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
     };
 
     return (
@@ -240,7 +304,10 @@ export default function ProfilePage() {
                                             <Button onClick={handleSave}>
                                                 Save
                                             </Button>
-                                            <Button variant="secondary">
+                                            <Button
+                                                variant="secondary"
+                                                onClick={handleCancel}
+                                            >
                                                 Cancel
                                             </Button>
                                         </div>
@@ -293,9 +360,7 @@ export default function ProfilePage() {
                                             </Button>
                                             <Button
                                                 variant="secondary"
-                                                onClick={() =>
-                                                    setShowPasswordReset(false)
-                                                }
+                                                onClick={resetPasswordForm}
                                             >
                                                 Cancel
                                             </Button>
