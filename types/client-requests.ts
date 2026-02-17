@@ -13,14 +13,13 @@ export type ClientRequest = {
 
 export type Client = LocationContact & {
     hmis: string,
-    secondaryContact: ClientSecondaryContact, //made optional
+    secondaryContact: ClientSecondaryContact,
     questions: ClientQuestions
 }
 
 export type ClientSecondaryContact = {
-    // name: string,
-    // relationship: string,
-    nameAndRelationship: string, //combined because one text input
+    name: string,
+    relationship: string,
     phone: string
 }
 

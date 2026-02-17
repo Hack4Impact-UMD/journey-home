@@ -22,18 +22,18 @@ export type Tables = {
 };
 
 export type Kitchen = {
-  sofa: number;
-  armchair: number;
-  kitchenchair: number;
-  kitchentable: number;
-  coffeetable: number;
-  endtable: number;
+  coffeeMaker: number;
+  toaster: number;
+  microwave: number;
+  potset: number;
+  kitchenset: number;
 };
 
 export type Other = {
   dresser: number;
   fan: number;
   heater: number;
+  arearug: number;
   towelset: number;
   lamp: number;
   //add custom optional
@@ -59,7 +59,8 @@ const defaultState: CaseFormState = {
   clientInfoAndNewHome: {
     hmis: "",
     secondaryContact: {
-        nameAndRelationship: "",
+        name: "",
+        relationship: "",
         phone: ""
     },
     questions: {
@@ -82,7 +83,7 @@ const defaultState: CaseFormState = {
       streetAddress: "",
       apt: "",
       city: "",
-      state: "",
+      state: "CT",
       zipCode: ""
     }
   },
@@ -103,17 +104,17 @@ const defaultState: CaseFormState = {
     endtable: 0
   },
   kitchen: {
-    sofa: 0,
-    armchair: 0,
-    kitchenchair: 0,
-    kitchentable: 0,
-    coffeetable: 0,
-    endtable: 0
+    coffeeMaker: 0,
+    toaster: 0,
+    microwave: 0,
+    potset: 0,
+    kitchenset: 0,
   },
   other: {
     dresser: 0,
     fan: 0,
     heater: 0,
+    arearug: 0,
     towelset: 0,
     lamp: 0
   }

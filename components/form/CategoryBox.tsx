@@ -1,58 +1,49 @@
-"use client";
-
-import { useState } from "react";
-
-interface Item {
+interface Item<T> {
   label: string;
   description?: string;
-  quantity: number;
+  field: keyof T;  // key in the object we want to update
+  value: number;
 }
 
-interface BoxProps {
+interface CategoryBoxProps<T> {
   categoryName: string;
-  items: Item[];
-  onChange: (items: Item[]) => void;
+  items: Item<T>[];
+  onChange: (update: Partial<T>) => void;
 }
 
-export default function CategoryBox({ categoryName, items, onChange }: BoxProps) {
-  const [itemList, setItemList] = useState<Item[]>(items);
-
+export default function CategoryBox<T>({ categoryName, items, onChange }: CategoryBoxProps<T>) {
   const handleQuantityChange = (index: number, value: string) => {
     const numericValue = value === "" ? 0 : Math.max(0, Number(value));
-    const updated = [...itemList];
-    updated[index] = { ...updated[index], quantity: numericValue };
-    setItemList(updated);
-    if (onChange) onChange(updated);
+    const field = items[index].field;
+    onChange({ [field]: numericValue } as Partial<T>);
   };
 
   return (
-    <div className="border border-[#D9D9D9] rounded-md overflow-hidden w-full max-w-md">
+    <div className="border border-[#D9D9D9] rounded-md w-full max-w-2xl mx-auto">
       <div className="bg-[#D9D9D9] px-4 py-2 font-semibold">{categoryName}</div>
 
-      <div className="grid grid-cols-2 px-4 py-2 border-b border-[#D9D9D9] font-bold bg-white">
+      <div className="grid grid-cols-2 px-4 py-2 font-bold bg-white">
         <div>Item Type</div>
         <div className="text-right">Quantity</div>
       </div>
 
       <div className="bg-white">
-        {itemList.map((item, index) => (
+        {items.map((item, index) => (
           <div
-            key={item.label}
-            className="grid grid-cols-2 px-4 py-2 border-b border-[#D9D9D9] last:border-b-0"
+            key={String(item.field)}
+            className="grid grid-cols-2 px-4 py-2"
           >
             <div>
               <div>{item.label}</div>
-              {item.description && (
-                <div className="text-[#BBBDBE] text-sm">{item.description}</div>
-              )}
+              {item.description && <div className="text-[#BBBDBE] text-sm">{item.description}</div>}
             </div>
             <div className="text-right">
               <input
                 type="number"
                 min={0}
-                value={item.quantity}
+                value={item.value}
                 onChange={(e) => handleQuantityChange(index, e.target.value)}
-                className="w-16 border border-[#D9D9D9] rounded px-2 py-1 text-right"
+                className="w-70 border border-[#D9D9D9] rounded px-2 py-1 text-right"
               />
             </div>
           </div>

@@ -57,7 +57,6 @@ export default function Step1ClientInfo() {
         if (!client.address?.city) newErrors.city = "City is required";
         if (!client.address?.zipCode)
             newErrors.zipCode = "Zip code is required";
-        if (!client.address?.state) newErrors.state = "State is required";
         if (client.questions.hasElevator === undefined)
             newErrors.hasElevator = "Please select elevator option";
 
@@ -239,15 +238,27 @@ export default function Step1ClientInfo() {
                             />
 
                             <FormInput
-                                label="Name and Relationship to Secondary Contact"
+                                label="Secondary Contact Name"
                                 value={
                                     formState.clientInfoAndNewHome
-                                        .secondaryContact
-                                        ?.nameAndRelationship ?? ""
+                                        .secondaryContact?.name ?? ""
                                 }
                                 onChange={(e) =>
                                     updateSecondaryContact({
-                                        nameAndRelationship: e.target.value,
+                                        name: e.target.value,
+                                    })
+                                }
+                            />
+
+                            <FormInput
+                                label="Secondary Contact Relationship to Client"
+                                value={
+                                    formState.clientInfoAndNewHome
+                                        .secondaryContact?.relationship ?? ""
+                                }
+                                onChange={(e) =>
+                                    updateSecondaryContact({
+                                        relationship: e.target.value,
                                     })
                                 }
                             />
