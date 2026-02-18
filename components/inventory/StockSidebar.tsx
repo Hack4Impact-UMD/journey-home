@@ -23,6 +23,10 @@ export function StockSidebar({
     onOpen,
     categoryStocks,
 }: SidebarProps) {
+    const sortedStocks = [...categoryStocks].sort((a, b) =>
+        a.category.localeCompare(b.category),
+    );
+
     return (
         <>
             {/* Background of screen (when sidebar is open or closed) */}
@@ -34,8 +38,8 @@ export function StockSidebar({
                 onClick={onClose}
             />
 
-            {/* Floating toggle button */}
-            {!isOpen && (
+            {/*Toggle button */}
+            {/* {!isOpen && (
                 <button
                     onClick={onOpen}
                     className="fixed top-1/2 right-0 -translate-y-1/2 bg-primary text-white px-2 py-3 rounded-l-lg shadow-lg z-50 hover:bg-primary/90 transition-colors"
@@ -45,15 +49,25 @@ export function StockSidebar({
                         <Package className="w-5 h-5" />
                     </div>
                 </button>
-            )}
+            )} */}
 
             {/* Sidebar Contents */}
             <div
                 className={cn(
-                    "fixed top-0 right-0 h-full bg-white shadow-xl z-50 transition-transform duration-300 ease-in-out flex flex-col w-[15rem]",
+                    "fixed top-6 right-0 h-full bg-white shadow-2xl z-50 transition-transform duration-500 ease-in-out flex flex-col w-[18rem]",
                     isOpen ? "translate-x-0" : "translate-x-full",
                 )}
             >
+                {/* Toggle Sidebar */}
+                {!isOpen && (
+                    <button
+                        onClick={onOpen}
+                        className="absolute inset-y-0 -left-10 w-10 bg-white border-l border-gray-200 shadow-[-5px_0_15px_rgba(0,0,0,0.05)] flex flex-col items-center py-6 gap-4 "
+                    >
+                        <Package className={cn("w-6")} />
+                    </button>
+                )}
+
                 {/* Header */}
                 <div className="flex items-center justify-between px-4 py-2 border-b">
                     <div className="flex items-center gap-2">
@@ -72,9 +86,12 @@ export function StockSidebar({
                 {/* Content of Sidebar */}
                 <div className="flex-1 overflow-y-auto px-4 py-3">
                     <div className="space-y-3">
-                        {categoryStocks.map((stock) => {
-                            const percentage = stock.maxCount >0 ?
-                                (stock.count / stock.maxCount) * 100 : 0;
+                        {sortedStocks.map((stock) => {
+                            const percentage =
+                                stock.maxCount > 0
+                                    ? (stock.count / stock.maxCount) * 100
+                                    : 0;
+
                             return (
                                 <div key={stock.category} className="space-y-1">
                                     {/* Text identifier */}
@@ -87,7 +104,7 @@ export function StockSidebar({
                                         <div
                                             className="h-full rounded-full transition-all duration-300"
                                             style={{
-                                                width: `${percentage}%`,
+                                                width: `${Math.min(percentage, 100)}%`,
                                                 backgroundColor: stock.color,
                                             }}
                                         ></div>
