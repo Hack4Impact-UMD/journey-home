@@ -1,3 +1,4 @@
+"use client";
 import { ProtectedRoute } from "@/components/general/ProtectedRoute";
 import StepIndicator from "../../../components/form/StepIndicator";
 import Image from "next/image";
@@ -8,6 +9,7 @@ import { Timestamp } from "firebase/firestore";
 import { ClientRequest, ItemRequest } from "@/types/client-requests";
 import { createClientRequest } from "@/lib/services/clientRequests";
 import { getAuth } from "firebase/auth";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function Step3Review() {
     const auth = getAuth();
@@ -86,10 +88,15 @@ export default function Step3Review() {
                 { name: "Lamp", quantity: formState.other.lamp },
             ].filter((item) => item.quantity > 0);
 
+            const uid = auth.currentUser?.uid;
+            if (!uid) {
+                alert("You must be logged in to submit a request.");
+                return;
+            }
             const request: ClientRequest = {
                 id: crypto.randomUUID(),
                 client,
-                caseManagerID: auth.currentUser?.uid ?? "TEMP_USER_ID",
+                caseManagerID: uid,
                 notes: client.questions.notes ?? "",
                 status: "Not Reviewed",
                 items,
@@ -203,7 +210,7 @@ export default function Step3Review() {
 
                     <div>
                         <h3 className="text-xl font-semibold mb-4">
-                            Client&aposs New Home
+                            Client&apos;s New Home
                         </h3>
 
                         <div className="grid grid-cols-2 gap-y-4">
@@ -401,7 +408,7 @@ export default function Step3Review() {
                         variant="primary"
                         className="min-w-80"
                     >
-                        Submit {submitLoading}
+                        Submit {submitLoading && <Spinner className="text-white inline"/>}
                     </Button>
                 </div>
             </div>

@@ -485,7 +485,10 @@ export default function Step1ClientInfo() {
 
                             <FormInput
                                 label="Move-in Date"
-                                required
+                                required={
+                                    formState.clientInfoAndNewHome.questions
+                                        .hasMovedIn === true
+                                }
                                 type="date"
                                 value={
                                     formState.clientInfoAndNewHome.questions
@@ -502,9 +505,20 @@ export default function Step1ClientInfo() {
                                         : ""
                                 }
                                 onChange={(e) => {
-                                    const newDate = new Date(e.target.value);
+                                    const parts = e.target.value
+                                        .split("-")
+                                        .map(Number);
+                                    const isValid =
+                                        parts.length === 3 &&
+                                        parts.every((n) => !isNaN(n));
 
-                                    if (!isNaN(newDate.getTime())) {
+                                    if (isValid) {
+                                        const newDate = new Date(
+                                            parts[0],
+                                            parts[1] - 1,
+                                            parts[2],
+                                        );
+
                                         updateClientQuestions({
                                             moveInDate:
                                                 Timestamp.fromDate(newDate),
