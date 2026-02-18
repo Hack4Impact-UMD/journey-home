@@ -30,6 +30,8 @@ export default function Step1ClientInfo() {
         if (!client.hmis) newErrors.hmis = "HMIS number is required";
         if (!client.phoneNumber)
             newErrors.phoneNumber = "Client Phone number is required";
+        else if (!/^\d{3}-\d{3}-\d{4}$/.test(client.phoneNumber))
+            newErrors.phoneNumber = "Enter a valid 10-digit phone number (e.g. 555-867-5309)";
 
         if (
             client.questions.adultsInFamily === undefined ||

@@ -407,6 +407,7 @@ export default function Step3Review() {
                         }}
                         variant="primary"
                         className="min-w-80"
+                        disabled={submitLoading}
                     >
                         Submit {submitLoading && <Spinner className="text-white inline"/>}
                     </Button>
