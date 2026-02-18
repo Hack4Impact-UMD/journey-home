@@ -2,17 +2,18 @@
 
 import ScheduleButton from "@/components/pickups-deliveries/ScheduleButton";
 import { useState } from "react";
-import { DonationRequest } from "@/types/donations";
 import ScheduleModal from "./ScheduleModal";
+import { DonationRequest } from "@/types/donations";
 import { ClientRequest } from "@/types/client-requests";
 import { PhoneIcon } from "../icons/PhoneIcon";
 import { EmailIcon } from "../icons/EmailIcon";
+import { Task } from "@/types/schedule";
 
 type RequestProps = {
-    donation: DonationRequest | ClientRequest;
+    donation: Task;
 }
 
-export function getTotalItems(donation: DonationRequest | ClientRequest) {
+export function getTotalItems(donation: Task) {
   if ("donor" in donation) {
     return donation.items.filter(item => item.status === "Approved").length;
   } else {
@@ -20,7 +21,7 @@ export function getTotalItems(donation: DonationRequest | ClientRequest) {
   }
 }
 
-export function countItemsInRequest(donation: DonationRequest | ClientRequest) {
+export function countItemsInRequest(donation: Task) {
     const counts: Record<string, number> = {};
 
     if ("donor" in donation) {
@@ -109,7 +110,10 @@ export default function Request({ donation }: RequestProps) {
             </div>
        
             {/*need to adjust for the new changes in the modal*/}
-            {isOpen && <ScheduleModal onClose={() => setOpen(false) /*also need to collect timeslot if needed*/}/>}
+            {isOpen && <ScheduleModal 
+                scheduleRequest= {donation}
+                onClose={() => setOpen(false)} 
+            />}
         </div>
     )
 }

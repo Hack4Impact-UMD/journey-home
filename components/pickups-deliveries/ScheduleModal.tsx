@@ -2,6 +2,8 @@ import { useState } from "react";
 import { TimeBlock, Task, Delivery, Pickup } from "@/types/schedule";
 import { useTBs } from "@/lib/queries/timeblocks";
 import { Timestamp } from "firebase/firestore";
+import { setDonationRequest } from "@/lib/services/donations";
+import { setClientRequest } from "@/lib/services/client-request";
 
 // will need the props on the item being scheduled? to send into the firestore once i hit set shift 
 // would probably have the item identifier, onClose() function 
@@ -10,9 +12,9 @@ import { Timestamp } from "firebase/firestore";
 type scheduleModalProps = {
     scheduleRequest: Task; //donationRequest OR clientRequest
     onClose: () => void;
-    finalTB: (timeB: TimeBlock) => void;
 };
 
+//to do the date stuff my head hurts
 type DateInfo = {
   weekday: string;
   month: string;
@@ -85,11 +87,9 @@ export function sortTasks(tb: TimeBlock): Task[] {
     });
 }
 
-
 export default function ScheduleModal({ 
     scheduleRequest,
     onClose,
-    finalTB,
  } : scheduleModalProps) { 
 
     //need to get all the timeBlocks
@@ -99,13 +99,31 @@ export default function ScheduleModal({
     //doing this for now, should 100 percent find a better way to do this in the future
     const sortedTBs = [...timeBlocks].sort((a, b) => a.startTime.toMillis() - b.startTime.toMillis());
 
-    //keeping track of the selected timeBlock
-    const [selectedTB, setSelected] = useState<TimeBlock | null>(null);
-    const handleSelect = (tb: TimeBlock) => {
-        setSelected(tb); 
+    const addShift = async (tb: TimeBlock) => {
+        //add to the task list !
+        const updatedTB = {
+            ...tb,
+            tasks: [...tb.tasks, scheduleRequest],
+        };
+        await editTB(updatedTB);
+
+        //change the associated timeblock id
+        if ("donor" in scheduleRequest) {
+            const updatedReq: Pickup = {
+            ...scheduleRequest,
+            associatedTimeBlockID: tb.id,
+        }
+            setDonationRequest(updatedReq);
+        } else {
+            const updatedReq: Delivery = {
+            ...scheduleRequest,
+            associatedTimeBlockID: tb.id,
+        }
+            setClientRequest(updatedReq);
+        }
+
+        onClose();
     };
-
-
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center font-family-roboto">
@@ -121,12 +139,11 @@ export default function ScheduleModal({
 
                     {sortedTBs.map((tb) => {
                         const { weekday, day, month } = getDateInfo(tb.startTime);
-                        const isSelected = selectedTB?.id === tb.id;
                         const timeSlot = getTimeSlot(tb.startTime, tb.endTime);
                         const sortedTasks = sortTasks(tb);
 
                         return(
-                            <div key={tb.id} className="border-b pb-4 mb-4 flex-col items-center pt-4">
+                            <div key={tb.id} className="border-b pb-4 mb-4 flex-col items-center pt-1.75">
                                 <div className="flex gap-1 items-baseline">
                                     <h1 className= "text-[14px] text-[#565656] font-medium">
                                         {weekday}
@@ -137,23 +154,18 @@ export default function ScheduleModal({
                                 </div>
 
                                 <div className="flex justify-between mr-5 items-baseline">
-                                    <div onClick= {() => handleSelect(tb)}>
-                                    <h1 
-                                        className={`cursor-pointer text-[14px] px-2 py-1 rounded-lg
-                                        ${isSelected
-                                            ? "text-[#FFFFFF] bg-[#02AFC7]"
-                                            : "border-[#02AFC7] border text-[#565656] bg-[#F5FAFA]"
-                                        }`}>
+                                    <h1 className="cursor-pointer text-[14px] px-2 py-1 rounded-lg border-[#02AFC7] border text-[#565656] bg-[#F5FAFA]">
                                         {timeSlot}
                                     </h1>
-                                    </div>
-                                    
-                                    <button className="text-[#FFFFFF] text-[14px] rounded-lg bg-[#02AFC7] px-3 py-2">
+                                   
+                                    <button 
+                                    onClick= {() => addShift(tb)}
+                                    className="text-[#FFFFFF] text-[14px] rounded-lg bg-[#02AFC7] px-3 py-2">
                                         +  Add Shift
                                     </button>
                                 </div>
                                 
-                                <div className= "flex-col gap-2 pt-2">
+                                <div className= "flex-col pt-2">
                                     {/*need to map through each task*/}
 
                                     {sortedTasks.map((task) => {
