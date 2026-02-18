@@ -16,8 +16,8 @@ export default function Unscheduled() {
     ]);
     const [sortBy, setSortBy] = useState<"Quantity">();
     const [sortAsc, setSortAsc] = useState<boolean>(false);
-    const { pickups: approvedItems = [] } = usePickups(searchQuery);
-    const { deliveries: deliveryItems = [] } = useDeliveries(searchQuery);
+    const { pickups: approvedItems = [] } = usePickups(searchQuery, false);
+    const { deliveries: deliveryItems = [] } = useDeliveries(searchQuery, false);
     const allOptions = [
         "Pickups & Deliveries",
         "Pickups",
