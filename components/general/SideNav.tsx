@@ -77,7 +77,7 @@ export default function SideNavbar() {
                 />
                 <SideNavbarLink
                     name="Scheduled"
-                    path="/pickups-deliveres/scheduled"
+                    path="/pickups-deliveries/scheduled"
                     roles={["Admin"]}
                 />
                 <SideNavbarLink
