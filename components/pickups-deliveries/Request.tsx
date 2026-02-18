@@ -48,6 +48,7 @@ export default function Request({ donation }: RequestProps) {
                 <ScheduleButton onOpen={() => setOpen(true)}/>
             </div>
        
+            {/*need to adjust for the new changes in the modal*/}
             {isOpen && <ScheduleModal onClose={() => setOpen(false) /*also need to collect timeslot if needed*/}/>}
         </div>
     )
