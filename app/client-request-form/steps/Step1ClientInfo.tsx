@@ -29,7 +29,7 @@ export default function Step1ClientInfo() {
         if (!client.lastName) newErrors.lastName = "Last name is required";
         if (!client.hmis) newErrors.hmis = "HMIS number is required";
         if (!client.phoneNumber)
-            newErrors.phoneNumber = "Secondary Phone number is required";
+            newErrors.phoneNumber = "Client Phone number is required";
 
         if (
             client.questions.adultsInFamily === undefined ||
@@ -49,7 +49,10 @@ export default function Step1ClientInfo() {
             newErrors.wasChronic = "Please select chronic homelessness option";
         if (client.questions.hasMovedIn === undefined)
             newErrors.hasMovedIn = "Please select move-in status";
-        if (client.questions.moveInDate === undefined)
+        if (
+            client.questions.hasMovedIn &&
+            client.questions.moveInDate === undefined
+        )
             newErrors.moveInDate = "Please select move-in date";
 
         if (!client.address?.streetAddress)
@@ -99,6 +102,15 @@ export default function Step1ClientInfo() {
         { number: 2, label: "Requests" },
         { number: 3, label: "Review" },
     ];
+
+    const clearError = (field: keyof typeof errors) => {
+        if (errors[field]) {
+            setErrors((prev) => ({
+                ...prev,
+                [field]: "",
+            }));
+        }
+    };
     return (
         <ProtectedRoute allow={["Case Manager"]}>
             <div className="space-y-6">
@@ -172,9 +184,10 @@ export default function Step1ClientInfo() {
                                 value={
                                     formState.clientInfoAndNewHome.hmis ?? ""
                                 }
-                                onChange={(e) =>
-                                    updateClientInfo({ hmis: e.target.value })
-                                }
+                                onChange={(e) => {
+                                    updateClientInfo({ hmis: e.target.value });
+                                    clearError("hmis");
+                                }}
                             />
                             {errors.hmis && (
                                 <p className="text-red-500 text-sm">
@@ -201,9 +214,12 @@ export default function Step1ClientInfo() {
                                             "$1-$2-$3",
                                         )
                                         .slice(0, 12);
+
                                     updateClientInfo({
                                         phoneNumber: formatted,
                                     });
+
+                                    clearError("phoneNumber");
                                 }}
                             />
                             {errors.phoneNumber && (
@@ -296,11 +312,16 @@ export default function Step1ClientInfo() {
                                     formState.clientInfoAndNewHome.questions
                                         .adultsInFamily ?? ""
                                 }
-                                onChange={(e) =>
+                                onChange={(e) => {
                                     updateClientQuestions({
-                                        adultsInFamily: Number(e.target.value),
-                                    })
-                                }
+                                        adultsInFamily:
+                                            e.target.value === ""
+                                                ? undefined
+                                                : Number(e.target.value),
+                                    });
+
+                                    clearError("adultsInFamily");
+                                }}
                             />
                             {errors.adultsInFamily && (
                                 <p className="text-red-500 text-sm">
@@ -317,13 +338,15 @@ export default function Step1ClientInfo() {
                                     formState.clientInfoAndNewHome.questions
                                         .childrenInFamily ?? ""
                                 }
-                                onChange={(e) =>
+                                onChange={(e) => {
                                     updateClientQuestions({
-                                        childrenInFamily: Number(
-                                            e.target.value,
-                                        ),
-                                    })
-                                }
+                                        childrenInFamily:
+                                            e.target.value === ""
+                                                ? undefined
+                                                : Number(e.target.value),
+                                    });
+                                    clearError("childrenInFamily");
+                                }}
                             />
                             {errors.childrenInFamily && (
                                 <p className="text-red-500 text-sm">
@@ -343,7 +366,7 @@ export default function Step1ClientInfo() {
                                           ? "Yes"
                                           : "No"
                                 }
-                                onChange={(e) =>
+                                onChange={(e) => {
                                     updateClientQuestions({
                                         isVeteran:
                                             e.target.value === "Yes"
@@ -351,8 +374,10 @@ export default function Step1ClientInfo() {
                                                 : e.target.value === "No"
                                                   ? false
                                                   : undefined,
-                                    })
-                                }
+                                    });
+
+                                    clearError("isVeteran");
+                                }}
                                 options={["Yes", "No"]}
                             />
                             {errors.isVeteran && (
@@ -373,7 +398,7 @@ export default function Step1ClientInfo() {
                                           ? "Yes"
                                           : "No"
                                 }
-                                onChange={(e) =>
+                                onChange={(e) => {
                                     updateClientQuestions({
                                         canPickUp:
                                             e.target.value === "Yes"
@@ -381,8 +406,10 @@ export default function Step1ClientInfo() {
                                                 : e.target.value === "No"
                                                   ? false
                                                   : undefined,
-                                    })
-                                }
+                                    });
+
+                                    clearError("canPickUp");
+                                }}
                                 options={["Yes", "No"]}
                             />
                             {errors.canPickUp && (
@@ -404,7 +431,7 @@ export default function Step1ClientInfo() {
                                           ? "Yes"
                                           : "No"
                                 }
-                                onChange={(e) =>
+                                onChange={(e) => {
                                     updateClientQuestions({
                                         wasChronic:
                                             e.target.value === "Yes"
@@ -412,8 +439,10 @@ export default function Step1ClientInfo() {
                                                 : e.target.value === "No"
                                                   ? false
                                                   : undefined,
-                                    })
-                                }
+                                    });
+
+                                    clearError("wasChronic");
+                                }}
                                 options={["Yes", "No"]}
                             />
                             {errors.wasChronic && (
@@ -434,7 +463,7 @@ export default function Step1ClientInfo() {
                                           ? "Yes"
                                           : "No"
                                 }
-                                onChange={(e) =>
+                                onChange={(e) => {
                                     updateClientQuestions({
                                         hasMovedIn:
                                             e.target.value === "Yes"
@@ -442,8 +471,10 @@ export default function Step1ClientInfo() {
                                                 : e.target.value === "No"
                                                   ? false
                                                   : undefined,
-                                    })
-                                }
+                                    });
+
+                                    clearError("hasMovedIn");
+                                }}
                                 options={["Yes", "No"]}
                             />
                             {errors.hasMovedIn && (
@@ -472,6 +503,7 @@ export default function Step1ClientInfo() {
                                 }
                                 onChange={(e) => {
                                     const newDate = new Date(e.target.value);
+
                                     if (!isNaN(newDate.getTime())) {
                                         updateClientQuestions({
                                             moveInDate:
@@ -482,6 +514,8 @@ export default function Step1ClientInfo() {
                                             moveInDate: undefined,
                                         });
                                     }
+
+                                    clearError("moveInDate");
                                 }}
                             />
                             {errors.moveInDate && (
@@ -513,15 +547,17 @@ export default function Step1ClientInfo() {
                                     formState.clientInfoAndNewHome.address
                                         .streetAddress ?? ""
                                 }
-                                onChange={(e) =>
+                                onChange={(e) => {
                                     updateClientInfo({
                                         address: {
                                             ...formState.clientInfoAndNewHome
                                                 .address,
                                             streetAddress: e.target.value,
                                         },
-                                    })
-                                }
+                                    });
+
+                                    clearError("streetAddress");
+                                }}
                             />
                             {errors.streetAddress && (
                                 <p className="text-red-500 text-sm">
@@ -556,7 +592,7 @@ export default function Step1ClientInfo() {
                                                 .address.city ?? ""
                                         }
                                         options={cityOptions}
-                                        onChange={(e) =>
+                                        onChange={(e) => {
                                             updateClientInfo({
                                                 address: {
                                                     ...formState
@@ -564,8 +600,10 @@ export default function Step1ClientInfo() {
                                                         .address,
                                                     city: e.target.value,
                                                 },
-                                            })
-                                        }
+                                            });
+
+                                            clearError("city");
+                                        }}
                                     />
                                     {errors.city && (
                                         <p className="text-red-500 text-sm mt-1">
@@ -583,7 +621,7 @@ export default function Step1ClientInfo() {
                                             formState.clientInfoAndNewHome
                                                 .address.zipCode ?? ""
                                         }
-                                        onChange={(e) =>
+                                        onChange={(e) => {
                                             updateClientInfo({
                                                 address: {
                                                     ...formState
@@ -591,8 +629,10 @@ export default function Step1ClientInfo() {
                                                         .address,
                                                     zipCode: e.target.value,
                                                 },
-                                            })
-                                        }
+                                            });
+
+                                            clearError("zipCode");
+                                        }}
                                     />
                                     {errors.zipCode && (
                                         <p className="text-red-500 text-sm mt-1">
@@ -614,7 +654,7 @@ export default function Step1ClientInfo() {
                                           ? "Yes"
                                           : "No"
                                 }
-                                onChange={(e) =>
+                                onChange={(e) => {
                                     updateClientQuestions({
                                         hasElevator:
                                             e.target.value === "Yes"
@@ -622,8 +662,10 @@ export default function Step1ClientInfo() {
                                                 : e.target.value === "No"
                                                   ? false
                                                   : undefined,
-                                    })
-                                }
+                                    });
+
+                                    clearError("hasElevator");
+                                }}
                                 options={["Yes", "No"]}
                             />
                             {errors.hasElevator && (

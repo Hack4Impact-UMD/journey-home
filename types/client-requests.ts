@@ -24,16 +24,16 @@ export type ClientSecondaryContact = {
 }
 
 export type ClientQuestions = {
-    clientSpeaksEnglish: boolean | undefined,
-    adultsInFamily: number | undefined,
-    childrenInFamily: number | undefined,
-    isVeteran: boolean | undefined,
-    canPickUp: boolean | undefined,
-    wasChronic: boolean | undefined,
-    hasMovedIn: boolean | undefined,
-    moveInDate: Timestamp | undefined,
-    hasElevator: boolean | undefined,
-    notes?: string //made optional
+    clientSpeaksEnglish?: boolean,
+    adultsInFamily?: number,
+    childrenInFamily?: number,
+    isVeteran?: boolean,
+    canPickUp?: boolean,
+    wasChronic?: boolean,
+    hasMovedIn?: boolean,
+    moveInDate?: Timestamp,
+    hasElevator?: boolean,
+    notes?: string
 }
 
 export type ItemRequest = {

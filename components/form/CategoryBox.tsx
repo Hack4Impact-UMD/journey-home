@@ -13,7 +13,8 @@ interface CategoryBoxProps<T> {
 
 export default function CategoryBox<T>({ categoryName, items, onChange }: CategoryBoxProps<T>) {
   const handleQuantityChange = (index: number, value: string) => {
-    const numericValue = value === "" ? 0 : Math.max(0, Number(value));
+    const parsed = Number(value);
+    const numericValue = value === "" || isNaN(parsed) ? 0 : Math.max(0, parsed);
     const field = items[index].field;
     onChange({ [field]: numericValue } as Partial<T>);
   };
@@ -41,6 +42,7 @@ export default function CategoryBox<T>({ categoryName, items, onChange }: Catego
               <input
                 type="number"
                 min={0}
+                aria-label={`Quantity for ${item.label}`}
                 value={item.value}
                 onChange={(e) => handleQuantityChange(index, e.target.value)}
                 className="w-70 border border-[#D9D9D9] rounded px-2 py-1 text-right"

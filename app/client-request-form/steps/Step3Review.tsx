@@ -28,6 +28,12 @@ export default function Step3Review() {
         return new Date(timestamp.toMillis()).toLocaleDateString();
     };
 
+    const renderBoolean = (value?: boolean) => {
+        if (value === true) return "Yes";
+        if (value === false) return "No";
+        return "Not specified";
+    };
+
     const handleSubmit = async () => {
         try {
             const items: ItemRequest[] = [
@@ -159,7 +165,7 @@ export default function Step3Review() {
                                 Does the client speak/understand English
                             </div>
                             <div>
-                                {questions.clientSpeaksEnglish ? "Yes" : "No"}
+                                {renderBoolean(questions.clientSpeaksEnglish)}
                             </div>
 
                             <div className="font-semibold">
@@ -175,20 +181,20 @@ export default function Step3Review() {
                             <div className="font-semibold">
                                 Is the client a veteran?
                             </div>
-                            <div>{questions.isVeteran ? "Yes" : "No"}</div>
+                            <div>{renderBoolean(questions.isVeteran)}</div>
 
                             <div className="font-semibold">
                                 Can pick up at warehouse?
                             </div>
-                            <div>{questions.canPickUp ? "Yes" : "No"}</div>
+                            <div>{renderBoolean(questions.canPickUp)}</div>
 
                             <div className="font-semibold">
                                 Was chronic before housing?
                             </div>
-                            <div>{questions.wasChronic ? "Yes" : "No"}</div>
+                            <div>{renderBoolean(questions.wasChronic)}</div>
 
                             <div className="font-semibold">Moved in?</div>
-                            <div>{questions.hasMovedIn ? "Yes" : "No"}</div>
+                            <div>{renderBoolean(questions.hasMovedIn)}</div>
 
                             <div className="font-semibold">Move-in date</div>
                             <div>{formatDate(questions.moveInDate)}</div>
@@ -213,7 +219,7 @@ export default function Step3Review() {
                             <div className="font-semibold">
                                 Working elevator?
                             </div>
-                            <div>{questions.hasElevator ? "Yes" : "No"}</div>
+                            <div>{renderBoolean(questions.hasElevator)}</div>
                         </div>
                     </div>
                 </div>

@@ -66,7 +66,7 @@ export default function Step2Requests() {
                         { label: "Kitchen Chair", field: "kitchenchair", value: formState.tables.kitchenchair },
                         { label: "Kitchen Table", field: "kitchentable", value: formState.tables.kitchentable },
                         { label: "Coffee Table", field: "coffeetable", value: formState.tables.coffeetable },
-                        { label: "End Table/Nightsand", field: "endtable", value: formState.tables.endtable },
+                        { label: "End Table/Nightstand", field: "endtable", value: formState.tables.endtable },
                     ]}
                     />
 

@@ -6,7 +6,6 @@ export type Address = {
     zipCode: string
 }
 
-// no contact info
 export type Name = {
     firstName: string,
     lastName: string
