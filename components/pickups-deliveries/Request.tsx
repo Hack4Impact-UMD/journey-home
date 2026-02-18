@@ -5,6 +5,8 @@ import { useState } from "react";
 import { DonationRequest } from "@/types/donations";
 import ScheduleModal from "./ScheduleModal";
 import { ClientRequest } from "@/types/client-requests";
+import { PhoneIcon } from "../icons/PhoneIcon";
+import { EmailIcon } from "../icons/EmailIcon";
 
 type RequestProps = {
     donation: DonationRequest | ClientRequest;
@@ -80,8 +82,8 @@ export default function Request({ donation }: RequestProps) {
                 <div className="p-2">
                     <div className="text-md font-bold">Contact  </div>
                     <div className="text-sm break-words">
-                        <p>{email}</p>
-                        <p>{phoneNumber}</p>
+                        <a href={`mailto:${email}`} className="flex flex-row items-center gap-1">{email} <EmailIcon/></a>
+                        <a href={`tel:${phoneNumber}`} className="flex flex-row items-center gap-1">{phoneNumber} < PhoneIcon/></a>  
                     </div>
                 </div>
                 <div className="p-2">
@@ -91,9 +93,9 @@ export default function Request({ donation }: RequestProps) {
                         <p> {city} {state} {zipCode}</p>
                     </div>
                 </div>
-                <div className="p-2">
+                <div className="p-2 max-h-[10em] overflow-hidden">
                     <div className="text-md font-bold">{totalItems} Items </div>
-                    <div className="text-sm ml-6 breakwords">
+                    <div className="text-sm ml-6 breakwords line-clamp-4">
                         {itemCounts.map((line, idx) => (
                             <li key={idx}>{line}</li>
                         ))}
