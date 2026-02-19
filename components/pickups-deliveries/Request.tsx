@@ -41,7 +41,7 @@ export function countItemsInRequest(donation: Task) {
 }
 
 export default function Request({ donation }: RequestProps) {  
-    let items, firstName, lastName, email, phoneNumber, streetAddress, city, state, zipCode, title, color;
+    let items, firstName, lastName, email, phoneNumber, streetAddress, city, state, zipCode, title, color, text;
     if ("donor" in donation) { 
         items = donation.items.filter(dItem => dItem.status === 'Approved').map(dItem => ({ name: dItem.item.name }));
         firstName = donation.donor.firstName
@@ -54,6 +54,7 @@ export default function Request({ donation }: RequestProps) {
         zipCode = donation.donor.address.zipCode
         title = "Pickup"
         color = "#D5e7F2"
+        text = "#004F7F"
     } else {
         items = donation.items
         firstName = donation.client.firstName
@@ -66,6 +67,7 @@ export default function Request({ donation }: RequestProps) {
         zipCode = donation.client.address.zipCode
         title = "Delivery"
         color = "#F8DFEB"
+        text = "#4C2337"
         
     }
 
@@ -75,9 +77,9 @@ export default function Request({ donation }: RequestProps) {
     const [isOpen, setOpen] = useState(false);
 
     return (
-        <div className="w-[19em] h-[24em] max-w-full border-2 rounded-lg shadow-md relative">
-            <div className="w-fixed h-14 rounded-t-lg text-lg p-4 items-center flex text-center justify-center font-bold" style={{background: color}}>
-                {title} from {firstName} {lastName}
+        <div className="w-[19em] h-[24em] max-w-full rounded-lg shadow-md relative">
+            <div className="w-fixed h-14 rounded-t-lg text-lg p-4 items-center flex text-center justify-center font-bold" style={{background: color, color: text}}>
+                {title} {"donor" in donation ? "From" : "To"} {firstName} {lastName}
             </div>
             <div className="m-2">
                 <div className="p-2">
@@ -91,12 +93,12 @@ export default function Request({ donation }: RequestProps) {
                     <div className="text-md font-bold">Address </div>
                     <div className="text-sm break-words">
                         <p>{streetAddress}</p>
-                        <p> {city} {state} {zipCode}</p>
+                        <p> {city}, {state} {zipCode}</p>
                     </div>
                 </div>
                 <div className="p-2 max-h-[10em] overflow-hidden">
                     <div className="text-md font-bold">{totalItems} Items </div>
-                    <div className="text-sm ml-4 breakwords line-clamp-4">
+                    <div className="text-sm ml-2 breakwords line-clamp-4">
                         {itemCounts.map((line, idx) => (
                             <li key={idx}>• {line}</li>
                         ))}
