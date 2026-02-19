@@ -4,6 +4,7 @@ import { useTBs } from "@/lib/queries/timeblocks";
 import { Timestamp } from "firebase/firestore";
 import { setDonationRequest } from "@/lib/services/donations";
 import { setClientRequest } from "@/lib/services/client-request";
+import { useQueryClient } from "@tanstack/react-query";
 
 // will need the props on the item being scheduled? to send into the firestore once i hit set shift 
 // would probably have the item identifier, onClose() function 
@@ -94,16 +95,32 @@ export default function ScheduleModal({
 
     //need to get all the timeBlocks
     const { allTB: timeBlocks, refetch: refetchAllRequests, isLoading, editTB } = useTBs();
+    const queryClient = useQueryClient();
 
     //sorting timeblocks in latest to furthest away
     //doing this for now, should 100 percent find a better way to do this in the future
     const sortedTBs = [...timeBlocks].sort((a, b) => a.startTime.toMillis() - b.startTime.toMillis());
 
     const addShift = async (tb: TimeBlock) => {
+
+        //remove any old objects during rescheduling if needed
+        const currentTB = scheduleRequest.associatedTimeBlockID;
+        if (currentTB && currentTB !== tb.id) {
+            const oldTB = timeBlocks.find(t => t.id === currentTB);
+            if (oldTB) {
+                const updatedOldTB = {
+                    ...oldTB,
+                    tasks: oldTB.tasks.filter(task => task.id !== scheduleRequest.id),
+                };
+                await editTB(updatedOldTB);
+            }
+        }
+
         //add to the task list !
+        const alreadyInTB = tb.tasks.some(task => task.id === scheduleRequest.id);
         const updatedTB = {
             ...tb,
-            tasks: [...tb.tasks, scheduleRequest],
+            tasks: alreadyInTB ? tb.tasks : [...tb.tasks, scheduleRequest],
         };
         await editTB(updatedTB);
 
@@ -113,14 +130,18 @@ export default function ScheduleModal({
             ...scheduleRequest,
             associatedTimeBlockID: tb.id,
         }
-            setDonationRequest(updatedReq);
+            await setDonationRequest(updatedReq);
         } else {
             const updatedReq: Delivery = {
             ...scheduleRequest,
             associatedTimeBlockID: tb.id,
         }
-            setClientRequest(updatedReq);
+            await setClientRequest(updatedReq);
         }
+
+        await queryClient.invalidateQueries({ queryKey: ["donationRequest"] });
+        await queryClient.invalidateQueries({ queryKey: ["clientRequests"] });
+        await queryClient.invalidateQueries({ queryKey: ["timeblocks"] });
 
         onClose();
     };
