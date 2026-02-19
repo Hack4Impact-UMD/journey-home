@@ -6,7 +6,7 @@ const CLIENTREQS_COLLECTION = "client-requests";
 
 export async function getAllClientRequest(): Promise <ClientRequest[]> {
     const snapshot = await getDocs(collection(db, CLIENTREQS_COLLECTION));
-    const requests: ClientRequest[] = snapshot.docs.map(doc => doc.data() as ClientRequest);
+    const requests: ClientRequest[] = snapshot.docs.map(docSnap => docSnap.data() as ClientRequest);
     return requests;
 }
 

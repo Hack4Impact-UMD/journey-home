@@ -95,7 +95,7 @@ export default function Request({ donation }: RequestProps) {
                     </div>
                 </div>
                 <div className="p-2 max-h-[10em] overflow-hidden">
-                    <div className="text-md font-bold">{totalItems} Items </div>
+                    <div className="text-md font-bold">{totalItems} {totalItems == 1 ? "Item" : "Items"} </div>
                     <div className="text-sm ml-2 breakwords line-clamp-4">
                         {itemCounts.map((line, idx) => (
                             <li key={idx}>• {line}</li>
