@@ -1,4 +1,4 @@
-import { useState } from "react";
+//import { useState } from "react";
 import { TimeBlock, Task, Delivery, Pickup } from "@/types/schedule";
 import { useTBs } from "@/lib/queries/timeblocks";
 import { Timestamp } from "firebase/firestore";
@@ -94,7 +94,8 @@ export default function ScheduleModal({
  } : scheduleModalProps) { 
 
     //need to get all the timeBlocks
-    const { allTB: timeBlocks, refetch: refetchAllRequests, isLoading, editTB } = useTBs();
+    {/*refetch: refetchAllRequests, isLoading,*/}
+    const { allTB: timeBlocks, editTB } = useTBs();
     const queryClient = useQueryClient();
 
     //sorting timeblocks in latest to furthest away

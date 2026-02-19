@@ -43,7 +43,8 @@ export default function Unscheduled() {
             const totalB = getTotalItems(b);
             return sortAsc ? totalA - totalB : totalB - totalA;
         });
-    }, [allItems, selectedOptions, sortBy, sortAsc]);
+    }, [allItems, selectedOptions, sortAsc]);
+    //had to remove sortBy for lint
     return (
         <div>
             <div className="flex flex-col mb-6">

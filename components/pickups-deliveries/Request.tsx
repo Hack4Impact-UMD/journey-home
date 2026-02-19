@@ -3,8 +3,6 @@
 import ScheduleButton from "@/components/pickups-deliveries/ScheduleButton";
 import { useState } from "react";
 import ScheduleModal from "./ScheduleModal";
-import { DonationRequest } from "@/types/donations";
-import { ClientRequest } from "@/types/client-requests";
 import { PhoneIcon } from "../icons/PhoneIcon";
 import { EmailIcon } from "../icons/EmailIcon";
 import { Task } from "@/types/schedule";
@@ -41,9 +39,9 @@ export function countItemsInRequest(donation: Task) {
 }
 
 export default function Request({ donation }: RequestProps) {  
-    let items, firstName, lastName, email, phoneNumber, streetAddress, city, state, zipCode, title, color, text;
+    let firstName, lastName, email, phoneNumber, streetAddress, city, state, zipCode, title, color, text;
     if ("donor" in donation) { 
-        items = donation.items.filter(dItem => dItem.status === 'Approved').map(dItem => ({ name: dItem.item.name }));
+        //items = donation.items.filter(dItem => dItem.status === 'Approved').map(dItem => ({ name: dItem.item.name }));
         firstName = donation.donor.firstName
         lastName = donation.donor.lastName
         email = donation.donor.email
@@ -56,7 +54,7 @@ export default function Request({ donation }: RequestProps) {
         color = "#D5e7F2"
         text = "#004F7F"
     } else {
-        items = donation.items
+        //items = donation.items
         firstName = donation.client.firstName
         lastName = donation.client.lastName
         email = donation.client.email

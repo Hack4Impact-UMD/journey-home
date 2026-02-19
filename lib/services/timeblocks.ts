@@ -1,7 +1,7 @@
 "use client";
 
 import { db } from "../firebase";
-import { collection, doc, getDocs, setDoc, updateDoc, deleteDoc} from "firebase/firestore";
+import { collection, doc, getDocs, setDoc, deleteDoc} from "firebase/firestore";
 import { TimeBlock } from "../../types/schedule";
 
 const timeCol = collection(db, "timeblocks");
