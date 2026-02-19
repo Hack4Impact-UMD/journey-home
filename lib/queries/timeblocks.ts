@@ -45,10 +45,12 @@ export function useTBs() {
             success: "timeblock modified successfully!",
             error: "error: couldn't update timeblock",
         });
-        await promise;
+        await promise.catch(() => {
+            // Error surfaced via toast above; prevent unhandled rejection
+        });
     };
 
-    return{
+    return {
         allTB: query.data ?? [],
 
         editTB: updateTB,

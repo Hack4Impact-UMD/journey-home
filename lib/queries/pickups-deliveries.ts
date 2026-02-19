@@ -22,7 +22,7 @@ export function usePickups(search: string = "", isScheduled: boolean) {
             let shownItems = searchedItems
 
             if (isScheduled) {
-                shownItems = searchedItems.filter(dr => dr.associatedTimeBlockID != null)
+                shownItems = searchedItems.filter(dr => dr.associatedTimeBlockID !== null)
             } else {
                 shownItems = searchedItems.filter(dr => dr.associatedTimeBlockID == null)
             }
@@ -91,7 +91,7 @@ export function useDeliveries(search: string = "", isScheduled: boolean) {
             let shownItems = searchedItems;
 
             if (isScheduled) {
-                shownItems = searchedItems.filter(req => req.associatedTimeBlockID != null)
+                shownItems = searchedItems.filter(req => req.associatedTimeBlockID !== null)
             } else {
                 shownItems = searchedItems.filter(req => req.associatedTimeBlockID == null)
             }
