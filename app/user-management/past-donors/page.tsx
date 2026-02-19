@@ -41,9 +41,10 @@ export default function PastDonorsPage() {
         fetchAllDonors().then(setAllDonors);
     }, []);
 
+
     useEffect(() => {
-        setOnExport(() => () => handleExport(allDonors));
-    }, [allDonors]);
+    setOnExport(() => () => handleExport(allDonors));
+}, [allDonors, setOnExport]);
 
     return (
         <>

@@ -48,10 +48,11 @@ export default function AllAccountsPage() {
         URL.revokeObjectURL(url);
     }
 
+  
     useEffect(() => {
-        setOnExport(() => () => handleExport(allAccounts));
-    }, [allAccounts]);
-
+    setOnExport(() => () => handleExport(allAccounts));
+    }, [allAccounts, setOnExport]);
+    
     return (
         <>
             {selectedAccount && (
