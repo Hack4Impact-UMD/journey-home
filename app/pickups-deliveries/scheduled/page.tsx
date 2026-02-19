@@ -23,8 +23,8 @@ export default function Scheduled() {
         "Pickups",
         "Deliveries",
     ]
-    const allItems = [...approvedItems, ...deliveryItems];
     const sortedItems = useMemo(() => {
+        const allItems = [...approvedItems, ...deliveryItems];
         let filteredItems: typeof allItems = [];
     
         if (selectedOptions.includes("Pickups & Deliveries")) {
@@ -43,8 +43,8 @@ export default function Scheduled() {
             const totalB = getTotalItems(b);
             return sortAsc ? totalA - totalB : totalB - totalA;
         });
-    }, [allItems, selectedOptions, sortAsc]);
-    //removed SortBy for lint
+    }, [approvedItems, deliveryItems, selectedOptions, sortAsc, sortBy]);
+    //sortBy was causing warnings in lint but coderabbit is suggesting adding sortBy
     return (
         <div>
             <div className="flex flex-col mb-6">
@@ -69,6 +69,7 @@ export default function Scheduled() {
                                 setSortAsc(status == "asc");
                             }}
                         />
+                        {/* Date doesn't work and only sorts due to clientRequests not having a date field */}
                         <SortOption
                             label="Date"
                             status={

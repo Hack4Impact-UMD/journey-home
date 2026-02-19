@@ -23,8 +23,8 @@ export default function Unscheduled() {
         "Pickups",
         "Deliveries",
     ]
-    const allItems = [...approvedItems, ...deliveryItems];
     const sortedItems = useMemo(() => {
+        const allItems = [...approvedItems, ...deliveryItems];
         let filteredItems: typeof allItems = [];
 
         if (selectedOptions.includes("Pickups & Deliveries")) {
@@ -43,7 +43,7 @@ export default function Unscheduled() {
             const totalB = getTotalItems(b);
             return sortAsc ? totalA - totalB : totalB - totalA;
         });
-    }, [allItems, selectedOptions, sortAsc]);
+    }, [approvedItems, deliveryItems, selectedOptions, sortAsc]);
     //had to remove sortBy for lint
     return (
         <div>
