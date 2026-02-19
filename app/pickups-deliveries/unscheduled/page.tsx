@@ -43,7 +43,7 @@ export default function Unscheduled() {
             const totalB = getTotalItems(b);
             return sortAsc ? totalA - totalB : totalB - totalA;
         });
-    }, [approvedItems, deliveryItems, selectedOptions, sortAsc]);
+    }, [approvedItems, deliveryItems, selectedOptions, sortBy, sortAsc]);
     //had to remove sortBy for lint
     return (
         <div>
