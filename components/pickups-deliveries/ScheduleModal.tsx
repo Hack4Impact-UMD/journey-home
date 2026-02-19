@@ -5,6 +5,7 @@ import { Timestamp } from "firebase/firestore";
 import { setDonationRequest } from "@/lib/services/donations";
 import { setClientRequest } from "@/lib/services/client-request";
 import { useQueryClient } from "@tanstack/react-query";
+import { getTotalItems } from "./Request";
 
 // will need the props on the item being scheduled? to send into the firestore once i hit set shift 
 // would probably have the item identifier, onClose() function 
@@ -202,7 +203,7 @@ export default function ScheduleModal({
                                                     {zipCode}
                                                 </h1>
                                                 <h1 className= "bg-[#E6E6E6] text-[#383838] px-2.5 py-0.75 rounded-[2px] text-[12px]">
-                                                    {task.items.length}
+                                                    {getTotalItems(task)}
                                                 </h1>
                                             </div>
                                         );
