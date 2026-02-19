@@ -6,6 +6,7 @@ import { setDonationRequest } from "@/lib/services/donations";
 import { setClientRequest } from "@/lib/services/client-request";
 import { useQueryClient } from "@tanstack/react-query";
 import { getTotalItems } from "./Request";
+import { useState } from "react";
 
 // will need the props on the item being scheduled? to send into the firestore once i hit set shift 
 // would probably have the item identifier, onClose() function 
@@ -103,8 +104,10 @@ export default function ScheduleModal({
     //doing this for now, should 100 percent find a better way to do this in the future
     const sortedTBs = [...timeBlocks].sort((a, b) => a.startTime.toMillis() - b.startTime.toMillis());
 
+    const [isScheduling, setIsScheduling] = useState(false);
     const addShift = async (tb: TimeBlock) => {
-
+        setIsScheduling(true);
+        try {
         //remove any old objects during rescheduling if needed
         const currentTB = scheduleRequest.associatedTimeBlockID;
         if (currentTB && currentTB !== tb.id) {
@@ -144,8 +147,14 @@ export default function ScheduleModal({
         await queryClient.invalidateQueries({ queryKey: ["donationRequest"] });
         await queryClient.invalidateQueries({ queryKey: ["clientRequests"] });
         await queryClient.invalidateQueries({ queryKey: ["timeblocks"] });
-
+        
         onClose();
+
+        } catch (e) {
+            console.error("Failed to assign shift:", e);
+        } finally {
+            setIsScheduling(false);
+        }
     };
 
     return (
