@@ -7,6 +7,7 @@ import { setClientRequest } from "@/lib/services/client-request";
 import { useQueryClient } from "@tanstack/react-query";
 import { getTotalItems } from "./Request";
 import { useState } from "react";
+import { Plus } from "lucide-react";
 
 // will need the props on the item being scheduled? to send into the firestore once i hit set shift 
 // would probably have the item identifier, onClose() function 
@@ -159,10 +160,10 @@ export default function ScheduleModal({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center font-family-roboto">
-            <div className="inset-0 w-full h-full flex bg-black/20" onClick={onClose}> {/*clicking out*/}
+            <div className="inset-0 w-full h-full flex bg-black/20 items-center justify-center" onClick={onClose}> {/*clicking out*/}
 
                 <div 
-                    className="flex-1 flex-col rounded-[5px] border-light-border m-20 mx-95 z-10 bg-[#FBFCFD] p-6 overflow-y-auto drop-shadow-[#ABABAB] [&::-webkit-scrollbar]:hidden"
+                    className="flex-1 flex-col rounded-sm border-light-border max-w-[25em] max-h-[40em] z-10 bg-[#FBFCFD] p-6 overflow-y-auto drop-shadow-[#ABABAB]"
                     onClick={(e) => e.stopPropagation()}>
 
                     <h1 className="text-[20px] text-[#565656] font-medium text-left w-full">
@@ -185,15 +186,15 @@ export default function ScheduleModal({
                                     </h1>
                                 </div>
 
-                                <div className="flex justify-between mr-5 items-baseline">
-                                    <h1 className="cursor-pointer text-[14px] px-2 py-1 rounded-lg border-[#02AFC7] border text-[#565656] bg-[#F5FAFA]">
+                                <div className="flex justify-between items-baseline">
+                                    <p className="cursor-pointer text-sm px-2 py-1 mr-auto font-family-roboto rounded-sm border-[#02AFC7] border text-[#565656] bg-[#F5FAFA]">
                                         {timeSlot}
-                                    </h1>
+                                    </p>
                                    
                                     <button 
                                     onClick= {() => addShift(tb)}
-                                    className="text-[#FFFFFF] text-[14px] rounded-lg bg-[#02AFC7] px-3 py-2">
-                                        +  Add Shift
+                                    className="text-[#FFFFFF] text-xs rounded-sm bg-[#02AFC7] px-3 py-2 flex items-center gap-1.5">
+                                        <Plus className="h-3 w-3" />  <span className="">Add Shift</span>
                                     </button>
                                 </div>
                                 
