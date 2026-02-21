@@ -175,6 +175,8 @@ export default function ScheduleModal({
                         const timeSlot = getTimeSlot(tb.startTime, tb.endTime);
                         const sortedTasks = sortTasks(tb);
 
+                        const isAlreadyAssigned = scheduleRequest.associatedTimeBlockID === tb.id;
+
                         return(
                             <div key={tb.id} className="border-b pb-4 mb-4 flex-col items-center pt-1.75">
                                 <div className="flex gap-1 items-baseline">
@@ -192,9 +194,17 @@ export default function ScheduleModal({
                                     </p>
                                    
                                     <button 
-                                    onClick= {() => addShift(tb)}
-                                    className="text-[#FFFFFF] text-xs rounded-sm bg-[#02AFC7] px-3 py-2 flex items-center gap-1.5">
-                                        <Plus className="h-3 w-3" />  <span className="">Add Shift</span>
+                                    onClick= {isAlreadyAssigned ? undefined : () => addShift(tb)}
+                                    disabled= {isAlreadyAssigned}
+                                    className={`text-xs rounded-sm px-3 py-2 flex items-center gap-1.5 
+                                        ${isAlreadyAssigned 
+                                            ? "bg-gray-300 text-gray-600 cursor-not-allowed" 
+                                            : "bg-[#02AFC7] text-[#FFFFFF]"}`
+                                        }>
+                                        {isAlreadyAssigned ? <></> : <Plus className="h-3 w-3" />}
+                                        <span className="">
+                                            {isAlreadyAssigned ? "Assigned" :  "Add Shift"}
+                                        </span>
                                     </button>
                                 </div>
                                 
