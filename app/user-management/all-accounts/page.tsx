@@ -23,7 +23,6 @@ export default function AllAccountsPage() {
         isLoading,
     } = useAllActiveAccounts();
 
-<<<<<<< HEAD
     const [selectedAccount, setSelectedAccount] = useState<UserData | null>(null);
 
     const { setOnExport } = useExport();
@@ -54,13 +53,6 @@ export default function AllAccountsPage() {
     setOnExport(() => () => handleExport(allAccounts));
     }, [allAccounts, setOnExport]);
     
-=======
-    const [selectedAccount, setSelectedAccount] = useState<UserData | null>(
-        null,
-    );
-    console.log("Account stuff: ");
-    console.log(allAccounts);
->>>>>>> main
     return (
         <>
             {selectedAccount && (
