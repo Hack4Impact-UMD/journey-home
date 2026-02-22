@@ -25,7 +25,8 @@ export default function AllAccountsPage() {
     const [selectedAccount, setSelectedAccount] = useState<UserData | null>(
         null,
     );
-
+    console.log("Account stuff: ");
+    console.log(allAccounts);
     return (
         <>
             {selectedAccount && (
