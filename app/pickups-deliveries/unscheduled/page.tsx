@@ -6,54 +6,38 @@ import Request, { getTotalItems } from "@/components/pickups-deliveries/Request"
 import { useDeliveries, usePickups} from "@/lib/queries/pickups-deliveries";
 import { useMemo, useState } from "react";
 
-export default function Unscheduled() {
-    const [searchInput, setSearchInput] = useState("");
+export default function UnscheduledTasksPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedOptions, setSelectedOptions] = useState<string[]>([
-        "Pickups & Deliveries",
         "Pickups",
         "Deliveries",
     ]);
     const [sortBy, setSortBy] = useState<"Quantity">();
     const [sortAsc, setSortAsc] = useState<boolean>(false);
-    const { pickups: approvedItems = [] } = usePickups(searchQuery, false);
-    const { deliveries: deliveryItems = [] } = useDeliveries(searchQuery, false);
+    const {
+        pickups: approvedItems = [],
+        refetch: refetchPickups
+    } = usePickups(false);
+    const {
+        deliveries: deliveryItems = [],
+        refetch: refetchDeliveries
+    } = useDeliveries(false);
     const allOptions = [
-        "Pickups & Deliveries",
         "Pickups",
         "Deliveries",
     ]
-    const sortedItems = useMemo(() => {
-        const allItems = [...approvedItems, ...deliveryItems];
-        let filteredItems: typeof allItems = [];
-
-        if (selectedOptions.includes("Pickups & Deliveries")) {
-        filteredItems = allItems;
-        } else {
-        if (selectedOptions.includes("Pickups")) {
-            filteredItems = [...filteredItems, ...allItems.filter(item => "donor" in item)];
-        }
-        if (selectedOptions.includes("Deliveries")) {
-            filteredItems = [...filteredItems, ...allItems.filter(item => "client" in item)];
-        }
-        }
-        filteredItems = Array.from(new Set(filteredItems));
-        return filteredItems.toSorted((a, b) => {
-            const totalA = getTotalItems(a);
-            const totalB = getTotalItems(b);
-            return sortAsc ? totalA - totalB : totalB - totalA;
-        });
-    }, [approvedItems, deliveryItems, selectedOptions, sortBy, sortAsc]);
-    //had to remove sortBy for lint
     return (
         <div>
             <div className="flex flex-col mb-6">
                 <div className="flex">
                     <div className="flex flex-wrap gap-3">
                         <SearchBox
-                            value={searchInput}
-                            onChange={setSearchInput}
-                            onSubmit={() => setSearchQuery(searchInput)}
+                            value={searchQuery}
+                            onChange={setSearchQuery}
+                            onSubmit={() => {
+                                refetchPickups();
+                                refetchDeliveries();
+                            }}
                         />
                         <SortOption
                             label="Qnt"
@@ -70,7 +54,7 @@ export default function Unscheduled() {
                             }}
                         />
                         <DropdownMultiselect
-                            label="Pickups & Deliveries"
+                            label="Task Type"
                             options={allOptions}
                             selected={selectedOptions}
                             setSelected={setSelectedOptions}
@@ -79,10 +63,25 @@ export default function Unscheduled() {
                 </div>
                                     
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                 {sortedItems.map((donation) => (
-                    <Request donation={donation} key={donation.id} />
-                ))}
+            <div className="w-full h-full flex flex-wrap gap-x-3 gap-y-6 content-start">
+                {[...approvedItems, ...deliveryItems]
+                .filter(item =>
+                    selectedOptions.includes("All") ||
+                    ("donor" in item && selectedOptions.includes("Pickups")) ||
+                    ("client" in item && selectedOptions.includes("Deliveries"))
+                ).filter(item => {
+                    const query = searchQuery.toLowerCase().trim();
+                    if (!query) return true; 
+                    const searchable = JSON.stringify(item).toLowerCase();
+                    return searchable.includes(query);
+                }).sort((a, b) => { //will change this later once clientRequest date gets implemented
+                    const totalA = getTotalItems(a);
+                    const totalB = getTotalItems(b);
+                    return sortAsc ? totalA - totalB : totalB - totalA;
+                }).map(item => (
+                    <Request donation={item} key={item.id} />
+                ))
+            }
             </div>
         </div>
     )

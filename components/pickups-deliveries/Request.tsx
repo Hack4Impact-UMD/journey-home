@@ -75,7 +75,7 @@ export default function Request({ donation }: RequestProps) {
     const [isOpen, setOpen] = useState(false);
 
     return (
-        <div className="w-[19em] h-[24em] max-w-full rounded-lg shadow-md relative">
+        <div className="w-[18.5em] h-[24em] max-w-full rounded-lg shadow-md relative">
             <div className="w-fixed h-14 rounded-t-lg text-lg p-4 items-center flex text-center justify-center font-bold" style={{background: color, color: text}}>
                 {title} {"donor" in donation ? "From" : "To"} {firstName} {lastName}
             </div>

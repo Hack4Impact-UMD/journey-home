@@ -80,11 +80,6 @@ export default function SideNavbar() {
                     path="/pickups-deliveries/scheduled"
                     roles={["Admin"]}
                 />
-                <SideNavbarLink
-                    name="Completed"
-                    path="/pickups-deliveries/completed"
-                    roles={["Admin"]}
-                />
             </SideNavbarLinkGroup>
             <SideNavbarLink
                 name="Control Panel"

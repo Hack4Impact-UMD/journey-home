@@ -45,32 +45,6 @@ export default function PickupsDeliveriesLayout({ children }: { children: ReactN
                             >
                                 Scheduled
                             </Link>
-                            <Link
-                                className={`py-4${
-                                    pathname.startsWith(
-                                        "/pickups-deliveries/completed"
-                                    )
-                                        ? " border-b-2 border-primary text-primary"
-                                        : ""
-                                }`}
-                                href="/pickups-deliveries/completed"
-                                suppressHydrationWarning
-                            >
-                                Completed
-                            </Link>
-                            <Link
-                                className={`py-4${
-                                    pathname.startsWith(
-                                        "/pickups-deliveries/calendar"
-                                    )
-                                        ? " border-b-2 border-primary text-primary"
-                                        : ""
-                                }`}
-                                href="/pickups-deliveries/calendar"
-                                suppressHydrationWarning
-                            >
-                                Calendar
-                            </Link>
                         </div>
                         <div className="bg-background rounded-xl flex-wrap my-2 flex-1 py-4 px-6 min-h-0 overflow-hidden">
                             { children }
