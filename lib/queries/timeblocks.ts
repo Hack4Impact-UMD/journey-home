@@ -3,7 +3,7 @@ import { fetchAllTB, setTB } from "../services/timeblocks";
 import { TimeBlock } from "@/types/schedule";
 import { toast } from "sonner";
 
-export function useTBs() {
+export function useTimeBlocks() {
     const queryClient = useQueryClient();
 
     const query = useQuery({
@@ -45,9 +45,8 @@ export function useTBs() {
             success: "timeblock modified successfully!",
             error: "error: couldn't update timeblock",
         });
-        await promise.catch(() => {
-            // Error surfaced via toast above; prevent unhandled rejection
-        });
+        
+        await promise;
     };
 
     return {

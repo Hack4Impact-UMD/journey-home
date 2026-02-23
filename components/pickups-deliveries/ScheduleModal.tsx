@@ -1,6 +1,6 @@
 //import { useState } from "react";
 import { TimeBlock, Task, Delivery, Pickup } from "@/types/schedule";
-import { useTBs } from "@/lib/queries/timeblocks";
+import { useTimeBlocks } from "@/lib/queries/timeblocks";
 import { Timestamp } from "firebase/firestore";
 import { setDonationRequest } from "@/lib/services/donations";
 import { setClientRequest } from "@/lib/services/client-request";
@@ -98,7 +98,7 @@ export default function ScheduleModal({
 
     //need to get all the timeBlocks
     {/*refetch: refetchAllRequests, isLoading,*/}
-    const { allTB: timeBlocks, editTB } = useTBs();
+    const { allTB: timeBlocks, editTB } = useTimeBlocks();
     const queryClient = useQueryClient();
 
     //sorting timeblocks in latest to furthest away
@@ -174,8 +174,12 @@ export default function ScheduleModal({
                         const { weekday, day, month } = getDateInfo(tb.startTime);
                         const timeSlot = getTimeSlot(tb.startTime, tb.endTime);
                         const sortedTasks = sortTasks(tb);
+                        const currentTime = Timestamp.now();
+                        const notCurrent = currentTime > tb.startTime
 
                         const isAlreadyAssigned = scheduleRequest.associatedTimeBlockID === tb.id;
+
+                        if (notCurrent) return null;
 
                         return(
                             <div key={tb.id} className="border-b pb-4 mb-4 flex-col items-center pt-1.75">
@@ -232,7 +236,7 @@ export default function ScheduleModal({
                                     {/*then submit with the add shift, and also the list of shifts by zip code and stuff*/}
                                 </div>
                             </div>
-                        );
+                        );   
                     })} 
                 </div>
             </div>    
