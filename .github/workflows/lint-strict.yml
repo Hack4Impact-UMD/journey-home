@@ -1,4 +1,4 @@
-name: Lint (Strict)
+name: Lint
 
 on:
   pull_request:
@@ -11,7 +11,7 @@ env:
 
 jobs:
   lint-strict:
-    name: Lint (No Warnings)
+    name: Lint (Strict)
     runs-on: ubuntu-latest
     timeout-minutes: 10
 

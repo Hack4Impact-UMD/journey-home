@@ -1,4 +1,4 @@
-name: Lint and Build
+name: Test Build
 
 on:
   pull_request:
@@ -11,7 +11,7 @@ env:
 
 jobs:
   lint-and-build:
-    name: Lint and Build
+    name: Build
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
