@@ -3,7 +3,7 @@ import Request, { getTotalItems } from "@/components/pickups-deliveries/Request"
 import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { SortOption } from "@/components/inventory/SortOption";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useDeliveries, usePickups } from "@/lib/queries/pickups-deliveries";
 
 export default function ScheduledTasksPage() {

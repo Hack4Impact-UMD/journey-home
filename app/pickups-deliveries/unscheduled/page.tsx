@@ -4,7 +4,7 @@ import { SearchBox } from "@/components/inventory/SearchBox";
 import { SortOption } from "@/components/inventory/SortOption";
 import Request, { getTotalItems } from "@/components/pickups-deliveries/Request";
 import { useDeliveries, usePickups} from "@/lib/queries/pickups-deliveries";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 export default function UnscheduledTasksPage() {
     const [searchQuery, setSearchQuery] = useState("");
