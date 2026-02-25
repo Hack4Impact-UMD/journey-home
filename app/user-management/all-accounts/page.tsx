@@ -5,9 +5,10 @@ import { SearchBox } from "@/components/inventory/SearchBox";
 import { EditAccountModal } from "@/components/user-management/EditAccountModal";
 import { UserTable } from "@/components/user-management/UserTable";
 import { UserData, UserRole } from "@/types/user";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAllActiveAccounts } from "@/lib/queries/users";
 import { Spinner } from "@/components/ui/spinner";
+import { useExport } from "@/contexts/UserExportContext";
 
 export default function AllAccountsPage() {
     const roleOptions: UserRole[] = ["Admin", "Case Manager", "Volunteer"];
@@ -22,11 +23,36 @@ export default function AllAccountsPage() {
         isLoading,
     } = useAllActiveAccounts();
 
-    const [selectedAccount, setSelectedAccount] = useState<UserData | null>(
-        null,
-    );
-    console.log("Account stuff: ");
-    console.log(allAccounts);
+    const [selectedAccount, setSelectedAccount] = useState<UserData | null>(null);
+
+    const { setOnExport } = useExport();
+
+    function handleExport(users: UserData[]) {
+        const headers = ["First Name", "Last Name", "User Type", "Email", "Date of Birth"];
+        const rows = users.map(user => [
+            user.firstName,
+            user.lastName,
+            user.role,
+            user.email,
+            user.dob ? user.dob.toDate().toLocaleDateString() : ""
+        ]);
+
+        const csv = [headers, ...rows].map(row => row.join(",")).join("\n");
+
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "users.csv";
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+  
+    useEffect(() => {
+    setOnExport(() => () => handleExport(allAccounts));
+    }, [allAccounts, setOnExport]);
+    
     return (
         <>
             {selectedAccount && (
@@ -36,7 +62,7 @@ export default function AllAccountsPage() {
                     editAccount={editAccount}
                 />
             )}
-            <div className="flex flex-col mb-6">
+            <div className="flex justify-between items-center mb-2">
                 <div className="flex gap-3">
                     <SearchBox
                         value={searchQuery}
