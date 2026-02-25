@@ -2,9 +2,8 @@
 import { TimeBlock, Task, Delivery, Pickup } from "@/types/schedule";
 import { useTimeBlocks } from "@/lib/queries/timeblocks";
 import { Timestamp } from "firebase/firestore";
-import { setDonationRequest } from "@/lib/services/donations";
-import { setClientRequest } from "@/lib/services/client-request";
-import { useQueryClient } from "@tanstack/react-query";
+import { useDonationRequests } from "@/lib/queries/donation-requests";
+import { useClientRequests } from "@/lib/queries/client-requests";
 import { getTotalItems } from "./Request";
 import { Plus } from "lucide-react";
 
@@ -12,7 +11,7 @@ import { Plus } from "lucide-react";
 // would probably have the item identifier, onClose() function 
 // taking inspo from item-review, donation request
 
-type scheduleModalProps = {
+type ScheduleModalProps = {
     scheduleRequest: Task; //donationRequest OR clientRequest
     onClose: () => void;
 };
@@ -93,12 +92,13 @@ export function sortTasks(tb: TimeBlock): Task[] {
 export default function ScheduleModal({ 
     scheduleRequest,
     onClose,
- } : scheduleModalProps) { 
+ } : ScheduleModalProps) { 
 
     //need to get all the timeBlocks
     {/*refetch: refetchAllRequests, isLoading,*/}
     const { allTB: timeBlocks, setTimeblock } = useTimeBlocks();
-    const queryClient = useQueryClient();
+    const { setDonationRequest } = useDonationRequests();
+    const { setClientRequest } = useClientRequests();
 
     //sorting timeblocks in latest to furthest away
     //doing this for now, should 100 percent find a better way to do this in the future
@@ -133,14 +133,12 @@ export default function ScheduleModal({
                 associatedTimeBlockID: tb.id,
             }
             await setDonationRequest(updatedReq);
-            await queryClient.invalidateQueries({ queryKey: ["donationRequest"] });
         } else {
             const updatedReq: Delivery = {
                 ...scheduleRequest,
                 associatedTimeBlockID: tb.id,
             }
             await setClientRequest(updatedReq);
-            await queryClient.invalidateQueries({ queryKey: ["clientRequests"] });
         }
 
     };

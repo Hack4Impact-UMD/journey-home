@@ -3,8 +3,9 @@ import Request, { getTotalItems } from "@/components/pickups-deliveries/Request"
 import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { SortOption } from "@/components/inventory/SortOption";
-import { useState } from "react";
-import { useDeliveries, usePickups } from "@/lib/queries/pickups-deliveries";
+import { useState, useMemo } from "react";
+import { useDonationRequests } from "@/lib/queries/donation-requests";
+import { useClientRequests } from "@/lib/queries/client-requests";
 
 export default function ScheduledTasksPage() {
     const [searchQuery, setSearchQuery] = useState("");
@@ -14,14 +15,24 @@ export default function ScheduledTasksPage() {
     ]);
     const [sortBy, setSortBy] = useState<"Quantity" | "Date">();
     const [sortAsc, setSortAsc] = useState<boolean>(false);
-    const {
-        pickups: approvedItems = [],
-        refetch: refetchPickups
-    } = usePickups(true);
-    const {
-        deliveries: deliveryItems = [],
-        refetch: refetchDeliveries
-    } = useDeliveries(true);
+    const { donationRequests, refetch: refetchPickups } = useDonationRequests();
+    const { clientRequests, refetch: refetchDeliveries } = useClientRequests();
+
+    const approvedItems = useMemo(
+        () => donationRequests.filter(
+            (dr) => dr.associatedTimeBlockID !== null &&
+                    dr.items.every((item) => item.status === "Approved" || item.status === "Denied") &&
+                    dr.items.some((item) => item.status === "Approved")
+        ),
+        [donationRequests]
+    );
+
+    const deliveryItems = useMemo(
+        () => clientRequests.filter(
+            (cr) => cr.associatedTimeBlockID !== null
+        ),
+        [clientRequests]
+    );
     const allOptions = [
         "Pickups",
         "Deliveries",
