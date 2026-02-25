@@ -6,6 +6,7 @@ import { SortOption } from "@/components/inventory/SortOption";
 import { useState, useMemo } from "react";
 import { useDonationRequests } from "@/lib/queries/donation-requests";
 import { useClientRequests } from "@/lib/queries/client-requests";
+import { useTimeBlocks } from "@/lib/queries/timeblocks";
 
 export default function ScheduledTasksPage() {
     const [searchQuery, setSearchQuery] = useState("");
@@ -17,6 +18,8 @@ export default function ScheduledTasksPage() {
     const [sortAsc, setSortAsc] = useState<boolean>(true);
     const { donationRequests, refetch: refetchPickups } = useDonationRequests();
     const { clientRequests, refetch: refetchDeliveries } = useClientRequests();
+    const { allTB } = useTimeBlocks();
+    const tbMap = useMemo(() => new Map(allTB.map(tb => [tb.id, tb])), [allTB]);
 
     const approvedItems = useMemo(
         () => donationRequests.filter(
@@ -64,7 +67,6 @@ export default function ScheduledTasksPage() {
                                 setSortAsc(status == "asc");
                             }}
                         />
-                        {/* Date doesn't work and only sorts due to clientRequests not having a date field */}
                         <SortOption
                             label="Date"
                             status={
@@ -101,6 +103,15 @@ export default function ScheduledTasksPage() {
                     const searchable = JSON.stringify(item).toLowerCase();
                     return searchable.includes(query);
                 }).sort((a, b) => {
+                    if (sortBy === "Date") {
+                        const timeA = a.associatedTimeBlockID
+                            ? (tbMap.get(a.associatedTimeBlockID)?.startTime.toMillis() ?? 0)
+                            : 0;
+                        const timeB = b.associatedTimeBlockID
+                            ? (tbMap.get(b.associatedTimeBlockID)?.startTime.toMillis() ?? 0)
+                            : 0;
+                        return sortAsc ? timeA - timeB : timeB - timeA;
+                    }
                     const totalA = getTotalItems(a);
                     const totalB = getTotalItems(b);
                     return sortAsc ? totalA - totalB : totalB - totalA;
