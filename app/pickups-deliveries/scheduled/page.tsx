@@ -13,8 +13,8 @@ export default function ScheduledTasksPage() {
         "Pickups",
         "Deliveries",
     ]);
-    const [sortBy, setSortBy] = useState<"Quantity" | "Date">();
-    const [sortAsc, setSortAsc] = useState<boolean>(false);
+    const [sortBy, setSortBy] = useState<"Quantity" | "Date">("Date");
+    const [sortAsc, setSortAsc] = useState<boolean>(true);
     const { donationRequests, refetch: refetchPickups } = useDonationRequests();
     const { clientRequests, refetch: refetchDeliveries } = useClientRequests();
 

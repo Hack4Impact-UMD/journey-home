@@ -75,7 +75,7 @@ export default function Request({ donation }: RequestProps) {
     const [isOpen, setOpen] = useState(false);
 
     return (
-        <div className="w-[18.5em] h-[24em] max-w-full rounded-lg shadow-md relative">
+        <div className="w-[18.5em] h-96 max-w-full rounded-lg shadow-md relative">
             <div className="w-fixed h-14 rounded-t-lg text-lg p-4 items-center flex text-center justify-center font-bold" style={{background: color, color: text}}>
                 {title} {"donor" in donation ? "From" : "To"} {firstName} {lastName}
             </div>
@@ -94,7 +94,7 @@ export default function Request({ donation }: RequestProps) {
                         <p> {city}, {state} {zipCode}</p>
                     </div>
                 </div>
-                <div className="p-2 max-h-[10em] overflow-hidden">
+                <div className="p-2 max-h-40 overflow-hidden">
                     <div className="text-md font-bold">{totalItems} {totalItems == 1 ? "Item" : "Items"} </div>
                     <div className="text-sm ml-2 breakwords line-clamp-4">
                         {itemCounts.map((line, idx) => (

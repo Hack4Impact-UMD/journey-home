@@ -148,10 +148,10 @@ export default function ScheduleModal({
             <div className="inset-0 w-full h-full flex bg-black/20 items-center justify-center" onClick={onClose}> {/*clicking out*/}
 
                 <div 
-                    className="flex-1 flex-col rounded-sm border-light-border max-w-[25em] max-h-[40em] z-10 bg-[#FBFCFD] p-6 overflow-y-auto drop-shadow-[#ABABAB]"
+                    className="flex-1 flex-col rounded-sm border-light-border max-w-[25em] max-h-[40em] z-10 bg-[#FBFCFD] p-6 overflow-y-auto drop-shadow-md"
                     onClick={(e) => e.stopPropagation()}>
 
-                    <h1 className="text-[20px] text-[#565656] font-medium text-left w-full">
+                    <h1 className="text-xl text-[#565656] font-medium text-left w-full">
                         Available Times
                     </h1>
 
@@ -167,28 +167,28 @@ export default function ScheduleModal({
                         if (notCurrent) return null;
 
                         return(
-                            <div key={tb.id} className="border-b pb-4 mb-4 flex-col items-center pt-1.75">
+                            <div key={tb.id} className="border-b pb-4 mb-4 flex-col items-center pt-2">
                                 <div className="flex gap-1 items-baseline">
-                                    <h1 className= "text-[14px] text-[#565656] font-medium">
+                                    <h1 className= "text-sm text-[#565656] font-medium">
                                         {weekday}
                                     </h1>
-                                    <h1 className= "text-[12px] text-[#7D7D7D]">
+                                    <h1 className= "text-xs text-[#7D7D7D]">
                                         {day} {month}
                                     </h1>
                                 </div>
 
                                 <div className="flex justify-between items-baseline">
-                                    <p className="cursor-pointer text-sm px-2 py-1 mr-auto font-family-roboto rounded-sm border-[#02AFC7] border text-[#565656] bg-[#F5FAFA]">
+                                    <p className="cursor-pointer text-sm px-2 py-1 mr-auto font-family-roboto rounded-sm border-primary border text-[#565656] bg-[#F5FAFA]">
                                         {timeSlot}
                                     </p>
                                    
                                     <button 
                                     onClick= {isAlreadyAssigned ? undefined : () => addShift(tb)}
                                     disabled= {isAlreadyAssigned}
-                                    className={`text-xs rounded-sm px-3 py-2 flex items-center gap-1.5 
-                                        ${isAlreadyAssigned 
-                                            ? "bg-gray-300 text-gray-600 cursor-not-allowed" 
-                                            : "bg-[#02AFC7] text-[#FFFFFF]"}`
+                                    className={`text-xs rounded-sm px-3 py-2 flex items-center gap-1.5
+                                        ${isAlreadyAssigned
+                                            ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                                            : "bg-primary text-white"}`
                                         }>
                                         {isAlreadyAssigned ? <></> : <Plus className="h-3 w-3" />}
                                         <span className="">
@@ -204,14 +204,14 @@ export default function ScheduleModal({
                                         const { city, zipCode } = getLocoInfo(task);
                                         
                                         return(
-                                            <div key={task.id} className="flex gap-0.75 pt-2 items-baseline">
-                                                <h1 className= "text-[14px] text-[#565656] font-medium">
+                                            <div key={task.id} className="flex gap-1 pt-2 items-baseline">
+                                                <h1 className= "text-sm text-[#565656] font-medium">
                                                     {city}
                                                 </h1>
-                                                <h1 className= "text-[12px] text-[#7D7D7D]">
+                                                <h1 className= "text-xs text-[#7D7D7D]">
                                                     {zipCode}
                                                 </h1>
-                                                <h1 className= "bg-[#E6E6E6] text-[#383838] px-2.5 py-0.75 rounded-[2px] text-[12px]">
+                                                <h1 className= "bg-[#E6E6E6] text-[#383838] px-2.5 py-1 rounded-sm text-xs">
                                                     {getTotalItems(task)}
                                                 </h1>
                                             </div>
