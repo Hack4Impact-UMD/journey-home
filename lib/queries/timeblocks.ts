@@ -11,19 +11,22 @@ export function useTimeBlocks() {
         queryFn: fetchAllTB
     });
 
-    const updateMutation = useMutation({
-        mutationFn: async (newTB: TimeBlock) => {
-            await setTB(newTB);
-        },
+    const setMutation = useMutation({
+        mutationFn: setTB,
         onMutate: async (newTB: TimeBlock) => {
             await queryClient.cancelQueries({ queryKey: ["timeblocks"] });
             const prevData = queryClient.getQueryData<TimeBlock[]>(["timeblocks"]);
 
             queryClient.setQueryData(["timeblocks"], (oldData: TimeBlock[] | undefined) => {
                 if (!oldData) return [newTB];
-                return oldData.map((TB) =>
-                    TB.id === newTB.id ? newTB : TB,
-                );
+
+                if(oldData.find((TB) => TB.id === newTB.id)) {
+                    return oldData.map((TB) =>
+                        TB.id === newTB.id ? newTB : TB,
+                    );
+                }
+
+                return oldData.concat([newTB,]);
             });
 
             return { prevData };
@@ -33,17 +36,14 @@ export function useTimeBlocks() {
                 queryClient.setQueryData(["timeblocks"], context.prevData);
             }
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["timeblocks"] });
-        }
     });
 
-    const updateTB = async (newTB: TimeBlock) => {
-        const promise = updateMutation.mutateAsync(newTB);
+    const setTimeblockToast = async (newTB: TimeBlock) => {
+        const promise = setMutation.mutateAsync(newTB);
         toast.promise(promise, {
-            loading: "updating timeblock...",
-            success: "timeblock modified successfully!",
-            error: "error: couldn't update timeblock",
+            loading: "Setting Timeblock...",
+            success: "Timeblock set successfully!",
+            error: "Error: Couldn't update timeblock",
         });
         
         await promise;
@@ -52,7 +52,8 @@ export function useTimeBlocks() {
     return {
         allTB: query.data ?? [],
 
-        editTB: updateTB,
+        setTimeblockToast: setTimeblockToast,
+        setTimeblock: setMutation.mutateAsync,
 
         isLoading: query.isLoading,
         isError: query.isError,

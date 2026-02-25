@@ -6,7 +6,6 @@ import { setDonationRequest } from "@/lib/services/donations";
 import { setClientRequest } from "@/lib/services/client-request";
 import { useQueryClient } from "@tanstack/react-query";
 import { getTotalItems } from "./Request";
-import { useState } from "react";
 import { Plus } from "lucide-react";
 
 // will need the props on the item being scheduled? to send into the firestore once i hit set shift 
@@ -98,17 +97,14 @@ export default function ScheduleModal({
 
     //need to get all the timeBlocks
     {/*refetch: refetchAllRequests, isLoading,*/}
-    const { allTB: timeBlocks, editTB } = useTimeBlocks();
+    const { allTB: timeBlocks, setTimeblock } = useTimeBlocks();
     const queryClient = useQueryClient();
 
     //sorting timeblocks in latest to furthest away
     //doing this for now, should 100 percent find a better way to do this in the future
     const sortedTBs = [...timeBlocks].sort((a, b) => a.startTime.toMillis() - b.startTime.toMillis());
 
-    const [isScheduling, setIsScheduling] = useState(false);
     const addShift = async (tb: TimeBlock) => {
-        setIsScheduling(true);
-        try {
         //remove any old objects during rescheduling if needed
         const currentTB = scheduleRequest.associatedTimeBlockID;
         if (currentTB && currentTB !== tb.id) {
@@ -118,7 +114,7 @@ export default function ScheduleModal({
                     ...oldTB,
                     tasks: oldTB.tasks.filter(task => task.id !== scheduleRequest.id),
                 };
-                await editTB(updatedOldTB);
+                await setTimeblock(updatedOldTB);
             }
         }
 
@@ -128,34 +124,25 @@ export default function ScheduleModal({
             ...tb,
             tasks: alreadyInTB ? tb.tasks : [...tb.tasks, scheduleRequest],
         };
-        await editTB(updatedTB);
+        await setTimeblock(updatedTB);
 
         //change the associated timeblock id
         if ("donor" in scheduleRequest) {
             const updatedReq: Pickup = {
-            ...scheduleRequest,
-            associatedTimeBlockID: tb.id,
-        }
+                ...scheduleRequest,
+                associatedTimeBlockID: tb.id,
+            }
             await setDonationRequest(updatedReq);
+            await queryClient.invalidateQueries({ queryKey: ["donationRequest"] });
         } else {
             const updatedReq: Delivery = {
-            ...scheduleRequest,
-            associatedTimeBlockID: tb.id,
-        }
+                ...scheduleRequest,
+                associatedTimeBlockID: tb.id,
+            }
             await setClientRequest(updatedReq);
+            await queryClient.invalidateQueries({ queryKey: ["clientRequests"] });
         }
 
-        await queryClient.invalidateQueries({ queryKey: ["donationRequest"] });
-        await queryClient.invalidateQueries({ queryKey: ["clientRequests"] });
-        await queryClient.invalidateQueries({ queryKey: ["timeblocks"] });
-        
-        onClose();
-
-        } catch (e) {
-            console.error("Failed to assign shift:", e);
-        } finally {
-            setIsScheduling(false);
-        }
     };
 
     return (

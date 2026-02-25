@@ -10,6 +10,7 @@ export type ClientRequest = {
     status: ReviewStatus
     items: ItemRequest[],
     associatedTimeBlockID: string | null
+    date: Timestamp
 };
 
 export type Client = LocationContact & {

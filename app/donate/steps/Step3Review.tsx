@@ -4,97 +4,105 @@ import { useDonorForm } from "../DonorFormContext";
 import StepIndicator from "../../../components/form/StepIndicator";
 import Button from "../../../components/form/Button";
 import { Timestamp } from "firebase/firestore";
-import { createDonationRequest } from "../../../lib/services/donations";
+import { addDonorIfNotExists } from "../../../lib/services/donations";
 import { DonationRequest, DonationItem } from "../../../types/donations";
 import { InventoryPhoto } from "@/types/inventory";
 import { uploadImage } from "@/lib/services/inventory";
-import { useState } from "react";
-import { Spinner } from "@/components/ui/spinner";
+import { useDonationRequests } from "@/lib/queries/donation-requests";
+import { toast } from "sonner";
 import Image from "next/image";
 
 
 export default function Step3Review() {
     const { formState, setCurrentStep } = useDonorForm();
-
-    const [submitLoading, setSubmitLoading] = useState<boolean>(false);
+    const { setDonationRequest } = useDonationRequests();
 
     const handleBack = () => {
         setCurrentStep(2);
     };
 
     const handleSubmit = async () => {
-        try {
-            const donor = {
-                firstName: formState.donorInfo.firstName ?? "",
-                lastName: formState.donorInfo.lastName ?? "",
-                email: formState.donorInfo.email ?? "",
-                phoneNumber: formState.donorInfo.phoneNumber ?? "",
-                address: formState.donorInfo.address ?? {
-                    streetAddress: "",
-                    city: "",
-                    state: "CT",
-                    zipCode: "",
-                },
-            };
+        const donor = {
+            firstName: formState.donorInfo.firstName ?? "",
+            lastName: formState.donorInfo.lastName ?? "",
+            email: formState.donorInfo.email ?? "",
+            phoneNumber: formState.donorInfo.phoneNumber ?? "",
+            address: formState.donorInfo.address ?? {
+                streetAddress: "",
+                city: "",
+                state: "CT",
+                zipCode: "",
+            },
+        };
 
-            const validSizes = ["Small", "Medium", "Large"];
-            const items: DonationItem[] = await Promise.all(
-                formState.donationItems.map(async (donationItem) => {
-                    const size =
-                        donationItem.size &&
-                        validSizes.includes(donationItem.size)
-                            ? donationItem.size
-                            : "Medium";
+        const validSizes = ["Small", "Medium", "Large"];
+        const items: DonationItem[] = await Promise.all(
+            formState.donationItems.map(async (donationItem) => {
+                const size =
+                    donationItem.size &&
+                    validSizes.includes(donationItem.size)
+                        ? donationItem.size
+                        : "Medium";
 
-                    const photos: InventoryPhoto[] = await Promise.all(
-                        (donationItem.photos ?? []).map(async (file) => ({
-                            url: await uploadImage(file),
-                            altText: file.name,
-                        }))
-                    );
+                const photos: InventoryPhoto[] = await Promise.all(
+                    (donationItem.photos ?? []).map(async (file) => ({
+                        url: await uploadImage(file),
+                        altText: file.name,
+                    }))
+                );
 
-                    return {
-                        item: {
-                            id: crypto.randomUUID(),
-                            name: donationItem.name ?? "",
-                            category: donationItem.category ?? "",
-                            size: size as "Small" | "Medium" | "Large",
-                            quantity: donationItem.quantity ?? 1,
-                            notes: donationItem.notes ?? "",
-                            dateAdded: Timestamp.now(),
-                            donorEmail: donor.email,
-                            photos: photos,
-                        },
-                        status: "Not Reviewed" as const,
-                    };
-                })
-            );
+                return {
+                    item: {
+                        id: crypto.randomUUID(),
+                        name: donationItem.name ?? "",
+                        category: donationItem.category ?? "",
+                        size: size as "Small" | "Medium" | "Large",
+                        quantity: donationItem.quantity ?? 1,
+                        notes: donationItem.notes ?? "",
+                        dateAdded: Timestamp.now(),
+                        donorEmail: donor.email,
+                        photos: photos,
+                    },
+                    status: "Not Reviewed" as const,
+                };
+            })
+        );
 
-            const isFirstTimeDonor =
-                formState.firstTimeDonor === null
-                    ? true
-                    : formState.firstTimeDonor;
+        const isFirstTimeDonor =
+            formState.firstTimeDonor === null
+                ? true
+                : formState.firstTimeDonor;
 
-            const request: DonationRequest = {
-                id: crypto.randomUUID(),
-                donor,
-                firstTimeDonor: isFirstTimeDonor,
-                howDidYouHear: formState.howDidYouHear ?? "",
-                canDropOff: formState.canDropOff ?? false,
-                notes: formState.notes ?? "",
-                date: Timestamp.now(),
-                items,
-                associatedTimeBlockID: null // Placeholder for now, need to replace to create a Time Block 
-            };
+        const request: DonationRequest = {
+            id: crypto.randomUUID(),
+            donor,
+            firstTimeDonor: isFirstTimeDonor,
+            howDidYouHear: formState.howDidYouHear ?? "",
+            canDropOff: formState.canDropOff ?? false,
+            notes: formState.notes ?? "",
+            date: Timestamp.now(),
+            items,
+            associatedTimeBlockID: null // Placeholder for now, need to replace to create a Time Block
+        };
 
-            await createDonationRequest(request);
-            setCurrentStep(4);
-        } catch (e) {
-            console.error(e);
-            alert(
-                "There was a problem submitting your donation. Please try again."
-            );
-        }
+        await toast.promise(
+            Promise.all([
+                addDonorIfNotExists({
+                    ...donor,
+                    firstTimeDonor: isFirstTimeDonor,
+                    howDidYouHear: formState.howDidYouHear ?? "",
+                    canDropOff: formState.canDropOff ?? false,
+                    notes: formState.notes ?? "",
+                }),
+                setDonationRequest(request),
+            ]),
+            {
+                loading: "Submitting your donation...",
+                success: "Donation submitted successfully!",
+                error: "There was a problem submitting your donation. Please try again.",
+            },
+        );
+        setCurrentStep(4);
     };
 
     return (
@@ -273,17 +281,11 @@ export default function Step3Review() {
                     Back
                 </Button>
                 <Button
-                    onClick={async () => {
-                        if(!submitLoading) {
-                            setSubmitLoading(true);
-                            await handleSubmit();
-                            setSubmitLoading(false);
-                        }
-                    }}
+                    onClick={handleSubmit}
                     variant="primary"
                     className="min-w-[9.375em]"
                 >
-                    Submit {submitLoading && <Spinner className="text-white inline"/>}
+                    Submit
                 </Button>
             </div>
         </div>

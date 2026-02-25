@@ -10,7 +10,6 @@ export async function getAllClientRequest(): Promise <ClientRequest[]> {
     return requests;
 }
 
-
 export async function setClientRequest(clientreq: ClientRequest): Promise <void> {
     const docRef = doc(db, CLIENTREQS_COLLECTION, clientreq.id);
     await setDoc(docRef, clientreq);
