@@ -1,4 +1,5 @@
-//import { useState } from "react";
+import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { TimeBlock, Task, Delivery, Pickup } from "@/types/schedule";
 import { useTimeBlocks } from "@/lib/queries/timeblocks";
 import { Timestamp } from "firebase/firestore";
@@ -6,6 +7,7 @@ import { useDonationRequests } from "@/lib/queries/donation-requests";
 import { useClientRequests } from "@/lib/queries/client-requests";
 import { getTotalItems } from "./Request";
 import { Plus } from "lucide-react";
+import { toast } from "sonner";
 
 // will need the props on the item being scheduled? to send into the firestore once i hit set shift 
 // would probably have the item identifier, onClose() function 
@@ -94,66 +96,74 @@ export default function ScheduleModal({
     onClose,
  } : ScheduleModalProps) { 
 
-    //need to get all the timeBlocks
-    {/*refetch: refetchAllRequests, isLoading,*/}
     const { allTB: timeBlocks, setTimeblock } = useTimeBlocks();
     const { setDonationRequest } = useDonationRequests();
     const { setClientRequest } = useClientRequests();
+
+    useEffect(() => {
+        document.body.style.overflow = "hidden";
+        return () => { document.body.style.overflow = ""; };
+    }, []);
+
 
     //sorting timeblocks in latest to furthest away
     //doing this for now, should 100 percent find a better way to do this in the future
     const sortedTBs = [...timeBlocks].sort((a, b) => a.startTime.toMillis() - b.startTime.toMillis());
 
     const addShift = async (tb: TimeBlock) => {
-        //remove any old objects during rescheduling if needed
+        const writes: Promise<void>[] = [];
+
+        //remove from old timeblock if rescheduling
         const currentTB = scheduleRequest.associatedTimeBlockID;
         if (currentTB && currentTB !== tb.id) {
             const oldTB = timeBlocks.find(t => t.id === currentTB);
             if (oldTB) {
-                const updatedOldTB = {
+                writes.push(setTimeblock({
                     ...oldTB,
                     tasks: oldTB.tasks.filter(task => task.id !== scheduleRequest.id),
-                };
-                await setTimeblock(updatedOldTB);
+                }));
             }
         }
 
-        //add to the task list !
+        //add to new timeblock
         const alreadyInTB = tb.tasks.some(task => task.id === scheduleRequest.id);
-        const updatedTB = {
+        writes.push(setTimeblock({
             ...tb,
             tasks: alreadyInTB ? tb.tasks : [...tb.tasks, scheduleRequest],
-        };
-        await setTimeblock(updatedTB);
+        }));
 
-        //change the associated timeblock id
-        if ("donor" in scheduleRequest) {
-            const updatedReq: Pickup = {
-                ...scheduleRequest,
-                associatedTimeBlockID: tb.id,
-            }
-            await setDonationRequest(updatedReq);
-        } else {
-            const updatedReq: Delivery = {
-                ...scheduleRequest,
-                associatedTimeBlockID: tb.id,
-            }
-            await setClientRequest(updatedReq);
-        }
+        //update associated timeblock id on the request
+        const updatedReq = { ...scheduleRequest, associatedTimeBlockID: tb.id };
+        writes.push(
+            "donor" in scheduleRequest
+                ? setDonationRequest(updatedReq as Pickup)
+                : setClientRequest(updatedReq as Delivery)
+        );
 
+        const promise = Promise.all(writes);
+        toast.promise(promise, {
+            loading: "Assigning task to timeblock...",
+            success: "Task assigned!",
+            error: "Error: Couldn't assign task",
+        });
+        await promise;
     };
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center font-family-roboto">
             <div className="inset-0 w-full h-full flex bg-black/20 items-center justify-center" onClick={onClose}> {/*clicking out*/}
 
-                <div 
-                    className="flex-1 flex-col rounded-sm border-light-border max-w-[25em] max-h-[40em] z-10 bg-[#FBFCFD] p-6 overflow-y-auto drop-shadow-md"
+                <div
+                    className="flex-1 flex flex-col rounded-sm border-light-border max-w-[25em] max-h-[40em] z-10 bg-[#FBFCFD] drop-shadow-md overflow-hidden"
                     onClick={(e) => e.stopPropagation()}>
 
-                    <h1 className="text-xl text-[#565656] font-medium text-left w-full">
-                        Available Times
-                    </h1>
+                    <div className="px-6 pt-6 pb-3 bg-[#FBFCFD]">
+                        <h1 className="text-xl text-[#565656] font-medium text-left w-full">
+                            Available Times
+                        </h1>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto px-6">
 
                     {sortedTBs.map((tb) => {
                         const { weekday, day, month } = getDateInfo(tb.startTime);
@@ -192,7 +202,7 @@ export default function ScheduleModal({
                                         }>
                                         {isAlreadyAssigned ? <></> : <Plus className="h-3 w-3" />}
                                         <span className="">
-                                            {isAlreadyAssigned ? "Assigned" :  "Add Shift"}
+                                            {isAlreadyAssigned ? "Assigned" :  "Add To Shift"}
                                         </span>
                                     </button>
                                 </div>
@@ -222,9 +232,18 @@ export default function ScheduleModal({
                                 </div>
                             </div>
                         );   
-                    })} 
+                    })}
+
+                    </div>
+
+                    <div className="px-6 py-2 bg-[#FBFCFD] shadow-[0_-2px_6px_rgba(0,0,0,0.08)] flex justify-end">
+                        <button onClick={onClose} className="border-light-border border rounded-xs px-4 py">
+                            Done
+                        </button>
+                    </div>
                 </div>
-            </div>    
-        </div>
+            </div>
+        </div>,
+        document.body
     )
 }
