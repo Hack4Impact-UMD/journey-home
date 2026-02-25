@@ -1026,6 +1026,7 @@ async function addCaseManagerRequests(count: number) {
             ],
 
             associatedTimeBlockID: randomBlock.id,
+            date: Timestamp.now(),
         };
 
         await setCaseRequest(request);
