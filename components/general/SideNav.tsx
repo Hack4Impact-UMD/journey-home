@@ -17,6 +17,11 @@ export default function SideNavbar() {
 
     return (
         <div className="h-full w-[13em] p-[1em] flex flex-col font-family-roboto">
+            <Link href="/" className="pb-4">
+                <span className="text-primary font-family-raleway font-semibold text-xl">Journey</span>
+                <span className="text-secondary font-family-raleway font-semibold text-xl">Home</span>
+            </Link>
+
             <SideNavbarLink
                 icon={InventoryIcon}
                 name="Inventory"
@@ -65,12 +70,6 @@ export default function SideNavbar() {
                 path="/control-panel"
                 roles={["Admin"]}
             />
-
-            {/* <SideNavbarLink
-                name="Profile"
-                path="/profile"
-                roles={["Admin", "Case Manager", "Volunteer"]}
-            /> */}
 
             <div className="mt-auto w-full">
                 <div className=" pt-[0.5rem] pb-[0.5rem] pl-[1rem] border border-light-border rounded-lg w-full">
