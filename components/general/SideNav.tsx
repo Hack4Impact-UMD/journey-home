@@ -17,7 +17,7 @@ export default function SideNavbar() {
             <SideNavbarLinkGroup
                 name="Inventory"
                 path="/inventory"
-                roles={["Admin"]}
+                roles={["Admin", "Volunteer"]}
             >
                 <SideNavbarLink
                     name="Warehouse"
