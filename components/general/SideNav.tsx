@@ -1,11 +1,11 @@
 "use client";
-import { useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import React from "react";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserRole } from "@/types/user";
 import Link from "next/link";
-import {InventoryIcon} from "../icons/InventoryIcon";
+import { InventoryIcon } from "../icons/InventoryIcon";
 import { DonorRequestsIcon } from "../icons/DonorRequestsIcon";
 import { ClientRequestIcon } from "../icons/ClientRequestIcon";
 import { PickupDeliveryIcon } from "../icons/PickupDeliveryIcon";
@@ -17,19 +17,15 @@ export default function SideNavbar() {
 
     return (
         <div className="h-full w-[13em] p-[1em] flex flex-col font-family-roboto">
-            <Link href="/" className="text-primary font-extrabold pb-[1em]">
-                {auth.state.userData?.role ?? "Loading..."}
-            </Link>
-
             <SideNavbarLink
-                icon = {InventoryIcon}
+                icon={InventoryIcon}
                 name="Inventory"
                 path="/inventory"
                 roles={["Admin", "Volunteer"]}
             />
 
             <SideNavbarLink
-                icon = {DonorRequestsIcon}
+                icon={DonorRequestsIcon}
                 name="Donor Requests"
                 path="/inventory/donation-requests"
                 roles={["Admin"]}
@@ -43,41 +39,56 @@ export default function SideNavbar() {
             /> */}
 
             <SideNavbarLink
-                icon = {ClientRequestIcon}
+                icon={ClientRequestIcon}
                 name="Client Requests"
                 path="/client-requests"
                 roles={["Admin", "Case Manager"]}
             />
 
             <SideNavbarLink
-                icon = {PickupDeliveryIcon}
+                icon={PickupDeliveryIcon}
                 name="Pickups & Deliveries"
                 path="/pickups-deliveries"
                 roles={["Admin"]}
             />
 
             <SideNavbarLink
-                icon = {UserManagementIcon}
+                icon={UserManagementIcon}
                 name="User Management"
                 path="/user-management"
                 roles={["Admin"]}
             />
 
-
             <SideNavbarLink
-                icon = {ControlPanelIcon}
+                icon={ControlPanelIcon}
                 name="Control Panel"
                 path="/control-panel"
                 roles={["Admin"]}
             />
-
-
 
             {/* <SideNavbarLink
                 name="Profile"
                 path="/profile"
                 roles={["Admin", "Case Manager", "Volunteer"]}
             /> */}
+
+            <div className="mt-auto w-full">
+                <div className=" pt-[0.5rem] pb-[0.5rem] pl-[1rem] border border-light-border rounded-lg w-full">
+                    <Link href="/profile">
+                        <div className="text-text-1">
+                            {auth.state.userData && (
+                                <span className="font-family-opensans">
+                                    {auth.state.userData.firstName}{" "}
+                                    {auth.state.userData.lastName}
+                                </span>
+                            )}
+                        </div>
+                        <div className="text-text-2">
+                            {auth.state.userData?.role ?? "Loading..."}
+                        </div>
+                    </Link>
+                </div>
+            </div>
         </div>
     );
 }
@@ -86,7 +97,7 @@ function SideNavbarLink({
     name,
     path,
     roles,
-    icon :Icon,
+    icon: Icon,
 }: {
     name: string;
     path: string;
@@ -106,7 +117,7 @@ function SideNavbarLink({
     return (
         <Link
             href={path}
-            className={`hover:text-primary pb-3 text-sm flex items-center gap-2 ${
+            className={`hover:text-primary pb-4 text-sm flex items-center gap-2 ${
                 pathname?.startsWith(path) ? "text-primary font-semibold" : ""
             }`}
         >
