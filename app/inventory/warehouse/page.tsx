@@ -188,7 +188,7 @@ export default function WarehousePage() {
     return (
         <>
             <div className="flex h-screen">
-                <div className="flex-1 flex flex-col overflow-hidden">
+                <div className="flex-1 flex flex-col overflow-auto">
                     {editedItem !== null && (
                         <SetItemModal
                             item={editedItem}
