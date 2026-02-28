@@ -54,7 +54,7 @@ export function StockSidebar({
             {/* Sidebar Contents */}
             <div
                 className={cn(
-                    "fixed top-6 right-0 h-full bg-white shadow-2xl z-50 transition-transform duration-500 ease-in-out flex flex-col w-[18rem]",
+                    "fixed top-0 right-0 h-full bg-white shadow-2xl z-50 transition-transform duration-500 ease-in-out flex flex-col w-[18rem]",
                     isOpen ? "translate-x-0" : "translate-x-full",
                 )}
             >
