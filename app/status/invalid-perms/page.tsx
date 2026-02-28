@@ -9,20 +9,30 @@ export default function InvalidPerms() {
 
     return (
         <>
-            <div className="w-full h-full flex items-center align-center flex-col p-10 gap-2">
-                <h1>You don&apos;t have permissions to view this page</h1>
-                <button
-                    className="border border-light-border px-8 rounded-xs font-family-roboto"
-                    onClick={() => router.push("/")}
-                >
-                    Home
-                </button>
-                <button
-                    className="border border-light-border px-8 rounded-xs font-family-roboto"
-                    onClick={() => auth.logout().then(() => router.push("/login"))}
-                >
-                    Logout
-                </button>
+            <div className="w-full h-full flex items-center justify-center flex-col gap-4 bg-[#ECFBFE]">
+                <h1 className="text-3xl text-text-2">Page not found.</h1>
+
+                <div className="flex items-center justify-center flex-col pt-[2rem]">
+                    <p className="text-text-2">
+                        You don&apos;t have permissions to view this page
+                    </p>
+                    <div className = "flex flex-row gap-4">
+                    <button
+                        className="border border-light-border px-3 py-1 rounded-lg font-family-roboto mt-[1rem] bg-background text-text-2"
+                        onClick={() => router.push("/")}
+                    >
+                        Back to Home
+                    </button>
+                    <button
+                         className="border border-light-border px-3 py-1 rounded-lg font-family-roboto mt-[1rem] bg-background text-text-2"
+                        onClick={() =>
+                            auth.logout().then(() => router.push("/login"))
+                        }
+                    >
+                        Logout
+                    </button>
+                    </div>
+                </div>
             </div>
         </>
     );

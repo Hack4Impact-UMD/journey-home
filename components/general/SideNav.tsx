@@ -71,7 +71,8 @@ export default function SideNavbar() {
                 roles={["Admin"]}
             />
 
-            <div className="mt-auto w-full">
+            <div className="mt-auto w-full" onClick={() => auth.logout()}>
+            {/* <div className="mt-auto w-full"> */}
                 <div className=" pt-[0.5rem] pb-[0.5rem] pl-[1rem] border border-light-border rounded-lg w-full">
                     <Link href="/profile">
                         <div className="text-text-1">
