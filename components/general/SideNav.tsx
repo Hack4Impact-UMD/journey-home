@@ -19,7 +19,7 @@ export default function SideNavbar() {
         <div className="h-full w-[13em] p-[1em] flex flex-col font-family-roboto">
             <Link href="/" className="pb-4">
                 <span className="text-primary font-family-raleway font-semibold text-xl">Journey</span>
-                <span className="text-secondary font-family-raleway font-semibold text-xl">Home</span>
+                <span className="text-secondary-1 font-family-raleway font-semibold text-xl">Home</span>
             </Link>
 
             <SideNavbarLink
