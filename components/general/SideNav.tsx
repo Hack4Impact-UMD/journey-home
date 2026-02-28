@@ -6,13 +6,17 @@ import { useAuth } from "@/contexts/AuthContext";
 import { UserRole } from "@/types/user";
 import Link from "next/link";
 import {InventoryIcon} from "../icons/InventoryIcon";
+import { DonorRequestsIcon } from "../icons/DonorRequestsIcon";
 import { ClientRequestIcon } from "../icons/ClientRequestIcon";
+import { PickupDeliveryIcon } from "../icons/PickupDeliveryIcon";
+import { UserManagementIcon } from "../icons/UserMangementIcon";
+import { ControlPanelIcon } from "../icons/ControlPanelIcon";
 
 export default function SideNavbar() {
     const auth = useAuth();
 
     return (
-        <div className="h-full w-[12.5em] p-[1em] flex flex-col font-family-roboto">
+        <div className="h-full w-[13em] p-[1em] flex flex-col font-family-roboto">
             <Link href="/" className="text-primary font-extrabold pb-[1em]">
                 {auth.state.userData?.role ?? "Loading..."}
             </Link>
@@ -25,10 +29,18 @@ export default function SideNavbar() {
             />
 
             <SideNavbarLink
-                name="User Management"
-                path="/user-management"
+                icon = {DonorRequestsIcon}
+                name="Donor Requests"
+                path="/inventory/donation-requests"
                 roles={["Admin"]}
             />
+
+            {/* <SideNavbarLink
+                icon = {}
+                name="Donation Form"
+                path="/donate"
+                roles={[]}
+            /> */}
 
             <SideNavbarLink
                 icon = {ClientRequestIcon}
@@ -38,28 +50,34 @@ export default function SideNavbar() {
             />
 
             <SideNavbarLink
+                icon = {PickupDeliveryIcon}
                 name="Pickups & Deliveries"
                 path="/pickups-deliveries"
                 roles={["Admin"]}
             />
 
             <SideNavbarLink
+                icon = {UserManagementIcon}
+                name="User Management"
+                path="/user-management"
+                roles={["Admin"]}
+            />
+
+
+            <SideNavbarLink
+                icon = {ControlPanelIcon}
                 name="Control Panel"
                 path="/control-panel"
                 roles={["Admin"]}
             />
 
-            <SideNavbarLink
-                name="Donation Form"
-                path="/donate"
-                roles={[]}
-            />
 
-            <SideNavbarLink
+
+            {/* <SideNavbarLink
                 name="Profile"
                 path="/profile"
                 roles={["Admin", "Case Manager", "Volunteer"]}
-            />
+            /> */}
         </div>
     );
 }
@@ -73,7 +91,7 @@ function SideNavbarLink({
     name: string;
     path: string;
     roles: UserRole[];
-    icon?: React.FC;
+    icon: React.FC;
 }) {
     const pathname = usePathname();
     const auth = useAuth();
@@ -92,7 +110,7 @@ function SideNavbarLink({
                 pathname?.startsWith(path) ? "text-primary font-semibold" : ""
             }`}
         >
-            {Icon && <Icon />}
+            <Icon />
             {name}
         </Link>
     );
