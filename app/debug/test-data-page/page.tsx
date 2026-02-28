@@ -874,7 +874,7 @@ async function seedUsers() {
             dob: user.dob,
             role: user.role,
             email: user.email,
-            pending: Math.random() > 0.75 && user.role == "Volunteer",
+            pending: (user.role === "Volunteer" && Math.random() > 0.75) ? "Case Manager" : null,
             emailVerified: false,
         });
     }
@@ -1026,6 +1026,7 @@ async function addCaseManagerRequests(count: number) {
             ],
 
             associatedTimeBlockID: randomBlock.id,
+            date: Timestamp.now(),
         };
 
         await setCaseRequest(request);

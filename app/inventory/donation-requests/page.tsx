@@ -5,20 +5,16 @@ import { DRTable } from "@/components/donation-requests/DRTable";
 import { ItemReviewModal } from "@/components/donation-requests/ItemReviewModal";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { SortOption } from "@/components/inventory/SortOption";
-import {
-    getAllDonationRequests,
-    setRequestItemStatus,
-} from "@/lib/services/donations";
-import {
-    DonationItem,
-    DonationRequest,
-    DonationSearchParams,
-} from "@/types/donations";
-import { ReviewStatus } from "@/types/general";
-import { useEffect, useState } from "react";
+import { useDonationRequests } from "@/lib/queries/donation-requests";
+import { DonationItem, DonationSearchParams } from "@/types/donations";
+import { useState } from "react";
 
 export default function DonationRequestsPage() {
-    const [selectedDR, setSelectedDR] = useState<DonationRequest | null>(null);
+    const { donationRequests, setDonationRequestToast, refetch } =
+        useDonationRequests();
+    const [selectedDRId, setSelectedDRId] = useState<string | null>(null);
+    const selectedDR =
+        donationRequests.find((dr) => dr.id === selectedDRId) ?? null;
     const [selectedItem, setSelectedItem] = useState<DonationItem | null>(null);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [searchParams, setSearchParams] = useState<DonationSearchParams>({
@@ -26,49 +22,6 @@ export default function DonationRequestsPage() {
         sortBy: "Date",
         ascending: false,
     });
-
-    const [allDonationRequests, setAllDonationRequests] = useState<
-        DonationRequest[]
-    >([]);
-
-    useEffect(() => {
-        getAllDonationRequests().then((res) => {
-            setAllDonationRequests(res);
-        });
-    }, []);
-
-    function changeItemStatus(
-        drID: string,
-        itemID: string,
-        status: ReviewStatus,
-    ) {
-        setAllDonationRequests((prevRequests) =>
-            prevRequests.map((request) =>
-                request.id == drID
-                    ? {
-                          ...request,
-                          items: request.items.map((donationItem) =>
-                              donationItem.item.id == itemID
-                                  ? { ...donationItem, status: status }
-                                  : donationItem,
-                          ),
-                      }
-                    : request,
-            ),
-        );
-        setSelectedDR((request) =>
-            request
-                ? {
-                      ...request,
-                      items: request.items.map((donationItem) =>
-                          donationItem.item.id == itemID
-                              ? { ...donationItem, status: status }
-                              : donationItem,
-                      ),
-                  }
-                : null,
-        );
-    }
 
     return selectedDR ? (
         <>
@@ -78,24 +31,14 @@ export default function DonationRequestsPage() {
                     item={selectedItem}
                     onClose={() => setSelectedItem(null)}
                     setStatus={(status) => {
-                        setRequestItemStatus(
-                            selectedDR.id,
-                            selectedItem.item.id,
-                            status,
-                        ).then((res) => {
-                            if (res) {
-                                changeItemStatus(
-                                    selectedDR.id,
-                                    selectedItem.item.id,
-                                    status,
-                                );
-                                setSelectedItem(null);
-                            } else {
-                                console.error(
-                                    `Setting Request Item Status failed. ${selectedDR.id} ${selectedItem.item.id}`,
-                                );
-                            }
-                        });
+                        setDonationRequestToast({
+                            ...selectedDR,
+                            items: selectedDR.items.map((item) =>
+                                item.item.id === selectedItem.item.id
+                                    ? { ...item, status }
+                                    : item,
+                            ),
+                        }).then(() => setSelectedItem(null));
                     }}
                 />
             )}
@@ -103,7 +46,7 @@ export default function DonationRequestsPage() {
                 <div className="flex gap-3">
                     <button
                         className="w-16 h-8 text-white bg-primary rounded-xs text-sm"
-                        onClick={() => setSelectedDR(null)}
+                        onClick={() => setSelectedDRId(null)}
                     >
                         Back
                     </button>
@@ -133,11 +76,7 @@ export default function DonationRequestsPage() {
                     <SearchBox
                         value={searchQuery}
                         onChange={setSearchQuery}
-                        onSubmit={() => {
-                            getAllDonationRequests().then((res) => {
-                                setAllDonationRequests(res);
-                            });
-                        }}
+                        onSubmit={() => refetch()}
                     />
                     <SortOption
                         label="Date"
@@ -176,7 +115,7 @@ export default function DonationRequestsPage() {
                 </div>
             </div>
             <DRTable
-                donationRequests={allDonationRequests
+                donationRequests={donationRequests
                     .filter((request) => {
                         const donorFullName =
                             `${request.donor.firstName} ${request.donor.lastName}`.toLowerCase();
@@ -238,7 +177,7 @@ export default function DonationRequestsPage() {
 
                         return diff;
                     })}
-                openDR={setSelectedDR}
+                openDR={(dr) => setSelectedDRId(dr.id)}
             />
         </>
     );
