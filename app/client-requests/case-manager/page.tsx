@@ -1,11 +1,14 @@
 "use client";
 
+import { RequestDetailsPage } from "@/components/client-requests/RequestDetails";
 import { ProtectedRoute } from "@/components/general/ProtectedRoute";
 import SideNavbar from "@/components/general/SideNav";
 import TopNavbar from "@/components/general/TopNav";
+import { useClientRequests } from "@/lib/queries/client-requests";
 import Link from "next/link";
 
 export default function ClientRequestsCaseManagerPage() {
+    const { clientRequests, refetch: refetchClientRequests } = useClientRequests();
     return (
         <ProtectedRoute allow={["Case Manager"]}>
             <div className="h-full w-full flex flex-col font-family-roboto">
@@ -23,6 +26,13 @@ export default function ClientRequestsCaseManagerPage() {
                             >
                                 Create Request
                             </Link>
+                            {clientRequests.map((client) => (
+                                                        <RequestDetailsPage
+                                                            key={client.id}
+                                                            client={client}
+                                                            userRole="CaseManager"
+                                                        />
+                                                    ))}
                         </div>
                     </div>
                 </div>
