@@ -129,7 +129,7 @@ export default function ListView() {
                                                 className="flex items-center gap-4 hover:bg-gray-50 px-2 py-1.5 rounded-lg cursor-pointer transition-colors"
                                             >
                                                 <div className={`w-3 h-3 rounded-full flex-shrink-0 ${dotColor}`} />
-                                                <div className="text-sm text-[#3D4B6B] w-28 flex-shrink-0">
+                                                <div className="text-sm text-[#3D4B6B] w-36 flex-shrink-0 whitespace-nowrap">
                                                     {moment(start).format("h:mma")}-{moment(end).format("h:mma")}
                                                 </div>
                                                 <div className="text-sm text-[#3D4B6B]">
