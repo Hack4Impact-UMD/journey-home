@@ -39,30 +39,30 @@ export default function ClientRequestsCaseManagerPage() {
                         </h1>
 
                         <div className="flex gap-8 text-sm">
-                            <h1 onClick={() => changeGroup("All")} 
+                            <button onClick={() => changeGroup("All")} 
                                 className= {`py-4${
                                     selectedGroup == "All"
                                         ? " border-b-2 border-primary text-primary"
                                         : ""
                             }`}>
                                 All
-                            </h1>
-                            <h1 onClick={() => changeGroup("New")}
+                            </button>
+                            <button onClick={() => changeGroup("New")}
                                 className= {`py-4${
                                     selectedGroup == "New"
                                         ? " border-b-2 border-primary text-primary"
                                         : ""
                             }`}>
                                 Pending
-                            </h1>
-                            <h1 onClick={() => changeGroup("Reviewed")}
+                            </button>
+                            <button onClick={() => changeGroup("Reviewed")}
                                 className= {`py-4${
                                     selectedGroup == "Reviewed"
                                         ? " border-b-2 border-primary text-primary"
                                         : ""
                             }`}>
                                 Reviewed
-                            </h1>
+                            </button>
                         </div>
                         {/*actual content*/}
                         <div className="bg-background rounded-xl flex-wrap my-2 flex-1 py-4 px-6 min-h-0 overflow-hidden">
