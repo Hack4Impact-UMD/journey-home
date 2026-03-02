@@ -36,8 +36,6 @@ export default function SideNavbar() {
                 roles={["Admin"]}
             />
 
-
-
             <SideNavbarLink
                 icon={ClientRequestIcon}
                 name="Client Requests"

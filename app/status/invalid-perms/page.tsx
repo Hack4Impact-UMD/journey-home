@@ -7,6 +7,16 @@ export default function InvalidPerms() {
     const router = useRouter();
     const auth = useAuth();
 
+    const handleLogout = async () => {
+        try{
+            await auth.logout();
+            router.push("/login");
+        } catch(error){
+            console.error("Logout failed", error);
+        }
+
+    };
+
     return (
         <>
             <div className="w-full h-full flex items-center justify-center flex-col gap-4 bg-[#ECFBFE]">
@@ -25,9 +35,7 @@ export default function InvalidPerms() {
                     </button>
                     <button
                          className="border border-light-border px-3 py-1 rounded-lg font-family-roboto mt-[1rem] bg-background text-text-2"
-                        onClick={() =>
-                            auth.logout().then(() => router.push("/login"))
-                        }
+                        onClick={handleLogout}
                     >
                         Logout
                     </button>

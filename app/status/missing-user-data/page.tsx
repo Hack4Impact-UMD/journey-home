@@ -7,21 +7,28 @@ export default function MissingUserData() {
     const auth = useAuth();
     const router = useRouter();
 
+    const handleLogout = async () => {
+        try {
+            await auth.logout();
+            router.push("/login");
+        } catch (error) {
+            console.error("Logout failed", error);
+        }
+    };
+
     return (
         <>
             <div className="w-full h-full flex items-center justify-center flex-col gap-4 bg-[#ECFBFE]">
                 <h1 className="text-3xl text-text-2">Page not found.</h1>
 
-                <div className = "flex items-center justify-center flex-col pt-[2rem]">
+                <div className="flex items-center justify-center flex-col pt-[2rem]">
                     <p className="text-text-2">
                         Could not find data for this user
                     </p>
 
                     <button
                         className="border border-light-border px-3 py-1 rounded-lg font-family-roboto mt-[1rem] bg-background text-text-2"
-                        onClick={() =>
-                            auth.logout().then(() => router.push("/login"))
-                        }
+                        onClick={handleLogout}
                     >
                         Logout
                     </button>
