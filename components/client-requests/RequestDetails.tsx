@@ -11,15 +11,15 @@ export function RequestDetailsPage({client, userRole} : ClientProps) {
             <div>
                 {userRole === "Admin" && (
                     <div>
-                        <div className="border-b border-gray-400 text-[#02AFC7] font-bold p-2"> Case Manager</div>
+                        <div className="border-b border-gray-400 text-[#02AFC7] bg-[#FAFAFB] font-bold p-2"> Case Manager</div>
                         <div className="flex flex-row">
-                            <div className="w-1/2 divide-y divide-x divide-gray-400">
+                            <div className="w-1/2 divide-y divide-x divide-gray-400 bg-[#FAFAFB]">
                                 <div className="p-2">Name</div>
                                 <div className="p-2">Email</div>
                                 <div className="p-2" >Phone Number</div>
                                 <div className="border-r border-gray-400 p-2">Program</div>
                             </div>
-                            <div className="w-1/2 divide-y divide-x divide-gray-400 bg-white">
+                            <div className="w-1/2 divide-y divide-gray-400 bg-white">
                                 <div className="p-2">{client.client.firstName} {client.client.lastName} </div>
                                 <div className="p-2">{client.client.email} </div>
                                 <div className="p-2">{client.client.phoneNumber} </div>
@@ -32,10 +32,10 @@ export function RequestDetailsPage({client, userRole} : ClientProps) {
                     
                 )}
             </div>
-            <div className="divide-x divide-gray-400">
-                <div className="border-b border-gray-400 text-[#02AFC7] font-bold p-2">Client</div>
+            <div className="border-b border-gray-400 text-[#02AFC7] font-bold p-2 bg-[#FAFAFB]">Client</div>
+                <div className="divide-x divide-gray-400">
                 <div className="flex flex-row">
-                    <div className="w-1/2 divide-y divide-x divide-gray-400">
+                    <div className="w-1/2 divide-y divide-x divide-gray-400 bg-[#FAFAFB]">
                         <div className="p-2">HMIS number</div>
                         <div className="p-2">Client phone number</div >
                         <div className="p-2">Secondary contact number</div>
@@ -66,9 +66,9 @@ export function RequestDetailsPage({client, userRole} : ClientProps) {
                 </div>
             </div>
             <div className="divide-y divide-gray-400" >
-                <div className="border-b border-gray-400 text-[#02AFC7] font-bold p-2">Client's New Home</div>
+                <div className="border-b border-gray-400 text-[#02AFC7] font-bold p-2 bg-[#FAFAFB]">Client's New Home</div>
                 <div className="flex flex-row">
-                    <div className="w-1/2 divide-y divide-x divide-gray-400"> 
+                    <div className="w-1/2 divide-y divide-x divide-gray-400 bg-[#FAFAFB]"> 
                         <div className="p-2">Address</div>
                         <div className="p-2">Apt, unit, etc.</div>
                         <div className="border-r border-gray-400 p-2">Working elevator?</div>
@@ -84,7 +84,7 @@ export function RequestDetailsPage({client, userRole} : ClientProps) {
     
             </div>
             <div>
-                <div className="border-b border-gray-400 text-[#02AFC7] font-bold p-2">Furniture Requests</div>
+                <div className="border-b border-gray-400 text-[#02AFC7] font-bold p-2 bg-[#FAFAFB]">Furniture Requests</div>
                 <div className="flex flex-row flex-wrap w-full bg-white">
                     {client.items.map((item) => (
                         <div key={item.name} className="w-1/3 flex flex-row border-b border-gray-300 p-2">
