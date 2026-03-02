@@ -67,7 +67,9 @@ export default function DonationRequestsPage() {
                     {selectedDR.donor.firstName} {selectedDR.donor.lastName}
                 </span>
             </div>
-            <DRContentsTable request={selectedDR} openItem={setSelectedItem} />
+            <div className="flex-1 overflow-auto min-h-0">
+                <DRContentsTable request={selectedDR} openItem={setSelectedItem} />
+            </div>
         </>
     ) : (
         <>
@@ -114,6 +116,7 @@ export default function DonationRequestsPage() {
                     />
                 </div>
             </div>
+            <div className="flex-1 overflow-auto min-h-0">
             <DRTable
                 donationRequests={donationRequests
                     .filter((request) => {
@@ -179,6 +182,7 @@ export default function DonationRequestsPage() {
                     })}
                 openDR={(dr) => setSelectedDRId(dr.id)}
             />
+            </div>
         </>
     );
 }
