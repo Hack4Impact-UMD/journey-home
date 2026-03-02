@@ -11,6 +11,7 @@ import { RequestDetailsPage } from "@/components/client-requests/RequestDetails"
 import { useClientRequests } from "@/lib/queries/client-requests";
 import { useState } from "react";
 import { ReviewStatus } from "@/types/general";
+import { toast } from "sonner";
 
 export default function ClientRequestsAdminPage() {
     const { clientRequests, refetch: refetchClientRequests, setClientRequestToast } = useClientRequests();
@@ -26,15 +27,22 @@ export default function ClientRequestsAdminPage() {
     const [selectedStatus, setStatus] = useState<ReviewStatus[]>(statusOpts);
 
     const handleUpdateStatus = async (status: ReviewStatus) => {
-    if (!selectedCR) return;
+        if (!selectedCR) return;
 
-    await setClientRequestToast({
-        ...selectedCR,
-        status
-    });
-
-    setSelectedCRId(null);
-    };
+        toast.promise(
+            setClientRequestToast({
+                ...selectedCR,
+                status
+            }).then(() => {
+                setSelectedCRId(null);
+            }),
+            {
+                loading: "Updating status...",
+                success: "Status updated successfully!",
+                error: "Error: Couldn't update status",
+            }
+        );
+    }
 
     return (
         <ProtectedRoute allow={["Admin"]}>
@@ -48,30 +56,30 @@ export default function ClientRequestsAdminPage() {
                         </h1>
                         {/*top bar of options, need to filter the displayed info based on that*/}
                         <div className="flex gap-8 text-sm">
-                            <button onClick={() => changeGroup("All")} 
+                            <h1 onClick={() => changeGroup("All")} 
                                 className= {`py-4${
                                     selectedGroup == "All"
                                         ? " border-b-2 border-primary text-primary"
                                         : ""
                             }`}>
                                 All
-                            </button>
-                            <button onClick={() => changeGroup("New")}
+                            </h1>
+                            <h1 onClick={() => changeGroup("New")}
                                 className= {`py-4${
                                     selectedGroup == "New"
                                         ? " border-b-2 border-primary text-primary"
                                         : ""
                             }`}>
                                 New
-                            </button>
-                            <button onClick={() => changeGroup("Reviewed")}
+                            </h1>
+                            <h1 onClick={() => changeGroup("Reviewed")}
                                 className= {`py-4${
                                     selectedGroup == "Reviewed"
                                         ? " border-b-2 border-primary text-primary"
                                         : ""
                             }`}>
                                 Reviewed
-                            </button>
+                            </h1>
                         </div>
                         {/*actual content*/}
                         <div className="bg-background rounded-xl flex-wrap my-2 flex-1 py-4 px-6 min-h-0 overflow-hidden">
