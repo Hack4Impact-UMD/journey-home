@@ -45,7 +45,7 @@ function CRTableRow({ request, onOpen, }: { request: ClientRequest; onOpen: () =
     return (
         <>
             <div 
-                className="h-10 border-light-border border-b border-x flex items-center font-family-roboto text-sm text-text-1 hover:bg-blue-50 cursor-pointer"
+                className="h-10 border-light-border border-b border-x flex items-center font-family-roboto text-sm text-text-1"
             >
                 <div className="w-[20%] px-4 flex items-center">
                     <input
