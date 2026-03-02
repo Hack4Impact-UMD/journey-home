@@ -15,7 +15,7 @@ export function AdminCRTable({
     return (
         <>
             <div className="w-full h-full min-w-3xl">
-                <div className="h-12 bg-[#FAFAFB] border-light-border border flex items-center font-family-roboto font-bold text-sm text-text-1">
+                <div className="h-12 bg-[#FAFAFB] border-light-border border flex items-center font-family-roboto font-bold text-sm text-text-1 shrink-0">
                     <span className="w-[20%] border-l-2 border-light-border px-4">
                         Client
                     </span>
@@ -36,9 +36,11 @@ export function AdminCRTable({
                     </span>
                     
                 </div>
+                <div className= "flex-1 overflow-auto min-h-0">
                 {clientRequests.map((cr) => (
                     <CRTableRow request={cr} key={cr.id} onOpen={() => openCR(cr)} />
                 ))}
+                </div>
             </div>
         </>
     );
@@ -56,7 +58,7 @@ function CRTableRow({ request, onOpen, }: { request: ClientRequest; onOpen: () =
     return (
         <>
             <div 
-                className="h-10 border-light-border border-b border-x flex items-center font-family-roboto text-sm text-text-1 hover:bg-blue-50 cursor-pointer"
+                className="h-10 border-light-border border-b border-x flex items-center font-family-roboto text-sm text-text-1"
             >
                 <div className="w-[20%] px-4 flex items-center">
                     <input
