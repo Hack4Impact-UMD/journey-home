@@ -1,9 +1,6 @@
 import { ClientRequest } from "@/types/client-requests";
-import { getUserByUID } from "@/lib/services/users";
-import { UserData } from "@/types/user";
 import { Badge } from "../inventory/Badge";
 import { ViewIcon } from "../icons/ViewIcon";
-import { useEffect, useState } from "react";
 
 export function CaseMCRTable({
     clientRequests,

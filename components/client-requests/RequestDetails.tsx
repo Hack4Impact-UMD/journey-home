@@ -66,7 +66,7 @@ export function RequestDetailsPage({client, userRole} : ClientProps) {
                 </div>
             </div>
             <div className="divide-y divide-gray-400" >
-                <div className="border-b border-gray-400 text-[#02AFC7] font-bold p-2 bg-[#FAFAFB]">Client's New Home</div>
+                <div className="border-b border-gray-400 text-[#02AFC7] font-bold p-2 bg-[#FAFAFB]">Client&apos;s New Home</div>
                 <div className="flex flex-row">
                     <div className="w-1/2 divide-y divide-x divide-gray-400 bg-[#FAFAFB]"> 
                         <div className="p-2">Address</div>
