@@ -35,7 +35,7 @@ export default function ListView() {
         : blocks.filter((tb) => (tb.type ?? "Pickups / Deliveries") === filterType);
 
     const grouped = filteredBlocks.reduce((acc, tb) => {
-        const dateKey = moment(tb.startTime.toDate()).format("YYYY-MM-DD");
+        const dateKey = moment(tb.start.toDate()).format("YYYY-MM-DD");
         if (!acc[dateKey]) acc[dateKey] = [];
         acc[dateKey].push(tb);
         return acc;
@@ -116,8 +116,8 @@ export default function ListView() {
                                 {/* Shift rows */}
                                 <div className="flex-1 space-y-1.5">
                                     {grouped[date].map((tb) => {
-                                        const start = tb.startTime.toDate();
-                                        const end = tb.endTime.toDate();
+                                    const start = tb.start.toDate();
+                                    const end = tb.end.toDate();
                                         const dotColor =
                                             tb.type === "Warehouse"
                                                 ? "bg-yellow-400"

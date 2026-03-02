@@ -15,9 +15,9 @@ export default function CalendarView() {
     const loadEvents = useCallback(async () => {
         const tbs: TimeBlock[] = await fetchAllTB();
         const mapped = tbs.map((tb) => ({
-            title: `${tb.startTime.toDate().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} - ${tb.endTime.toDate().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`,
-            start: tb.startTime.toDate(),
-            end: tb.endTime.toDate(),
+        title: `${tb.start.toDate().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} - ${tb.end.toDate().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`,
+        start: tb.start.toDate(),
+        end: tb.end.toDate(),
         }));
         setEvents(mapped);
     }, []);
