@@ -5,10 +5,28 @@ import { ProtectedRoute } from "@/components/general/ProtectedRoute";
 import SideNavbar from "@/components/general/SideNav";
 import TopNavbar from "@/components/general/TopNav";
 import { useClientRequests } from "@/lib/queries/client-requests";
+import { useState } from "react";
+import { SearchBox } from "@/components/inventory/SearchBox";
+import { SortOption } from "@/components/inventory/SortOption";
+import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
+import { CaseMCRTable } from "@/components/client-requests/CaseMCRTable";
+import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
+import { ReviewStatus } from "@/types/general";
 
 export default function ClientRequestsCaseManagerPage() {
     const { clientRequests, refetch: refetchClientRequests } = useClientRequests();
+    const [ selectedGroup, changeGroup ] = useState<string>("All");
+
+    const statusOpts: ReviewStatus[] = ["Not Reviewed", "Approved", "Denied"];
+
+    const [searchQuery, setSearchQuery] = useState<string>("");
+    const [sortBy, setSortBy] = useState<"asc" | "desc" | "none">("none")
+    const [selectedStatus, setStatus] = useState<ReviewStatus[]>(statusOpts);
+
+    const currCM = useAuth()
+    const uidCM = currCM.state.userData?.uid
+
     return (
         <ProtectedRoute allow={["Case Manager"]}>
             <div className="h-full w-full flex flex-col font-family-roboto">
@@ -19,6 +37,97 @@ export default function ClientRequestsCaseManagerPage() {
                         <h1 className="text-2xl text-primary font-extrabold">
                             Client Requests
                         </h1>
+
+                        <div className="flex gap-8 text-sm">
+                            <h1 onClick={() => changeGroup("All")} 
+                                className= {`py-4${
+                                    selectedGroup == "All"
+                                        ? " border-b-2 border-primary text-primary"
+                                        : ""
+                            }`}>
+                                All
+                            </h1>
+                            <h1 onClick={() => changeGroup("New")}
+                                className= {`py-4${
+                                    selectedGroup == "New"
+                                        ? " border-b-2 border-primary text-primary"
+                                        : ""
+                            }`}>
+                                Pending
+                            </h1>
+                            <h1 onClick={() => changeGroup("Reviewed")}
+                                className= {`py-4${
+                                    selectedGroup == "Reviewed"
+                                        ? " border-b-2 border-primary text-primary"
+                                        : ""
+                            }`}>
+                                Reviewed
+                            </h1>
+                        </div>
+                        {/*actual content*/}
+                        <div className="bg-background rounded-xl flex-wrap my-2 flex-1 py-4 px-6 min-h-0 overflow-hidden">
+                            <>
+                                <div className="flex flex-col mb-6">
+                                    <div className="flex gap-3">
+                                        <SearchBox
+                                            value={searchQuery}
+                                            onChange={setSearchQuery}
+                                            onSubmit={() => refetchClientRequests()}
+                                        />
+                                        <SortOption
+                                            label="Date"
+                                            status={sortBy}
+                                            onChange={(status) => setSortBy(status)}
+                                        />
+
+                                        <DropdownMultiselect
+                                                                label="Status"
+                                                                options={statusOpts}
+                                                                selected={selectedStatus}
+                                                                setSelected={setStatus}
+                                                            />
+                                    </div>
+                                </div>
+
+                                <CaseMCRTable
+                                    clientRequests={clientRequests
+                                        .filter((request) => {
+                                            if (request.caseManagerID !== uidCM) return false;
+                                            if (!selectedStatus.includes(request.status)) return false;
+
+                                            const clientFullName =
+                                                `${request.client.firstName} ${request.client.lastName}`.toLowerCase();
+
+                                            //making it easier to return when i have a specific group selected, i think i did it right
+                                            if (selectedGroup === "New" && request.status !== "Not Reviewed") return false;
+                                            if (selectedGroup === "Reviewed" && request.status === "Not Reviewed") return false;
+                                            
+                                            return clientFullName.includes(searchQuery.toLowerCase());
+                                        })
+                                        .sort((req1, req2) => {
+                                            let diff;
+                                            //by name if default
+                                            if (sortBy === "none"){
+                                                diff =
+                                                    `${req1.client.lastName} ${req1.client.firstName}`.localeCompare(
+                                                        `${req2.client.lastName} ${req2.client.firstName}`,
+                                                );
+                                            }
+                                            //by date ascending
+                                            else if (sortBy === "asc"){
+                                                diff = req1.date.seconds - req2.date.seconds;
+                                            }
+                                            //by date descending
+                                            else{
+                                                diff = req2.date.seconds - req1.date.seconds;
+                                            }
+
+                                            return diff;
+                                        })
+                                    }
+                                />
+                            </>
+                        </div>
                         <div className="mt-4">
                             <Link
                                 href="/client-request-form"
@@ -26,13 +135,6 @@ export default function ClientRequestsCaseManagerPage() {
                             >
                                 Create Request
                             </Link>
-                            {clientRequests.map((client) => (
-                                                        <RequestDetailsPage
-                                                            key={client.id}
-                                                            client={client}
-                                                            userRole="CaseManager"
-                                                        />
-                                                    ))}
                         </div>
                     </div>
                 </div>

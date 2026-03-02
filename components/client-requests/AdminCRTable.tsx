@@ -1,0 +1,102 @@
+import { ClientRequest } from "@/types/client-requests";
+import { getUserByUID } from "@/lib/services/users";
+import { UserData } from "@/types/user";
+import { Badge } from "../inventory/Badge";
+import { ViewIcon } from "../icons/ViewIcon";
+import { useEffect, useState } from "react";
+
+export function AdminCRTable({
+    clientRequests,
+}: {
+    clientRequests: ClientRequest[];
+}) {
+    return (
+        <>
+            <div className="w-full h-full min-w-3xl">
+                <div className="h-12 bg-[#FAFAFB] border-light-border border flex items-center font-family-roboto font-bold text-sm text-text-1">
+                    <span className="w-[20%] border-l-2 border-light-border px-4">
+                        Client
+                    </span>
+                    <span className="w-[20%] border-l-2 border-light-border px-4">
+                        Case Manager
+                    </span>
+                    <span className="w-[25%] border-l-2 border-light-border px-4">
+                        Case Manager Email
+                    </span>
+                    <span className="w-[15%] border-l-2 border-light-border px-4">
+                        Status
+                    </span>
+                    <span className="w-[10%] border-l-2 border-light-border px-4">
+                        Date
+                    </span>
+                    <span className="w-[10%] border-l-2 border-light-border px-4">
+                        Actions
+                    </span>
+                    
+                </div>
+                {clientRequests.map((cr) => (
+                    <CRTableRow request={cr} key={cr.id} />
+                ))}
+            </div>
+        </>
+    );
+}
+
+function CRTableRow({ request }: { request: ClientRequest }) {
+    const [currCM, setCM] = useState<UserData | null>(null);
+
+    useEffect(() => {
+        getUserByUID(request.caseManagerID).then((user) => {
+            setCM(user);
+        });
+    }, [request.caseManagerID]);
+
+    return (
+        <>
+            <div 
+                className="h-10 border-light-border border-b border-x flex items-center font-family-roboto text-sm text-text-1 hover:bg-blue-50 cursor-pointer"
+            >
+                <div className="w-[20%] px-4 flex items-center">
+                    <input
+                        type="checkbox"
+                        className="w-4 h-4 mr-4 rounded-xs cursor-pointer border-white"
+                    ></input>
+                    <span>
+                        {request.client.firstName} {request.client.lastName}
+                    </span>
+                </div>
+                <div className="w-[20%] px-4">
+                    <span>
+                        {/*need the case manager for each request*/}
+                        {currCM?.firstName} {currCM?.lastName}
+                    </span>
+                </div>
+                <div className="w-[25%] px-4">
+                    <span>{currCM?.email ?? "—"}</span>
+                </div>
+                <span className="w-[15%] px-4 text-xs">
+                    <Badge text={request.status} color={
+                        (request.status == "Not Reviewed") ? "yellow" :
+                        (request.status == "Approved") ? "green" :
+                        "red"
+                    }/>
+                </span>
+                <span className="w-[10%] px-4">
+                    {/*the date stuff is being a butt so gonna do a conditional thing even tho i shouldn't actually need one */}
+                    {request.date
+                        ? request.date.toDate().toLocaleDateString("en-US", {
+                            month: "2-digit",
+                            day: "2-digit",
+                            year: "2-digit",
+                        })
+                        : "—"
+                    }
+                </span>
+                <div className="w-[10%] px-4 flex align-center">
+                    <ViewIcon />
+                </div>
+                
+            </div>
+        </>
+    );
+}
