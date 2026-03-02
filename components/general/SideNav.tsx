@@ -11,6 +11,7 @@ import { PickupDeliveryIcon } from "../icons/PickupDeliveryIcon";
 import { UserManagementIcon } from "../icons/UserMangementIcon";
 import { ControlPanelIcon } from "../icons/ControlPanelIcon";
 
+
 export default function SideNavbar() {
     const auth = useAuth();
 
@@ -35,12 +36,7 @@ export default function SideNavbar() {
                 roles={["Admin"]}
             />
 
-            {/* <SideNavbarLink
-                icon = {}
-                name="Donation Form"
-                path="/donate"
-                roles={[]}
-            /> */}
+
 
             <SideNavbarLink
                 icon={ClientRequestIcon}
@@ -69,6 +65,13 @@ export default function SideNavbar() {
                 path="/control-panel"
                 roles={["Admin"]}
             />
+
+            {/* <SideNavbarLink
+                icon = {}
+                name="Donation Form"
+                path="/donate"
+                roles={[]}
+            /> */}
 
             <div className="mt-auto w-full">
                 <button onClick={() => auth.logout()} > Logout </button>
