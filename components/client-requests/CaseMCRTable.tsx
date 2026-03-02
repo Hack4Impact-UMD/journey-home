@@ -7,8 +7,10 @@ import { useEffect, useState } from "react";
 
 export function CaseMCRTable({
     clientRequests,
+    openCR,
 }: {
     clientRequests: ClientRequest[];
+    openCR: (cr: ClientRequest) => void;
 }) {
     return (
         <>
@@ -35,14 +37,14 @@ export function CaseMCRTable({
                     
                 </div>
                 {clientRequests.map((cr) => (
-                    <CRTableRow request={cr} key={cr.id} />
+                    <CRTableRow request={cr} key={cr.id} onOpen={() => openCR(cr)}/>
                 ))}
             </div>
         </>
     );
 }
 
-function CRTableRow({ request }: { request: ClientRequest }) {
+function CRTableRow({ request, onOpen, }: { request: ClientRequest; onOpen: () => void; }) {
     return (
         <>
             <div 
@@ -92,7 +94,13 @@ function CRTableRow({ request }: { request: ClientRequest }) {
                     }
                 </span>
                 <div className="w-[10%] px-4 flex align-center">
+                    <div className="cursor-pointer"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onOpen();
+                        }}>
                     <ViewIcon />
+                    </div>
                 </div>
                 
             </div>

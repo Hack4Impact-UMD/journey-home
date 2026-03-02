@@ -7,7 +7,7 @@ type ClientProps = {
 
 export function RequestDetailsPage({client, userRole} : ClientProps) {
     return (
-        <div className="flex flex-col divide-y divide-gray-400 border-2 w-[59em]">
+        <div className="flex flex-col divide-y divide-gray-400 border-2 w-full">
             <div>
                 {userRole === "Admin" && (
                     <div>
