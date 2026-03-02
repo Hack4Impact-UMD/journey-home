@@ -12,6 +12,8 @@ export type TimeBlock = {
     published: boolean;
 };
 
+export type MyEvent = { title: string; start: Date; end: Date };
+
 export type Task = Pickup | Delivery;
 export type Delivery = ClientRequest;
 export type Pickup = DonationRequest;

@@ -1,0 +1,29 @@
+$rbc-event-background: #F5FAFA;
+$rbc-event-border-color: #02AFC7;
+$rbc-event-color: #3D4B6B;
+
+@import 'react-big-calendar/lib/sass/styles';
+
+.rbc-event {
+    background-color: #F5FAFA !important;
+    border: 1px solid #02AFC7 !important;
+    color: #3D4B6B !important;
+}
+
+.rbc-event-content {
+    color: #3D4B6B !important;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rbc-month-view .rbc-event {
+    background-color: #F5FAFA !important;
+    border: 1px solid #02AFC7 !important;
+    color: #3D4B6B !important;
+}
+
+.rbc-month-view .rbc-event-content {
+    color: #3D4B6B !important;
+}
