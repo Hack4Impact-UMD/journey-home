@@ -1,20 +1,20 @@
+"use client";
 import { useState } from "react";
 import { ToolbarProps } from "react-big-calendar";
 import { MyEvent } from "../../types/schedule";
 import { AddShiftOverlay } from "./AddShiftOverlay";
 
-export function CustomToolbar({ label, onNavigate, onView, view }: ToolbarProps<MyEvent, object>) {
+interface ExtraProps { onShiftCreated: () => void; }
+
+export function CustomToolbar({ label, onNavigate, onView, view, onShiftCreated }: ToolbarProps<MyEvent, object> & ExtraProps) {
     const [showOverlay, setShowOverlay] = useState(false);
 
     return (
         <div className="flex justify-between items-center mb-4">
             <div className="flex items-center gap-4">
                 <button onClick={() => onNavigate("TODAY")} className="px-4 py-2 rounded border text-[#6B7A99]">
-                    <span className={label.includes(new Date().getFullYear().toString()) ? "text-[#02AFC7]" : ""}>
-                        Today
-                    </span>
+                    <span className={label.includes(new Date().getFullYear().toString()) ? "text-[#02AFC7]" : ""}>Today</span>
                 </button>
-
                 <div className="flex border rounded overflow-hidden">
                     <button onClick={() => onView("month")} className="px-4 py-2">
                         <span className={view === "month" ? "text-[#02AFC7]" : "text-[#6B7A99]"}>Month</span>
@@ -39,14 +39,16 @@ export function CustomToolbar({ label, onNavigate, onView, view }: ToolbarProps<
             </div>
 
             <div className="relative">
-                <button
+                <button onClick={() => setShowOverlay(v => !v)}
                     className="px-4 py-2 rounded border cursor-pointer text-white"
-                    style={{ backgroundColor: "#02AFC7" }}
-                    onClick={() => setShowOverlay(v => !v)}
-                >
+                    style={{ backgroundColor: "#02AFC7" }}>
                     + Add Shift
                 </button>
-                <AddShiftOverlay isOpen={showOverlay} onClose={() => setShowOverlay(false)} />
+                <AddShiftOverlay
+                    isOpen={showOverlay}
+                    onClose={() => setShowOverlay(false)}
+                    onShiftCreated={onShiftCreated}
+                />
             </div>
         </div>
     );
