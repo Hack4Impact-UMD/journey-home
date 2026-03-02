@@ -67,7 +67,6 @@ export default function SideNavbar() {
             />
 
             <SideNavbarLink
-                icon = {ClientRequestIcon}
                 name="Donation Form"
                 path="/donate"
                 roles={[]}
@@ -100,12 +99,12 @@ function SideNavbarLink({
     name,
     path,
     roles,
-    icon: Icon,
+    icon: Icon = ClientRequestIcon,
 }: {
     name: string;
     path: string;
     roles: UserRole[];
-    icon: React.FC;
+    icon?: React.FC;
 }) {
     const pathname = usePathname();
     const auth = useAuth();
