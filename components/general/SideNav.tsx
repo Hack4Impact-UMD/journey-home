@@ -66,15 +66,15 @@ export default function SideNavbar() {
                 roles={["Admin"]}
             />
 
-            {/* <SideNavbarLink
-                icon = {}
+            <SideNavbarLink
+                icon = {ClientRequestIcon}
                 name="Donation Form"
                 path="/donate"
                 roles={[]}
-            /> */}
+            />
 
             <div className="mt-auto w-full">
-                <button onClick={() => auth.logout()} > Logout </button>
+                <button onClick={() => auth.logout()} > Logout </button> {/*will be removed later after can logout from profile  */} 
                 <div className=" pt-[0.5rem] pb-[0.5rem] pl-[1rem] border border-light-border rounded-lg w-full">
 
                     <Link href="/profile">
