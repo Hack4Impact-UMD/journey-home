@@ -3,8 +3,8 @@
 export function ControlPanelIcon() {
     return (
         <svg
-            width="20"
-            height="20"
+            width="1.25em"
+            height="1.25em"
             viewBox="0 0 20 20"
             className = "fill-current"
             xmlns="http://www.w3.org/2000/svg"

@@ -118,7 +118,7 @@ function SideNavbarLink({
         <Link
             href={path}
             className={`hover:text-primary pb-4 text-sm flex items-center gap-2 ${
-                pathname?.startsWith(path) ? "text-primary font-semibold" : ""
+                pathname === path ? "text-primary font-semibold" : ""
             }`}
         >
             <Icon />

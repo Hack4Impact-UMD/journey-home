@@ -3,8 +3,8 @@
 export function ClientRequestIcon() {
     return (
         <svg
-            width="15"
-            height="15"
+            width="1em"
+            height="1em"
             viewBox="0 0 15 15"
             className="fill-current"
             xmlns="http://www.w3.org/2000/svg"

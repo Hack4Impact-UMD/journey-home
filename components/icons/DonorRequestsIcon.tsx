@@ -3,8 +3,8 @@
 export function DonorRequestsIcon() {
     return (
         <svg
-            width="19"
-            height="15"
+            width="1.25em"
+            height="1em"
             viewBox="0 0 19 15"
             className = "fill-current"
             xmlns="http://www.w3.org/2000/svg"

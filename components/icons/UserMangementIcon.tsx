@@ -3,8 +3,8 @@
 export function UserManagementIcon() {
     return (
         <svg
-            width="20"
-            height="12"
+            width="1.25em"
+            height="0.75em"
             viewBox="0 0 20 12"
             className = "fill-current"
             xmlns="http://www.w3.org/2000/svg"
