@@ -19,6 +19,9 @@ export default function ClientRequestsCaseManagerPage() {
     const [ selectedGroup, changeGroup ] = useState<string>("All");
 
     const statusOpts: ReviewStatus[] = ["Not Reviewed", "Approved", "Denied"];
+    
+    const [selectedCRId, setSelectedCRId] = useState<string | null>(null);
+    const selectedCR = clientRequests.find((cr) => cr.id === selectedCRId) ?? null;
 
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [sortBy, setSortBy] = useState<"asc" | "desc" | "none">("none")
@@ -66,7 +69,28 @@ export default function ClientRequestsCaseManagerPage() {
                         </div>
                         {/*actual content*/}
                         <div className="bg-background rounded-xl flex-wrap my-2 flex-1 py-4 px-6 min-h-0 overflow-hidden">
-                            <>
+                            {selectedCR ? (
+                                <div>
+                                <div className="flex items-center justify-between mb-4">
+                                    <span className="text-lg font-semibold text-text-1">
+                                    {selectedCR.client.firstName} {selectedCR.client.lastName}
+                                    </span>
+                                    <button
+                                        className="w-16 h-8 text-white bg-primary rounded-xs text-sm mb-4"
+                                        onClick={() => setSelectedCRId(null)}
+                                    >
+                                        Back
+                                    </button>
+                                </div>
+                                    <div className="h-90 overflow-scroll overflow-x-hidden">
+                                        <RequestDetailsPage
+                                            client={selectedCR}
+                                            userRole="CaseManager"
+                                        />
+                                    </div>
+                                </div>
+                            ) : (               
+                           <>
                                 <div className="flex flex-col mb-6">
                                     <div className="flex gap-3">
                                         <SearchBox
@@ -125,8 +149,10 @@ export default function ClientRequestsCaseManagerPage() {
                                             return diff;
                                         })
                                     }
+                                    openCR={(cr) => setSelectedCRId(cr.id)}
                                 />
                             </>
+)}
                         </div>
                         <div className="mt-4">
                             <Link
