@@ -91,13 +91,13 @@ function CRTableRow({ request, onOpen, }: { request: ClientRequest; onOpen: () =
                     }
                 </span>
                 <div className="w-[10%] px-4 flex align-center">
-                    <div className="cursor-pointer"
+                    <button
                         onClick={(e) => {
                             e.stopPropagation();
                             onOpen();
                         }}>
                     <ViewIcon />
-                    </div>
+                    </button>
                 </div>
                 
             </div>
