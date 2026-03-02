@@ -43,14 +43,6 @@ export function CaseMCRTable({
 }
 
 function CRTableRow({ request }: { request: ClientRequest }) {
-    const [currCM, setCM] = useState<UserData | null>(null);
-
-    useEffect(() => {
-        getUserByUID(request.caseManagerID).then((user) => {
-            setCM(user);
-        });
-    }, [request.caseManagerID]);
-
     return (
         <>
             <div 
