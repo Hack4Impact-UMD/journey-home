@@ -49,11 +49,7 @@ function CRTableRow({ request, onOpen, }: { request: ClientRequest; onOpen: () =
             <div 
                 className="h-10 border-light-border border-b border-x flex items-center font-family-roboto text-sm text-text-1"
             >
-                <div className="w-[20%] px-4 flex items-center">
-                    <input
-                        type="checkbox"
-                        className="w-4 h-4 mr-4 rounded-xs cursor-pointer border-white"
-                    ></input>
+                <div className="w-[20%] px-4">
                     <span>
                         {request.client.firstName} {request.client.lastName}
                     </span>
