@@ -16,10 +16,9 @@ import { StockSidebar } from "@/components/inventory/StockSidebar";
 
 export default function InventoryLayout({ children }: { children: ReactNode }) {
     const pathname = usePathname();
+
     const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
-
     const [allItems, setAllItems] = useState<InventoryRecord[]>([]);
-
     const [categoryAttributes, setCategoryAttributes] = useState<
         CategoryAttributes[]
     >([]);
@@ -35,14 +34,6 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
         const count = allItems
             .filter((item) => item.category === catAttr.name)
             .reduce((sum, item) => sum + item.quantity, 0);
-
-        // console.log(
-        //     allItems.map((i) => ({
-        //         category: i.category,
-        //         quantity: i.quantity,
-        //         type: typeof i.quantity,
-        //     })),
-        // );
 
         let color;
         if (count < catAttr.lowThreshold) {

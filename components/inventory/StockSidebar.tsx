@@ -62,14 +62,14 @@ export function StockSidebar({
                 {!isOpen && (
                     <button
                         onClick={onOpen}
-                        className="absolute inset-y-0 -left-10 w-10 bg-white border-l border-gray-200 shadow-[-5px_0_15px_rgba(0,0,0,0.05)] flex flex-col items-center py-6 gap-4 "
+                        className="absolute inset-y-0 -left-10 w-10 bg-white border-l border-gray-200 shadow-[-5px_0_15px_rgba(0,0,0,0.05)] flex flex-col items-center py-[1rem] gap-4 "
                     >
-                        <Package className={cn("w-6")} />
+                        <Package className={cn("w-5")} />
                     </button>
                 )}
 
                 {/* Header */}
-                <div className="flex items-center justify-between px-4 py-2 border-b">
+                <div className="flex items-center justify-between px-4 pt-[1rem] pb-[0.5rem]   ">
                     <div className="flex items-center gap-2">
                         <Package className="w-5 h-5" />
                         <h2 className="text-base font-medium">Stock</h2>
