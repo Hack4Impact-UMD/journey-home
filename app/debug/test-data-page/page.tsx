@@ -13,6 +13,7 @@ import { UserData } from "@/types/user";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { TimeBlock } from "@/types/schedule";
 import { collection, getDocs } from "firebase/firestore";
+import { useAuth } from "@/contexts/AuthContext";
 
 const CASEREQUEST = "client-requests";
 const TIMEBLOCK = "timeblocks";
@@ -319,109 +320,241 @@ const SEED_DONORS: LocationContact[] = [
         },
     },
 ];
-const ITEM_DESCRIPTIONS: Record<string, string[]> = {
+const ITEM_DESCRIPTIONS: Record<string, ItemDetail[]> = {
     Sofas: [
-        "Gray L-shaped Sofa",
-        "Brown L-shaped Sofa",
-        "Green Sofa",
-        "Massive Gray Sofa",
+        { title: "Gray L-shaped Sofa", size: "Large" },
+        { title: "Brown L-shaped Sofa", size: "Large" },
+        { title: "Green Sofa", size: "Large" },
+        { title: "Massive Gray Sofa", size: "Large" },
     ],
     Dressers: [
-        "Orange ish colored dresser thing",
-        "Sleek black dresser",
-        "White dresser",
-        "dark brown dresser",
+        { title: "Orange ish colored dresser thing", size: "Large" },
+        { title: "Sleek black dresser", size: "Large" },
+        { title: "White dresser", size: "Large" },
+        { title: "dark brown dresser", size: "Large" },
     ],
     "Kitchen Tables": [
-        "White Modern Kitchen Table",
-        "Brown and Green Kitchen Table",
-        "Red-Brown Kitchen Table",
-        "Light Brown Kitchen Table",
+        { title: "White Modern Kitchen Table", size: "Large" },
+        { title: "Brown and Green Kitchen Table", size: "Large" },
+        { title: "Red-Brown Kitchen Table", size: "Large" },
+        { title: "Light Brown Kitchen Table", size: "Large" },
     ],
     "Area Rugs": [
-        "Persian Area Rug",
-        "Black and White Area Rug",
-        "Character Area Rug",
-        "Thick Area Rug(Cat not included)",
+        { title: "Persian Area Rug", size: "Large" },
+        { title: "Black and White Area Rug", size: "Large" },
+        { title: "Character Area Rug", size: "Medium" },
+        { title: "Thick Area Rug(Cat not included)", size: "Large" },
     ],
     Armchairs: [
-        "Beige Armchair",
-        "Fancy Old Armchair",
-        "Jaymar Post Modern Sculptural Tongue Armchair",
-        "Throne Armchair",
+        { title: "Beige Armchair", size: "Medium" },
+        { title: "Fancy Old Armchair", size: "Medium" },
+        { title: "Jaymar Post Modern Sculptural Tongue Armchair", size: "Medium" },
+        { title: "Throne Armchair", size: "Large" },
     ],
     "Box Springs": [
-        "Box Spring Queen",
-        "Queen Sized Box Spring",
-        "Tempur-pedic King Sized Box Spring",
-        "Twin Box Spring",
+        { title: "Box Spring Queen", size: "Large" },
+        { title: "Queen Sized Box Spring", size: "Large" },
+        { title: "Tempur-pedic King Sized Box Spring", size: "Large" },
+        { title: "Twin Box Spring", size: "Large" },
     ],
     "Coffee Tables": [
-        "Circular Gear Coffee Table",
-        "Pear-Shaped Coffee Table",
-        "White Modern Coffee Table",
-        "Glass Coffee Table",
+        { title: "Circular Gear Coffee Table", size: "Medium" },
+        { title: "Pear-Shaped Coffee Table", size: "Medium" },
+        { title: "White Modern Coffee Table", size: "Medium" },
+        { title: "Glass Coffee Table", size: "Medium" },
     ],
     "End Tables": [
-        "Brown End Table",
-        "Skinny Brown End Table",
-        "Unique Mosaic End Table",
-        "Circular Solid Wood End Table",
+        { title: "Brown End Table", size: "Small" },
+        { title: "Skinny Brown End Table", size: "Small" },
+        { title: "Unique Mosaic End Table", size: "Small" },
+        { title: "Circular Solid Wood End Table", size: "Small" },
     ],
     "Kitchen Chairs": [
-        "Modern Black Dining Table Chairs",
-        "Camel Leather Dining Chairs",
-        "Set of 5 Gray Dining Chairs",
-        "Uncomfortable Kitchen Chairs",
+        { title: "Modern Black Dining Table Chairs", size: "Medium" },
+        { title: "Camel Leather Dining Chairs", size: "Medium" },
+        { title: "Set of 5 Gray Dining Chairs", size: "Medium" },
+        { title: "Uncomfortable Kitchen Chairs", size: "Medium" },
     ],
     Loveseats: [
-        "Gray Loveseat",
-        "Brown Microfiber Suede Loveseat",
-        "Gray rectangular loveseat",
-        "Confusing Loveseat",
+        { title: "Gray Loveseat", size: "Large" },
+        { title: "Brown Microfiber Suede Loveseat", size: "Large" },
+        { title: "Gray rectangular loveseat", size: "Large" },
+        { title: "Confusing Loveseat", size: "Large" },
     ],
     Mattresses: [
-        "Queen Sized 10 Inch Mattress",
-        "Twin Sized Mattress",
-        "Queen Sized Mattress",
-        "Full Sized Mattress",
+        { title: "Queen Sized 10 Inch Mattress", size: "Large" },
+        { title: "Twin Sized Mattress", size: "Large" },
+        { title: "Queen Sized Mattress", size: "Large" },
+        { title: "Full Sized Mattress", size: "Large" },
     ],
     "Microwave Stands": [
-        "Dark Brown Microwave Stand",
-        "Dual Shade Microwave Stand",
-        "Kitchen and Microwave Stand",
-        "Ikea Microwave Stand",
+        { title: "Dark Brown Microwave Stand", size: "Medium" },
+        { title: "Dual Shade Microwave Stand", size: "Medium" },
+        { title: "Kitchen and Microwave Stand", size: "Large" },
+        { title: "Ikea Microwave Stand", size: "Medium" },
     ],
     Nightstands: [
-        "Dark green nightstand",
-        "Wood Nightstand with metal legs",
-        "Maple Nightstand",
-        "Dark Brown nightstand",
+        { title: "Dark green nightstand", size: "Small" },
+        { title: "Wood Nightstand with metal legs", size: "Small" },
+        { title: "Maple Nightstand", size: "Small" },
+        { title: "Dark Brown nightstand", size: "Small" },
     ],
     "Small Bookshelves": [
-        "Little Blue Bookshelf",
-        "Ladder Bookshelf",
-        "Small Dark Brown Bookshelf",
-        "Skinny Bookshelf",
+        { title: "Little Blue Bookshelf", size: "Small" },
+        { title: "Ladder Bookshelf", size: "Medium" },
+        { title: "Small Dark Brown Bookshelf", size: "Small" },
+        { title: "Skinny Bookshelf", size: "Small" },
     ],
     "TV Stands": [
-        "Rusted brown tv stand",
-        "Deep brown TV stand",
-        "Low Brown IKEA TV stand",
-        "Shiny Brown TV Stand",
+        { title: "Rusted brown tv stand", size: "Medium" },
+        { title: "Deep brown TV stand", size: "Medium" },
+        { title: "Low Brown IKEA TV stand", size: "Medium" },
+        { title: "Shiny Brown TV Stand", size: "Medium" },
     ],
     TVs: [
-        "75 inch ROKU TV",
-        "Vizio 40in 1080p Smart TV",
-        "45in Samsung TV",
-        "9in CRT TV w/ VCR",
+        { title: "75 inch ROKU TV", size: "Large" },
+        { title: "Vizio 40in 1080p Smart TV", size: "Medium" },
+        { title: "45in Samsung TV", size: "Medium" },
+        { title: "9in CRT TV w/ VCR", size: "Small" },
     ],
 };
+
+const SEED_REQS = [
+    // ===== ADMINS (5) =====
+    {
+        email: "marcus.johnson@journeyhome.org",
+        password: "password",
+        first: "Marcus",
+        last: "Johnson",
+        dob: Timestamp.fromDate(new Date("1983-05-12T08:30:00")),
+        role: "Admin",
+    },
+    {
+        email: "elena.rodriguez@journeyhome.org",
+        password: "password",
+        first: "Elena",
+        last: "Rodriguez",
+        dob: Timestamp.fromDate(new Date("1988-11-20T14:15:00")),
+        role: "Admin",
+    },
+    {
+        email: "william.chen@journeyhome.org",
+        password: "password",
+        first: "William",
+        last: "Chen",
+        dob: Timestamp.fromDate(new Date("1985-02-14T09:45:00")),
+        role: "Admin",
+    },
+    {
+        email: "samantha.wright@journeyhome.org",
+        password: "password",
+        first: "Samantha",
+        last: "Wright",
+        dob: Timestamp.fromDate(new Date("1991-08-05T11:20:00")),
+        role: "Admin",
+    },
+    {
+        email: "jonathan.davis@journeyhome.org",
+        password: "password",
+        first: "Jonathan",
+        last: "Davis",
+        dob: Timestamp.fromDate(new Date("1980-12-01T16:00:00")),
+        role: "Admin",
+    },
+
+    // ===== CASE MANAGERS (10) =====
+    {
+        email: "jessica.taylor@journeyhome.org",
+        password: "password",
+        first: "Jessica",
+        last: "Taylor",
+        dob: Timestamp.fromDate(new Date("1994-03-22T10:00:00")),
+        role: "Case Manager",
+    },
+    {
+        email: "anthony.moore@journeyhome.org",
+        password: "password",
+        first: "Anthony",
+        last: "Moore",
+        dob: Timestamp.fromDate(new Date("1995-07-11T13:30:00")),
+        role: "Case Manager",
+    },
+    {
+        email: "ashley.jackson@journeyhome.org",
+        password: "password",
+        first: "Ashley",
+        last: "Jackson",
+        dob: Timestamp.fromDate(new Date("1992-09-28T09:10:00")),
+        role: "Case Manager",
+    },
+    {
+        email: "brian.white@journeyhome.org",
+        password: "password",
+        first: "Brian",
+        last: "White",
+        dob: Timestamp.fromDate(new Date("1990-04-16T15:20:00")),
+        role: "Case Manager",
+    },
+    {
+        email: "melissa.harris@journeyhome.org",
+        password: "password",
+        first: "Melissa",
+        last: "Harris",
+        dob: Timestamp.fromDate(new Date("1996-10-04T11:05:00")),
+        role: "Case Manager",
+    },
+    {
+        email: "christopher.martin@journeyhome.org",
+        password: "password",
+        first: "Christopher",
+        last: "Martin",
+        dob: Timestamp.fromDate(new Date("1993-01-09T14:40:00")),
+        role: "Case Manager",
+    },
+    {
+        email: "stephanie.clark@journeyhome.org",
+        password: "password",
+        first: "Stephanie",
+        last: "Clark",
+        dob: Timestamp.fromDate(new Date("1997-06-18T08:55:00")),
+        role: "Case Manager",
+    },
+    {
+        email: "matthew.lewis@journeyhome.org",
+        password: "password",
+        first: "Matthew",
+        last: "Lewis",
+        dob: Timestamp.fromDate(new Date("1991-11-25T12:15:00")),
+        role: "Case Manager",
+    },
+    {
+        email: "rachel.martinez@journeyhome.org",
+        password: "password",
+        first: "Rachel",
+        last: "Martinez",
+        dob: Timestamp.fromDate(new Date("1998-02-03T09:50:00")),
+        role: "Case Manager",
+    },
+    {
+        email: "justin.walker@journeyhome.org",
+        password: "password",
+        first: "Justin",
+        last: "Walker",
+        dob: Timestamp.fromDate(new Date("1995-12-14T16:25:00")),
+        role: "Case Manager",
+    },
+];
+
+
 type SeedImage = {
     file: File;
     title: string;
+    size: "Small"|"Medium"|"Large";
 };
-
+type ItemDetail = {
+    title: string;
+    size: "Small"|"Medium"|"Large";
+};
 function randomTimestamp(days: number = 90): Timestamp {
     const now = Date.now(); // current time in ms
     const past = now - days * 24 * 60 * 60 * 1000; // ms timestamp X days ago
@@ -449,31 +582,50 @@ async function seedImageToPhotos(seed: SeedImage): Promise<InventoryPhoto[]> {
     ];
 }
 
-async function addDonationRequests(category: string) {
-    const validSizes = ["Small", "Medium", "Large"] as const;
-    const time = randomTimestamp();
-    const imagePool = await getSeedImagePool(category);
 
+async function addDonationRequests() {
+    const time = randomTimestamp();
     const donor: LocationContact = randomFrom(SEED_DONORS);
-    const randomBlock = await getRandomAvailableTimeBlock();
 
     const items: DonationItem[] = [];
 
-    for (const seedImage of imagePool) {
-        items.push({
-            item: {
-                id: crypto.randomUUID(),
-                name: seedImage.title,
-                category,
-                size: getRandom(validSizes),
-                quantity: 1,
-                notes: randomFrom(desc),
-                dateAdded: time,
-                donorEmail: donor.email,
-                photos: await seedImageToPhotos(seedImage),
-            },
-            status: "Not Reviewed",
-        });
+    const shuffledCategories = [...DEFAULT_CATEGORIES].sort(() => Math.random() - 0.5);
+    const numCategories = Math.floor(Math.random() * DEFAULT_CATEGORIES.length) + 1;
+    const selectedCategories = shuffledCategories.slice(0, numCategories);
+
+const MAX_ITEMS = 15;
+    const numItems = Math.floor(Math.random() * MAX_ITEMS) + 1;
+    const itemsPerCategory: Record<string, number> = {};
+
+    // 1. Distribute items freely (no caps, no infinite loops!)
+    for (let i = 0; i < numItems; i++) {
+        const category = randomFrom(selectedCategories);
+        itemsPerCategory[category] = (itemsPerCategory[category] ?? 0) + 1;
+    }
+    for (const category of selectedCategories) {
+        const quota = itemsPerCategory[category];
+        if (!quota) continue;
+
+        const imagePool = await getSeedImagePool(category);
+        const shuffledImages = [...imagePool].sort(() => Math.random() - 0.5);
+        const selectedImages = shuffledImages.slice(0, quota);
+
+        for (const seedImage of selectedImages) {
+            items.push({
+                item: {
+                    id: crypto.randomUUID(),
+                    name: seedImage.title,
+                    category,
+                    size: seedImage.size,
+                    quantity: 1,
+                    notes: randomFrom(desc),
+                    dateAdded: time,
+                    donorEmail: donor.email,
+                    photos: await seedImageToPhotos(seedImage),
+                },
+                status: Math.random() < 0.5 ? "Not Reviewed" : (Math.random() < 0.5 ? "Approved" : "Denied"),
+            });
+        }
     }
 
     const request: DonationRequest = {
@@ -506,18 +658,14 @@ async function addDonationRequests(category: string) {
         ]),
         date: time,
         items,
-        associatedTimeBlockID: randomBlock?.id ?? null,
+        associatedTimeBlockID: null, // no time block
     };
-    if (randomBlock !== null) {
-        assignDonationRequestToTimeBlock(randomBlock.id, request);
-    }
 
-    console.log("creating donation request");
+    console.log("creating donation request: " + request.id);
     await createDonationRequest(request);
 }
 
 async function addInventoryRecord(category: string) {
-    const validSizes = ["Small", "Medium", "Large"] as const;
     const time = randomTimestamp();
     const imagePool = await getSeedImagePool(category);
     for (const image of imagePool) {
@@ -527,7 +675,7 @@ async function addInventoryRecord(category: string) {
             id: crypto.randomUUID(),
             name: image.title,
             category,
-            size: getRandom(validSizes),
+            size: image.size,
             quantity: 1,
             notes: randomFrom(desc),
             dateAdded: time,
@@ -544,15 +692,25 @@ async function loadSeedImages(category: string): Promise<SeedImage[]> {
         `${category}2.jpg`,
         `${category}3.jpg`,
     ];
+    
     const filesWithDescriptions: SeedImage[] = [];
+    
     for (let i = 0; i < imageNames.length; i++) {
-        const title = ITEM_DESCRIPTIONS[category]?.[i] || "Other";
+        // Grab the item object instead of just the string
+        const itemData = ITEM_DESCRIPTIONS[category]?.[i];
+        
+        // Extract title and size with safe fallbacks
+        const title = itemData?.title || "Other";
+        const size = itemData?.size || "Medium"; 
+
         const url = getPublicUrl(`/seed-images/${category}/${imageNames[i]}`);
         const res = await fetch(url);
         const blob = await res.blob();
+        
         const file = new File([blob], title, { type: blob.type });
 
-        filesWithDescriptions.push({ file, title });
+        // Push the title, file, AND size to satisfy the SeedImage type
+        filesWithDescriptions.push({ file, title, size });
     }
 
     return filesWithDescriptions;
@@ -586,7 +744,6 @@ const DEFAULT_CATEGORIES: string[] = [
     "Small Bookshelves",
     "Area Rugs",
     "End Tables",
-    "Other",
 ];
 
 const DEFAULT_CATEGORY_ATTRS = DEFAULT_CATEGORIES.map(
@@ -880,6 +1037,34 @@ async function seedUsers() {
     }
 }
 
+async function accountReqs() {
+    console.log("Seeding pending account requests...");
+
+    for (const user of SEED_REQS) {
+        // Generate a mock UID to serve as both the doc ID and the stored uid field
+        const uid = crypto.randomUUID(); 
+
+        // Map your seed data to match the screenshot schema exactly
+        const pendingUserData = {
+            dob: user.dob,
+            email: user.email,
+            emailVerified: false,
+            firstName: user.first,
+            lastName: user.last,
+            pending: user.role,   // The role they are applying for (e.g., "Admin")
+            role: "Volunteer",    // The default role before approval
+            uid: uid,
+        };
+
+        try {
+            await setDoc(doc(db, "users", uid), pendingUserData);
+            console.log(`Created pending request for: ${user.email}`);
+        } catch (error) {
+            console.error(`Failed to create request for ${user.email}:`, error);
+        }
+    }
+}
+
 //seedUsers();
 async function assignDonationRequestToTimeBlock(
     timeBlockId: string,
@@ -910,12 +1095,12 @@ async function getRandomAvailableTimeBlock(): Promise<TimeBlock | null> {
 
 function generateTimeBlocks() {
     const now = new Date();
-    const targetCount = 20; // 10–15 blocks
+    const targetCount = 200; // 10–15 blocks
 
     // Build all weekday 1-hour slots (9am–5pm) for the next 14 days
     const candidates: Array<{ start: Date; end: Date }> = [];
 
-    for (let dayOffset = 0; dayOffset < 14; dayOffset++) {
+    for (let dayOffset = 0; dayOffset < 180; dayOffset++) {
         const date = new Date(now);
         date.setDate(now.getDate() + dayOffset);
 
@@ -966,17 +1151,24 @@ export async function seedTimeBlocks() {
 function randomHMIS(): string {
     return Math.floor(10 ** 12 + Math.random() * 9 * 10 ** 12).toString();
 }
-async function addCaseManagerRequests(count: number) {
-    for (let i = 0; i < count; i++) {
-        const randomBlock = await getRandomAvailableTimeBlock();
 
-        if (!randomBlock) {
-            console.log("No available time blocks left");
-            break;
-        }
+
+async function addCaseManagerRequests(count: number) {
+    for(let i = 0; i < count; i++) {
         const randomCaseManager = await getRandomCaseManagerID();
-        // base location contact
         const baseClient: LocationContact = randomFrom(SEED_DONORS);
+
+        const numItemsNeeded = Math.floor(Math.random() * 4) + 1;
+
+        // 2. Grab unique categories so they don't request "Sofas" twice
+        const shuffledCategories = [...DEFAULT_CATEGORIES].sort(() => Math.random() - 0.5);
+        const selectedCategories = shuffledCategories.slice(0, numItemsNeeded);
+
+        // 3. Build the items array with random quantities for each category
+        const requestedItems = selectedCategories.map((category) => ({
+            name: category,
+            quantity: Math.floor(Math.random() * 3) + 1, // Assigns 1, 2, or 3 of this item
+        }));
 
         const request: ClientRequest = {
             id: crypto.randomUUID(),
@@ -1015,23 +1207,16 @@ async function addCaseManagerRequests(count: number) {
             },
 
             caseManagerID: randomCaseManager ?? "",
-            notes: randomFrom(desc),
+            notes: randomFrom(CASE_NOTES),
             status: "Not Reviewed",
 
-            items: [
-                {
-                    name: randomFrom(DEFAULT_CATEGORIES),
-                    quantity: Math.floor(Math.random() * 3) + 1,
-                },
-            ],
+            items: requestedItems,
 
-            associatedTimeBlockID: randomBlock.id,
+            associatedTimeBlockID: null,
         };
 
         await setCaseRequest(request);
 
-        // mark block as used (optional but recommended)
-        await assignDonationRequestToTimeBlock(randomBlock.id, request);
 
         console.log("Created case manager request:", request.id);
     }
@@ -1051,6 +1236,24 @@ async function getRandomCaseManagerID(): Promise<string | null> {
 
     return random.uid;
 }
+
+const CASE_NOTES = [
+    "Tape color: BLUE. Keep all pieces together on a single pallet by the loading dock; double-check the overall dimensions before wrapping.",
+    "Assigned tape: RED. Heavy load in this order! Make sure to send at least two volunteers to lift and move the larger pieces.",
+    "Tape: YELLOW. Watch out for fragile components. Please wrap everything an extra time just to be safe.",
+    "Tape color: GREEN. Leave this order in Aisle 4 until the client arrives. They are bringing a smaller vehicle, so we will need to pack it tight.",
+    "Tape: ORANGE. Please verify the client's HMIS number before handing over the items. Make sure any moving parts or doors are taped shut before transporting.",
+    "Assigned tape: PURPLE. Load the heaviest items first, and make sure to grab any ziplock bags of hardware attached to the back.",
+    "Tape color: PINK. The client is moving into a 3rd-floor walkup, so please pick the lightest available options from the floor if there are duplicates.",
+    "Tape: WHITE. Wipe everything down before loading. Stack the items carefully to avoid scratching the finishes.",
+    "Assigned tape: LIGHT BLUE. Put any soft goods in the truck last so they can be carried in first at the destination.",
+    "Tape color: NEON YELLOW. Grab these from the overflow storage area. Please do a quick quality check for any missing parts before staging.",
+    "Tape: BLACK. Needs an extra wipe-down. Stack the smaller items on top of the heavier pieces to save space on the dolly.",
+    "Assigned tape: NEON ORANGE. Client will have help loading, but stage the order close to Bay 2 so they don't have to carry it far.",
+    "Tape color: DARK GREEN. Check the inventory tags to ensure these are the exact pieces requested; we have a few similar ones on the floor.",
+    "Tape: NAVY. Leave the protective plastic on everything until it's fully loaded into their vehicle.",
+    "Assigned tape: SILVER. Wrap the edges in cardboard before loading to prevent corner damage during transport."
+];
 
 const CLIENT_NOTES = [
     "Client recently moved into permanent housing and is missing essential furniture.",
@@ -1094,7 +1297,13 @@ export default function page() {
             >
                 Cool button to add users
             </button>
-
+             <button
+                onClick={() => {
+                    accountReqs();
+                }}
+            >
+                Cooler button to add user reqs
+            </button>
             <button
                 onClick={() => {
                     ensureCategoriesConfig();
@@ -1114,21 +1323,31 @@ export default function page() {
 
             <button
                 onClick={() => {
-                    addCaseManagerRequests(4);
+                    addCaseManagerRequests(7);
                 }}
             >
                 ADD 4 CASE MANAGERS{" "}
             </button>
-            <button
+            {/* <button
                 onClick={() => {
                     const promises = DEFAULT_CATEGORIES.filter(
                         (category) => category !== "Other"
-                    ).map((category) => addDonationRequests(category));
+                    ).map((category) => addDonationRequests());
 
                     Promise.all(promises);
                 }}
             >
                 {" "}
+                Epic Mega Button to Add All Different Donation Requests
+            </button> */}
+            <button
+                onClick={async () => {
+                    const NUM_REQUESTS = 5; // however many you want
+                    await Promise.all(
+                        Array.from({ length: NUM_REQUESTS }, () => addDonationRequests())
+                    );
+                }}
+            >
                 Epic Mega Button to Add All Different Donation Requests
             </button>
             <button
