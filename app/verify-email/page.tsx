@@ -87,7 +87,7 @@ export default function VerifyEmailPage() {
                             onClick={handleCheckVerification}
                             className="w-full h-12 rounded-md bg-primary text-white font-semibold"
                         >
-                            I've Verified My Email
+                            I&apos;ve Verified My Email
                         </button>
 
                         <button

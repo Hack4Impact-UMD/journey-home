@@ -75,7 +75,7 @@ function useAllAccounts(onlyActive: boolean) {
                 error: "Error: Couldn't update user",
             });
             await promise;
-        } catch (error) {
+        } catch {
             // Error already handled by toast.promise
         }
     };
@@ -143,7 +143,7 @@ export function useAccount(uid: string) {
                 error: "Error: Couldn't update account",
             });
             await promise;
-        } catch (error) {
+        } catch {
             // Error already handled by toast.promise
         }
     };

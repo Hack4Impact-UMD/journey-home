@@ -117,7 +117,7 @@ export default function ProfilePage() {
                 dob: dobTimestamp,
                 phoneNumber: phoneNumber.trim(),
             });
-        } catch (error) {
+        } catch {
             // Error already handled by toast.promise in editAccount
         }
     };
