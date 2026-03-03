@@ -1031,7 +1031,7 @@ async function seedUsers() {
             dob: user.dob,
             role: user.role,
             email: user.email,
-            pending: user.role === "Volunteer" && Math.random() > 0.75 ? "Volunteer" : null,
+            pending: (user.role === "Volunteer" && Math.random() > 0.75) ? "Case Manager" : null,
             emailVerified: false,
         });
     }

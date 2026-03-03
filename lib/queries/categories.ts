@@ -27,9 +27,6 @@ export function useCategories() {
                 queryClient.setQueryData(["categories"], context.prevData);
             }
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["categories"] });
-        }
     });
 
     const setCategoriesWithToast = async (attrs: CategoryAttributes[]) => {

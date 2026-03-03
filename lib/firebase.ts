@@ -34,7 +34,8 @@ if(process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true') {
 
   connectAuthEmulator(
   auth,
-  `http://${process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_HOST ?? 'localhost'}:${process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_AUTH_PORT ?? '9099'}`
+  `http://${process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_HOST ?? 'localhost'}:${process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_AUTH_PORT ?? '9099'}`,
+  { disableWarnings: true }
   );
 
 }
