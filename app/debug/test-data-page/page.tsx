@@ -13,7 +13,6 @@ import { UserData } from "@/types/user";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { TimeBlock } from "@/types/schedule";
 import { collection, getDocs } from "firebase/firestore";
-import { useAuth } from "@/contexts/AuthContext";
 
 const CASEREQUEST = "client-requests";
 const TIMEBLOCK = "timeblocks";
@@ -1066,32 +1065,32 @@ async function accountReqs() {
 }
 
 //seedUsers();
-async function assignDonationRequestToTimeBlock(
-    timeBlockId: string,
-    donationRequest: DonationRequest | ClientRequest
-): Promise<void> {
-    if (!timeBlockId) throw new Error("No TimeBlock ID provided");
-    if (!donationRequest) throw new Error("No DonationRequest ID provided");
+// async function assignDonationRequestToTimeBlock(
+//     timeBlockId: string,
+//     donationRequest: DonationRequest | ClientRequest
+// ): Promise<void> {
+//     if (!timeBlockId) throw new Error("No TimeBlock ID provided");
+//     if (!donationRequest) throw new Error("No DonationRequest ID provided");
 
-    const blockRef = doc(db, TIMEBLOCK, timeBlockId);
+//     const blockRef = doc(db, TIMEBLOCK, timeBlockId);
 
-    const old = (await (await getDoc(blockRef)).data()) as TimeBlock;
+//     const old = (await (await getDoc(blockRef)).data()) as TimeBlock;
 
-    await setDoc(blockRef, {
-        ...old,
-        tasks: old.tasks.concat([donationRequest]),
-    } as TimeBlock);
-}
+//     await setDoc(blockRef, {
+//         ...old,
+//         tasks: old.tasks.concat([donationRequest]),
+//     } as TimeBlock);
+// }
 
-async function getRandomAvailableTimeBlock(): Promise<TimeBlock | null> {
-    const snapshot = await getDocs(collection(db, TIMEBLOCK));
+// async function getRandomAvailableTimeBlock(): Promise<TimeBlock | null> {
+//     const snapshot = await getDocs(collection(db, TIMEBLOCK));
 
-    const available = snapshot.docs.map((doc) => doc.data() as TimeBlock);
+//     const available = snapshot.docs.map((doc) => doc.data() as TimeBlock);
 
-    if (available.length === 0) return null;
+//     if (available.length === 0) return null;
 
-    return available[Math.floor(Math.random() * available.length)];
-}
+//     return available[Math.floor(Math.random() * available.length)];
+// }
 
 function generateTimeBlocks() {
     const now = new Date();
@@ -1370,6 +1369,6 @@ export default function page() {
 const randomFrom = <T,>(arr: T[]): T =>
     arr[Math.floor(Math.random() * arr.length)];
 
-function getRandom<T>(arr: readonly T[]): T {
-    return arr[Math.floor(Math.random() * arr.length)];
-}
+// function getRandom<T>(arr: readonly T[]): T {
+//     return arr[Math.floor(Math.random() * arr.length)];
+// }
