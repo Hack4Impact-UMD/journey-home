@@ -6,13 +6,12 @@ import TopNavbar from "@/components/general/TopNav";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
     getAllWarehouseInventoryRecords,
     getCategoryAttributes,
 } from "@/lib/services/inventory";
 import { CategoryAttributes, InventoryRecord } from "@/types/inventory";
-import { useCategories } from "@/lib/queries/categories";
 import { StockSidebar } from "@/components/inventory/StockSidebar";
 
 export default function InventoryLayout({ children }: { children: ReactNode }) {
@@ -47,11 +46,11 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
 
         let color;
         if (count < catAttr.lowThreshold) {
-            color = "#F02118";
+            color = "#FF6B4A";
         } else if (count < catAttr.highThreshold) {
-            color = "#F09618";
+            color = "#F4DE13";
         } else {
-            color = "#5eed0b";
+            color = "#69C22E";
         }
         const maxCount = catAttr.highThreshold;
 
