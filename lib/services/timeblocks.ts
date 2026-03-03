@@ -28,12 +28,13 @@ export const deleteTB = async (id: string) => {
   await deleteDoc(timeRef);
 };
 
-export const createTB = async (startTime: string, endTime: string, maxVolunteers: number): Promise<void> => {
+export const createTB = async (date: string, startTime: string, endTime: string, maxVolunteers: number): Promise<void> => {
+    const [year, month, day] = date.split("-").map(Number);
     const [startH, startM] = startTime.split(":").map(Number);
     const [endH, endM] = endTime.split(":").map(Number);
 
-    const start = new Date(); start.setHours(startH, startM, 0);
-    const end = new Date(); end.setHours(endH, endM, 0);
+    const start = new Date(year, month - 1, day, startH, startM, 0);
+    const end = new Date(year, month - 1, day, endH, endM, 0);
 
     const newBlock: TimeBlock = {
         id: crypto.randomUUID(),

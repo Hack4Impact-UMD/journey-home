@@ -5,9 +5,11 @@ interface Props {
     isOpen: boolean;
     onClose: () => void;
     onShiftCreated: () => void;
+    selectedDate: Date;
 }
 
-export function AddShiftOverlay({ isOpen, onClose, onShiftCreated }: Props) {
+export function AddShiftOverlay({ isOpen, onClose, onShiftCreated, selectedDate }: Props) {
+    const [date, setDate] = useState(new Date().toLocaleDateString("en-CA"));
     const [startTime, setStartTime] = useState("");
     const [endTime, setEndTime] = useState("");
     const [shiftType, setShiftType] = useState<"pickup" | "warehouse" | null>(null);
@@ -18,12 +20,12 @@ export function AddShiftOverlay({ isOpen, onClose, onShiftCreated }: Props) {
     if (!isOpen) return null;
 
     const handleSave = async () => {
-        if (!startTime || !endTime || !shiftType || (openToVolunteers && !maxVolunteers)) {
+        if (!date || !startTime || !endTime || !shiftType || (openToVolunteers && !maxVolunteers)) {
             setError("Please fill in all required fields.");
             return;
         }
         setError("");
-        await createTB(startTime, endTime, openToVolunteers ? Number(maxVolunteers) : 0);
+        await createTB(date, startTime, endTime, openToVolunteers ? Number(maxVolunteers) : 0);
         onShiftCreated();
         onClose();
     };
@@ -33,6 +35,13 @@ export function AddShiftOverlay({ isOpen, onClose, onShiftCreated }: Props) {
             <div className="absolute inset-0 bg-black/20" onClick={onClose} />
 
             <div className="relative w-72 bg-gray-50 rounded-xl shadow-xl divide-y divide-gray-200">
+
+                <div className="p-4">
+                    <p className="font-bold text-slate-700 mb-3">Date</p>
+                    <input type="date" value={date} onChange={e => setDate(e.target.value)}
+                        className="w-full border border-gray-200 rounded-md px-2 py-1.5 text-sm" />
+                </div>
+
                 <div className="p-4">
                     <p className="font-bold text-slate-700 mb-3">Time</p>
                     <div className="flex gap-3">
