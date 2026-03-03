@@ -4,9 +4,9 @@ import { ToolbarProps } from "react-big-calendar";
 import { MyEvent } from "../../types/schedule";
 import { AddShiftOverlay } from "./AddShiftOverlay";
 
-interface ExtraProps { onShiftCreated: () => void; selectedDate: Date; }
+interface ExtraProps { onShiftCreated: () => void; }
 
-export function CustomToolbar({ label, onNavigate, onView, view, onShiftCreated, selectedDate }: ToolbarProps<MyEvent, object> & ExtraProps) {
+export function CustomToolbar({ label, onNavigate, onView, view, onShiftCreated }: ToolbarProps<MyEvent, object> & ExtraProps) {
     const [showOverlay, setShowOverlay] = useState(false);
 
     return (
@@ -48,7 +48,6 @@ export function CustomToolbar({ label, onNavigate, onView, view, onShiftCreated,
                     isOpen={showOverlay}
                     onClose={() => setShowOverlay(false)}
                     onShiftCreated={onShiftCreated}
-                    selectedDate={selectedDate}
                 />
             </div>
         </div>

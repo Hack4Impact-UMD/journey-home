@@ -36,7 +36,7 @@ export default function CalendarView() {
                 date={date}
                 onNavigate={(d) => setDate(d)}
                 components={{
-                    toolbar: (props) => <CustomToolbar {...props} onShiftCreated={loadEvents} selectedDate={date} />,
+                    toolbar: (props) => <CustomToolbar {...props} onShiftCreated={loadEvents} />,
                     event: ({ event }) => (
                         <span className="text-xs text-[#3D4B6B]">
                             {view === "month" ? event.title : ""}

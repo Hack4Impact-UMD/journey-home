@@ -5,10 +5,9 @@ interface Props {
     isOpen: boolean;
     onClose: () => void;
     onShiftCreated: () => void;
-    selectedDate: Date;
 }
 
-export function AddShiftOverlay({ isOpen, onClose, onShiftCreated, selectedDate }: Props) {
+export function AddShiftOverlay({ isOpen, onClose, onShiftCreated }: Props) {
     const [date, setDate] = useState(new Date().toLocaleDateString("en-CA"));
     const [startTime, setStartTime] = useState("");
     const [endTime, setEndTime] = useState("");
