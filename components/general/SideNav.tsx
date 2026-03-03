@@ -35,6 +35,7 @@ export default function SideNavbar() {
                     roles={["Admin"]}
                 />
             </SideNavbarLinkGroup>
+            
 
             <SideNavbarLinkGroup
                 name="User Management"
@@ -64,12 +65,22 @@ export default function SideNavbar() {
                 roles={["Admin", "Case Manager"]}
             />
 
-            <SideNavbarLink
-                name="Pickups & Deliveries"
+            <SideNavbarLinkGroup
+                name="Pickups & deliveries"
                 path="/pickups-deliveries"
                 roles={["Admin"]}
-            />
-
+            >
+                <SideNavbarLink
+                    name="Unscheduled"
+                    path="/pickups-deliveries/unscheduled"
+                    roles={["Admin"]}
+                />
+                <SideNavbarLink
+                    name="Scheduled"
+                    path="/pickups-deliveries/scheduled"
+                    roles={["Admin"]}
+                />
+            </SideNavbarLinkGroup>
             <SideNavbarLink
                 name="Control Panel"
                 path="/control-panel"
