@@ -88,6 +88,10 @@ export default function ProfilePage() {
         );
     }
 
+    /**
+     * Validates and saves profile changes to Firestore
+     * Performs validation on required fields and phone number format
+     */
     const handleSave = async () => {
         // Validation
         if (!firstName.trim()) {
@@ -118,6 +122,9 @@ export default function ProfilePage() {
         }
     };
 
+    /**
+     * Reverts all form fields to their original values from the account data
+     */
     const handleCancel = () => {
         if (account) {
             setFirstName(account.firstName || "");
@@ -135,6 +142,10 @@ export default function ProfilePage() {
         }
     };
 
+    /**
+     * Handles password reset with validation and reauthentication
+     * Validates password match, length, and current password before updating
+     */
     const handlePasswordReset = async () => {
         if (newPassword !== confirmPassword) {
             toast.error("New passwords don't match");
@@ -177,6 +188,9 @@ export default function ProfilePage() {
         }
     };
 
+    /**
+     * Clears password reset form and returns to profile view
+     */
     const resetPasswordForm = () => {
         setShowPasswordReset(false);
         setCurrentPassword("");

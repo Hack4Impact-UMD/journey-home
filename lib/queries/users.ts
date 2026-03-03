@@ -3,14 +3,27 @@ import { fetchAllUsers, getUserByUID, updateUser } from "../services/users";
 import { UserData } from "@/types/user";
 import { toast } from "sonner";
 
+/**
+ * Hook for fetching all active user accounts (non-pending users)
+ * @returns Object containing active accounts array, edit function, and query states
+ */
 export function useAllActiveAccounts() {
     return useAllAccounts(true);
 }
 
+/**
+ * Hook for fetching all pending account requests
+ * @returns Object containing pending accounts array, edit function, and query states
+ */
 export function useAllAccountRequests() {
     return useAllAccounts(false);
 }
 
+/**
+ * Internal hook for fetching user accounts with optional filtering
+ * @param onlyActive - If true, returns only active accounts; if false, returns only pending requests
+ * @returns Object containing accounts array, edit function, loading states, and refetch function
+ */
 function useAllAccounts(onlyActive: boolean) {
     const queryClient = useQueryClient();
 
@@ -49,6 +62,10 @@ function useAllAccounts(onlyActive: boolean) {
         }
     });
 
+    /**
+     * Updates a user account with optimistic updates and toast notifications
+     * @param newUserData - The updated user data to save
+     */
     const updateAccount = async (newUserData: UserData) => {
         try {
             const promise = updateMutation.mutateAsync(newUserData);
@@ -113,6 +130,10 @@ export function useAccount(uid: string) {
             queryClient.invalidateQueries({ queryKey: ["users"] });
         }
     });
+    /**
+     * Updates a single user account with optimistic updates and toast notifications
+     * @param newUserData - The updated user data to save
+     */
     const editAccount = async (newUserData: UserData) => {
         try {
             const promise = updateMutation.mutateAsync(newUserData);

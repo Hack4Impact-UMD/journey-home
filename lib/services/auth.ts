@@ -4,6 +4,7 @@ import {
     signInWithEmailAndPassword,
     signOut,
     User,
+    sendEmailVerification,
 } from "firebase/auth";
 import { auth } from "../firebase";
 import { Timestamp } from "firebase/firestore";
@@ -37,6 +38,9 @@ export async function signUp(
     };
 
     await createUserInDB(userRecord);
+
+    // Send verification email
+    await sendEmailVerification(user);
 
     return user;
 }
