@@ -50,7 +50,7 @@ export default function WarehousePage() {
     const [newItem, setNewItem] = useState<InventoryRecord | null>(null);
     const [openedItem, setOpenedItem] = useState<InventoryRecord | null>(null);
 
-    const [categoryAttributes, setCategoryAttributes] = useState<
+    const [, setCategoryAttributes] = useState<
         CategoryAttributes[]
     >([]);
 
