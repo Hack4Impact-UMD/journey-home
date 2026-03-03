@@ -6,7 +6,7 @@ import type {
     InventoryRecord,
     ItemSize,
 } from "@/types/inventory";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { GridIcon } from "@/components/icons/GridIcon";
 import { RowsIcon } from "@/components/icons/RowsIcon";
 import {
@@ -27,11 +27,11 @@ import { Timestamp } from "firebase/firestore";
 import { WarehouseGallery } from "@/components/inventory/WarehouseGallery";
 import { ItemViewModal } from "@/components/inventory/ItemViewModal";
 import { useCategories } from "@/lib/queries/categories";
-import { StockSidebar } from "@/components/inventory/StockSidebar";
+// import { StockSidebar } from "@/components/inventory/StockSidebar";
 
 export default function WarehousePage() {
     const [searchQuery, setSearchQuery] = useState<string>("");
-    const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+    // const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
 
     const { allCategories } = useCategories();
 
@@ -124,43 +124,43 @@ export default function WarehousePage() {
     }, [allCategories]);
 
     //Refetches data every time the sidebar opens
-    const handleSidebarOpen = () => {
-        setIsSidebarOpen(true);
-        getAllWarehouseInventoryRecords().then(setAllItems);
-        getCategoryAttributes().then(setCategoryAttributes);
-    };
+    // const handleSidebarOpen = () => {
+    //     setIsSidebarOpen(true);
+    //     getAllWarehouseInventoryRecords().then(setAllItems);
+    //     getCategoryAttributes().then(setCategoryAttributes);
+    // };
 
     //Calculating category stocks using CategoryAttributes
-    const categoryStocks = categoryAttributes.map((catAttr) => {
-        const count = allItems
-            .filter((item) => item.category === catAttr.name)
-            .reduce((sum, item) => sum + item.quantity, 0);
+//     const categoryStocks = categoryAttributes.map((catAttr) => {
+//         const count = allItems
+//             .filter((item) => item.category === catAttr.name)
+//             .reduce((sum, item) => sum + item.quantity, 0);
 
-        console.log(
-  allItems.map(i => ({
-    category: i.category,
-    quantity: i.quantity,
-    type: typeof i.quantity
-  }))
-);
+//         console.log(
+//   allItems.map(i => ({
+//     category: i.category,
+//     quantity: i.quantity,
+//     type: typeof i.quantity
+//   }))
+// );
 
-        let color;
-        if (count < catAttr.lowThreshold) {
-            color = "#F02118";
-        } else if (count < catAttr.highThreshold) {
-            color = "#F09618";
-        } else {
-            color = "#5eed0b";
-        }
-        const maxCount = catAttr.highThreshold;
+//         let color;
+//         if (count < catAttr.lowThreshold) {
+//             color = "#F02118";
+//         } else if (count < catAttr.highThreshold) {
+//             color = "#F09618";
+//         } else {
+//             color = "#5eed0b";
+//         }
+//         const maxCount = catAttr.highThreshold;
 
-        return {
-            category: catAttr.name,
-            count: count,
-            maxCount: maxCount,
-            color,
-        };
-    });
+//         return {
+//             category: catAttr.name,
+//             count: count,
+//             maxCount: maxCount,
+//             color,
+//         };
+//     });
 
     const items = allItems
         .filter(
@@ -326,12 +326,12 @@ export default function WarehousePage() {
                         />
                     )}
                 </div>
-                <StockSidebar
+                {/* <StockSidebar
                     isOpen={isSidebarOpen}
                     onClose={() => setIsSidebarOpen(false)}
                     onOpen={handleSidebarOpen}
                     categoryStocks={categoryStocks}
-                />
+                /> */}
             </div>
         </>
     );
