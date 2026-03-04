@@ -114,7 +114,7 @@ export default function ListView() {
                                         {grouped[date].map((tb) => {
                                             const start = tb.startTime.toDate();
                                             const end = tb.endTime.toDate();
-                                            const type = (tb as any).type ?? "Pickups / Deliveries";
+                                            const type = (tb as { type?: string }).type ?? "Pickups / Deliveries";
                                             const dotColor = type === "Warehouse" ? "bg-yellow-400" : "bg-[#02AFC7]";
                                             return (
                                                 <div
