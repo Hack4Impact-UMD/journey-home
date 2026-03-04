@@ -96,7 +96,6 @@ export default function ListView() {
 
                 <div>
                     {sortedDates.map((date, idx) => {
-                        const day = new Date(date + "T12:00:00");
                         return (
                             <div
                                 key={date}
