@@ -4,6 +4,7 @@ import {
     signInWithEmailAndPassword,
     signOut,
     User,
+    sendEmailVerification,
 } from "firebase/auth";
 import { auth } from "../firebase";
 import { Timestamp } from "firebase/firestore";
@@ -37,6 +38,13 @@ export async function signUp(
     };
 
     await createUserInDB(userRecord);
+
+    // Send verification email (don't fail signup if email fails)
+    try {
+        await sendEmailVerification(user);
+    } catch (error) {
+        console.warn("Verification email could not be sent during signup.", error);
+    }
 
     return user;
 }
