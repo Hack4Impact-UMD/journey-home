@@ -31,7 +31,7 @@ function useAllAccounts(onlyActive: boolean) {
         queryKey: ["users", onlyActive],
         queryFn: async () => {
             const allUsers = await fetchAllUsers();
-            return allUsers.filter(user => ((user.pending == null) == onlyActive));
+            return allUsers.filter(user => ((user.pending === null) == onlyActive));
         },
     });
 
