@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
-import moment from "moment";
 import { fetchAllTB } from "../../../lib/services/timeblocks";
 import { TimeBlock } from "../../../types/schedule";
 
@@ -33,7 +32,7 @@ export default function ListView() {
     const filteredBlocks = blocks;
        
     const grouped = filteredBlocks.reduce((acc, tb) => {
-        const dateKey = moment(tb.startTime.toDate()).format("YYYY-MM-DD");
+    const dateKey = tb.startTime.toDate().toISOString().split("T")[0];
         if (!acc[dateKey]) acc[dateKey] = [];
         acc[dateKey].push(tb);
         return acc;
@@ -97,7 +96,7 @@ export default function ListView() {
 
                 <div>
                     {sortedDates.map((date, idx) => {
-                        const day = moment(date);
+                        const day = new Date(date + "T12:00:00");
                         return (
                             <div
                                 key={date}
@@ -105,10 +104,10 @@ export default function ListView() {
                             >
                                 <div className="flex items-start gap-5">
                                     <div className="bg-[#02AFC7] text-white rounded-full w-10 h-10 flex items-center justify-center font-semibold text-base flex-shrink-0">
-                                        {day.format("D")}
+                                        {new Date(date).getDate()}
                                     </div>
                                     <div className="text-sm font-semibold text-[#6B7A99] uppercase pt-2.5 w-20 flex-shrink-0 tracking-wide">
-                                        {day.format("MMM, ddd")}
+                                        {new Date(date + "T12:00:00").toLocaleDateString("en-US", { month: "short", weekday: "short" }).toUpperCase().replace(" ", ", ")}
                                     </div>
                                     <div className="flex-1 space-y-1.5">
                                         {grouped[date].map((tb) => {
@@ -123,7 +122,8 @@ export default function ListView() {
                                                 >
                                                     <div className={`w-3.5 h-3.5 rounded-full flex-shrink-0 ${dotColor}`} />
                                                     <div className="text-sm font-normal text-black w-32 flex-shrink-0 whitespace-nowrap">
-                                                        {moment(start).format("h:mma")}-{moment(end).format("h:mma")}
+                                                        {start.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }).toLowerCase() + "-" +
+                                                            end.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }).toLowerCase()}
                                                     </div>
                                                     <div className="text-sm font-normal text-black">
                                                         {type}
