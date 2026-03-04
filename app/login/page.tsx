@@ -33,10 +33,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden flex-col">
+    <div className="flex min-h-screen flex-col">
       <MobileHeader backTo="/" />
       
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-y-auto md:overflow-hidden">
         {/* Background image - hidden on mobile */}
         <div className="hidden md:flex h-full max-w-[30em] overflow-hidden justify-center items-center">
           <img

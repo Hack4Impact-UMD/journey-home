@@ -24,6 +24,7 @@ export default function MobileHeader({ onBack, backTo }: MobileHeaderProps) {
         <div className="md:hidden flex justify-between items-center px-4 py-3 bg-white">
             {/* Back button */}
             <button
+                type="button"
                 onClick={handleBack}
                 className="flex items-center text-gray-700 font-medium"
             >

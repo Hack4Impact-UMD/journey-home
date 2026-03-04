@@ -12,6 +12,21 @@ export default function VerifyEmailPage() {
     const { state } = useAuth();
     const [resending, setResending] = useState(false);
 
+    // If still loading, show loading state
+    if (state.loading) {
+        return (
+            <div className="flex h-screen items-center justify-center">
+                <p>Loading...</p>
+            </div>
+        );
+    }
+
+    // If no user after loading, redirect to login
+    if (!state.currentUser) {
+        router.push("/login");
+        return null;
+    }
+
     const handleResendEmail = async () => {
         if (!state.currentUser) {
             toast.error("No user logged in");
@@ -36,14 +51,35 @@ export default function VerifyEmailPage() {
             return;
         }
 
-        // Reload user to get latest emailVerified status
-        await state.currentUser.reload();
-        
-        if (state.currentUser.emailVerified) {
-            toast.success("Email verified! Redirecting...");
-            router.push("/");
-        } else {
-            toast.error("Email not verified yet. Please check your inbox and click the verification link.");
+        try {
+            // Reload user to get latest emailVerified status
+            await state.currentUser.reload();
+            
+            if (state.currentUser.emailVerified) {
+                toast.success("Email verified! Redirecting...");
+                // Check if user has pending role (Admin or Case Manager)
+                if (state.userData?.pending) {
+                    router.push("/status/account-pending");
+                } else {
+                    router.push("/");
+                }
+            } else {
+                toast.error("Email not verified yet. Please verify your email in the emulator UI.");
+            }
+        } catch (error: unknown) {
+            console.error("Error checking verification:", error);
+            const firebaseError = error as { code?: string; message?: string };
+            // If token expired in emulator, just redirect anyway for testing
+            if (firebaseError.code === "auth/user-token-expired") {
+                toast.info("Redirecting... (emulator token expired)");
+                if (state.userData?.pending) {
+                    router.push("/status/account-pending");
+                } else {
+                    router.push("/");
+                }
+            } else {
+                toast.error("Failed to check verification status. Please try again.");
+            }
         }
     };
 

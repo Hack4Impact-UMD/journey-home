@@ -40,10 +40,10 @@ function useAllAccounts(onlyActive: boolean) {
             await updateUser(newUserData);
         },
         onMutate: async (newUserData: UserData) => {
-            await queryClient.cancelQueries({ queryKey: ["users"] });
-            const prevData = queryClient.getQueryData<UserData[]>(["users"]);
+            await queryClient.cancelQueries({ queryKey: ["users", onlyActive] });
+            const prevData = queryClient.getQueryData<UserData[]>(["users", onlyActive]);
 
-            queryClient.setQueryData(["users"], (oldData: UserData[] | undefined) => {
+            queryClient.setQueryData(["users", onlyActive], (oldData: UserData[] | undefined) => {
                 if (!oldData) return [newUserData];
                 return oldData.map((user) =>
                     user.uid === newUserData.uid ? newUserData : user,
@@ -54,11 +54,11 @@ function useAllAccounts(onlyActive: boolean) {
         },
         onError: (error, newUserData, context) => {
             if (context?.prevData) {
-                queryClient.setQueryData(["users"], context.prevData);
+                queryClient.setQueryData(["users", onlyActive], context.prevData);
             }
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["users"] });
+            queryClient.invalidateQueries({ queryKey: ["users", onlyActive] });
         }
     });
 
@@ -67,17 +67,13 @@ function useAllAccounts(onlyActive: boolean) {
      * @param newUserData - The updated user data to save
      */
     const updateAccount = async (newUserData: UserData) => {
-        try {
-            const promise = updateMutation.mutateAsync(newUserData);
-            toast.promise(promise, {
-                loading: "Updating user...",
-                success: "User updated successfully!",
-                error: "Error: Couldn't update user",
-            });
-            await promise;
-        } catch {
-            // Error already handled by toast.promise
-        }
+        const promise = updateMutation.mutateAsync(newUserData);
+        toast.promise(promise, {
+            loading: "Updating user...",
+            success: "User updated successfully!",
+            error: "Error: Couldn't update user",
+        });
+        return await promise;
     };
 
     return {
@@ -135,17 +131,13 @@ export function useAccount(uid: string) {
      * @param newUserData - The updated user data to save
      */
     const editAccount = async (newUserData: UserData) => {
-        try {
-            const promise = updateMutation.mutateAsync(newUserData);
-            toast.promise(promise, {
-                loading: "Updating account...",
-                success: "Account updated successfully!",
-                error: "Error: Couldn't update account",
-            });
-            await promise;
-        } catch {
-            // Error already handled by toast.promise
-        }
+        const promise = updateMutation.mutateAsync(newUserData);
+        toast.promise(promise, {
+            loading: "Updating account...",
+            success: "Account updated successfully!",
+            error: "Error: Couldn't update account",
+        });
+        return await promise;
     };
 
     return {

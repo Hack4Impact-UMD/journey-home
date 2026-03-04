@@ -10,7 +10,9 @@ import { useEffect, useState } from "react";
 export default function HomePage() {
     const { state } = useAuth();
     const router = useRouter();
-    const [isMobile, setIsMobile] = useState(false);
+    const [isMobile, setIsMobile] = useState(() => 
+        typeof window !== "undefined" ? window.innerWidth < 768 : false
+    );
 
     useEffect(() => {
         // Check if viewport is mobile size
