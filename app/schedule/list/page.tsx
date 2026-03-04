@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
+import moment from "moment";
 import { fetchAllTB } from "../../../lib/services/timeblocks";
 import { TimeBlock } from "../../../types/schedule";
 
@@ -29,12 +30,10 @@ export default function ListView() {
         return () => document.removeEventListener("mousedown", handler);
     }, []);
 
-    const filteredBlocks = filterType === "All"
-        ? blocks
-        : blocks.filter((tb) => (tb.type ?? "Pickups / Deliveries") === filterType);
-
+    const filteredBlocks = blocks;
+       
     const grouped = filteredBlocks.reduce((acc, tb) => {
-        const dateKey = moment(tb.start.toDate()).format("YYYY-MM-DD");
+        const dateKey = moment(tb.startTime.toDate()).format("YYYY-MM-DD");
         if (!acc[dateKey]) acc[dateKey] = [];
         acc[dateKey].push(tb);
         return acc;
@@ -113,9 +112,10 @@ export default function ListView() {
                                     </div>
                                     <div className="flex-1 space-y-1.5">
                                         {grouped[date].map((tb) => {
-                                            const start = tb.start.toDate();
-                                            const end = tb.end.toDate();
-                                            const dotColor = tb.type === "Warehouse" ? "bg-yellow-400" : "bg-[#02AFC7]";
+                                            const start = tb.startTime.toDate();
+                                            const end = tb.endTime.toDate();
+                                            const type = (tb as any).type ?? "Pickups / Deliveries";
+                                            const dotColor = type === "Warehouse" ? "bg-yellow-400" : "bg-[#02AFC7]";
                                             return (
                                                 <div
                                                     key={tb.id}
@@ -126,7 +126,7 @@ export default function ListView() {
                                                         {moment(start).format("h:mma")}-{moment(end).format("h:mma")}
                                                     </div>
                                                     <div className="text-sm font-normal text-black">
-                                                        {tb.type}
+                                                        {type}
                                                     </div>
                                                 </div>
                                             );

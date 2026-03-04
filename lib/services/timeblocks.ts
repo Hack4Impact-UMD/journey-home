@@ -18,24 +18,19 @@ export const fetchAllTB = async (): Promise<TimeBlock[]> => {
   snapshot.forEach((doc) => {
     const data = doc.data();
 
-    // Handle old field names (startTime/endTime) AND new ones (start/end)
-    const rawStart = data.start ?? data.startTime;
-    const rawEnd = data.end ?? data.endTime;
-
-    if (!rawStart || !rawEnd) {
-      console.warn("Skipping doc missing start/end:", doc.id);
+    if (!data.startTime || !data.endTime) {
+      console.warn("Skipping doc missing startTime/endTime:", doc.id);
       return;
     }
 
     TBs.push({
-      id: doc.id,                          // use doc.id, not data.id
-      start: Timestamp.fromMillis(rawStart.seconds * 1000),
-      end: Timestamp.fromMillis(rawEnd.seconds * 1000),
-      maxTasks: data.maxTasks ?? data.maxVolunteers ?? 0,
+      id: doc.id,
+      startTime: Timestamp.fromMillis(data.startTime.seconds * 1000),
+      endTime: Timestamp.fromMillis(data.endTime.seconds * 1000),
+      maxVolunteers: data.maxVolunteers ?? 0,
       volunteerIDs: data.volunteerIDs ?? [],
       tasks: data.tasks ?? [],
       published: data.published ?? false,
-      type: data.type ?? "Pickups / Deliveries",
     } as TimeBlock);
   });
 
@@ -57,13 +52,12 @@ export const createTB = async (startTime: string, endTime: string, maxVolunteers
 
  const newBlock: TimeBlock = {
     id: crypto.randomUUID(),
-    start: Timestamp.fromDate(start),   // was startTime
-    end: Timestamp.fromDate(end),       // was endTime
-    maxTasks: maxVolunteers,            // was maxVolunteers
+    startTime: Timestamp.fromDate(start),
+    endTime: Timestamp.fromDate(end),
+    maxVolunteers: maxVolunteers,
     volunteerIDs: [],
     tasks: [],
     published: false,
-    type: "Pickups / Deliveries",       // add default type
 };
 
     await setTB(newBlock);

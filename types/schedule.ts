@@ -5,12 +5,11 @@ import { ClientRequest } from "./client-requests";
 export type TimeBlock = {
     id: string;
     tasks: Task[];
-    start: Timestamp;      // was startTime
-    end: Timestamp;        // was endTime
+    startTime: Timestamp;
+    endTime: Timestamp;
     volunteerIDs: string[];
-    maxTasks: number;      // was maxVolunteers
+    maxVolunteers: number;
     published: boolean;
-    type: "Warehouse" | "Pickups / Deliveries";
 };
 
 export type Task = Pickup | Delivery;
