@@ -11,7 +11,6 @@ export type UserData = {
     lastName: string;
     email: string;
     dob: Timestamp | null;
-    phoneNumber?: string;
     role: UserRole;
     pending: UserRole | null;
     emailVerified: boolean;

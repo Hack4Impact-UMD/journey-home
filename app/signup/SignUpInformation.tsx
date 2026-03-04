@@ -18,8 +18,6 @@ export default function SignUpInformation({
     const [first, setFirst] = useState("");
     const [last, setLast] = useState("");
     const [dob, setDob] = useState("");
-    const [phoneNumber, setPhoneNumber] = useState("");
-    const [phoneExt, setPhoneExt] = useState("");
     const [pw, setPw] = useState("");
     const [pw2, setPw2] = useState("");
     const [loading, setLoading] = useState(false);
@@ -40,7 +38,7 @@ export default function SignUpInformation({
         try {
 
             await auth.signup(email, pw, first, last, dob, selectedRole);
-            router.push("/verify-email");
+            router.push("/status/account-created");
 
         } catch (e: unknown) {
             console.error("Signup failed:", e);
@@ -51,20 +49,17 @@ export default function SignUpInformation({
     }
 
     return (
-        <div className="w-full px-4">
-            <div className="relative mb-9 hidden md:block">
+        <div>
+            <div className="relative mb-9">
                 <button onClick={onBack} className="absolute left-0 text-2xl">
                     ←
                 </button>
-                <h1 className="text-center text-xl md:text-2xl font-bold font-family-roboto text-text-1">
+                <h1 className="text-center text-2xl font-bold font-family-roboto text-text-1">
                     Create Account
                 </h1>
             </div>
-            <h1 className="md:hidden text-center text-xl font-bold font-family-roboto text-text-1 mb-9">
-                Create Account
-            </h1>
 
-            <form onSubmit={onSubmit} className="w-full max-w-[28em] mx-auto">
+            <form onSubmit={onSubmit} className="w-[28em]">
                 <div className="flex gap-4">
                     <div>
                         <span className="text-sm">
@@ -99,24 +94,6 @@ export default function SignUpInformation({
                     onChange={(e) => setDob(e.target.value)}
                     className="rounded-xs border-[#D9D9D9] py-1.5 px-3 text-sm border w-full mt-2 mb-6"
                 />
-
-                <span className="text-sm">Phone Number</span>
-                <div className="flex gap-2 mt-2 mb-6">
-                    <input
-                        type="tel"
-                        value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e.target.value)}
-                        placeholder="(123) 456-7890"
-                        className="rounded-xs border-[#D9D9D9] py-1.5 px-3 text-sm border flex-1"
-                    />
-                    <input
-                        type="text"
-                        value={phoneExt}
-                        onChange={(e) => setPhoneExt(e.target.value)}
-                        placeholder="Ext"
-                        className="rounded-xs border-[#D9D9D9] py-1.5 px-3 text-sm border w-20"
-                    />
-                </div>
 
                 <span className="text-sm">
                     <span className="text-red-500">*</span> Email

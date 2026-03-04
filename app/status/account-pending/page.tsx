@@ -7,8 +7,8 @@ export default function AccountPending() {
 
     return (
         <div className="bg-background flex h-full overflow-hidden">
-            {/* Left side - background image - hidden on mobile */}
-            <div className="hidden md:flex shrink-0 items-start justify-start h-full">
+            {/* Left side - background image */}
+            <div className="flex shrink-0 items-start justify-start h-full">
                 <img
                     src="/background.png"
                     alt="Background"
@@ -17,14 +17,14 @@ export default function AccountPending() {
             </div>
 
             {/* Right side - content */}
-            <div className="flex flex-1 flex-col h-full items-center justify-center px-4 md:px-0">
-                <div className="flex flex-col items-center w-full max-w-[28em]">
+            <div className="flex flex-1 flex-col h-full items-center justify-center">
+                <div className="flex flex-col items-center w-[28em]">
                     {/* Logo */}
-                    <div className="flex justify-center mb-8 md:mb-16">
+                    <div className="flex justify-center mb-16">
                         <img
-                            src="/homes.png"
+                            src="/journey-home-logo.png"
                             alt="Journey Home"
-                            className="w-[220px] h-[58px] object-contain"
+                            className="h-[6em] w-[22em]"
                         />
                     </div>
 
@@ -36,7 +36,7 @@ export default function AccountPending() {
                     {/* Message */}
                     <p className="text-center font-family-roboto text-text-1 mb-12 px-8">
                         Thanks for requesting to be a part of the Journey Home
-                        team! You can expect to hear back from us within 3
+                        team! You can expect to hear back from us within X
                         business days.
                     </p>
 

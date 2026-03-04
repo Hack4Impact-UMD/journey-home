@@ -6,7 +6,6 @@ import LongButton from '@/components/auth/LongButton';
 import InputBox from '../../components/auth/InputBox';
 import { FirebaseError } from 'firebase/app';
 import { useAuth } from '@/contexts/AuthContext';
-import MobileHeader from '@/components/auth/MobileHeader';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -33,29 +32,25 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <MobileHeader backTo="/" />
-      
-      <div className="flex flex-1 overflow-y-auto md:overflow-hidden">
-        {/* Background image - hidden on mobile */}
-        <div className="hidden md:flex h-full max-w-[30em] overflow-hidden justify-center items-center">
-          <img
-            src="/background.png"
-            alt="Login Background"
-            className="object-cover min-h-full"
-          />
-        </div>
+    <div className="flex h-screen overflow-hidden">
+      <div className="h-full max-w-[30em] overflow-hidden flex justify-center items-center">
+        <img
+          src="/background.png"
+          alt="Login Background"
+          className="object-cover min-h-full"
+        />
+      </div>
 
-        <div className="flex-1 flex items-center justify-center px-4 md:px-0">
-          <form
-            onSubmit={handleLogin}
-            className="w-full max-w-[24em] flex flex-col text-black space-y-[1.2em]"
-          >
+      <div className="flex-1 flex items-center justify-center">
+        <form
+          onSubmit={handleLogin}
+          className="w-[24em] h-[35em] flex flex-col text-black space-y-[1.2em]"
+        >
           <div className="flex justify-center">
             <img
-              src="/homes.png"
+              src="/journey-home-logo.png"
               alt="Journey Home"
-              className="w-[220px] h-[58px] object-contain"
+              className="h-[6em] w-[22em]"
             />
           </div>
 
@@ -114,7 +109,6 @@ export default function LoginPage() {
             </p>
           </div>
         </form>
-      </div>
       </div>
     </div>
   );

@@ -11,16 +11,7 @@ const openSans = localFont({
 });
 
 const raleway = localFont({
-    src: [
-        {
-            path: "../public/fonts/Raleway/Raleway-Light.ttf",
-            weight: "300",
-        },
-        {
-            path: "../public/fonts/Raleway/Raleway-Regular.ttf",
-            weight: "400",
-        },
-    ],
+    src: "../public/fonts/Raleway/Raleway.ttf",
     variable: "--font-raleway",
 });
 
