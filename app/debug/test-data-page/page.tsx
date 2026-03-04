@@ -5,7 +5,7 @@ import { setInventoryRecord, uploadImage } from "@/lib/services/inventory";
 import { DonationItem, DonationRequest } from "@/types/donations";
 import { CategoryAttributes, InventoryPhoto } from "@/types/inventory";
 import { Timestamp } from "@firebase/firestore";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { LocationContact } from "@/types/general";
 import { ClientRequest } from "@/types/client-requests";
@@ -1178,8 +1178,7 @@ async function addCaseManagerRequests(count: number) {
                 hmis: randomHMIS(),
 
                 secondaryContact: {
-                    name:
-                        randomFrom(SEED_DONORS).firstName +
+                    name: randomFrom(SEED_DONORS).firstName +
                         " " +
                         randomFrom(SEED_DONORS).lastName,
                     relationship: randomFrom([
@@ -1212,6 +1211,7 @@ async function addCaseManagerRequests(count: number) {
             items: requestedItems,
 
             associatedTimeBlockID: null,
+            date: randomTimestamp(60)
         };
 
         await setCaseRequest(request);
