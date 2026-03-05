@@ -11,6 +11,7 @@ import { EditIcon } from "@/components/icons/EditIcon";
 import { TrashIcon } from "@/components/icons/TrashIcon";
 import { CloseIcon } from "@/components/icons/CloseIcon";
 import Button from "@/components/form/Button";
+import { toast } from "sonner";
 
 export default function ControlPanelPage() {
     const { allAttrs, isLoading, setCategoriesWithToast } = useCategories();
@@ -34,9 +35,7 @@ export default function ControlPanelPage() {
     const [max, setMax] = useState(21);
 
     useEffect(() => {
-        if (!allAttrs || allAttrs.length === 0) return;
-
-        setCategories(allAttrs);
+        setCategories(allAttrs ?? []);
     }, [allAttrs]);
 
     if (isLoading) return null;
@@ -88,6 +87,10 @@ export default function ControlPanelPage() {
         if (!newCategoryName) return;
 
         if (!validateAddThresholds()) return;
+        if (categories.some((c) => c.name === newCategoryName)) {
+            toast.error("Category name already exists");
+            return;
+        }
 
         const newCategory: CategoryAttributes = {
             name: newCategoryName,
@@ -95,7 +98,7 @@ export default function ControlPanelPage() {
             highThreshold: mid,
             max: 0,
             mid: 0,
-            min: 0,
+            min: 0
         };
 
         const updated = [...categories, newCategory];
@@ -363,8 +366,9 @@ export default function ControlPanelPage() {
 
                 {showEditModal && selectedCategory && (
                     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-                        <div className="bg-white rounded-xl w-130 p-8 shadow-lg">
+                        <div className="bg-white rounded-xl w-130 p-8 shadow-lg relative">
                             <button
+                                type="button"
                                 aria-label="Close modal"
                                 className="absolute top-5 right-5 text-gray-400 hover:text-gray-600"
                                 onClick={() => setShowEditModal(false)}
