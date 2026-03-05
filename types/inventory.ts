@@ -23,6 +23,6 @@ export type SortStatus = "asc" | "desc" | "none";
 
 export type CategoryAttributes = {
   name: string,
-  lowThreshold: number, // number separating yellow and red zone
-  highThreshold: number, // number separating green and yellow zone
+  lowThreshold: number, 
+  highThreshold: number,
 }

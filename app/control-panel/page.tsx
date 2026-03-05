@@ -96,9 +96,6 @@ export default function ControlPanelPage() {
             name: newCategoryName,
             lowThreshold: min,
             highThreshold: mid,
-            max: 0,
-            mid: 0,
-            min: 0,
         };
 
         const updated = [...categories, newCategory];
