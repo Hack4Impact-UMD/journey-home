@@ -13,7 +13,6 @@ import { CloseIcon } from "@/components/icons/CloseIcon";
 import Button from "@/components/form/Button";
 
 export default function ControlPanelPage() {
-
     const { allAttrs, isLoading, setCategoriesWithToast } = useCategories();
 
     const [search, setSearch] = useState("");
@@ -23,20 +22,21 @@ export default function ControlPanelPage() {
     const [showAddModal, setShowAddModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
 
-    const [selectedCategory, setSelectedCategory] = useState<CategoryAttributes | null>(null);
+    const [selectedCategory, setSelectedCategory] =
+        useState<CategoryAttributes | null>(null);
 
     const [originalName, setOriginalName] = useState("");
 
     const [newCategoryName, setNewCategoryName] = useState("");
 
-    const [min, setMin] = useState(0);
-    const [mid, setMid] = useState(0);
+    const [min, setMin] = useState(3);
+    const [mid, setMid] = useState(10);
     const [max, setMax] = useState(21);
 
     useEffect(() => {
-        if (allAttrs.length > 0) {
-            setCategories(allAttrs);
-        }
+        if (!allAttrs || allAttrs.length === 0) return;
+
+        setCategories(allAttrs);
     }, [allAttrs]);
 
     if (isLoading) return null;
@@ -46,7 +46,6 @@ export default function ControlPanelPage() {
     );
 
     const validateAddThresholds = () => {
-
         if (!(min < mid)) {
             alert("Very low must be less than Low.");
             return false;
@@ -56,7 +55,6 @@ export default function ControlPanelPage() {
     };
 
     const validateEditThresholds = () => {
-
         if (!(min < mid && mid < max)) {
             alert("Min must be less than Mid & Mid must be less than Max.");
             return false;
@@ -87,7 +85,6 @@ export default function ControlPanelPage() {
 
     // save new category
     const saveNewCategory = async () => {
-
         if (!newCategoryName) return;
 
         if (!validateAddThresholds()) return;
@@ -98,7 +95,7 @@ export default function ControlPanelPage() {
             highThreshold: mid,
             max: 0,
             mid: 0,
-            min: 0
+            min: 0,
         };
 
         const updated = [...categories, newCategory];
@@ -114,7 +111,6 @@ export default function ControlPanelPage() {
 
     // save edit
     const saveEdit = async () => {
-
         if (!selectedCategory) return;
 
         if (!validateEditThresholds()) return;
@@ -122,11 +118,11 @@ export default function ControlPanelPage() {
         const updated = categories.map((cat) =>
             cat.name === originalName
                 ? {
-                    ...cat,
-                    name: selectedCategory.name,
-                    lowThreshold: min,
-                    highThreshold: mid
-                }
+                      ...cat,
+                      name: selectedCategory.name,
+                      lowThreshold: min,
+                      highThreshold: mid,
+                  }
                 : cat
         );
 
@@ -139,7 +135,6 @@ export default function ControlPanelPage() {
 
     // delete category
     const deleteCategory = async (name: string) => {
-
         const updated = categories.filter((cat) => cat.name !== name);
 
         setCategories(updated);
@@ -155,15 +150,11 @@ export default function ControlPanelPage() {
     const greenWidth = ((safeMax - mid) / safeMax) * 100;
 
     return (
-
         <ProtectedRoute allow={["Admin"]}>
-
             <div className="h-full w-full flex flex-col font-family-roboto">
-
                 <TopNavbar />
 
                 <div className="flex flex-1 bg-[#F3F4F6]">
-
                     {/* sidebar */}
 
                     <div className="bg-white border-r border-gray-200 w-62.5 shrink-0">
@@ -173,32 +164,28 @@ export default function ControlPanelPage() {
                     {/* main content */}
 
                     <div className="flex flex-1 p-8 gap-8">
-
                         <div className="flex-1">
-
                             <h1 className="text-[28px] font-bold text-primary mb-6">
                                 Control panel
                             </h1>
 
                             <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-
                                 {/* search + add */}
 
                                 <div className="flex items-center gap-4 mb-6">
-
                                     <div className="flex border border-gray-300 h-8.5">
-
                                         <input
                                             className="px-2 text-sm w-60 outline-none"
                                             placeholder="Search"
                                             value={search}
-                                            onChange={(e) => setSearch(e.target.value)}
+                                            onChange={(e) =>
+                                                setSearch(e.target.value)
+                                            }
                                         />
 
                                         <div className="flex items-center justify-center w-9 border-l border-gray-300 text-gray-500">
                                             <SearchIcon />
                                         </div>
-
                                     </div>
 
                                     <Button
@@ -207,7 +194,6 @@ export default function ControlPanelPage() {
                                     >
                                         + Add
                                     </Button>
-
                                 </div>
 
                                 {/* table header */}
@@ -220,73 +206,74 @@ export default function ControlPanelPage() {
                                 {/* rows */}
 
                                 <div className="border-l border-r border-b border-gray-200">
+                                    {filteredCategories.map(
+                                        (category, index) => (
+                                            <div
+                                                key={index}
+                                                className="grid grid-cols-2 px-6 py-3 border-b border-gray-200 items-center hover:bg-gray-50"
+                                            >
+                                                <span className="text-[14px] text-gray-800">
+                                                    {category.name}
+                                                </span>
 
-                                    {filteredCategories.map((category, index) => (
+                                                <div className="flex justify-end gap-5 text-gray-400">
+                                                    <button
+                                                        aria-label="Edit category"
+                                                        onClick={() => {
+                                                            setSelectedCategory(
+                                                                category
+                                                            );
 
-                                        <div
-                                            key={index}
-                                            className="grid grid-cols-2 px-6 py-3 border-b border-gray-200 items-center hover:bg-gray-50"
-                                        >
+                                                            setOriginalName(
+                                                                category.name
+                                                            );
 
-                                            <span className="text-[14px] text-gray-800">
-                                                {category.name}
-                                            </span>
+                                                            setMin(
+                                                                category.lowThreshold ??
+                                                                    0
+                                                            );
+                                                            setMid(
+                                                                category.highThreshold ??
+                                                                    0
+                                                            );
+                                                            setMax(21);
 
-                                            <div className="flex justify-end gap-5 text-gray-400">
+                                                            setShowEditModal(
+                                                                true
+                                                            );
+                                                        }}
+                                                    >
+                                                        <EditIcon />
+                                                    </button>
 
-                                                <button
-                                                    aria-label="Edit category"
-                                                    onClick={() => {
-
-                                                        setSelectedCategory(category);
-
-                                                        setOriginalName(category.name);
-
-                                                        setMin(category.lowThreshold ?? 0);
-                                                        setMid(category.highThreshold ?? 0);
-                                                        setMax(21);
-
-                                                        setShowEditModal(true);
-
-                                                    }}
-                                                >
-                                                    <EditIcon />
-                                                </button>
-
-                                                <button
-                                                    aria-label="Delete category"
-                                                    onClick={() => deleteCategory(category.name)}
-                                                >
-                                                    <TrashIcon />
-                                                </button>
-
+                                                    <button
+                                                        aria-label="Delete category"
+                                                        onClick={() =>
+                                                            deleteCategory(
+                                                                category.name
+                                                            )
+                                                        }
+                                                    >
+                                                        <TrashIcon />
+                                                    </button>
+                                                </div>
                                             </div>
-
-                                        </div>
-
-                                    ))}
-
+                                        )
+                                    )}
                                 </div>
-
                             </div>
-
                         </div>
 
                         {/* stock bar */}
                         <div className="w-[320px]" />
-
                     </div>
-
                 </div>
 
                 {/* add modal */}
 
                 {showAddModal && (
-
                     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-
                         <div className="bg-white rounded-xl w-140 p-8 shadow-lg relative">
-
                             {/* close modal */}
 
                             <button
@@ -309,13 +296,13 @@ export default function ControlPanelPage() {
                                 className="border border-gray-300 w-full px-3 py-2 mb-6 rounded"
                                 placeholder="Name"
                                 value={newCategoryName}
-                                onChange={(e) => setNewCategoryName(e.target.value)}
+                                onChange={(e) =>
+                                    setNewCategoryName(e.target.value)
+                                }
                             />
 
                             <div className="flex gap-8 mb-6">
-
                                 <div>
-
                                     <label className="text-gray-600 text-sm block mb-1">
                                         Very low
                                     </label>
@@ -324,13 +311,13 @@ export default function ControlPanelPage() {
                                         className="border border-red-400 px-3 py-2 w-25 rounded"
                                         placeholder="Num"
                                         value={min === 0 ? "" : min}
-                                        onChange={(e) => setMin(Number(e.target.value))}
+                                        onChange={(e) =>
+                                            setMin(Number(e.target.value))
+                                        }
                                     />
-
                                 </div>
 
                                 <div>
-
                                     <label className="text-gray-600 text-sm block mb-1">
                                         Low
                                     </label>
@@ -339,46 +326,51 @@ export default function ControlPanelPage() {
                                         className="border border-yellow-400 px-3 py-2 w-25 rounded"
                                         placeholder="Num"
                                         value={mid === 0 ? "" : mid}
-                                        onChange={(e) => setMid(Number(e.target.value))}
+                                        onChange={(e) =>
+                                            setMid(Number(e.target.value))
+                                        }
                                     />
-
                                 </div>
-
                             </div>
 
                             {/* threshold bar */}
 
                             <div className="mb-8">
-
                                 <div className="flex h-1.5 rounded overflow-hidden">
+                                    <div
+                                        className="bg-red-400"
+                                        style={{ width: `${redWidth}%` }}
+                                    />
 
-                                    <div className="bg-red-400" style={{ width: `${redWidth}%` }} />
+                                    <div
+                                        className="bg-yellow-400"
+                                        style={{ width: `${yellowWidth}%` }}
+                                    />
 
-                                    <div className="bg-yellow-400" style={{ width: `${yellowWidth}%` }} />
-
-                                    <div className="bg-green-500" style={{ width: `${greenWidth}%` }} />
-
+                                    <div
+                                        className="bg-green-500"
+                                        style={{ width: `${greenWidth}%` }}
+                                    />
                                 </div>
-
                             </div>
 
-                            <Button onClick={saveNewCategory}>
-                                Save
-                            </Button>
-
+                            <Button onClick={saveNewCategory}>Save</Button>
                         </div>
-
                     </div>
-
                 )}
 
                 {/* edit modal */}
 
                 {showEditModal && selectedCategory && (
-
                     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-
                         <div className="bg-white rounded-xl w-130 p-8 shadow-lg">
+                            <button
+                                aria-label="Close modal"
+                                className="absolute top-5 right-5 text-gray-400 hover:text-gray-600"
+                                onClick={() => setShowEditModal(false)}
+                            >
+                                <CloseIcon />
+                            </button>
 
                             <h2 className="text-xl font-semibold mb-5">
                                 Edit category
@@ -394,15 +386,13 @@ export default function ControlPanelPage() {
                                 onChange={(e) =>
                                     setSelectedCategory({
                                         ...selectedCategory,
-                                        name: e.target.value
+                                        name: e.target.value,
                                     })
                                 }
                             />
 
                             <div className="flex gap-5 mb-6">
-
                                 <div>
-
                                     <label className="text-sm text-gray-600 block mb-1">
                                         Min
                                     </label>
@@ -410,13 +400,13 @@ export default function ControlPanelPage() {
                                     <input
                                         className="border border-gray-300 px-3 py-2 w-20"
                                         value={min}
-                                        onChange={(e) => setMin(Number(e.target.value))}
+                                        onChange={(e) =>
+                                            setMin(Number(e.target.value))
+                                        }
                                     />
-
                                 </div>
 
                                 <div>
-
                                     <label className="text-sm text-gray-600 block mb-1">
                                         Mid
                                     </label>
@@ -424,13 +414,13 @@ export default function ControlPanelPage() {
                                     <input
                                         className="border border-gray-300 px-3 py-2 w-20"
                                         value={mid}
-                                        onChange={(e) => setMid(Number(e.target.value))}
+                                        onChange={(e) =>
+                                            setMid(Number(e.target.value))
+                                        }
                                     />
-
                                 </div>
 
                                 <div>
-
                                     <label className="text-sm text-gray-600 block mb-1">
                                         Max
                                     </label>
@@ -438,40 +428,37 @@ export default function ControlPanelPage() {
                                     <input
                                         className="border border-gray-300 px-3 py-2 w-20"
                                         value={max}
-                                        onChange={(e) => setMax(Number(e.target.value))}
+                                        onChange={(e) =>
+                                            setMax(Number(e.target.value))
+                                        }
                                     />
-
                                 </div>
-
                             </div>
 
                             <div className="mb-6">
-
                                 <div className="flex h-1.5 rounded overflow-hidden">
+                                    <div
+                                        className="bg-red-400"
+                                        style={{ width: `${redWidth}%` }}
+                                    />
 
-                                    <div className="bg-red-400" style={{ width: `${redWidth}%` }} />
+                                    <div
+                                        className="bg-yellow-400"
+                                        style={{ width: `${yellowWidth}%` }}
+                                    />
 
-                                    <div className="bg-yellow-400" style={{ width: `${yellowWidth}%` }} />
-
-                                    <div className="bg-green-500" style={{ width: `${greenWidth}%` }} />
-
+                                    <div
+                                        className="bg-green-500"
+                                        style={{ width: `${greenWidth}%` }}
+                                    />
                                 </div>
-
                             </div>
 
-                            <Button onClick={saveEdit}>
-                                Save
-                            </Button>
-
+                            <Button onClick={saveEdit}>Save</Button>
                         </div>
-
                     </div>
-
                 )}
-
             </div>
-
         </ProtectedRoute>
-
     );
 }
