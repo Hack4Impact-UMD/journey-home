@@ -10,8 +10,8 @@ type DonorsTableProps = {
 
 export function DonorsTable({ donors }: DonorsTableProps) {
     return (
-        <div className="w-full h-full min-w-3xl">
-            <div className="h-12 bg-[#FAFAFB] border-light-border border flex items-center font-family-roboto font-bold text-sm text-text-1">
+        <div className="w-full min-w-3xl h-full flex flex-col">
+            <div className="h-12 bg-[#FAFAFB] border-light-border border flex items-center font-family-roboto font-bold text-sm text-text-1 shrink-0">
                 <span className="w-[20%] border-l-2 border-light-border px-4">
                     Name
                 </span>
@@ -28,40 +28,40 @@ export function DonorsTable({ donors }: DonorsTableProps) {
                     Actions
                 </span>
             </div>
-            {donors.map((donor) => (
-                <DonorsTableRow donor={donor} key={donor.email} />
-            ))}
+            <div className="flex-1 overflow-auto min-h-0">
+                {donors.map((donor) => (
+                    <DonorsTableRow donor={donor} key={donor.email} />
+                ))}
+            </div>
         </div>
     );
 }
 
 function DonorsTableRow({ donor }: { donor: LocationContact }) {
     return (
-        <>
-            <div
-                className="h-10 border-light-border border-b border-x flex items-center font-family-roboto text-sm text-text-1 hover:bg-blue-50 cursor-pointer"
-            >
-                <div className="w-[20%] px-4 flex items-center">
-                    <span>
-                        {donor.firstName} {donor.lastName}
-                    </span>
-                </div>
-                <div className="w-[20%] px-4">
-                    <span>{donor.phoneNumber}</span>
-                </div>
-                <div className="w-[20%] px-4 flex items-center">
-                    <span>
-                        {donor.email}
-                    </span>
-                </div>
-                <span className="w-[20%] px-4">
-                    {donor.address.streetAddress}, {donor.address.city} {donor.address.zipCode}
+        <div
+            className="h-10 border-light-border border-b border-x flex items-center font-family-roboto text-sm text-text-1 hover:bg-blue-50 cursor-pointer"
+        >
+            <div className="w-[20%] px-4 flex items-center">
+                <span>
+                    {donor.firstName} {donor.lastName}
                 </span>
-                <div className="w-[20%] px-4 flex align-center">
-                    <ViewIcon />
-                    <TrashIcon />
-                </div>
             </div>
-        </>
+            <div className="w-[20%] px-4">
+                <span>{donor.phoneNumber}</span>
+            </div>
+            <div className="w-[20%] px-4 flex items-center">
+                <span>
+                    {donor.email}
+                </span>
+            </div>
+            <span className="w-[20%] px-4">
+                {donor.address.streetAddress}, {donor.address.city} {donor.address.zipCode}
+            </span>
+            <div className="w-[20%] px-4 flex align-center">
+                <ViewIcon />
+                <TrashIcon />
+            </div>
+        </div>
     );
 }

@@ -12,11 +12,11 @@ export default function UserManagementLayout({ children }: { children: ReactNode
 
     return (
         <ProtectedRoute allow={["Admin"]}>
-            <div className="h-full w-full flex flex-col font-family-roboto">
+            <div className="h-full w-full flex flex-col font-family-roboto overflow-hidden">
                 <TopNavbar />
-                <div className="flex flex-1">
+                <div className="flex flex-1 min-h-0">
                     <SideNavbar />
-                    <div className="flex-1 bg-[#F7F7F7] py-4 px-6 flex flex-col">
+                    <div className="flex-1 min-h-0 bg-[#F7F7F7] py-4 px-6 flex flex-col">
                         <span className="text-2xl text-primary font-extrabold block font-family-roboto">
                             User Management
                         </span>
@@ -55,7 +55,7 @@ export default function UserManagementLayout({ children }: { children: ReactNode
                                 Past Donors
                             </Link>
                         </div>
-                        <div className="bg-background rounded-xl my-2 flex-1 py-4 px-6">
+                        <div className="bg-background rounded-xl my-2 flex-1 py-4 px-6 min-h-0 overflow-hidden flex flex-col">
                             {children}
                         </div>
                     </div>
