@@ -1094,7 +1094,7 @@ async function accountReqs() {
 
 function generateTimeBlocks() {
     const now = new Date();
-    const targetCount = 200; // 10–15 blocks
+    const targetCount = 50;
 
     // Build all weekday 1-hour slots (9am–5pm) for the next 14 days
     const candidates: Array<{ start: Date; end: Date }> = [];
@@ -1123,19 +1123,53 @@ function generateTimeBlocks() {
         [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
     }
 
-    // Select random 10–15 and map to TimeBlocks
-    return candidates.slice(0, targetCount).map(
-        ({ start, end }) =>
-            ({
-                id: crypto.randomUUID(),
-                tasks: [],
-                startTime: Timestamp.fromDate(start),
-                endTime: Timestamp.fromDate(end),
-                volunteerIDs: [],
-                maxVolunteers: Math.floor(Math.random() * 10) + 1,
-                published: false,
-            } as TimeBlock)
-    );
+    const TIMEBLOCK_NAMES = [
+        ...Array(14).fill("General Volunteering"),
+        "Hartford Public High School ONLY",
+        "University of Hartford ONLY",
+        "Trinity College ONLY",
+        "Capital Community College ONLY",
+        "Travelers Insurance ONLY",
+        "Aetna ONLY",
+        "St. Francis Hospital ONLY",
+        "Hartford Hospital ONLY",
+        "Boy Scouts Troop 42 ONLY",
+        "First Baptist Church ONLY",
+        "YMCA of Greater Hartford ONLY",
+        "Rotary Club of Hartford ONLY",
+    ];
+
+    const volunteersGroup = () => ({
+        name: "Volunteers",
+        maxNum: Math.floor(Math.random() * 10) + 1,
+        volunterIDs: [] as string[],
+    });
+    const leadDriversGroup = () => ({
+        name: "Lead Drivers ONLY",
+        maxNum: Math.floor(Math.random() * 3) + 1,
+        volunterIDs: [] as string[],
+    });
+
+    // Select random 50 and map to TimeBlocks
+    return candidates.slice(0, targetCount).map(({ start, end }) => {
+        const isWarehouse = Math.random() < 0.15;
+        const name = isWarehouse
+            ? "Warehouse Organizing"
+            : TIMEBLOCK_NAMES[Math.floor(Math.random() * TIMEBLOCK_NAMES.length)];
+        const volunteerGroups = isWarehouse
+            ? [volunteersGroup()]
+            : [volunteersGroup(), leadDriversGroup()];
+        return {
+            id: crypto.randomUUID(),
+            name,
+            notes: "",
+            tasks: [],
+            startTime: Timestamp.fromDate(start),
+            endTime: Timestamp.fromDate(end),
+            volunteerGroups,
+            published: false,
+        } as TimeBlock;
+    });
 }
 
 export async function seedTimeBlocks() {
@@ -1287,81 +1321,70 @@ const CLIENT_NOTES = [
     "Apartment access through side entrance only.",
 ];
 export default function page() {
+    const btnClass = "border border-gray-400 rounded px-6 py-2 hover:bg-gray-100 text-sm w-64";
+
     return (
-        <div className="flex flex-col gap-5 m-10">
+        <div className="flex flex-col gap-8 m-10 items-center">
             <button
-                onClick={() => {
-                    seedUsers();
-                }}
-            >
-                Cool button to add users
-            </button>
-             <button
-                onClick={() => {
-                    accountReqs();
-                }}
-            >
-                Cooler button to add user reqs
-            </button>
-            <button
-                onClick={() => {
-                    ensureCategoriesConfig();
-                }}
-            >
-                {" "}
-                ADD CONFIG
-            </button>
-
-            <button
-                onClick={() => {
-                    seedTimeBlocks();
-                }}
-            >
-                TIME BLOCKSdsadasdasd
-            </button>
-
-            <button
-                onClick={() => {
-                    addCaseManagerRequests(7);
-                }}
-            >
-                ADD 4 CASE MANAGERS{" "}
-            </button>
-            {/* <button
-                onClick={() => {
-                    const promises = DEFAULT_CATEGORIES.filter(
-                        (category) => category !== "Other"
-                    ).map((category) => addDonationRequests());
-
-                    Promise.all(promises);
-                }}
-            >
-                {" "}
-                Epic Mega Button to Add All Different Donation Requests
-            </button> */}
-            <button
+                className="border-2 border-black rounded-lg px-10 py-6 text-2xl font-bold hover:bg-gray-100"
                 onClick={async () => {
-                    const NUM_REQUESTS = 5; // however many you want
+                    await seedUsers();
+                    await ensureCategoriesConfig();
+                    await seedTimeBlocks();
                     await Promise.all(
-                        Array.from({ length: NUM_REQUESTS }, () => addDonationRequests())
+                        Array.from({ length: 5 }, () => addDonationRequests())
                     );
+                    await Promise.all(
+                        DEFAULT_CATEGORIES.filter((c) => c !== "Other").map((c) =>
+                            addInventoryRecord(c)
+                        )
+                    );
+                    await addCaseManagerRequests(7);
                 }}
             >
-                Epic Mega Button to Add All Different Donation Requests
-            </button>
-            <button
-                onClick={() => {
-                    const promises = DEFAULT_CATEGORIES.filter(
-                        (category) => category !== "Other"
-                    ).map((category) => addInventoryRecord(category));
-
-                    Promise.all(promises);
-                }}
-            >
-                {" "}
-                Epic Mega Button to Add All Different Inventory Records
+                Set All Test Data
             </button>
 
+            <div className="flex flex-col gap-3 items-center">
+                <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Granular data stuff</p>
+                <button className={btnClass} onClick={() => seedUsers()}>
+                    Add users
+                </button>
+                <button className={btnClass} onClick={() => accountReqs()}>
+                    Add account requests
+                </button>
+                <button className={btnClass} onClick={() => ensureCategoriesConfig()}>
+                    Add config
+                </button>
+                <button className={btnClass} onClick={() => seedTimeBlocks()}>
+                    Add time blocks
+                </button>
+                <button
+                    className={btnClass}
+                    onClick={async () => {
+                        await Promise.all(
+                            Array.from({ length: 5 }, () => addDonationRequests())
+                        );
+                    }}
+                >
+                    Add donation requests
+                </button>
+                <button
+                    className={btnClass}
+                    onClick={() => {
+                        Promise.all(
+                            DEFAULT_CATEGORIES.filter((c) => c !== "Other").map((c) =>
+                                addInventoryRecord(c)
+                            )
+                        );
+                    }}
+                >
+                    Add inventory records
+                </button>
+                <button className={btnClass} onClick={() => addCaseManagerRequests(7)}>
+                    Add client requests
+                </button>
+            </div>
         </div>
     );
 }
