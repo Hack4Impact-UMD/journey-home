@@ -13,6 +13,7 @@ import { UserData } from "@/types/user";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { TimeBlock } from "@/types/schedule";
 import { collection, getDocs } from "firebase/firestore";
+import { toast, Toaster } from "sonner";
 
 const CASEREQUEST = "client-requests";
 const TIMEBLOCK = "timeblocks";
@@ -582,7 +583,7 @@ async function seedImageToPhotos(seed: SeedImage): Promise<InventoryPhoto[]> {
 }
 
 
-async function addDonationRequests() {
+async function addDonationRequests(completed = false) {
     const time = randomTimestamp();
     const donor: LocationContact = randomFrom(SEED_DONORS);
 
@@ -622,7 +623,9 @@ const MAX_ITEMS = 15;
                     donorEmail: donor.email,
                     photos: await seedImageToPhotos(seedImage),
                 },
-                status: Math.random() < 0.5 ? "Not Reviewed" : (Math.random() < 0.5 ? "Approved" : "Denied"),
+                status: completed
+                    ? (Math.random() < 0.5 ? "Approved" : "Denied")
+                    : (Math.random() < 0.5 ? "Not Reviewed" : (Math.random() < 0.5 ? "Approved" : "Denied")),
             });
         }
     }
@@ -1325,21 +1328,28 @@ export default function page() {
 
     return (
         <div className="flex flex-col gap-8 m-10 items-center">
+            <Toaster />
             <button
                 className="border-2 border-black rounded-lg px-10 py-6 text-2xl font-bold hover:bg-gray-100"
-                onClick={async () => {
-                    await seedUsers();
-                    await ensureCategoriesConfig();
-                    await seedTimeBlocks();
-                    await Promise.all(
-                        Array.from({ length: 5 }, () => addDonationRequests())
-                    );
-                    await Promise.all(
-                        DEFAULT_CATEGORIES.filter((c) => c !== "Other").map((c) =>
-                            addInventoryRecord(c)
-                        )
-                    );
-                    await addCaseManagerRequests(7);
+                onClick={() => {
+                    const promise = (async () => {
+                        await seedUsers();
+                        await ensureCategoriesConfig();
+                        await seedTimeBlocks();
+                        for (let i = 0; i < 5; i++) await addDonationRequests(true);
+                        for (let i = 0; i < 20; i++) await addDonationRequests(false);
+                        await Promise.all(
+                            DEFAULT_CATEGORIES.filter((c) => c !== "Other").map((c) =>
+                                addInventoryRecord(c)
+                            )
+                        );
+                        await addCaseManagerRequests(7);
+                    })();
+                    toast.promise(promise, {
+                        loading: "Seeding all test data...",
+                        success: "All test data seeded!",
+                        error: "Something went wrong while seeding data.",
+                    });
                 }}
             >
                 Set All Test Data
