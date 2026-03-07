@@ -11,6 +11,7 @@ export type VolunteerGroup = {
 export type TimeBlock = {
     id: string;
     name: string;
+    type: "Pickup/Delivery" | "Warehouse",
     notes: string;
     tasks: Task[];
     startTime: Timestamp;

@@ -1166,6 +1166,7 @@ function generateTimeBlocks() {
             id: crypto.randomUUID(),
             name,
             notes: "",
+            type: (isWarehouse) ? "Warehouse" : "Pickup/Delivery",
             tasks: [],
             startTime: Timestamp.fromDate(start),
             endTime: Timestamp.fromDate(end),
