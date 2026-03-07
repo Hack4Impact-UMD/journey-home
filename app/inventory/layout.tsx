@@ -6,9 +6,52 @@ import TopNavbar from "@/components/general/TopNav";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
+import { useState } from "react";
+import {
+    getAllWarehouseInventoryRecords,
+    getCategoryAttributes,
+} from "@/lib/services/inventory";
+import { CategoryAttributes, InventoryRecord } from "@/types/inventory";
+import { StockSidebar } from "@/components/inventory/StockSidebar";
 
 export default function InventoryLayout({ children }: { children: ReactNode }) {
     const pathname = usePathname();
+
+    const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+    const [allItems, setAllItems] = useState<InventoryRecord[]>([]);
+    const [categoryAttributes, setCategoryAttributes] = useState<
+        CategoryAttributes[]
+    >([]);
+
+    const handleSidebarOpen = () => {
+        setIsSidebarOpen(true);
+        getAllWarehouseInventoryRecords().then(setAllItems);
+        getCategoryAttributes().then(setCategoryAttributes);
+    };
+
+    //Calculating category stocks using CategoryAttributes
+    const categoryStocks = categoryAttributes.map((catAttr) => {
+        const count = allItems
+            .filter((item) => item.category === catAttr.name)
+            .reduce((sum, item) => sum + item.quantity, 0);
+
+        let color;
+        if (count < catAttr.lowThreshold) {
+            color = "#FF6B4A";
+        } else if (count < catAttr.highThreshold) {
+            color = "#F4DE13";
+        } else {
+            color = "#69C22E";
+        }
+        const maxCount = catAttr.highThreshold;
+
+        return {
+            category: catAttr.name,
+            count: count,
+            maxCount: maxCount,
+            color,
+        };
+    });
 
     return (
         <ProtectedRoute allow={["Admin"]}>
@@ -35,7 +78,7 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
                             <Link
                                 className={`py-4${
                                     pathname.startsWith(
-                                        "/inventory/donation-requests"
+                                        "/inventory/donation-requests",
                                     )
                                         ? " border-b-2 border-primary text-primary"
                                         : ""
@@ -48,7 +91,7 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
                             <Link
                                 className={`py-4${
                                     pathname.startsWith(
-                                        "/inventory/reviewed-donations"
+                                        "/inventory/reviewed-donations",
                                     )
                                         ? " border-b-2 border-primary text-primary"
                                         : ""
@@ -64,6 +107,12 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
                         </div>
                     </div>
                 </div>
+                <StockSidebar
+                    isOpen={isSidebarOpen}
+                    onClose={() => setIsSidebarOpen(false)}
+                    onOpen={handleSidebarOpen}
+                    categoryStocks={categoryStocks}
+                />
             </div>
         </ProtectedRoute>
     );
