@@ -3,7 +3,7 @@ import { createContext, useContext, useState, ReactNode } from "react";
 
 type ExportContextType = {
     onExport: (() => void) | null;
-    setOnExport: (fn: () => void) => void;
+    setOnExport: (fn: (() => void) | null) => void;
 };
 
 const ExportContext = createContext<ExportContextType>({

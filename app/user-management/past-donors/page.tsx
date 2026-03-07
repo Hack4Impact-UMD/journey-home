@@ -23,7 +23,7 @@ export default function PastDonorsPage() {
             donor.address.streetAddress,
             donor.address.city,
             donor.address.state,
-            donor.address.zipCode,
+            donor.address.zipCode ? `"${donor.address.zipCode}"` : "",
         ]);
 
         const csv = [headers, ...rows].map(row => row.join(",")).join("\n");
@@ -41,10 +41,9 @@ export default function PastDonorsPage() {
         fetchAllDonors().then(setAllDonors);
     }, []);
 
-
     useEffect(() => {
-    setOnExport(() => () => handleExport(allDonors));
-}, [allDonors, setOnExport]);
+        setOnExport(() => () => handleExport(allDonors));
+    }, [allDonors, setOnExport]);
 
     return (
         <>
@@ -70,7 +69,7 @@ export default function PastDonorsPage() {
                         .toLowerCase()
                         .replace(/\s/g, "")
                         .includes(searchQuery.toLowerCase().trim())
-                ).sort((a, b) => (a.lastName+a.firstName).toLowerCase().localeCompare((b.lastName+b.firstName).toLowerCase()))}
+                ).sort((a, b) => (a.lastName + a.firstName).toLowerCase().localeCompare((b.lastName + b.firstName).toLowerCase()))}
             />
         </>
     );

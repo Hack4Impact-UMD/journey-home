@@ -10,6 +10,14 @@ import { useAllActiveAccounts } from "@/lib/queries/users";
 import { Spinner } from "@/components/ui/spinner";
 import { useExport } from "@/contexts/UserExportContext";
 
+function escapeCSVField(value: string | null | undefined): string {
+    const str = String(value ?? "");
+    if (str.includes(",") || str.includes('"') || str.includes("\n") || str.includes("\r")) {
+        return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+}
+
 export default function AllAccountsPage() {
     const roleOptions: UserRole[] = ["Admin", "Case Manager", "Volunteer"];
 
@@ -28,14 +36,14 @@ export default function AllAccountsPage() {
     const { setOnExport } = useExport();
 
     function handleExport(users: UserData[]) {
-        const headers = ["First Name", "Last Name", "User Type", "Email", "Date of Birth"];
+        const headers = ["First Name", "Last Name", "Role", "Email", "Date of Birth"];
         const rows = users.map(user => [
             user.firstName,
             user.lastName,
             user.role,
             user.email,
             user.dob ? user.dob.toDate().toLocaleDateString() : ""
-        ]);
+        ].map(escapeCSVField));
 
         const csv = [headers, ...rows].map(row => row.join(",")).join("\n");
 
@@ -48,11 +56,10 @@ export default function AllAccountsPage() {
         URL.revokeObjectURL(url);
     }
 
-  
     useEffect(() => {
-    setOnExport(() => () => handleExport(allAccounts));
+        setOnExport(() => () => handleExport(allAccounts));
     }, [allAccounts, setOnExport]);
-    
+
     return (
         <>
             {selectedAccount && (
