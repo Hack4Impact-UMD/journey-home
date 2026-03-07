@@ -7,7 +7,6 @@ import { fetchAllTB } from "../../../lib/services/timeblocks";
 import { CustomToolbar } from "../../../components/schedule/CustomToolbar";
 import { ShiftDetailOverlay } from "../../../components/schedule/ShiftDetailOverlay";
 
-// Extend MyEvent to carry the full TimeBlock for the overlay
 type CalendarEvent = MyEvent & { timeBlock: TimeBlock };
 
 export default function CalendarView() {

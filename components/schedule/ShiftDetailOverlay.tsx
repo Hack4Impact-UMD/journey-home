@@ -42,7 +42,6 @@ export const ShiftDetailOverlay = ({
   const { allAccounts, isLoading: accountsLoading } = useAllActiveAccounts();
   const [mode, setMode] = useState<"detail" | "edit">("detail");
 
-  // Reset to detail view whenever a new timeblock is opened
   useEffect(() => { setMode("detail"); }, [timeBlock]);
 
   useEffect(() => {
@@ -92,7 +91,7 @@ export const ShiftDetailOverlay = ({
         className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden"
         style={{ maxHeight: "85vh", overflowY: "auto" }}
       >
-        {/* Header */}
+
         <div className="px-6 pt-6 pb-4 border-b border-gray-100">
           <button
             onClick={onClose}
@@ -114,7 +113,6 @@ export const ShiftDetailOverlay = ({
           </p>
         </div>
 
-        {/* Volunteers */}
         <div className="px-6 py-4 border-b border-gray-100">
           <h3 className="text-base font-semibold text-gray-500 mb-3">
             Volunteers
@@ -134,7 +132,6 @@ export const ShiftDetailOverlay = ({
           )}
         </div>
 
-        {/* Shift Details */}
         <div className="px-6 py-4">
           <h3 className="text-base font-semibold text-gray-500 mb-3">
             Shift details
@@ -201,7 +198,6 @@ export const ShiftDetailOverlay = ({
           )}
         </div>
 
-        {/* Footer */}
         <div className="px-6 pb-6 pt-2 flex justify-end">
           <button
             onClick={() => setMode("edit")}
