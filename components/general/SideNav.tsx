@@ -10,6 +10,7 @@ import { ClientRequestIcon } from "../icons/ClientRequestIcon";
 import { PickupDeliveryIcon } from "../icons/PickupDeliveryIcon";
 import { UserManagementIcon } from "../icons/UserManagementIcon";
 import { ControlPanelIcon } from "../icons/ControlPanelIcon";
+import { ViewIcon } from "../icons/ViewIcon";
 
 export default function SideNavbar() {
     const auth = useAuth();
@@ -76,23 +77,24 @@ export default function SideNavbar() {
                 />
 
                 <div className="mt-auto w-full mb-4">
-                    <button onClick={() => auth.logout()}> Logout </button>{" "}
-                    {/*will be removed later after can logout from profile  */}
-                    <div className=" pt-2 pb-2 pl-4 border border-light-border rounded-lg w-full">
-                        <Link href="/profile">
-                            <div className="text-text-1">
-                                {auth.state.userData && (
-                                    <span className="font-family-opensans">
-                                        {auth.state.userData.firstName}{" "}
-                                        {auth.state.userData.lastName}
-                                    </span>
-                                )}
+                    <Link href="/profile">
+                        <div className="pt-2 pb-2 pl-4 pr-2 border border-light-border rounded-lg w-full flex items-center justify-between">
+                            <div>
+                                <div className="text-text-1 text-sm font-family-opensans">
+                                    {auth.state.userData && (
+                                        <>
+                                            {auth.state.userData.firstName}{" "}
+                                            {auth.state.userData.lastName}
+                                        </>
+                                    )}
+                                </div>
+                                <div className="text-xs font-family-opensans text-[#666666]">
+                                    {auth.state.userData?.role ?? "Loading..."}
+                                </div>
                             </div>
-                            <div className="text-text-2">
-                                {auth.state.userData?.role ?? "Loading..."}
-                            </div>
-                        </Link>
-                    </div>
+                            <ViewIcon />
+                        </div>
+                    </Link>
                 </div>
             </div>
         </div>
