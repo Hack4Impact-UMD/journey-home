@@ -3,7 +3,6 @@
 import { RequestDetailsPage } from "@/components/client-requests/RequestDetails";
 import { ProtectedRoute } from "@/components/general/ProtectedRoute";
 import SideNavbar from "@/components/general/SideNav";
-import TopNavbar from "@/components/general/TopNav";
 import { useClientRequests } from "@/lib/queries/client-requests";
 import { useState } from "react";
 import { SearchBox } from "@/components/inventory/SearchBox";

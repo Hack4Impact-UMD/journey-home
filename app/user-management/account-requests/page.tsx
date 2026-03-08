@@ -49,6 +49,7 @@ export default function AccountRequestsPage() {
                     )}
                 </div>
             </div>
+            <div className="flex-1 overflow-auto min-h-0">
             <AccountReqTable
                 requests={allRequests.filter(
                     (user) =>
@@ -63,6 +64,7 @@ export default function AccountRequestsPage() {
                 ).sort((a, b) => (a.lastName+a.firstName).toLowerCase().localeCompare((b.lastName+b.firstName).toLowerCase()))}
                 onAccept={onAccept}
             />
+            </div>
         </>
     );
 }

@@ -25,6 +25,7 @@ export default function PastDonorsPage() {
                     />
                 </div>
             </div>
+            <div className="flex-1 overflow-auto min-h-0">
             <DonorsTable
                 donors={allDonors.filter((donor) =>
                     (
@@ -40,6 +41,7 @@ export default function PastDonorsPage() {
                         .includes(searchQuery.toLowerCase().trim())
                 ).sort((a, b) => (a.lastName+a.firstName).toLowerCase().localeCompare((b.lastName+b.firstName).toLowerCase()))}
             />
+            </div>
         </>
     );
 }

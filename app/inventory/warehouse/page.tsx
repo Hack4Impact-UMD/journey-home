@@ -259,19 +259,21 @@ export default function WarehousePage() {
                     </div>
                 </div>
             </div>
-            {isGridDisplay ? (
-                <WarehouseGallery
-                    inventoryRecords={items}
-                    openItem={setOpenedItem}
-                />
-            ) : (
-                <WarehouseTable
-                    inventoryRecords={items}
-                    openItem={setOpenedItem}
-                    editItem={setEditedItem}
-                    deleteItem={deleteItem}
-                />
-            )}
+            <div className="flex-1 overflow-auto min-h-0">
+                {isGridDisplay ? (
+                    <WarehouseGallery
+                        inventoryRecords={items}
+                        openItem={setOpenedItem}
+                    />
+                ) : (
+                    <WarehouseTable
+                        inventoryRecords={items}
+                        openItem={setOpenedItem}
+                        editItem={setEditedItem}
+                        deleteItem={deleteItem}
+                    />
+                )}
+            </div>
         </>
     );
 }
