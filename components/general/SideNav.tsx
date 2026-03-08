@@ -8,7 +8,7 @@ import { InventoryIcon } from "../icons/InventoryIcon";
 import { DonorRequestsIcon } from "../icons/DonorRequestsIcon";
 import { ClientRequestIcon } from "../icons/ClientRequestIcon";
 import { PickupDeliveryIcon } from "../icons/PickupDeliveryIcon";
-import { UserManagementIcon } from "../icons/UserMangementIcon";
+import { UserManagementIcon } from "../icons/UserManagementIcon";
 import { ControlPanelIcon } from "../icons/ControlPanelIcon";
 
 
@@ -118,7 +118,7 @@ function SideNavbarLink({
         <Link
             href={path}
             className={`hover:text-primary pb-4 text-sm flex items-center gap-2 ${
-                pathname === path ? "text-primary font-semibold" : ""
+                pathname?.startsWith(path) ? "text-primary font-semibold" : ""
             }`}
         >
             <Icon />
