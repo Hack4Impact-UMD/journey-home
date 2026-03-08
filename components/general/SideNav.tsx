@@ -11,82 +11,88 @@ import { PickupDeliveryIcon } from "../icons/PickupDeliveryIcon";
 import { UserManagementIcon } from "../icons/UserManagementIcon";
 import { ControlPanelIcon } from "../icons/ControlPanelIcon";
 
-
 export default function SideNavbar() {
     const auth = useAuth();
 
     return (
-        <div className="h-full w-[13em] p-[1em] flex flex-col font-family-roboto">
+        <div className="h-full w-[13em] flex flex-col font-family-roboto">
             <Link href="/" className="pb-4">
-                <span className="text-primary font-family-raleway font-semibold text-xl">Journey</span>
-                <span className="text-secondary-1 font-family-raleway font-semibold text-xl">Home</span>
+                <div className="border border-[#EFF3F5] px-4 py-3">
+                    <span className="text-primary font-family-raleway font-semibold text-xl">
+                        Journey
+                    </span>
+                    <span className="text-secondary-1 font-family-raleway font-semibold text-xl">
+                        Home
+                    </span>
+                </div>
             </Link>
+            <div className="px-4 h-full w-full flex flex-col">
+                <SideNavbarLink
+                    icon={InventoryIcon}
+                    name="Inventory"
+                    path="/inventory"
+                    roles={["Admin"]}
+                />
 
-            <SideNavbarLink
-                icon={InventoryIcon}
-                name="Inventory"
-                path="/inventory"
-                roles={["Admin"]}
-            />
+                <SideNavbarLink
+                    icon={DonorRequestsIcon}
+                    name="Donor Requests"
+                    path="/inventory/donation-requests"
+                    roles={["Admin"]}
+                />
 
-            <SideNavbarLink
-                icon={DonorRequestsIcon}
-                name="Donor Requests"
-                path="/inventory/donation-requests"
-                roles={["Admin"]}
-            />
+                <SideNavbarLink
+                    icon={ClientRequestIcon}
+                    name="Client Requests"
+                    path="/client-requests"
+                    roles={["Admin", "Case Manager"]}
+                />
 
-            <SideNavbarLink
-                icon={ClientRequestIcon}
-                name="Client Requests"
-                path="/client-requests"
-                roles={["Admin", "Case Manager"]}
-            />
+                <SideNavbarLink
+                    icon={PickupDeliveryIcon}
+                    name="Pickups & Deliveries"
+                    path="/pickups-deliveries"
+                    roles={["Admin"]}
+                />
 
-            <SideNavbarLink
-                icon={PickupDeliveryIcon}
-                name="Pickups & Deliveries"
-                path="/pickups-deliveries"
-                roles={["Admin"]}
-            />
+                <SideNavbarLink
+                    icon={UserManagementIcon}
+                    name="User Management"
+                    path="/user-management"
+                    roles={["Admin"]}
+                />
 
-            <SideNavbarLink
-                icon={UserManagementIcon}
-                name="User Management"
-                path="/user-management"
-                roles={["Admin"]}
-            />
+                <SideNavbarLink
+                    icon={ControlPanelIcon}
+                    name="Control Panel"
+                    path="/control-panel"
+                    roles={["Admin"]}
+                />
 
-            <SideNavbarLink
-                icon={ControlPanelIcon}
-                name="Control Panel"
-                path="/control-panel"
-                roles={["Admin"]}
-            />
+                <SideNavbarLink
+                    name="Donation Form"
+                    path="/donate"
+                    roles={[]}
+                />
 
-            <SideNavbarLink
-                name="Donation Form"
-                path="/donate"
-                roles={[]}
-            />
-
-            <div className="mt-auto w-full">
-                <button onClick={() => auth.logout()} > Logout </button> {/*will be removed later after can logout from profile  */} 
-                <div className=" pt-[0.5rem] pb-[0.5rem] pl-[1rem] border border-light-border rounded-lg w-full">
-
-                    <Link href="/profile">
-                        <div className="text-text-1">
-                            {auth.state.userData && (
-                                <span className="font-family-opensans">
-                                    {auth.state.userData.firstName}{" "}
-                                    {auth.state.userData.lastName}
-                                </span>
-                            )}
-                        </div>
-                        <div className="text-text-2">
-                            {auth.state.userData?.role ?? "Loading..."}
-                        </div>
-                    </Link>
+                <div className="mt-auto w-full mb-4">
+                    <button onClick={() => auth.logout()}> Logout </button>{" "}
+                    {/*will be removed later after can logout from profile  */}
+                    <div className=" pt-2 pb-2 pl-4 border border-light-border rounded-lg w-full">
+                        <Link href="/profile">
+                            <div className="text-text-1">
+                                {auth.state.userData && (
+                                    <span className="font-family-opensans">
+                                        {auth.state.userData.firstName}{" "}
+                                        {auth.state.userData.lastName}
+                                    </span>
+                                )}
+                            </div>
+                            <div className="text-text-2">
+                                {auth.state.userData?.role ?? "Loading..."}
+                            </div>
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>
