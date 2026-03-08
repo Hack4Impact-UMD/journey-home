@@ -48,16 +48,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     return () => unsubscribe();
   }, []);
-//   signup: (
-//     email: string,
-//     password: string,
-//     firstName: string,
-//     lastName: string,
-//     dob: string,
-//     role: UserRole
-// ) => Promise<User>;
-// login: (email: string, password: string) => Promise<User>;
-// logout: () => Promise<void>;
+
   async function _signup(
     email: string,
     password: string,

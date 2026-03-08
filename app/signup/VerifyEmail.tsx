@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { resendVerificationEmail } from '@/lib/services/auth';
+import { updateEmailVerificationStatus } from '@/lib/services/users';
 import { useRouter } from 'next/navigation';
 import { UserRole } from '@/types/user';
 import { auth } from '@/lib/firebase';
@@ -11,6 +12,7 @@ export default function VerifyEmail({ selectedRole }: { selectedRole: UserRole }
   const authContext = useAuth();
   const router = useRouter();
   const [sending, setSending] = useState(false);
+  const [checking, setChecking] = useState(false);
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
 
@@ -35,6 +37,9 @@ export default function VerifyEmail({ selectedRole }: { selectedRole: UserRole }
   };
 
   const handleCheckVerification = async () => {
+    if (checking) return;
+    
+    setChecking(true);
     try {
       const currentUser = auth.currentUser || authContext.state.currentUser;
       if (!currentUser) {
@@ -47,6 +52,9 @@ export default function VerifyEmail({ selectedRole }: { selectedRole: UserRole }
       await currentUser.reload();
       
       if (currentUser.emailVerified) {
+        // Sync to Firestore before routing to prevent race condition
+        await updateEmailVerificationStatus(currentUser.uid, true);
+        
         // Volunteer goes to account created, others go to pending
         if (selectedRole === 'Volunteer') {
           router.push('/status/account-created');
@@ -67,6 +75,8 @@ export default function VerifyEmail({ selectedRole }: { selectedRole: UserRole }
       } else {
         setMessage('Error checking verification. Please try again.');
       }
+    } finally {
+      setChecking(false);
     }
   };
 
@@ -106,9 +116,10 @@ export default function VerifyEmail({ selectedRole }: { selectedRole: UserRole }
       <div className="w-full flex flex-col gap-4">
         <button
           onClick={handleCheckVerification}
-          className="w-full h-10 rounded-xs bg-primary text-white font-medium font-family-roboto"
+          disabled={checking}
+          className="w-full h-10 rounded-xs bg-primary text-white font-medium font-family-roboto disabled:opacity-50"
         >
-          Check Verification
+          {checking ? 'Checking...' : 'Check Verification'}
         </button>
 
         <button
