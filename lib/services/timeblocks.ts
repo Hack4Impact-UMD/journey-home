@@ -1,64 +1,39 @@
 import { db } from "../firebase";
-import { collection, doc, getDocs, setDoc, deleteDoc} from "firebase/firestore";
+import { collection, doc, getDocs, setDoc, deleteDoc } from "firebase/firestore";
 import { TimeBlock } from "../../types/schedule";
 import { Timestamp } from "firebase/firestore";
 
 const timeCol = collection(db, "timeblocks");
 
 //set time block (edit + create)
-export const setTB = async(timeblock: TimeBlock) => {
-  const timeRef = doc(db, "timeblocks", timeblock.id);
-  await setDoc(timeRef, timeblock);
-}
+export const setTB = async (timeblock: TimeBlock) => {
+    const timeRef = doc(db, "timeblocks", timeblock.id);
+    await setDoc(timeRef, timeblock);
+};
 
+//fetch all time blocks
 export const fetchAllTB = async (): Promise<TimeBlock[]> => {
-  const snapshot = await getDocs(timeCol);
-  const TBs: TimeBlock[] = [];
+    const snapshot = await getDocs(timeCol);
+    const TBs: TimeBlock[] = [];
 
-  snapshot.forEach((doc) => {
-    const data = doc.data();
+    snapshot.forEach((doc) => {
+        const data = doc.data();
+        TBs.push({
+            id: doc.id,
+            startTime: data.startTime as Timestamp,
+            endTime: data.endTime as Timestamp,
+            maxVolunteers: data.maxVolunteers ?? 0,
+            volunteerIDs: data.volunteerIDs ?? [],
+            tasks: data.tasks ?? [],
+            published: data.published ?? false,
+        } as TimeBlock);
+    });
 
-    if (!data.startTime || !data.endTime) {
-      console.warn("Skipping doc missing startTime/endTime:", doc.id);
-      return;
-    }
-
-    TBs.push({
-      id: doc.id,
-      startTime: Timestamp.fromMillis(data.startTime.seconds * 1000),
-      endTime: Timestamp.fromMillis(data.endTime.seconds * 1000),
-      maxVolunteers: data.maxVolunteers ?? 0,
-      volunteerIDs: data.volunteerIDs ?? [],
-      tasks: data.tasks ?? [],
-      published: data.published ?? false,
-    } as TimeBlock);
-  });
-
-  return TBs;
+    return TBs;
 };
 
 //delete time blocks
 export const deleteTB = async (id: string) => {
-  const timeRef = doc(db, "timeblocks", id);
-  await deleteDoc(timeRef);
-};
-
-export const createTB = async (startTime: string, endTime: string, maxVolunteers: number): Promise<void> => {
-    const [startH, startM] = startTime.split(":").map(Number);
-    const [endH, endM] = endTime.split(":").map(Number);
-
-    const start = new Date(); start.setHours(startH, startM, 0);
-    const end = new Date(); end.setHours(endH, endM, 0);
-
- const newBlock: TimeBlock = {
-    id: crypto.randomUUID(),
-    startTime: Timestamp.fromDate(start),
-    endTime: Timestamp.fromDate(end),
-    maxVolunteers: maxVolunteers,
-    volunteerIDs: [],
-    tasks: [],
-    published: false,
-};
-
-    await setTB(newBlock);
+    const timeRef = doc(db, "timeblocks", id);
+    await deleteDoc(timeRef);
 };
