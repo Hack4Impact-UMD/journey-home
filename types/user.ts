@@ -10,7 +10,7 @@ export type UserData = {
     firstName: string;
     lastName: string;
     email: string;
-    phone: string;
+    phone?: string;
     phoneExtension?: string;
     dob: Timestamp | null;
     role: UserRole;

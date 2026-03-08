@@ -33,7 +33,7 @@ export async function signUp(
         firstName,
         lastName,
         email: user.email!,
-        phone,
+        ...(phone && { phone }),
         ...(phoneExtension && { phoneExtension }),
         dob: dob ? Timestamp.fromDate(new Date(dob)) : null,
         role: "Volunteer",
@@ -43,8 +43,12 @@ export async function signUp(
 
     await createUserInDB(userRecord);
 
-    // Send verification email
-    await sendEmailVerification(user);
+    // Send verification email (don't fail signup if this fails)
+    try {
+        await sendEmailVerification(user);
+    } catch (error) {
+        console.error("Failed to send verification email:", error);
+    }
 
     return user;
 }

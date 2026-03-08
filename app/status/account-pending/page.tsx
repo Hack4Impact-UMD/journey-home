@@ -1,10 +1,17 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 import MobileTopBar from "@/components/auth/MobileTopBar";
 
 export default function AccountPending() {
     const auth = useAuth();
+    const router = useRouter();
+
+    const handleLogout = async () => {
+        await auth.logout();
+        router.push("/login");
+    };
 
     return (
         <div className="bg-background flex flex-col h-full overflow-hidden">
@@ -51,7 +58,7 @@ export default function AccountPending() {
 
                     {/* Back to Login button */}
                     <button
-                        onClick={auth.logout}
+                        onClick={handleLogout}
                         className="w-full h-10 rounded-xs bg-primary text-white font-medium font-family-roboto"
                     >
                         Back to Login

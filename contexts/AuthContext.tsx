@@ -31,8 +31,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // Sync email verification status if it changed
       if (user && foundUser && user.emailVerified !== foundUser.emailVerified) {
-        await updateEmailVerificationStatus(user.uid, user.emailVerified);
-        foundUser.emailVerified = user.emailVerified;
+        try {
+          await updateEmailVerificationStatus(user.uid, user.emailVerified);
+          foundUser.emailVerified = user.emailVerified;
+        } catch (err) {
+          console.error("Failed to sync email verification status:", err);
+        }
       }
 
       setAuthState({

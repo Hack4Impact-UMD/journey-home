@@ -12,6 +12,7 @@ export default function VerifyEmail({ selectedRole }: { selectedRole: UserRole }
   const router = useRouter();
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState('');
+  const [isError, setIsError] = useState(false);
 
   const handleResend = async () => {
     const currentUser = auth.currentUser || authContext.state.currentUser;
@@ -22,7 +23,12 @@ export default function VerifyEmail({ selectedRole }: { selectedRole: UserRole }
     
     try {
       await resendVerificationEmail(currentUser);
+      setIsError(false);
       setMessage('Verification email sent! Check your inbox.');
+    } catch (error) {
+      console.error('Error sending verification email:', error);
+      setIsError(true);
+      setMessage('Failed to send verification email. Please try again.');
     } finally {
       setSending(false);
     }
@@ -32,31 +38,29 @@ export default function VerifyEmail({ selectedRole }: { selectedRole: UserRole }
     try {
       const currentUser = auth.currentUser || authContext.state.currentUser;
       if (!currentUser) {
-        console.log('No current user');
+        setIsError(true);
         setMessage('Session expired. Please log in again.');
         setTimeout(() => router.push('/login'), 2000);
         return;
       }
       
-      console.log('Before reload - emailVerified:', currentUser.emailVerified);
       await currentUser.reload();
-      console.log('After reload - emailVerified:', currentUser.emailVerified);
       
       if (currentUser.emailVerified) {
         // Volunteer goes to account created, others go to pending
-        console.log('Email verified! Redirecting...', selectedRole);
         if (selectedRole === 'Volunteer') {
           router.push('/status/account-created');
         } else {
           router.push('/status/account-pending');
         }
       } else {
-        console.log('Email not verified yet');
+        setIsError(true);
         setMessage('Email not verified yet. Please check your inbox and click the verification link.');
       }
     } catch (error: unknown) {
       console.error('Error checking verification:', error);
       const firebaseError = error as { code?: string };
+      setIsError(true);
       if (firebaseError.code === 'auth/user-token-expired') {
         setMessage('Session expired. Please log in again to continue.');
         setTimeout(() => router.push('/login'), 2000);
@@ -93,7 +97,7 @@ export default function VerifyEmail({ selectedRole }: { selectedRole: UserRole }
       </p>
 
       {message && (
-        <p className="text-center font-family-roboto text-red-500 text-sm mb-6">
+        <p className={`text-center font-family-roboto text-sm mb-6 ${isError ? 'text-red-500' : 'text-green-600'}`}>
           {message}
         </p>
       )}
