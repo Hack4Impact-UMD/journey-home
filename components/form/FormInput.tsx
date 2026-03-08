@@ -3,20 +3,22 @@
 interface FormInputProps {
   label: string;
   required?: boolean;
-  value?: string;
+  value?: string | number;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   type?: string;
   className?: string;
+  disabled?: boolean;
   min?: number;
 }
 
 export default function FormInput({
   label,
   required = false,
-  value = "",
+  value,
   onChange,
   type = "text",
   className = "",
+  disabled = false,
   min,
 }: FormInputProps) {
   return (
@@ -27,9 +29,11 @@ export default function FormInput({
       </label>
       <input
         type={type}
-        value={value}
-        onChange={onChange}
         min={min}
+        disabled={disabled}
+        {...(onChange
+          ? { value: value ?? "", onChange }   // controlled
+          : { defaultValue: value })}          // uncontrolled
         className="w-full border border-gray-300 rounded px-3 py-2"
       />
     </div>

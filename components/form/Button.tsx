@@ -6,6 +6,7 @@ interface ButtonProps {
   variant?: "primary" | "secondary";
   type?: "button" | "submit";
   className?: string;
+  disabled?: boolean;
 }
 
 export default function Button({
