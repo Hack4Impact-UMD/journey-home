@@ -37,7 +37,7 @@ export default function SideNavbar() {
                 <SideNavbarLink
                     icon={DonorRequestsIcon}
                     name="Donor Requests"
-                    path="/inventory/donation-requests"
+                    path="/donation-requests"
                     roles={["Admin"]}
                 />
 
