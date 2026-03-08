@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 import { User, onAuthStateChanged } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import { UserData, UserRole, AuthContextType } from "../types/user";
-import { getUserByUID } from "../lib/services/users";
+import { getUserByUID, updateEmailVerificationStatus } from "../lib/services/users";
 import { login, logout, signUp } from "@/lib/services/auth";
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -27,16 +27,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
    */
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      // setCurrentUser(user);
-      // if (user) {
-      //   // Fetch user data from Firestore
-      //   const foundUser = await getUserByUID(user.uid);
-      //   setUserData(foundUser);
-      // } else {
-      //   setUserData(null);
-      // }
-      // setLoading(false);
       const foundUser = (user) ? await getUserByUID(user.uid) : null;
+
+      // Sync email verification status if it changed
+      if (user && foundUser && user.emailVerified !== foundUser.emailVerified) {
+        await updateEmailVerificationStatus(user.uid, user.emailVerified);
+        foundUser.emailVerified = user.emailVerified;
+      }
 
       setAuthState({
         currentUser: user,
@@ -62,11 +59,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     password: string,
     firstName: string,
     lastName: string,
+    phone: string,
+    phoneExtension: string,
     dob: string,
     role: UserRole
   ): Promise<User> {
     setAuthState(old => ({...old, loading: true}));
-    return (await signUp(email, password, firstName, lastName, dob, role))
+    return (await signUp(email, password, firstName, lastName, phone, phoneExtension, dob, role))
   }
 
   async function _login(

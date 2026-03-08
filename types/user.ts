@@ -10,6 +10,8 @@ export type UserData = {
     firstName: string;
     lastName: string;
     email: string;
+    phone: string;
+    phoneExtension?: string;
     dob: Timestamp | null;
     role: UserRole;
     pending: UserRole | null;
@@ -27,6 +29,8 @@ export interface AuthContextType {
         password: string,
         firstName: string,
         lastName: string,
+        phone: string,
+        phoneExtension: string,
         dob: string,
         role: UserRole
     ) => Promise<User>;
