@@ -124,6 +124,13 @@ export default function DonationRequestsPage() {
                             `${request.donor.firstName} ${request.donor.lastName}`.toLowerCase();
                         const searchq = searchQuery.toLowerCase();
 
+                        const completedRequest = request.items.every(
+                            (donItem) =>
+                                donItem.status === "Approved" ||
+                                donItem.status === "Denied",
+                        );
+                        if (completedRequest) return false;
+
                         //status depends on the donationitems, need to map through that array to define the status.
                         if (searchParams.status.length != 0) {
                             const startedRequest = request.items.some(
