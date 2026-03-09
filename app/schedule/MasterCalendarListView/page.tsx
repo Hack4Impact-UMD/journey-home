@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 
-const SHIFT_OPTIONS = ["All", "Warehouse", "Pickups / Deliveries"];
+const SHIFT_OPTIONS = ["All", "Warehouse", "Pickup/Delivery"];
 
 export default function MasterCalendarListView() {
     const { allTB: blocks } = useTimeBlocks();
@@ -18,10 +18,7 @@ export default function MasterCalendarListView() {
 
     const filteredBlocks = filterType === "All"
         ? blocks
-        : blocks.filter((tb) => {
-            const type = (tb as { type?: string }).type ?? "Pickups / Deliveries";
-            return type === filterType;
-        });
+        : blocks.filter((tb) => tb.type === filterType);
 
     const grouped = filteredBlocks.reduce((acc, tb) => {
         const dateKey = tb.startTime.toDate().toISOString().split("T")[0];
@@ -91,7 +88,7 @@ export default function MasterCalendarListView() {
                                     {grouped[date].map((tb) => {
                                         const start = tb.startTime.toDate();
                                         const end = tb.endTime.toDate();
-                                        const type = (tb as { type?: string }).type ?? "Pickups / Deliveries";
+                                        const type = tb.type;
                                         const dotColor = type === "Warehouse" ? "bg-yellow-400" : "bg-[#02AFC7]";
                                         return (
                                             <div
