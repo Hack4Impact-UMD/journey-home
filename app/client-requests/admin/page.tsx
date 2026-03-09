@@ -27,20 +27,10 @@ export default function ClientRequestsAdminPage() {
 
     const handleUpdateStatus = async (status: ReviewStatus) => {
         if (!selectedCR) return;
-
-        toast.promise(
-            setClientRequestToast({
-                ...selectedCR,
-                status
-            }).then(() => {
-                setSelectedCRId(null);
-            }),
-            {
-                loading: "Updating status...",
-                success: "Status updated successfully!",
-                error: "Error: Couldn't update status",
-            }
-        );
+        await setClientRequestToast({
+        ...selectedCR,
+        status: status,
+        });
     }
 
     return (

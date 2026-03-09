@@ -48,6 +48,10 @@ function CRTableRow({ request, onOpen, }: { request: ClientRequest; onOpen: () =
         <>
             <div 
                 className="h-10 border-light-border border-b border-x flex items-center font-family-roboto text-sm text-text-1"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onOpen();
+                }}
             >
                 <div className="w-[20%] px-4">
                     <span>
