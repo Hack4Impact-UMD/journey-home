@@ -14,6 +14,14 @@ type DRDropdownProps<T extends string> = {
 
 export function DRDropdown<T extends string>({ options, selected, setSelected }: DRDropdownProps<T>) {
 
+    const value = selected[0];
+    const colorClass =
+        value === "Yes"
+            ? "bg-green-100 border-green-300"
+            : value === "No"
+            ? "bg-red-100 border-red-300"
+            : "bg-white border-light-border";
+
     return (
         <>
             <DropdownMenu>
@@ -29,7 +37,7 @@ export function DRDropdown<T extends string>({ options, selected, setSelected }:
                     {options.map(option => 
                         <DropdownMenuCheckboxItem
                             key={option}
-                            className="text-xs cursor-pointer"
+                            className={`text-xs cursor-pointer ${colorClass}`}
                             checked={selected.includes(option) }
                             onCheckedChange={checked => {
                                 if(checked) {
@@ -37,7 +45,6 @@ export function DRDropdown<T extends string>({ options, selected, setSelected }:
                                 } else {
                                     setSelected(prev => prev.filter(x => x !== option));
                                 }
-                                
                             }}
                             onSelect={(event) => event.preventDefault()}
                         >
