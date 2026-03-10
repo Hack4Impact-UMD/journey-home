@@ -10,7 +10,6 @@ import { RequestDetailsPage } from "@/components/client-requests/RequestDetails"
 import { useClientRequests } from "@/lib/queries/client-requests";
 import { useState } from "react";
 import { ReviewStatus } from "@/types/general";
-import { toast } from "sonner";
 
 export default function ClientRequestsAdminPage() {
     const { clientRequests, refetch: refetchClientRequests, setClientRequestToast } = useClientRequests();
