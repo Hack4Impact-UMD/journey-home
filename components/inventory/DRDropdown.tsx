@@ -17,17 +17,17 @@ export function DRDropdown<T extends string>({ options, selected, setSelected }:
     const value = selected[0];
     const colorClass =
         value === "Yes"
-            ? "bg-green-100 border-green-300"
+            ? "bg-[#E7F9E8] border-[#BCDABE]"
             : value === "No"
-            ? "bg-red-100 border-red-300"
+            ? "bg-[#FBDED9] border-[#D7B7B1]"
             : "bg-white border-light-border";
 
     return (
         <>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild className="outline-0">
-                    <button className={`border border-light-border rounded-xs flex justify-center items-center pl-4 pr-3 gap-2 ${colorClass}`}>
-                        <span className="text-sm">
+                    <button className={`border rounded-xs flex items-center justify-between px-[0.5rem] w-[3.62rem] h-[1.375rem] ${colorClass}`}>
+                        <span className="text-xs">
                             {selected.length === 1 ? selected[0] : ""}
                         </span>
                         <DropdownIcon />
