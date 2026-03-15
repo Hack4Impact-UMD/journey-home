@@ -1,9 +1,9 @@
 "use client";
 
 import { createDonationRequest } from "@/lib/services/donations";
-import { setInventoryRecord, uploadImage } from "@/lib/services/inventory";
+import { setInventoryCategory, uploadImage } from "@/lib/services/inventory";
 import { DonationItem, DonationRequest } from "@/types/donations";
-import { CategoryAttributes, InventoryPhoto } from "@/types/inventory";
+import { InventoryCategory, InventoryPhoto } from "@/types/inventory";
 import { Timestamp } from "@firebase/firestore";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
@@ -625,7 +625,7 @@ const MAX_ITEMS = 15;
                 },
                 status: completed
                     ? (Math.random() < 0.5 ? "Approved" : "Denied")
-                    : (Math.random() < 0.5 ? "Not Reviewed" : (Math.random() < 0.5 ? "Approved" : "Denied")),
+                    : (Math.random() < 0.9 ? "Not Reviewed" : (Math.random() < 0.5 ? "Approved" : "Denied")),
             });
         }
     }
@@ -659,6 +659,7 @@ const MAX_ITEMS = 15;
             "Contactless pickup preferred",
         ]),
         date: time,
+        responded: completed ? Math.random() > 0.5 : false,
         items,
         associatedTimeBlockID: null, // no time block
     };
@@ -667,25 +668,6 @@ const MAX_ITEMS = 15;
     await createDonationRequest(request);
 }
 
-async function addInventoryRecord(category: string) {
-    const time = randomTimestamp();
-    const imagePool = await getSeedImagePool(category);
-    for (const image of imagePool) {
-        const donor: LocationContact = randomFrom(SEED_DONORS);
-
-        await setInventoryRecord({
-            id: crypto.randomUUID(),
-            name: image.title,
-            category,
-            size: image.size,
-            quantity: 1,
-            notes: randomFrom(desc),
-            dateAdded: time,
-            donorEmail: donor.email,
-            photos: await seedImageToPhotos(image),
-        });
-    }
-}
 
 async function loadSeedImages(category: string): Promise<SeedImage[]> {
     const imageNames = [
@@ -694,21 +676,21 @@ async function loadSeedImages(category: string): Promise<SeedImage[]> {
         `${category}2.jpg`,
         `${category}3.jpg`,
     ];
-    
+
     const filesWithDescriptions: SeedImage[] = [];
-    
+
     for (let i = 0; i < imageNames.length; i++) {
         // Grab the item object instead of just the string
         const itemData = ITEM_DESCRIPTIONS[category]?.[i];
-        
+
         // Extract title and size with safe fallbacks
         const title = itemData?.title || "Other";
-        const size = itemData?.size || "Medium"; 
+        const size = itemData?.size || "Medium";
 
         const url = getPublicUrl(`/seed-images/${category}/${imageNames[i]}`);
         const res = await fetch(url);
         const blob = await res.blob();
-        
+
         const file = new File([blob], title, { type: blob.type });
 
         // Push the title, file, AND size to satisfy the SeedImage type
@@ -748,14 +730,24 @@ const DEFAULT_CATEGORIES: string[] = [
     "End Tables",
 ];
 
-const DEFAULT_CATEGORY_ATTRS = DEFAULT_CATEGORIES.map(
-    (category) =>
-        ({
-            name: category,
-            lowThreshold: 3,
-            highThreshold: 5,
-        } as CategoryAttributes)
-);
+const DEFAULT_INVENTORY_CATEGORIES: Omit<InventoryCategory, "quantity">[] = [
+    { id: crypto.randomUUID(), name: "Mattresses",        lowThreshold: 5,  highThreshold: 10 },
+    { id: crypto.randomUUID(), name: "Box Springs",       lowThreshold: 5,  highThreshold: 10 },
+    { id: crypto.randomUUID(), name: "Sofas",             lowThreshold: 3,  highThreshold: 7  },
+    { id: crypto.randomUUID(), name: "Loveseats",         lowThreshold: 3,  highThreshold: 6  },
+    { id: crypto.randomUUID(), name: "Kitchen Tables",    lowThreshold: 4,  highThreshold: 8  },
+    { id: crypto.randomUUID(), name: "Kitchen Chairs",    lowThreshold: 8,  highThreshold: 15 },
+    { id: crypto.randomUUID(), name: "Armchairs",         lowThreshold: 4,  highThreshold: 8  },
+    { id: crypto.randomUUID(), name: "Coffee Tables",     lowThreshold: 4,  highThreshold: 8  },
+    { id: crypto.randomUUID(), name: "Dressers",          lowThreshold: 5,  highThreshold: 10 },
+    { id: crypto.randomUUID(), name: "Nightstands",       lowThreshold: 6,  highThreshold: 12 },
+    { id: crypto.randomUUID(), name: "TVs",               lowThreshold: 3,  highThreshold: 6  },
+    { id: crypto.randomUUID(), name: "TV Stands",         lowThreshold: 3,  highThreshold: 6  },
+    { id: crypto.randomUUID(), name: "Microwave Stands",  lowThreshold: 4,  highThreshold: 8  },
+    { id: crypto.randomUUID(), name: "Small Bookshelves", lowThreshold: 4,  highThreshold: 8  },
+    { id: crypto.randomUUID(), name: "Area Rugs",         lowThreshold: 5,  highThreshold: 10 },
+    { id: crypto.randomUUID(), name: "End Tables",        lowThreshold: 5,  highThreshold: 10 },
+];
 
 const desc = [
     "New: This item is brand new and has never been used. It comes in its original packaging and is ready for immediate use.",
@@ -780,8 +772,14 @@ const desc = [
     "Hand-Crafted Details: Item has handmade or delicate elements that require gentle handling. Overall condition is good.",
 ];
 export async function ensureCategoriesConfig() {
-    const ref = doc(db, "config", "categories");
-    await setDoc(ref, { categories: DEFAULT_CATEGORY_ATTRS });
+    await Promise.all(
+        DEFAULT_INVENTORY_CATEGORIES.map((cat) =>
+            setInventoryCategory({
+                ...cat,
+                quantity: Math.floor(Math.random() * (2 * cat.highThreshold + 1)),
+            })
+        )
+    );
 }
 
 const SEED_USERS = [
@@ -1191,8 +1189,15 @@ function randomHMIS(): string {
 
 
 async function addCaseManagerRequests(count: number) {
-    for(let i = 0; i < count; i++) {
-        const randomCaseManager = await getRandomCaseManagerID();
+    const snapshot = await getDocs(collection(db, "users"));
+    const caseManagers = snapshot.docs
+        .map((d) => d.data() as UserData)
+        .filter((u) => u.role === "Case Manager");
+
+    if (caseManagers.length === 0) return;
+
+    for (let i = 0; i < count; i++) {
+        const randomCaseManager = caseManagers[Math.floor(Math.random() * caseManagers.length)];
         const baseClient: LocationContact = randomFrom(SEED_DONORS);
 
         const numItemsNeeded = Math.floor(Math.random() * 4) + 1;
@@ -1211,7 +1216,7 @@ async function addCaseManagerRequests(count: number) {
             id: crypto.randomUUID(),
 
             client: {
-                ...baseClient, // <-- uses your LocationContact correctly
+                ...baseClient,
 
                 hmis: randomHMIS(),
 
@@ -1242,7 +1247,7 @@ async function addCaseManagerRequests(count: number) {
                 },
             },
 
-            caseManagerID: randomCaseManager ?? "",
+            caseManagerID: randomCaseManager.uid,
             notes: randomFrom(CASE_NOTES),
             status: "Not Reviewed",
 
@@ -1253,25 +1258,8 @@ async function addCaseManagerRequests(count: number) {
         };
 
         await setCaseRequest(request);
-
-
         console.log("Created case manager request:", request.id);
     }
-}
-
-async function getRandomCaseManagerID(): Promise<string | null> {
-    const snapshot = await getDocs(collection(db, "users"));
-
-    const caseManagers = snapshot.docs
-        .map((doc) => doc.data() as UserData)
-        .filter((user) => user.role === "Case Manager");
-
-    if (caseManagers.length === 0) return null;
-
-    const random =
-        caseManagers[Math.floor(Math.random() * caseManagers.length)];
-
-    return random.uid;
 }
 
 const CASE_NOTES = [
@@ -1339,11 +1327,6 @@ export default function page() {
                         await seedTimeBlocks();
                         for (let i = 0; i < 5; i++) await addDonationRequests(true);
                         for (let i = 0; i < 20; i++) await addDonationRequests(false);
-                        await Promise.all(
-                            DEFAULT_CATEGORIES.filter((c) => c !== "Other").map((c) =>
-                                addInventoryRecord(c)
-                            )
-                        );
                         await addCaseManagerRequests(7);
                     })();
                     toast.promise(promise, {
@@ -1382,15 +1365,9 @@ export default function page() {
                 </button>
                 <button
                     className={btnClass}
-                    onClick={() => {
-                        Promise.all(
-                            DEFAULT_CATEGORIES.filter((c) => c !== "Other").map((c) =>
-                                addInventoryRecord(c)
-                            )
-                        );
-                    }}
+                    onClick={() => ensureCategoriesConfig()}
                 >
-                    Add inventory records
+                    Add inventory categories
                 </button>
                 <button className={btnClass} onClick={() => addCaseManagerRequests(7)}>
                     Add client requests
