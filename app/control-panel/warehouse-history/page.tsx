@@ -6,16 +6,22 @@ import { SortOption } from "@/components/inventory/SortOption";
 import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
 import { WarehouseHistoryTable } from "@/components/control-panel/WarehouseHistoryTable";
 import { useWarehouseHistory, useRevertChange } from "@/lib/queries/changelog";
+import { useAuth } from "@/contexts/AuthContext";
 import { InventoryChange, InventoryChangeType, SortStatus } from "@/types/inventory";
 
 const CHANGE_TYPES: InventoryChangeType[] = ["Create", "Set", "Add", "Remove", "Delete"];
 
+function getMillis(t: { seconds: number; nanoseconds: number; toMillis?: () => number }) {
+    return t.toMillis?.() ?? (t.seconds * 1000 + t.nanoseconds / 1e6);
+}
+
 export default function WarehouseHistoryPage() {
+    const { state: { userData } } = useAuth();
+    const actor = userData ? { userId: userData.uid, userEmail: userData.email } : undefined;
+
     const [searchQuery, setSearchQuery] = useState("");
     const [appliedSearch, setAppliedSearch] = useState("");
-
     const [selectedTypes, setSelectedTypes] = useState<InventoryChangeType[]>([...CHANGE_TYPES]);
-
     const [dateSortStatus, setDateSortStatus] = useState<SortStatus>("desc");
     const [timeSortStatus, setTimeSortStatus] = useState<SortStatus>("none");
 
@@ -30,16 +36,13 @@ export default function WarehouseHistoryPage() {
                 c.userEmail.toLowerCase().includes(appliedSearch.toLowerCase()) ||
                 c.changeType.toLowerCase().includes(appliedSearch.toLowerCase());
 
-            const matchesType = selectedTypes.includes(c.changeType);
-
-            return matchesSearch && matchesType;
+            return matchesSearch && selectedTypes.includes(c.changeType);
         });
 
-        // Date sort takes priority, then time sort (both use the same timestamp field)
         const activeSortStatus = dateSortStatus !== "none" ? dateSortStatus : timeSortStatus;
         if (activeSortStatus !== "none") {
             result = [...result].sort((a, b) => {
-                const diff = a.timestamp.seconds - b.timestamp.seconds;
+                const diff = getMillis(a.timestamp) - getMillis(b.timestamp);
                 return activeSortStatus === "asc" ? diff : -diff;
             });
         }
@@ -90,7 +93,7 @@ export default function WarehouseHistoryPage() {
                 <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
                     <WarehouseHistoryTable
                         changes={filtered}
-                        onRevert={(change) => revertMutation.mutate(change)}
+                        onRevert={(change) => revertMutation.mutate({ change, actor })}
                         isReverting={revertMutation.isPending}
                     />
                 </div>

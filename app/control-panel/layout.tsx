@@ -12,9 +12,9 @@ export default function ControlPanelLayout({ children }: { children: ReactNode }
     return (
         <ProtectedRoute allow={["Admin"]}>
             <div className="h-full w-full flex flex-col font-family-roboto overflow-hidden">
-                <div className="flex flex-1 min-h-0">
+                <div className="flex flex-1 min-h-0 min-w-0">
                     <SideNavbar />
-                    <div className="flex-1 min-h-0 bg-[#F7F7F7] py-4 px-6 flex flex-col">
+                    <div className="flex-1 min-h-0 min-w-0 bg-[#F7F7F7] py-4 px-6 flex flex-col">
                         <span className="text-2xl text-primary font-extrabold block">
                             Control Panel
                         </span>
@@ -26,6 +26,7 @@ export default function ControlPanelLayout({ children }: { children: ReactNode }
                                         : ""
                                 }`}
                                 href="/control-panel"
+                                aria-current={pathname === "/control-panel" ? "page" : undefined}
                                 suppressHydrationWarning
                             >
                                 Overview
@@ -37,6 +38,7 @@ export default function ControlPanelLayout({ children }: { children: ReactNode }
                                         : ""
                                 }`}
                                 href="/control-panel/warehouse-history"
+                                aria-current={pathname.startsWith("/control-panel/warehouse-history") ? "page" : undefined}
                                 suppressHydrationWarning
                             >
                                 Warehouse History

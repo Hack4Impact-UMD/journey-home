@@ -57,6 +57,8 @@ export async function setInventoryRecord(
             const isCreate = !prevSnap.exists();
             const changeAmount = record.quantity - prevQty;
 
+            await setDoc(docRef, record);
+
             const change: InventoryChange = {
                 id: crypto.randomUUID(),
                 itemId: record.id,
@@ -70,9 +72,9 @@ export async function setInventoryRecord(
                 userEmail: actor.userEmail,
             };
             await setWarehouseChange(change);
+        } else {
+            await setDoc(docRef, record);
         }
-
-        await setDoc(docRef, record);
         return true;
     } catch (e) {
         console.error(e);
@@ -104,6 +106,7 @@ export async function deleteInventoryRecord(
             const prevSnap = await getDoc(docRef);
             if (prevSnap.exists()) {
                 const record = prevSnap.data() as InventoryRecord;
+                await deleteDoc(docRef);
                 const change: InventoryChange = {
                     id: crypto.randomUUID(),
                     itemId: id,
@@ -117,10 +120,12 @@ export async function deleteInventoryRecord(
                     userEmail: actor.userEmail,
                 };
                 await setWarehouseChange(change);
+            } else {
+                await deleteDoc(docRef);
             }
+        } else {
+            await deleteDoc(docRef);
         }
-
-        await deleteDoc(docRef);
         return true;
     } catch (e) {
         console.error(e);

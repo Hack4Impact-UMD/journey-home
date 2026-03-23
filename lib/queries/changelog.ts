@@ -38,21 +38,26 @@ export function useSetChange() {
     return mutation;
 }
 
+type RevertChangeArgs = {
+    change: InventoryChange;
+    actor?: { userId: string; userEmail: string };
+};
+
 /**
  * Revert a changelog entry by restoring the inventory item's quantity to amountBefore.
- * Also writes a new changelog entry recording the revert.
+ * Attributes the revert to the current user (actor), falling back to the original user.
  */
 export function useRevertChange() {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: async (change: InventoryChange) => {
+        mutationFn: async ({ change, actor }: RevertChangeArgs) => {
             const item = await getInventoryRecord(change.itemId);
             if (!item) throw new Error("Item not found");
 
             const reverted = { ...item, quantity: change.amountBefore };
-            // Pass no actor here — we write the changelog entry manually below
-            await setInventoryRecord(reverted);
+            const success = await setInventoryRecord(reverted);
+            if (!success) throw new Error("Failed to update inventory during revert");
 
             const revertEntry: InventoryChange = {
                 id: crypto.randomUUID(),
@@ -63,8 +68,8 @@ export function useRevertChange() {
                 amountBefore: item.quantity,
                 amountAfter: change.amountBefore,
                 timestamp: Timestamp.now(),
-                userId: change.userId,
-                userEmail: change.userEmail,
+                userId: actor?.userId ?? change.userId,
+                userEmail: actor?.userEmail ?? change.userEmail,
             };
             await setWarehouseChange(revertEntry);
         },
