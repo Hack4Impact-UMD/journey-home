@@ -22,8 +22,12 @@ import { Timestamp } from "firebase/firestore";
 import { WarehouseGallery } from "@/components/inventory/WarehouseGallery";
 import { ItemViewModal } from "@/components/inventory/ItemViewModal";
 import { useCategories } from "@/lib/queries/categories";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function WarehousePage() {
+    const { state: { userData } } = useAuth();
+    const actor = userData ? { userId: userData.uid, userEmail: userData.email } : undefined;
+
     const [searchQuery, setSearchQuery] = useState<string>("");
 
     const { allCategories } = useCategories();
@@ -48,7 +52,7 @@ export default function WarehousePage() {
     function editItem(updated: InventoryRecord) {
         const adding = newItem !== null;
         toast.promise(
-            setInventoryRecord(updated).then((success) => {
+            setInventoryRecord(updated, actor).then((success) => {
                 if (success) {
                     setEditedItem(null);
                     setNewItem(null);
@@ -90,7 +94,7 @@ export default function WarehousePage() {
         setOpenedItem((old) => (old && old.id == deleted.id ? null : old));
 
         toast.promise(
-            deleteInventoryRecord(deleted.id).then(() =>
+            deleteInventoryRecord(deleted.id, actor).then(() =>
                 setAllItems((prevItems) =>
                     prevItems.filter((item) => item.id !== deleted.id)
                 )
