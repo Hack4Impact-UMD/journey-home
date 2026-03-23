@@ -30,7 +30,7 @@ function WarehouseGalleryCard({
 }) {
     return (
         <>
-            <div 
+            <div
                 className="rounded-sm border border-light-border h-[20em] shadow-md hover:shadow-lg cursor-pointer flex flex-col items-center"
                 onClick={onOpen}
             >
