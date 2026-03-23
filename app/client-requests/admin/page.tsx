@@ -37,7 +37,7 @@ export default function ClientRequestsAdminPage() {
             <div className="h-full w-full flex flex-col font-family-roboto">
                 <div className="flex flex-1">
                     <SideNavbar />
-                    <div className="flex-1 bg-[#F7F7F7] py-4 px-6 flex flex-col">
+                    <div className="flex-1 min-h-0 bg-[#F7F7F7] pt-8 pb-4 px-6 flex flex-col">
                         <h1 className="text-2xl text-primary font-extrabold">
                             Client Requests
                         </h1>

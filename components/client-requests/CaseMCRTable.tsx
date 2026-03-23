@@ -75,7 +75,7 @@ function CRTableRow({ request, onOpen, }: { request: ClientRequest; onOpen: () =
                             (request.status)
                         } 
                         color={
-                            (request.status == "Not Reviewed") ? "yellow" :
+                            (request.status == "Not Reviewed") ? "orange" :
                             (request.status == "Approved") ? "green" :
                             "red"
                         }

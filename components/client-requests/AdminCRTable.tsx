@@ -79,7 +79,7 @@ function CRTableRow({ request, onOpen, }: { request: ClientRequest; onOpen: () =
                 </div>
                 <span className="w-[15%] px-4 text-xs">
                     <Badge text={request.status} color={
-                        (request.status == "Not Reviewed") ? "yellow" :
+                        (request.status == "Not Reviewed") ? "orange" :
                         (request.status == "Approved") ? "green" :
                         "red"
                     }/>
