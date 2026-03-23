@@ -1,0 +1,59 @@
+"use client";
+
+import { createPortal } from "react-dom";
+import { CloseIcon } from "../icons/CloseIcon";
+
+type ConfirmModalProps = {
+    title: string;
+    message: string;
+    confirmLabel?: string;
+    cancelLabel?: string;
+    onConfirm: () => void;
+    onCancel: () => void;
+    danger?: boolean;
+};
+
+export function ConfirmModal({
+    title,
+    message,
+    confirmLabel = "Confirm",
+    cancelLabel = "Cancel",
+    onConfirm,
+    onCancel,
+    danger = false,
+}: ConfirmModalProps) {
+    return createPortal(
+        <div className="fixed inset-0 z-50 flex items-center justify-center font-family-roboto">
+            <div
+                className="absolute inset-0 bg-black/40"
+                onClick={onCancel}
+            />
+            <div className="relative bg-white rounded-sm shadow-lg w-full max-w-md p-6 mx-4">
+                <div className="flex items-center justify-between mb-3">
+                    <span className="font-bold text-lg">{title}</span>
+                    <button onClick={onCancel} className="text-xl">
+                        <CloseIcon />
+                    </button>
+                </div>
+                <p className="text-sm text-text-1 mb-6">{message}</p>
+                <div className="flex gap-2 justify-end">
+                    <button
+                        className="rounded-xs h-8 px-4 border border-light-border text-sm"
+                        onClick={onCancel}
+                    >
+                        {cancelLabel}
+                    </button>
+                    <button
+                        className={`rounded-xs h-8 px-4 text-sm text-white ${
+                            danger ? "bg-red-500" : "bg-primary"
+                        }`}
+                        onClick={onConfirm}
+                    >
+                        {confirmLabel}
+                    </button>
+                </div>
+            </div>
+        </div>,
+        document.body
+    );
+}
