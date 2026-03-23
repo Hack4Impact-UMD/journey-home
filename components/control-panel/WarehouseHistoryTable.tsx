@@ -6,7 +6,7 @@ import { ConfirmModal } from "./ConfirmModal";
 
 type WarehouseHistoryTableProps = {
     changes: InventoryChange[];
-    onRevert: (change: InventoryChange) => void;
+    onRevert: (change: InventoryChange) => Promise<void>;
     isReverting: boolean;
 };
 
@@ -25,8 +25,8 @@ export function WarehouseHistoryTable({
                     message={`Are you sure you want to revert the "${pendingRevert.changeType}" change on "${pendingRevert.itemName}"? This will restore the quantity from ${pendingRevert.amountAfter} back to ${pendingRevert.amountBefore}.`}
                     confirmLabel="Revert"
                     danger
-                    onConfirm={() => {
-                        onRevert(pendingRevert);
+                    onConfirm={async () => {
+                        await onRevert(pendingRevert);
                         setPendingRevert(null);
                     }}
                     onCancel={() => setPendingRevert(null)}

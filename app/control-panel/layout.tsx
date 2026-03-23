@@ -27,7 +27,6 @@ export default function ControlPanelLayout({ children }: { children: ReactNode }
                                 }`}
                                 href="/control-panel"
                                 aria-current={pathname === "/control-panel" ? "page" : undefined}
-                                suppressHydrationWarning
                             >
                                 Overview
                             </Link>
@@ -39,7 +38,6 @@ export default function ControlPanelLayout({ children }: { children: ReactNode }
                                 }`}
                                 href="/control-panel/warehouse-history"
                                 aria-current={pathname.startsWith("/control-panel/warehouse-history") ? "page" : undefined}
-                                suppressHydrationWarning
                             >
                                 Warehouse History
                             </Link>

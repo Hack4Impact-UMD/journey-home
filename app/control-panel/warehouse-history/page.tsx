@@ -25,7 +25,7 @@ export default function WarehouseHistoryPage() {
     const [dateSortStatus, setDateSortStatus] = useState<SortStatus>("desc");
     const [timeSortStatus, setTimeSortStatus] = useState<SortStatus>("none");
 
-    const { changes, isLoading } = useWarehouseHistory();
+    const { changes, isLoading, isError } = useWarehouseHistory();
     const revertMutation = useRevertChange();
 
     const filtered = useMemo(() => {
@@ -89,11 +89,15 @@ export default function WarehouseHistoryPage() {
                 <div className="flex-1 flex items-center justify-center text-sm text-[#A2A2A2]">
                     Loading history...
                 </div>
+            ) : isError ? (
+                <div className="flex-1 flex items-center justify-center text-sm text-red-500">
+                    Failed to load history. Please try again.
+                </div>
             ) : (
                 <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
                     <WarehouseHistoryTable
                         changes={filtered}
-                        onRevert={(change) => revertMutation.mutate({ change, actor })}
+                        onRevert={(change) => revertMutation.mutateAsync({ change, actor })}
                         isReverting={revertMutation.isPending}
                     />
                 </div>

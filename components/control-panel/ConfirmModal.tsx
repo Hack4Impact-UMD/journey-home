@@ -1,7 +1,7 @@
 "use client";
 
 import { createPortal } from "react-dom";
-import { useId } from "react";
+import { useId, useEffect } from "react";
 import { CloseIcon } from "../icons/CloseIcon";
 
 type ConfirmModalProps = {
@@ -25,6 +25,14 @@ export function ConfirmModal({
 }: ConfirmModalProps) {
     const titleId = useId();
     const descId = useId();
+
+    useEffect(() => {
+        const handleEscape = (e: KeyboardEvent) => {
+            if (e.key === "Escape") onCancel();
+        };
+        document.addEventListener("keydown", handleEscape);
+        return () => document.removeEventListener("keydown", handleEscape);
+    }, [onCancel]);
 
     return createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center font-family-roboto">

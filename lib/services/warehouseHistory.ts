@@ -37,7 +37,13 @@ export async function getWarehouseHistory(
     }
 
     const snapshot = await getDocs(q);
-    return snapshot.docs.map((d) => d.data() as InventoryChange);
+    return snapshot.docs
+        .map((d) => {
+            const data = d.data();
+            if (!data.id || !data.itemId || !data.timestamp) return null;
+            return data as InventoryChange;
+        })
+        .filter((entry): entry is InventoryChange => entry !== null);
 }
 
 /**
