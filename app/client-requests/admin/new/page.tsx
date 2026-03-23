@@ -11,15 +11,12 @@ import { ReviewStatus } from "@/types/general";
 
 export default function ClientRequestsAdminPage() {
     const { clientRequests, refetch: refetchClientRequests, setClientRequestToast } = useClientRequests();
-    
-    const statusOpts: ReviewStatus[] = ["Not Reviewed", "Approved", "Denied"];
 
     const [selectedCRId, setSelectedCRId] = useState<string | null>(null);
     const selectedCR = clientRequests.find((cr) => cr.id === selectedCRId) ?? null;
 
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [sortBy, setSortBy] = useState<"asc" | "desc" | "none">("none") //don't need to worry about search params here bc only sorting by date!
-    const [selectedStatus, setStatus] = useState<ReviewStatus[]>(statusOpts);
 
     const handleUpdateStatus = async (status: ReviewStatus) => {
         if (!selectedCR) return;
@@ -85,7 +82,6 @@ export default function ClientRequestsAdminPage() {
                     </div>
                     <AdminCRTable clientRequests={clientRequests
                             .filter((request) => {
-                                if (!selectedStatus.includes(request.status)) return false;
 
                                 const clientFullName =
                                     `${request.client.firstName} ${request.client.lastName}`.toLowerCase();

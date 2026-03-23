@@ -14,7 +14,6 @@ import { ReviewStatus } from "@/types/general";
 
 export default function ClientRequestsCaseManagerPage() {
     const { clientRequests, refetch: refetchClientRequests } = useClientRequests();
-    const [ selectedGroup, changeGroup ] = useState<string>("All");
 
     const statusOpts: ReviewStatus[] = ["Approved", "Denied"];
     
@@ -86,7 +85,6 @@ export default function ClientRequestsCaseManagerPage() {
                                     `${request.client.firstName} ${request.client.lastName}`.toLowerCase();
 
                                 //making it easier to return when i have a specific group selected, i think i did it right
-                                if (selectedGroup === "New" && request.status !== "Not Reviewed") return false;
                                 if (request.status === "Not Reviewed") return false;
                                 
                                 return clientFullName.includes(searchQuery.toLowerCase());
