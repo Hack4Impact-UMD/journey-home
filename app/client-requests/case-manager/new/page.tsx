@@ -2,16 +2,13 @@
 
 import { RequestDetailsPage } from "@/components/client-requests/RequestDetails";
 import { ProtectedRoute } from "@/components/general/ProtectedRoute";
-import SideNavbar from "@/components/general/SideNav";
 import { useClientRequests } from "@/lib/queries/client-requests";
 import { useState } from "react";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { SortOption } from "@/components/inventory/SortOption";
-import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
 import { CaseMCRTable } from "@/components/client-requests/CaseMCRTable";
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
-import { ReviewStatus } from "@/types/general";
 
 export default function ClientRequestsCaseManagerPage() {
     const { clientRequests, refetch: refetchClientRequests } = useClientRequests();

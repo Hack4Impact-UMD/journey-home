@@ -1,10 +1,8 @@
 "use client";
 
 import { ProtectedRoute } from "@/components/general/ProtectedRoute";
-import SideNavbar from "@/components/general/SideNav";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { SortOption } from "@/components/inventory/SortOption";
-import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
 import { AdminCRTable } from "@/components/client-requests/AdminCRTable";
 import { RequestDetailsPage } from "@/components/client-requests/RequestDetails";
 import { useClientRequests } from "@/lib/queries/client-requests";
