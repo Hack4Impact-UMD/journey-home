@@ -38,5 +38,6 @@ export type CategoryQuantityChange = {
 export type InventoryChange = {
   userId: string,
   timestamp: Timestamp,
-  changes: CategoryQuantityChange[],
+  change: CategoryQuantityChange,
+  reverted: boolean,
 }
