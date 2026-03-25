@@ -36,6 +36,7 @@ export type CategoryQuantityChange = {
 }
 
 export type InventoryChange = {
+  id: string,
   userId: string,
   timestamp: Timestamp,
   change: CategoryQuantityChange,

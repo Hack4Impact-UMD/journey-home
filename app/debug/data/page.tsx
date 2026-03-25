@@ -783,6 +783,7 @@ async function generateInventoryChanges(count: number): Promise<InventoryChange[
     runningQty[cat.id] = reverted ? oldQuantity : newQuantity;
 
     return {
+        id: crypto.randomUUID(),
       userId: userIds[Math.floor(Math.random() * userIds.length)],
       timestamp: Timestamp.fromMillis(ts),
       change: { category: cat.name, oldQuantity, newQuantity },
