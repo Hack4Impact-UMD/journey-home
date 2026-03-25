@@ -75,13 +75,22 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                             {/* shifts */}
                             {blocks.map((tb) => {
                                 const tbWithTypes = tb as TBWithTypes;
+                                const totalGeneralCapacity = tb.volunteerGroups
+                                    .filter(
+                                        (g) => g.name === "General volunteer"
+                                    )
+                                    .reduce((sum, g) => sum + g.maxNum, 0);
 
                                 const timeRange = `${formatTime(
                                     tb.startTime
                                 )}-${formatTime(tb.endTime)}`;
 
-                                const isSignedUp =
-                                    tb.volunteerIDs.includes(currentUserID);
+                                const isSignedUp = tb.volunteerGroups.some(
+                                    (group) =>
+                                        group.volunterIDs.includes(
+                                            currentUserID
+                                        )
+                                );
 
                                 const type =
                                     tb.tasks.length > 0 &&
@@ -112,11 +121,12 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                                 <div className="text-primary text-xs">
                                                     <div>
                                                         {/* assuming there's only two lead drivers */}
-                                                        {leadDrivers}/2 lead drivers
+                                                        {leadDrivers}/2 lead
+                                                        drivers
                                                     </div>
                                                     <div>
                                                         {generalVolunteers}/
-                                                        {tb.maxVolunteers}{" "}
+                                                        {totalGeneralCapacity}{" "}
                                                         general volunteers
                                                     </div>
                                                 </div>
@@ -138,7 +148,7 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                                 {/* button */}
                                                 {isSignedUp ? (
                                                     <Button
-                                                    className="px-1 py-1 text-xs"
+                                                        className="px-1 py-1 text-xs"
                                                         onClick={() => {
                                                             setSelectedTB(tb);
                                                             setAction("drop");
@@ -148,9 +158,9 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                                     </Button>
                                                 ) : (
                                                     <Button
-                                                    className="px-1 py-1 text-xs"
-
+                                                        className="px-1 py-1 text-xs"
                                                         onClick={() => {
+                                                            setVolunteerType(null);
                                                             setSelectedTB(tb);
                                                             setAction("signup");
                                                         }}
@@ -180,7 +190,6 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                 })}
             </div>
             <div className="hidden md:block mx-auto max-w-6xl px-4">
-                
                 {/* desktop view */}
                 {Object.entries(groupedByDate).map(([dateKey, blocks]) => {
                     const date = new Date(dateKey);
@@ -214,16 +223,34 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                 {blocks.map((tb) => {
                                     const tbWithTypes = tb as TBWithTypes;
 
+                                    const totalGeneralCapacity =
+                                        tb.volunteerGroups
+                                            .filter(
+                                                (g) =>
+                                                    g.name ===
+                                                    "General volunteer"
+                                            )
+                                            .reduce(
+                                                (sum, g) => sum + g.maxNum,
+                                                0
+                                            );
+
                                     const timeRange = `${formatTime(
                                         tb.startTime
                                     )}-${formatTime(tb.endTime)}`;
 
-                                    const isSignedUp =
-                                        tb.volunteerIDs.includes(currentUserID);
+                                    const isSignedUp = tb.volunteerGroups.some(
+                                        (group) =>
+                                            group.volunterIDs.includes(
+                                                currentUserID
+                                            )
+                                    );
 
-                                    const isFull =
-                                        tb.volunteerIDs.length >=
-                                        tb.maxVolunteers;
+                                    const isFull = tb.volunteerGroups.every(
+                                        (group) =>
+                                            group.volunterIDs.length >=
+                                            group.maxNum
+                                    );
 
                                     const type =
                                         tb.tasks.length > 0 &&
@@ -275,7 +302,9 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                                         </span>
                                                         <span>
                                                             {generalVolunteers}/
-                                                            {tb.maxVolunteers}{" "}
+                                                            {
+                                                                totalGeneralCapacity
+                                                            }{" "}
                                                             general volunteers
                                                         </span>
                                                     </div>
@@ -332,24 +361,36 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                 <ConfirmModal
                     title="Confirm Sign Up"
                     confirmLabel="Sign up"
-                    confirmDisabled={!volunteerType}
                     onCancel={() => {
                         setSelectedTB(null);
                         setAction(null);
                         setVolunteerType(null);
                     }}
                     onConfirm={() => {
-                        if (!selectedTB) return;
+                        if (!selectedTB || !volunteerType) return;
 
                         const updatedTB = {
                             ...selectedTB,
 
-                            volunteerIDs: selectedTB.volunteerIDs.includes(
-                                currentUserID
-                            )
-                                ? selectedTB.volunteerIDs
-                                : [...selectedTB.volunteerIDs, currentUserID],
-
+                            volunteerGroups: selectedTB.volunteerGroups.map(
+                                (group) => {
+                                    if (group.name === volunteerType) {
+                                        return {
+                                            ...group,
+                                            volunterIDs:
+                                                group.volunterIDs.includes(
+                                                    currentUserID
+                                                )
+                                                    ? group.volunterIDs
+                                                    : [
+                                                          ...group.volunterIDs,
+                                                          currentUserID,
+                                                      ],
+                                        };
+                                    }
+                                    return group;
+                                }
+                            ),
                             volunteerTypes: {
                                 ...((selectedTB as TBWithTypes)
                                     .volunteerTypes || {}),
@@ -411,8 +452,13 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                             ...selectedTB,
 
                             // remove from IDs
-                            volunteerIDs: selectedTB.volunteerIDs.filter(
-                                (id) => id !== currentUserID
+                            volunteerGroups: selectedTB.volunteerGroups.map(
+                                (group) => ({
+                                    ...group,
+                                    volunterIDs: group.volunterIDs.filter(
+                                        (id) => id !== currentUserID
+                                    ),
+                                })
                             ),
 
                             // remove from volunteerTypes too

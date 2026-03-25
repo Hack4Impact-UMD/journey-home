@@ -3,7 +3,6 @@
 import { ReactNode, useState } from "react";
 import { ProtectedRoute } from "@/components/general/ProtectedRoute";
 import SideNavbar from "@/components/general/SideNav";
-import TopNavbar from "@/components/general/TopNav";
 
 export default function VolunteerSignupLayout({
     children,
@@ -15,9 +14,6 @@ export default function VolunteerSignupLayout({
     return (
         <ProtectedRoute allow={["Volunteer", "Admin"]}>
             <div className="h-full w-full flex flex-col font-family-roboto">
-                {/* top navbar */}
-                <TopNavbar />
-
                 {/* main content */}
                 <div className="flex flex-1 relative">
 
