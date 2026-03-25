@@ -795,7 +795,7 @@ async function seedInventoryChanges(count: number) {
   const changes = await generateInventoryChanges(count);
 
   const writes = changes.map((change) =>
-    addDoc(collection(db, "warehouse-logs"), change)
+    addDoc(collection(db, "warehouseHistory"), change)
   );
 
   await Promise.all(writes);
