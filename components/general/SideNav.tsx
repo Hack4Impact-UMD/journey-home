@@ -16,6 +16,7 @@ export default function SideNavbar() {
     const auth = useAuth();
 
     return (
+        <>
         <div className="h-full w-[13em] flex flex-col font-family-roboto max-md:hidden">
             <Link href="/" className="pb-4">
                 <div className="border border-[#EFF3F5] px-4 py-3">
@@ -98,6 +99,10 @@ export default function SideNavbar() {
                 </div>
             </div>
         </div>
+        <div className="h-full w-">
+                 lalal                       
+        </div>
+        </>
     );
 }
 
