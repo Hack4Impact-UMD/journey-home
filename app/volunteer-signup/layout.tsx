@@ -12,7 +12,7 @@ export default function VolunteerSignupLayout({
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     return (
-        <ProtectedRoute allow={["Volunteer", "Admin"]}>
+        <ProtectedRoute allow={["Volunteer"]}>
             <div className="h-full w-full flex flex-col font-family-roboto">
                 {/* main content */}
                 <div className="flex flex-1 relative">

@@ -69,6 +69,11 @@ export default function SideNavbar() {
                     path="/control-panel"
                     roles={["Admin"]}
                 />
+                <SideNavbarLink
+                    name="Shifts"
+                    path="/volunteer-signup"
+                    roles={["Volunteer"]}
+                />
 
                 <SideNavbarLink
                     name="Donation Form"
