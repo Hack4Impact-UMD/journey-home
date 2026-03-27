@@ -5,14 +5,17 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { useDonationRequests } from "@/lib/queries/donation-requests";
+import { DonationRequest } from "@/types/donations";
 
 type DRDropdownProps<T extends string> = {
     options: T[];
     selected: T[];
     setSelected: React.Dispatch<React.SetStateAction<T[]>>;
+    donationRequest: DonationRequest
 };
 
-export function DRDropdown<T extends string>({ options, selected, setSelected }: DRDropdownProps<T>) {
+export function DRDropdown<T extends string>({ options, selected, setSelected, donationRequest}: DRDropdownProps<T>) {
 
     const value = selected[0];
     const colorClass =
@@ -21,6 +24,8 @@ export function DRDropdown<T extends string>({ options, selected, setSelected }:
             : value === "No"
             ? "bg-[#FBDED9] border-[#D7B7B1]"
             : "bg-white border-light-border";
+
+    const {setDonationRequest} = useDonationRequests()
 
     return (
         <>
@@ -45,6 +50,10 @@ export function DRDropdown<T extends string>({ options, selected, setSelected }:
                                 } else {
                                     setSelected(prev => prev.filter(x => x !== option));
                                 }
+
+                                setDonationRequest({
+                                    ...donationRequest, responded: option == "Yes",
+                                });
                             }}
                             onSelect={(event) => event.preventDefault()}
                         >

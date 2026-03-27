@@ -69,7 +69,9 @@ function DRTableRow({
         statusColor = "red";
     }
 
-    const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+    const [selectedOptions, setSelectedOptions] = useState<string[]>(
+        request.responded ? ["Yes"] : ["No"]
+    );
     
     const dropOptions = ["Yes", "No"]
 
@@ -105,6 +107,7 @@ function DRTableRow({
                 options={dropOptions} 
                 selected = {selectedOptions}
                 setSelected = {setSelectedOptions}
+                donationRequest = {request}
                 />
             </span>
             <div className="w-[10%] px-4 flex align-center">
