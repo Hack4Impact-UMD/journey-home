@@ -33,7 +33,7 @@ export function DRDropdown<T extends string>({ options, selected, setSelected }:
                         <DropdownIcon />
                     </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="rounded-sm font-family-roboto text-xs p-0">
+                <DropdownMenuContent className="rounded-sm font-family-roboto text-xs ">
                     {options.map(option => 
                         <DropdownMenuCheckboxItem
                             key={option}
