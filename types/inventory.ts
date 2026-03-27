@@ -21,8 +21,22 @@ export type InventoryRecord = {
 
 export type SortStatus = "asc" | "desc" | "none";
 
-export type CategoryAttributes = {
+export type InventoryCategory = {
+  id: string,
   name: string,
-  lowThreshold: number, // number separating yellow and red zone
-  highThreshold: number, // number separating green and yellow zone
+  quantity: number,
+  lowThreshold: number,
+  highThreshold: number,
+}
+
+export type CategoryQuantityChange = {
+  category: string,
+  oldQuantity: number,
+  newQuantity: number,
+}
+
+export type InventoryChange = {
+  userId: string,
+  timestamp: Timestamp,
+  changes: CategoryQuantityChange[],
 }

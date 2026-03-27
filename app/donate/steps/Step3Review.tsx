@@ -81,6 +81,7 @@ export default function Step3Review() {
             canDropOff: formState.canDropOff ?? false,
             notes: formState.notes ?? "",
             date: Timestamp.now(),
+            responded: false,
             items,
             associatedTimeBlockID: null // Placeholder for now, need to replace to create a Time Block
         };

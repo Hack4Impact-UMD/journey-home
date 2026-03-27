@@ -1,5 +1,3 @@
-import { permanentRedirect } from "next/navigation";
-
-export default function InventoryHome() {
-  permanentRedirect("/inventory/warehouse");
+export default function InventoryPage() {
+    return <></>;
 }
