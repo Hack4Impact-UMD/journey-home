@@ -783,7 +783,7 @@ async function generateInventoryChanges(count: number): Promise<InventoryChange[
     runningQty[cat.id] = reverted ? oldQuantity : newQuantity;
 
     return {
-        id: crypto.randomUUID(),
+      id: crypto.randomUUID(),
       userId: userIds[Math.floor(Math.random() * userIds.length)],
       timestamp: Timestamp.fromMillis(ts),
       change: { category: cat.name, oldQuantity, newQuantity },
@@ -802,9 +802,6 @@ async function seedInventoryChanges(count: number) {
   await Promise.all(writes);
   console.log(`Seeded ${count} inventory changes`);
 }
-
-// Call it
-
 
 const desc = [
     "New: This item is brand new and has never been used. It comes in its original packaging and is ready for immediate use.",
@@ -1385,6 +1382,7 @@ export default function page() {
                         for (let i = 0; i < 5; i++) await addDonationRequests(true);
                         for (let i = 0; i < 20; i++) await addDonationRequests(false);
                         await addCaseManagerRequests(7);
+                        await seedInventoryChanges(50);
                     })();
                     toast.promise(promise, {
                         loading: "Seeding all test data...",
