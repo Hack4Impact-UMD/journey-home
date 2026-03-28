@@ -4,7 +4,7 @@ import { createDonationRequest } from "@/lib/services/donations";
 import { setInventoryCategory, uploadImage } from "@/lib/services/inventory";
 import { DonationItem, DonationRequest } from "@/types/donations";
 import { InventoryCategory, InventoryChange, InventoryPhoto } from "@/types/inventory";
-import { addDoc, query, Timestamp, where } from "@firebase/firestore";
+import { query, Timestamp, where } from "@firebase/firestore";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { LocationContact } from "@/types/general";
@@ -796,7 +796,7 @@ async function seedInventoryChanges(count: number) {
   const changes = await generateInventoryChanges(count);
 
   const writes = changes.map((change) =>
-    addDoc(collection(db, "warehouseHistory"), change)
+    setDoc(doc(db, "warehouseHistory", change.id), change)
   );
 
   await Promise.all(writes);
