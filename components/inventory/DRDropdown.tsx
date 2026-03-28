@@ -45,11 +45,8 @@ export function DRDropdown<T extends string>({ options, selected, setSelected, d
                             className="text-xs cursor-pointer"
                             checked={selected.includes(option) }
                             onCheckedChange={checked => {
-                                if(checked) {
-                                    setSelected([option]);
-                                } else {
-                                    setSelected(prev => prev.filter(x => x !== option));
-                                }
+                                if (!checked) return;
+                                setSelected([option]);
 
                                 setDonationRequest({
                                     ...donationRequest, responded: option == "Yes",

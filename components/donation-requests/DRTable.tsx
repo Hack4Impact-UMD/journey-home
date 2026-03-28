@@ -3,7 +3,7 @@ import { Badge } from "../inventory/Badge";
 import { ViewIcon } from "../icons/ViewIcon";
 import { TrashIcon } from "../icons/TrashIcon";
 import { DRDropdown } from "../inventory/DRDropdown";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function DRTable({
     donationRequests,
@@ -72,6 +72,10 @@ function DRTableRow({
     const [selectedOptions, setSelectedOptions] = useState<string[]>(
         request.responded ? ["Yes"] : ["No"]
     );
+
+    useEffect(()=> {
+        setSelectedOptions(request.responded ?["Yes"]:["No"]);
+    }, [request.responded])
     
     const dropOptions = ["Yes", "No"]
 
