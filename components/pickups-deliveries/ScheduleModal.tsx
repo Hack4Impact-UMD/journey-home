@@ -237,7 +237,7 @@ export default function ScheduleModal({
                     </div>
 
                     <div className="px-6 py-2 bg-[#FBFCFD] shadow-[0_-2px_6px_rgba(0,0,0,0.08)] flex justify-end">
-                        <button onClick={onClose} className="border-light-border border rounded-xs px-4 py">
+                        <button onClick={onClose} className="border-light-border border rounded-xs px-4">
                             Done
                         </button>
                     </div>
