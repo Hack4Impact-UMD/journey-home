@@ -76,8 +76,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return (await logout())
   }
 
+  async function _refreshUser(): Promise<void> {
+    const user = auth.currentUser;
+    if (!user) return;
+    const foundUser = await getUserByUID(user.uid);
+    setAuthState({
+      currentUser: user,
+      userData: foundUser,
+      loading: false,
+    });
+  }
+
   return (
-    <AuthContext.Provider value={{ state: authState, signup: _signup, login: _login, logout: _logout }}>
+    <AuthContext.Provider value={{ state: authState, signup: _signup, login: _login, logout: _logout, refreshUser: _refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
