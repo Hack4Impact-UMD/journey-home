@@ -126,7 +126,7 @@ export default function WarehouseHistoryPage() {
                     <WarehouseHistoryTable
                         changes={filtered}
                         onRevert={(change) => revert({ change, actor })}
-                        isReverting={isReverting}
+                        isReverting={isReverting || !actor}
                     />
                 </div>
             )}

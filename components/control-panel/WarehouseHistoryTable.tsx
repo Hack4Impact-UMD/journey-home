@@ -30,6 +30,7 @@ function buildRevertMessage(change: WarehouseChange): string {
 
 export function WarehouseHistoryTable({ changes, onRevert, isReverting }: WarehouseHistoryTableProps) {
     const [pendingRevert, setPendingRevert] = useState<WarehouseChange | null>(null);
+    const [isConfirming, setIsConfirming] = useState(false);
 
     return (
         <>
@@ -38,12 +39,17 @@ export function WarehouseHistoryTable({ changes, onRevert, isReverting }: Wareho
                     title="Revert this change?"
                     message={buildRevertMessage(pendingRevert)}
                     confirmLabel="Revert"
+                    disabled={isConfirming}
                     onConfirm={async () => {
+                        if (isConfirming) return;
+                        setIsConfirming(true);
                         try {
                             await onRevert(pendingRevert);
                             setPendingRevert(null);
                         } catch {
                             // modal stays open; mutation's onError shows toast
+                        } finally {
+                            setIsConfirming(false);
                         }
                     }}
                     onCancel={() => setPendingRevert(null)}
@@ -74,9 +80,9 @@ function buildDescription(change: WarehouseChange): string {
     const abs = Math.abs(changeAmount);
     switch (changeType) {
         case "Add":
-            return `added ${abs} to ${amountBefore} ${itemName}s. ${amountAfter} ${itemName}s remaining.`;
+            return `added ${abs} ${itemName} (was ${amountBefore}, now ${amountAfter}).`;
         case "Remove":
-            return `removed ${abs} of ${amountBefore} ${itemName}s. ${amountAfter} ${itemName}s remaining.`;
+            return `removed ${abs} ${itemName} (was ${amountBefore}, now ${amountAfter}).`;
         case "Create":
             return `created ${itemName} with ${amountAfter} in stock.`;
         case "Delete":
