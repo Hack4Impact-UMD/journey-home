@@ -49,10 +49,9 @@ export function DRDropdown<T extends string>({ options, selected, setSelected, d
                                 setSelected([option]);
 
                                 setDonationRequest({
-                                    ...donationRequest, responded: option == "Yes",
+                                    ...donationRequest, responded: option === "Yes",
                                 });
                             }}
-                            onSelect={(event) => event.preventDefault()}
                         >
                             {option}
                         </DropdownMenuCheckboxItem>
