@@ -10,6 +10,24 @@ type WarehouseHistoryTableProps = {
     isReverting: boolean;
 };
 
+function buildRevertMessage(change: WarehouseChange): string {
+    const { changeType, itemName, changeAmount, amountBefore, amountAfter } = change;
+    const abs = Math.abs(changeAmount);
+    const item = itemName.toLowerCase();
+    switch (changeType) {
+        case "Add":
+            return `${abs} ${item}${abs !== 1 ? "s" : ""} will be removed back to the ${amountBefore} in inventory. The amount of ${item}s will be set to ${amountBefore}.`;
+        case "Remove":
+            return `${abs} ${item}${abs !== 1 ? "s" : ""} will be added back to the ${amountBefore} in inventory. The amount of ${item}s will be set to ${amountBefore}.`;
+        case "Set":
+            return `${itemName} will be reverted from ${amountAfter} back to ${amountBefore}.`;
+        case "Create":
+            return `${itemName} will be removed from inventory.`;
+        default:
+            return `This change to ${itemName} will be reverted.`;
+    }
+}
+
 export function WarehouseHistoryTable({ changes, onRevert, isReverting }: WarehouseHistoryTableProps) {
     const [pendingRevert, setPendingRevert] = useState<WarehouseChange | null>(null);
 
@@ -17,13 +35,16 @@ export function WarehouseHistoryTable({ changes, onRevert, isReverting }: Wareho
         <>
             {pendingRevert && (
                 <ConfirmModal
-                    title="Revert Change"
-                    message={`Are you sure you want to revert the "${pendingRevert.changeType}" change on "${pendingRevert.itemName}"? This will restore the quantity from ${pendingRevert.amountAfter} back to ${pendingRevert.amountBefore}.`}
+                    title="Revert this change?"
+                    message={buildRevertMessage(pendingRevert)}
                     confirmLabel="Revert"
-                    danger
                     onConfirm={async () => {
-                        await onRevert(pendingRevert);
-                        setPendingRevert(null);
+                        try {
+                            await onRevert(pendingRevert);
+                            setPendingRevert(null);
+                        } catch {
+                            // modal stays open; mutation's onError shows toast
+                        }
                     }}
                     onCancel={() => setPendingRevert(null)}
                 />

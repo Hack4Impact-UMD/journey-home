@@ -3,23 +3,29 @@
 import { useState } from "react";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { SortOption } from "@/components/inventory/SortOption";
+import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
 import { WarehouseHistoryTable } from "@/components/control-panel/WarehouseHistoryTable";
 import { useWarehouseHistory } from "@/lib/queries/changelog";
 import { useAuth } from "@/contexts/AuthContext";
 import { SortStatus } from "@/types/inventory";
-import { WarehouseChange } from "@/types/changelog";
+import { InventoryChangeType, WarehouseChange } from "@/types/changelog";
+
+const ALL_CHANGE_TYPES: InventoryChangeType[] = ["Add", "Remove", "Create", "Delete", "Set"];
 
 export default function WarehouseHistoryPage() {
     const { state: { userData } } = useAuth();
     const actor = userData ? { userId: userData.uid, userEmail: userData.email } : undefined;
 
     const [searchQuery, setSearchQuery] = useState("");
-    const [sortStatus, setSortStatus] = useState<SortStatus>("desc");
+    const [dateSortStatus, setDateSortStatus] = useState<SortStatus>("desc");
+    const [timeSortStatus, setTimeSortStatus] = useState<SortStatus>("none");
+    const [selectedChangeTypes, setSelectedChangeTypes] = useState<InventoryChangeType[]>([...ALL_CHANGE_TYPES]);
 
     const { changes, isLoading, isError, revert, isReverting } = useWarehouseHistory();
 
     const filtered = changes
         .filter((c: WarehouseChange) => {
+            if (selectedChangeTypes.length > 0 && !selectedChangeTypes.includes(c.changeType)) return false;
             if (!searchQuery) return true;
             const q = searchQuery.toLowerCase();
             return (
@@ -29,24 +35,32 @@ export default function WarehouseHistoryPage() {
             );
         })
         .sort((a, b) => {
+            // time sort takes priority if active, otherwise date sort
+            const activeSort = timeSortStatus !== "none" ? timeSortStatus : dateSortStatus;
             const diff = a.timestamp.seconds - b.timestamp.seconds;
-            return sortStatus === "asc" ? diff : -diff;
+            return activeSort === "asc" ? diff : -diff;
         });
 
     function handleExport() {
         if (filtered.length === 0) return;
+        const escapeCsv = (value: unknown) => {
+            let s = String(value ?? "");
+            if (/^[=+\-@]/.test(s)) s = `'${s}`;
+            s = s.replace(/"/g, '""');
+            return /[",\n]/.test(s) ? `"${s}"` : s;
+        };
         const headers = ["Date", "Time", "Change Type", "Item", "Change Amount", "Before", "After", "User"];
         const rows = filtered.map((c) => {
             const d = new Date(c.timestamp.seconds * 1000);
             return [
-                d.toLocaleDateString("en-US"),
-                d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
-                c.changeType,
-                c.itemName,
-                c.changeAmount,
-                c.amountBefore,
-                c.amountAfter,
-                c.userEmail,
+                escapeCsv(d.toLocaleDateString()),
+                escapeCsv(d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })),
+                escapeCsv(c.changeType),
+                escapeCsv(c.itemName),
+                escapeCsv(c.changeAmount),
+                escapeCsv(c.amountBefore),
+                escapeCsv(c.amountAfter),
+                escapeCsv(c.userEmail),
             ].join(",");
         });
         const csv = [headers.join(","), ...rows].join("\n");
@@ -62,17 +76,30 @@ export default function WarehouseHistoryPage() {
     return (
         <>
             <div className="flex gap-3 mb-4 shrink-0 items-center">
-                <SearchBox
-                    value={searchQuery}
-                    onChange={setSearchQuery}
-                    onSubmit={() => {}}
-                />
+                <div className="flex-1">
+                    <SearchBox
+                        value={searchQuery}
+                        onChange={setSearchQuery}
+                        onSubmit={() => {}}
+                    />
+                </div>
                 <SortOption
                     label="Date"
-                    status={sortStatus}
-                    onChange={setSortStatus}
+                    status={dateSortStatus}
+                    onChange={(s) => { setDateSortStatus(s); setTimeSortStatus("none"); }}
                 />
-                <div className="ml-auto">
+                <SortOption
+                    label="Time"
+                    status={timeSortStatus}
+                    onChange={(s) => { setTimeSortStatus(s); setDateSortStatus("none"); }}
+                />
+                <DropdownMultiselect
+                    label="Change"
+                    options={ALL_CHANGE_TYPES}
+                    selected={selectedChangeTypes}
+                    setSelected={setSelectedChangeTypes}
+                />
+                <div>
                     <button
                         onClick={handleExport}
                         disabled={filtered.length === 0}
