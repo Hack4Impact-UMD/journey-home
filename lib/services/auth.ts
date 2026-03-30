@@ -4,6 +4,7 @@ import {
     signInWithEmailAndPassword,
     signOut,
     User,
+    sendEmailVerification,
 } from "firebase/auth";
 import { auth } from "../firebase";
 import { Timestamp } from "firebase/firestore";
@@ -15,6 +16,8 @@ export async function signUp(
     password: string,
     firstName: string,
     lastName: string,
+    phone: string,
+    phoneExtension: string,
     dob: string,
     role: UserRole
 ): Promise<User> {
@@ -30,6 +33,8 @@ export async function signUp(
         firstName,
         lastName,
         email: user.email!,
+        ...(phone && { phone }),
+        ...(phoneExtension && { phoneExtension }),
         dob: dob ? Timestamp.fromDate(new Date(dob)) : null,
         role: "Volunteer",
         pending: (role == "Volunteer") ? null : role,
@@ -37,6 +42,13 @@ export async function signUp(
     };
 
     await createUserInDB(userRecord);
+
+    // Send verification email (don't fail signup if this fails)
+    try {
+        await sendEmailVerification(user);
+    } catch (error) {
+        console.error("Failed to send verification email:", error);
+    }
 
     return user;
 }
@@ -54,4 +66,8 @@ export async function login(email: string, password: string): Promise<User> {
 
 export async function logout(): Promise<void> {
     await signOut(auth);
+}
+
+export async function resendVerificationEmail(user: User): Promise<void> {
+    await sendEmailVerification(user);
 }
