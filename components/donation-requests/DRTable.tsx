@@ -2,7 +2,7 @@ import { DonationRequest } from "@/types/donations";
 import { Badge } from "../inventory/Badge";
 import { ViewIcon } from "../icons/ViewIcon";
 import { TrashIcon } from "../icons/TrashIcon";
-import { DRDropdown } from "../inventory/DRDropdown";
+import { DRDropdown } from "./DRDropdown";
 import { useEffect, useState } from "react";
 
 export function DRTable({
