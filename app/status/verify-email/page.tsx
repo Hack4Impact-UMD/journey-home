@@ -6,7 +6,7 @@ import { resendVerificationEmail } from '@/lib/services/auth';
 import { updateEmailVerificationStatus } from '@/lib/services/users';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/lib/firebase';
-import MobileTopBar from '@/components/auth/MobileTopBar';
+import AuthMobileNavbar from '@/components/auth/AuthMobileNavbar';
 import { Spinner } from '@/components/ui/spinner';
 
 export default function VerifyEmailPage() {
@@ -103,7 +103,7 @@ export default function VerifyEmailPage() {
 
   return (
     <div className="bg-background flex flex-col h-screen overflow-hidden">
-      <MobileTopBar />
+      <AuthMobileNavbar />
 
       <div className="flex flex-1 overflow-hidden">
         {/* Left side - background image, desktop only */}

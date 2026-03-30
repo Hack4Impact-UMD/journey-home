@@ -2,7 +2,7 @@
 
 import { ProtectedRoute } from "@/components/general/ProtectedRoute";
 import { useRouter } from "next/navigation";
-import MobileTopBar from "@/components/auth/MobileTopBar";
+import AuthMobileNavbar from "@/components/auth/AuthMobileNavbar";
 
 export default function AccountCreated() {
   const router = useRouter();
@@ -10,7 +10,7 @@ export default function AccountCreated() {
   return (
     <ProtectedRoute allow={["Admin", "Case Manager", "Volunteer"]}>
       <div className="bg-background flex flex-col h-full overflow-hidden">
-        <MobileTopBar />
+        <AuthMobileNavbar />
         
         <div className="flex flex-1 overflow-hidden">
           {/* Left side - background image */}

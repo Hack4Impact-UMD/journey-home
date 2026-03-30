@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import MobileTopBar from "@/components/auth/MobileTopBar";
+import AuthMobileNavbar from "@/components/auth/AuthMobileNavbar";
 
 export default function AccountPending() {
     const auth = useAuth();
@@ -15,7 +15,7 @@ export default function AccountPending() {
 
     return (
         <div className="bg-background flex flex-col h-full overflow-hidden">
-            <MobileTopBar />
+            <AuthMobileNavbar />
             
             <div className="flex flex-1 overflow-hidden">
                 {/* Left side - background image */}

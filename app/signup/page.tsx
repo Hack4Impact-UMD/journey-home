@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import PickRole from "./PickRole";
 import SignUpInformation from "./SignUpInformation";
 import { UserRole } from "@/types/user";
-import MobileTopBar from "@/components/auth/MobileTopBar";
+import AuthMobileNavbar from "@/components/auth/AuthMobileNavbar";
 
 type Step = "pick" | "form";
 
@@ -15,7 +15,7 @@ export default function SignUpPage() {
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
-      <MobileTopBar />
+      <AuthMobileNavbar onBack={step === "pick" ? () => router.push("/login") : () => setStep("pick")} />
 
       <div className="flex flex-1 overflow-hidden">
         <div className="hidden md:flex h-full max-w-[30em] overflow-hidden justify-center items-center">
