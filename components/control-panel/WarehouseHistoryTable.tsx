@@ -1,17 +1,17 @@
 "use client";
 
-import { InventoryChange } from "@/types/inventory";
+import { WarehouseChange } from "@/types/changelog";
 import { useState } from "react";
 import { ConfirmModal } from "./ConfirmModal";
 
 type WarehouseHistoryTableProps = {
-    changes: InventoryChange[];
-    onRevert: (change: InventoryChange) => Promise<void>;
+    changes: WarehouseChange[];
+    onRevert: (change: WarehouseChange) => Promise<void>;
     isReverting: boolean;
 };
 
 export function WarehouseHistoryTable({ changes, onRevert, isReverting }: WarehouseHistoryTableProps) {
-    const [pendingRevert, setPendingRevert] = useState<InventoryChange | null>(null);
+    const [pendingRevert, setPendingRevert] = useState<WarehouseChange | null>(null);
 
     return (
         <>
@@ -48,7 +48,7 @@ export function WarehouseHistoryTable({ changes, onRevert, isReverting }: Wareho
     );
 }
 
-function buildDescription(change: InventoryChange): string {
+function buildDescription(change: WarehouseChange): string {
     const { changeType, itemName, changeAmount, amountBefore, amountAfter } = change;
     const abs = Math.abs(changeAmount);
     switch (changeType) {
@@ -72,7 +72,7 @@ function WarehouseHistoryRow({
     onRevert,
     isReverting,
 }: {
-    change: InventoryChange;
+    change: WarehouseChange;
     onRevert: () => void;
     isReverting: boolean;
 }) {

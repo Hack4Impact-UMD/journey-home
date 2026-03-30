@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { InventoryChange } from "@/types/inventory";
+import { WarehouseChange } from "@/types/changelog";
 import { getWarehouseHistory, setWarehouseChange } from "../services/warehouseHistory";
 import { setInventoryRecord, getInventoryRecord } from "../services/inventory";
 import { Timestamp } from "firebase/firestore";
@@ -15,12 +15,12 @@ export function useWarehouseHistory(startDate?: Date, endDate?: Date) {
         queryFn: () => getWarehouseHistory(startDate, endDate),
     });
 
-    const revertMutation = useMutation({
+    const setMutation = useMutation({
         mutationFn: async ({
             change,
             actor,
         }: {
-            change: InventoryChange;
+            change: WarehouseChange;
             actor?: { userId: string; userEmail: string };
         }) => {
             const item = await getInventoryRecord(change.itemId);
@@ -30,7 +30,7 @@ export function useWarehouseHistory(startDate?: Date, endDate?: Date) {
             const success = await setInventoryRecord(reverted);
             if (!success) throw new Error("Failed to update inventory during revert");
 
-            const revertEntry: InventoryChange = {
+            const revertEntry: WarehouseChange = {
                 id: crypto.randomUUID(),
                 itemId: change.itemId,
                 itemName: change.itemName,
@@ -59,7 +59,7 @@ export function useWarehouseHistory(startDate?: Date, endDate?: Date) {
         isError: query.isError,
         error: query.error,
         refetch: query.refetch,
-        revert: revertMutation.mutateAsync,
-        isReverting: revertMutation.isPending,
+        revert: setMutation.mutateAsync,
+        isReverting: setMutation.isPending,
     };
 }

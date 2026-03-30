@@ -1,52 +1,37 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { SortOption } from "@/components/inventory/SortOption";
-import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
 import { WarehouseHistoryTable } from "@/components/control-panel/WarehouseHistoryTable";
 import { useWarehouseHistory } from "@/lib/queries/changelog";
 import { useAuth } from "@/contexts/AuthContext";
-import { InventoryChange, InventoryChangeType, SortStatus } from "@/types/inventory";
-
-const CHANGE_TYPES: InventoryChangeType[] = ["Create", "Set", "Add", "Remove", "Delete"];
-
-function getMillis(t: { seconds: number; nanoseconds: number; toMillis?: () => number }) {
-    return t.toMillis?.() ?? (t.seconds * 1000 + t.nanoseconds / 1e6);
-}
+import { SortStatus } from "@/types/inventory";
+import { WarehouseChange } from "@/types/changelog";
 
 export default function WarehouseHistoryPage() {
     const { state: { userData } } = useAuth();
     const actor = userData ? { userId: userData.uid, userEmail: userData.email } : undefined;
 
     const [searchQuery, setSearchQuery] = useState("");
-    const [appliedSearch, setAppliedSearch] = useState("");
-    const [selectedTypes, setSelectedTypes] = useState<InventoryChangeType[]>([...CHANGE_TYPES]);
-    const [dateSortStatus, setDateSortStatus] = useState<SortStatus>("desc");
-    const [timeSortStatus, setTimeSortStatus] = useState<SortStatus>("none");
+    const [sortStatus, setSortStatus] = useState<SortStatus>("desc");
 
     const { changes, isLoading, isError, revert, isReverting } = useWarehouseHistory();
 
-    const filtered = useMemo(() => {
-        let result = changes.filter((c: InventoryChange) => {
-            const matchesSearch =
-                !appliedSearch ||
-                c.itemName.toLowerCase().includes(appliedSearch.toLowerCase()) ||
-                c.userEmail.toLowerCase().includes(appliedSearch.toLowerCase()) ||
-                c.changeType.toLowerCase().includes(appliedSearch.toLowerCase());
-            return matchesSearch && selectedTypes.includes(c.changeType);
+    const filtered = changes
+        .filter((c: WarehouseChange) => {
+            if (!searchQuery) return true;
+            const q = searchQuery.toLowerCase();
+            return (
+                c.itemName.toLowerCase().includes(q) ||
+                c.userEmail.toLowerCase().includes(q) ||
+                c.changeType.toLowerCase().includes(q)
+            );
+        })
+        .sort((a, b) => {
+            const diff = a.timestamp.seconds - b.timestamp.seconds;
+            return sortStatus === "asc" ? diff : -diff;
         });
-
-        const activeSortStatus = dateSortStatus !== "none" ? dateSortStatus : timeSortStatus;
-        if (activeSortStatus !== "none") {
-            result = [...result].sort((a, b) => {
-                const diff = getMillis(a.timestamp) - getMillis(b.timestamp);
-                return activeSortStatus === "asc" ? diff : -diff;
-            });
-        }
-
-        return result;
-    }, [changes, appliedSearch, selectedTypes, dateSortStatus, timeSortStatus]);
 
     function handleExport() {
         if (filtered.length === 0) return;
@@ -76,36 +61,16 @@ export default function WarehouseHistoryPage() {
 
     return (
         <>
-            <div className="flex flex-wrap gap-3 mb-4 shrink-0 items-center">
+            <div className="flex gap-3 mb-4 shrink-0 items-center">
                 <SearchBox
                     value={searchQuery}
-                    onChange={(val) => {
-                        setSearchQuery(val);
-                        if (val === "") setAppliedSearch("");
-                    }}
-                    onSubmit={() => setAppliedSearch(searchQuery)}
+                    onChange={setSearchQuery}
+                    onSubmit={() => {}}
                 />
                 <SortOption
                     label="Date"
-                    status={dateSortStatus}
-                    onChange={(s) => {
-                        setDateSortStatus(s);
-                        setTimeSortStatus("none");
-                    }}
-                />
-                <SortOption
-                    label="Time"
-                    status={timeSortStatus}
-                    onChange={(s) => {
-                        setTimeSortStatus(s);
-                        setDateSortStatus("none");
-                    }}
-                />
-                <DropdownMultiselect
-                    label="Change"
-                    options={CHANGE_TYPES}
-                    selected={selectedTypes}
-                    setSelected={setSelectedTypes}
+                    status={sortStatus}
+                    onChange={setSortStatus}
                 />
                 <div className="ml-auto">
                     <button

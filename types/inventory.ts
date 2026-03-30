@@ -29,23 +29,3 @@ export type InventoryCategory = {
   highThreshold: number,
 }
 
-export type CategoryAttributes = {
-  name: string,
-  lowThreshold: number, // number separating yellow and red zone
-  highThreshold: number, // number separating green and yellow zone
-}
-
-export type InventoryChangeType = "Set" | "Add" | "Remove" | "Delete" | "Create";
-
-export type InventoryChange = {
-  id: string,
-  itemId: string,
-  itemName: string,
-  changeType: InventoryChangeType,
-  changeAmount: number,
-  amountBefore: number,
-  amountAfter: number,
-  timestamp: Timestamp,
-  userId: string,
-  userEmail: string,
-};

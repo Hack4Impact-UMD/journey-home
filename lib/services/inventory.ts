@@ -1,4 +1,5 @@
-import { InventoryCategory, InventoryChange, InventoryRecord } from "@/types/inventory";
+import { InventoryCategory, InventoryRecord } from "@/types/inventory";
+import { WarehouseChange } from "@/types/changelog";
 
 import { db, storage } from "../firebase";
 import {
@@ -54,7 +55,7 @@ export async function setInventoryRecord(
         await setDoc(docRef, record);
 
         if (actor) {
-            const change: InventoryChange = {
+            const change: WarehouseChange = {
                 id: crypto.randomUUID(),
                 itemId: record.id,
                 itemName: record.name,
@@ -87,7 +88,7 @@ export async function deleteInventoryRecord(
 
         if (actor && prevSnap.exists()) {
             const record = prevSnap.data() as InventoryRecord;
-            const change: InventoryChange = {
+            const change: WarehouseChange = {
                 id: crypto.randomUUID(),
                 itemId: id,
                 itemName: record.name,

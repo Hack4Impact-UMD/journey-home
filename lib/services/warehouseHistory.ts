@@ -1,4 +1,4 @@
-import { InventoryChange } from "@/types/inventory";
+import { WarehouseChange } from "@/types/changelog";
 import { db } from "../firebase";
 import {
     collection,
@@ -18,7 +18,7 @@ export const WAREHOUSE_HISTORY_COLLECTION = "warehouseHistory";
 export async function getWarehouseHistory(
     startDate?: Date,
     endDate?: Date
-): Promise<InventoryChange[]> {
+): Promise<WarehouseChange[]> {
     const col = collection(db, WAREHOUSE_HISTORY_COLLECTION);
 
     let q;
@@ -41,15 +41,15 @@ export async function getWarehouseHistory(
         .map((d) => {
             const data = d.data();
             if (!data.id || !data.itemId || !data.timestamp) return null;
-            return data as InventoryChange;
+            return data as WarehouseChange;
         })
-        .filter((entry): entry is InventoryChange => entry !== null);
+        .filter((entry): entry is WarehouseChange => entry !== null);
 }
 
 /**
  * Write or update a single warehouse change entry.
  */
-export async function setWarehouseChange(change: InventoryChange): Promise<void> {
+export async function setWarehouseChange(change: WarehouseChange): Promise<void> {
     const docRef = doc(db, WAREHOUSE_HISTORY_COLLECTION, change.id);
     await setDoc(docRef, change);
 }
