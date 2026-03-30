@@ -86,3 +86,14 @@ export const deleteUser = async (uid: string) => {
   const userRef = doc(db, "users", uid);
   await deleteDoc(userRef);
 };
+
+/**
+ * Update user's email verification status
+ */
+export const updateEmailVerificationStatus = async (
+  uid: string,
+  emailVerified: boolean
+) => {
+  const userRef = doc(db, "users", uid);
+  await updateDoc(userRef, { emailVerified });
+};
