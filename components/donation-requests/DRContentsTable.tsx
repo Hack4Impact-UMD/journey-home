@@ -11,7 +11,7 @@ export function DRContentsTable({
     openItem: (item: DonationItem) => void;
 }) {
     return (
-        <div className="w-full min-w-4xl h-full flex flex-col">
+        <div className="w-full min-w-4xl flex flex-col">
             <div className="h-12 bg-[#FAFAFB] border-light-border border flex items-center font-family-roboto font-bold text-sm text-text-1 shrink-0">
                 <span className="w-[25%] border-l-2 border-light-border px-4">
                     Name
@@ -35,7 +35,7 @@ export function DRContentsTable({
                     Actions
                 </span>
             </div>
-            <div className="flex-1 overflow-auto min-h-0">
+            <div>
                 {request.items.map((item) => (
                     <DRContentsTableRow item={item} key={item.item.id+request.id} onOpen={() => openItem(item)}/>
                 ))}
