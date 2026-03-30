@@ -4,15 +4,15 @@ import { InventoryCategory } from "@/types/inventory";
 import { BoxIcon } from "lucide-react";
 
 function getStockColor(quantity: number, low: number, high: number): string {
-    if (quantity <= low) return "#E05252";
-    if (quantity >= high) return "#3DBB6A";
-    return "#F0B429";
+    if (quantity <= low) return "#E16060";
+    if (quantity >= high) return "#208A1E";
+    return "#FBCF0B";
 }
 
 function getStockBg(quantity: number, low: number, high: number): string {
     if (quantity <= low) return "#FFF5F5";
-    if (quantity >= high) return "#F0FFF4";
-    return "#FFFDF0";
+    if (quantity >= high) return "#F8FFF8";
+    return "#FFFCEF";
 }
 
 function DialArc({ quantity, low, high }: { quantity: number; low: number; high: number }) {
@@ -23,10 +23,7 @@ function DialArc({ quantity, low, high }: { quantity: number; low: number; high:
     const cx = size / 2;
     const cy = size / 2;
 
-    // Rotated 90deg clockwise from previous: opens at the left side
-    // 225deg to 495deg (270deg sweep), opening gap on the left
     const startAngle = 225;
-    const endAngle = 495; // = 135deg, sweep of 270deg
     const totalAngle = 270;
 
     const maxVal = Math.max(high * 1.5, quantity + 1);
@@ -47,15 +44,13 @@ function DialArc({ quantity, low, high }: { quantity: number; low: number; high:
 
     return (
         <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-            {/* Background track */}
             <path
-                d={arcPath(startAngle, endAngle)}
+                d={arcPath(startAngle, startAngle + totalAngle)}
                 fill="none"
                 stroke="#E5E7EB"
                 strokeWidth={strokeWidth}
                 strokeLinecap="round"
             />
-            {/* Filled portion */}
             {quantity > 0 && (
                 <path
                     d={arcPath(startAngle, startAngle + fillAngle)}
@@ -76,7 +71,7 @@ export function ItemDial({ category }: { category: InventoryCategory }) {
 
     return (
         <div
-            className="rounded-2xl border border-light-border shadow-sm flex flex-col items-center justify-center pt-4 pb-5 px-4 w-[22%] min-w-[180px] cursor-default select-none"
+            className="rounded-2xl border border-light-border shadow-sm flex flex-col items-center justify-center pt-4 pb-5 px-4 w-full min-w-0 cursor-default select-none"
             style={{ backgroundColor: bg }}
         >
             <div className="relative flex items-center justify-center">

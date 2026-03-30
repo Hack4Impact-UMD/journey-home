@@ -13,7 +13,7 @@ export function CategoryDialsGrid({ categories }: { categories: InventoryCategor
     }
 
     return (
-        <div className="w-full h-full grid grid-cols-4 gap-4 content-start">
+        <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(180px,1fr))]">
             {categories.map((category) => (
                 <ItemDial key={category.id} category={category} />
             ))}
