@@ -71,7 +71,7 @@ export function ItemDial({ category }: { category: InventoryCategory }) {
 
     return (
         <div
-            className="rounded-2xl border border-light-border shadow-sm flex flex-col items-center justify-center pt-4 pb-5 px-4 w-full min-w-0 cursor-default select-none"
+            className="rounded-2xl border border-light-border shadow-sm flex flex-col items-center justify-center pt-4 pb-5 px-4 w-full max-w-[240px] mx-auto cursor-default select-none"
             style={{ backgroundColor: bg }}
         >
             <div className="relative flex items-center justify-center">
