@@ -69,6 +69,9 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                             currentUserID
                                         )
                                 );
+                                    const isFull = tb.volunteerGroups.every(
+                                            (group) => group.volunterIDs.length >= group.maxNum
+                                        );
 
                                 const type = tb.type;
 
@@ -123,6 +126,7 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                                     <Button
                                                         className="px-1 py-1 text-xs"
                                                         onClick={() => {
+                                                            if (isFull) return;
                                                             setSelectedTB(tb);
                                                             setAction("signup");
                                                             setSelectedGroup(null); 
