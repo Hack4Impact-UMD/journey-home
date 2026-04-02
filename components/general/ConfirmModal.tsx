@@ -5,7 +5,6 @@ import { createPortal } from "react-dom";
 import Button from "@/components/form/Button";
 
 type ConfirmModalProps = {
-    title: string;
     confirmLabel: string;
     onConfirm: () => void;
     onCancel: () => void;
@@ -13,7 +12,6 @@ type ConfirmModalProps = {
 };
 
 export default function ConfirmModal({
-    title,
     confirmLabel,
     onConfirm,
     onCancel,
@@ -33,16 +31,13 @@ export default function ConfirmModal({
             onClick={onCancel}
         >
             <div
-                className="bg-white rounded-2xl shadow-lg w-full max-w-md p-8"
+                className="bg-white rounded-2xl shadow-lg w-full max-w-sm p-8"
                 onClick={(e) => e.stopPropagation()}
             >
-                <h2 className="text-xl font-semibold text-gray-800 mb-6">
-                    {title}
-                </h2>
-
                 <div className="mb-6">{children}</div>
 
-                <Button onClick={onConfirm} className="w-full py-3 text-lg">
+                <Button onClick={onConfirm}     
+                    className="w-full text-lg text-white bg-primary flex items-center justify-center">
                     {confirmLabel}
                 </Button>
             </div>

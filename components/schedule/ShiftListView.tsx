@@ -7,10 +7,6 @@ import ConfirmModal from "@/components/general/ConfirmModal";
 import Button from "@/components/form/Button";
 import { useTimeBlocks } from "@/lib/queries/timeblocks";
 
-type TBWithTypes = TimeBlock & {
-    volunteerTypes?: Record<string, "Lead driver" | "General volunteer">;
-};
-
 type Props = {
     timeBlocks: TimeBlock[];
     currentUserID: string;
@@ -20,12 +16,8 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
     const [selectedTB, setSelectedTB] = useState<TimeBlock | null>(null);
     const [action, setAction] = useState<"signup" | "drop" | null>(null);
     const { setTimeblockToast } = useTimeBlocks();
+    const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
 
-    const [volunteerType, setVolunteerType] = useState<
-        "Lead driver" | "General volunteer" | null
-    >(null);
-
-    // formatting time
     const formatTime = (timestamp: Timestamp) => {
         const date = timestamp.toDate();
         const hours = date.getHours();
@@ -34,13 +26,10 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
         return `${hour12}${suffix}`;
     };
 
-    // grouping list view by date
     const groupedByDate = timeBlocks.reduce((acc, tb) => {
         const dateKey = tb.startTime.toDate().toDateString();
-
         if (!acc[dateKey]) acc[dateKey] = [];
         acc[dateKey].push(tb);
-
         return acc;
     }, {} as Record<string, TimeBlock[]>);
 
@@ -53,18 +42,15 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
 
                     return (
                         <div key={dateKey} className="space-y-4">
-                            {/* date header */}
                             <div className="flex items-center gap-3">
                                 <div className="w-7 h-7 rounded-full bg-primary text-white text-sm flex items-center justify-center font-semibold">
                                     {date.getDate()}
                                 </div>
 
                                 <div className="text-sm font-medium text-gray-500">
-                                    {`${date
-                                        .toLocaleDateString("en-US", {
-                                            month: "short",
-                                        })
-                                        .toUpperCase()}, ${date
+                                    {`${date.toLocaleDateString("en-US", {
+                                        month: "short",
+                                    }).toUpperCase()}, ${date
                                         .toLocaleDateString("en-US", {
                                             weekday: "short",
                                         })
@@ -72,15 +58,7 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                 </div>
                             </div>
 
-                            {/* shifts */}
                             {blocks.map((tb) => {
-                                const tbWithTypes = tb as TBWithTypes;
-                                const totalGeneralCapacity = tb.volunteerGroups
-                                    .filter(
-                                        (g) => g.name === "General volunteer"
-                                    )
-                                    .reduce((sum, g) => sum + g.maxNum, 0);
-
                                 const timeRange = `${formatTime(
                                     tb.startTime
                                 )}-${formatTime(tb.endTime)}`;
@@ -92,60 +70,45 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                         )
                                 );
 
-                                const type =
-                                    tb.tasks.length > 0 &&
-                                    "donor" in tb.tasks[0]
-                                        ? "Pickups / Deliveries"
-                                        : "Warehouse";
-
-                                const leadDrivers = Object.values(
-                                    tbWithTypes.volunteerTypes || {}
-                                ).filter(
-                                    (type) => type === "Lead driver"
-                                ).length;
-
-                                const generalVolunteers = Object.values(
-                                    tbWithTypes.volunteerTypes || {}
-                                ).filter(
-                                    (type) => type === "General volunteer"
-                                ).length;
+                                const type = tb.type;
 
                                 return (
                                     <div key={tb.id} className="pb-4">
                                         <div className="flex justify-between items-start">
                                             <div className="flex flex-col gap-1">
                                                 <div className="text-sm text-gray-700">
-                                                    {type}
+                                                    {tb.name}
                                                 </div>
 
                                                 <div className="text-primary text-xs">
-                                                    <div>
-                                                        {/* assuming there's only two lead drivers */}
-                                                        {leadDrivers}/2 lead
-                                                        drivers
-                                                    </div>
-                                                    <div>
-                                                        {generalVolunteers}/
-                                                        {totalGeneralCapacity}{" "}
-                                                        general volunteers
-                                                    </div>
+                                                    {tb.volunteerGroups.map(
+                                                        (group) => (
+                                                            <div key={group.name}>
+                                                                {
+                                                                    group
+                                                                        .volunterIDs
+                                                                        .length
+                                                                }
+                                                                /{group.maxNum}{" "}
+                                                                {group.name}
+                                                            </div>
+                                                        )
+                                                    )}
                                                 </div>
                                             </div>
 
                                             <div className="flex flex-col items-end gap-2">
-                                                {/* time */}
                                                 <div className="flex items-center gap-2 text-xs">
                                                     <div
                                                         className={`w-3 h-3 rounded-full ${
                                                             type === "Warehouse"
-                                                                ? "bg-yellow-400"
-                                                                : "bg-teal-500"
+                                                                ? "bg-secondary"
+                                                                : "bg-primary"
                                                         }`}
                                                     />
                                                     {timeRange}
                                                 </div>
 
-                                                {/* button */}
                                                 {isSignedUp ? (
                                                     <Button
                                                         className="px-1 py-1 text-xs"
@@ -160,9 +123,9 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                                     <Button
                                                         className="px-1 py-1 text-xs"
                                                         onClick={() => {
-                                                            setVolunteerType(null);
                                                             setSelectedTB(tb);
                                                             setAction("signup");
+                                                            setSelectedGroup(null); 
                                                         }}
                                                     >
                                                         Sign up
@@ -171,7 +134,6 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                             </div>
                                         </div>
 
-                                        {/* volunteered */}
                                         {isSignedUp && (
                                             <div className="mt-3">
                                                 <span className="block border py-1 text-xs text-primary text-center">
@@ -183,14 +145,13 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                 );
                             })}
 
-                            {/* one divider per date */}
                             <div className="border-b border-gray-200 mt-2" />
                         </div>
                     );
                 })}
             </div>
+
             <div className="hidden md:block mx-auto max-w-6xl px-4">
-                {/* desktop view */}
                 {Object.entries(groupedByDate).map(([dateKey, blocks]) => {
                     const date = new Date(dateKey);
 
@@ -199,18 +160,15 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                             key={dateKey}
                             className="border-b border-gray-200 py-3 flex gap-6"
                         >
-                            {/* date */}
                             <div className="flex items-start gap-4 w-40 mt-2">
                                 <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-semibold">
                                     {date.getDate()}
                                 </div>
 
                                 <div className="text-sm text-gray-500 font-medium mt-2.5">
-                                    {`${date
-                                        .toLocaleDateString("en-US", {
-                                            month: "short",
-                                        })
-                                        .toUpperCase()}, ${date
+                                    {`${date.toLocaleDateString("en-US", {
+                                        month: "short",
+                                    }).toUpperCase()}, ${date
                                         .toLocaleDateString("en-US", {
                                             weekday: "short",
                                         })
@@ -218,23 +176,8 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                 </div>
                             </div>
 
-                            {/* shifts */}
                             <div className="flex flex-col gap-3 flex-1">
                                 {blocks.map((tb) => {
-                                    const tbWithTypes = tb as TBWithTypes;
-
-                                    const totalGeneralCapacity =
-                                        tb.volunteerGroups
-                                            .filter(
-                                                (g) =>
-                                                    g.name ===
-                                                    "General volunteer"
-                                            )
-                                            .reduce(
-                                                (sum, g) => sum + g.maxNum,
-                                                0
-                                            );
-
                                     const timeRange = `${formatTime(
                                         tb.startTime
                                     )}-${formatTime(tb.endTime)}`;
@@ -252,23 +195,7 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                             group.maxNum
                                     );
 
-                                    const type =
-                                        tb.tasks.length > 0 &&
-                                        "donor" in tb.tasks[0]
-                                            ? "Pickups / Deliveries"
-                                            : "Warehouse";
-
-                                    const leadDrivers = Object.values(
-                                        tbWithTypes.volunteerTypes || {}
-                                    ).filter(
-                                        (type) => type === "Lead driver"
-                                    ).length;
-
-                                    const generalVolunteers = Object.values(
-                                        tbWithTypes.volunteerTypes || {}
-                                    ).filter(
-                                        (type) => type === "General volunteer"
-                                    ).length;
+                                    const type = tb.type;
 
                                     return (
                                         <div
@@ -276,12 +203,11 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                             className="flex items-center justify-between"
                                         >
                                             <div className="flex items-center gap-4">
-                                                {/* time dots */}
                                                 <div
                                                     className={`w-3 h-3 rounded-full ${
                                                         type === "Warehouse"
-                                                            ? "bg-yellow-400"
-                                                            : "bg-teal-500"
+                                                            ? "bg-secondary"
+                                                            : "bg-primary"
                                                     }`}
                                                 />
 
@@ -290,27 +216,21 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                                 </div>
 
                                                 <div className="w-36 text-gray-700">
-                                                    {type}
+                                                    {tb.name}
                                                 </div>
 
-                                                {/* volunteets */}
                                                 <div className="text-primary px-5">
                                                     <div className="flex flex-col text-primary text-sm">
-                                                        <span>
-                                                            {leadDrivers}/2 lead
-                                                            drivers
-                                                        </span>
-                                                        <span>
-                                                            {generalVolunteers}/
-                                                            {
-                                                                totalGeneralCapacity
-                                                            }{" "}
-                                                            general volunteers
-                                                        </span>
+                                                        {tb.volunteerGroups.map(
+                                                            (group) => (
+                                                                <span key={group.name}>
+                                                                    {group.volunterIDs.length}/{group.maxNum} {group.name}
+                                                                </span>
+                                                            )
+                                                        )}
                                                     </div>
                                                 </div>
 
-                                                {/* volunteer label */}
                                                 {isSignedUp && (
                                                     <span className="border px-3 py-1 text-sm text-primary rounded-md">
                                                         Volunteered
@@ -318,7 +238,6 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                                 )}
                                             </div>
 
-                                            {/* drop shift or sign up button depending on if theyre signed up alr or not */}
                                             {isSignedUp ? (
                                                 <Button
                                                     onClick={() => {
@@ -333,13 +252,9 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                                     <Button
                                                         onClick={() => {
                                                             if (isFull) return;
-
-                                                            setVolunteerType(
-                                                                null
-                                                            );
-
                                                             setSelectedTB(tb);
                                                             setAction("signup");
+                                                            setSelectedGroup(null);
                                                         }}
                                                         className="w-26"
                                                     >
@@ -359,22 +274,20 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
             {/* confirm sign up */}
             {selectedTB && action === "signup" && (
                 <ConfirmModal
-                    title="Confirm Sign Up"
                     confirmLabel="Sign up"
                     onCancel={() => {
                         setSelectedTB(null);
                         setAction(null);
-                        setVolunteerType(null);
+                        setSelectedGroup(null); 
                     }}
                     onConfirm={() => {
-                        if (!selectedTB || !volunteerType) return;
+                        if (!selectedTB || !selectedGroup) return;
 
                         const updatedTB = {
                             ...selectedTB,
-
-                            volunteerGroups: selectedTB.volunteerGroups.map(
-                                (group) => {
-                                    if (group.name === volunteerType) {
+                            volunteerGroups:
+                                selectedTB.volunteerGroups.map((group) => {
+                                    if (group.name === selectedGroup) {
                                         return {
                                             ...group,
                                             volunterIDs:
@@ -389,57 +302,55 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                         };
                                     }
                                     return group;
-                                }
-                            ),
-                            volunteerTypes: {
-                                ...((selectedTB as TBWithTypes)
-                                    .volunteerTypes || {}),
-                                [currentUserID]: volunteerType,
-                            },
+                                }),
                         };
 
                         setTimeblockToast(updatedTB);
 
                         setSelectedTB(null);
                         setAction(null);
-                        setVolunteerType(null);
+                        setSelectedGroup(null); 
                     }}
                 >
-                    <div className="flex flex-col gap-3">
-                        <p className="font-medium">Type of volunteer</p>
+                    <div className="mt-2 flex flex-col gap-4">
+                        <div>
+                            <p className="font-medium text-gray-600 mb-2">
+                                Type of volunteer
+                            </p>
 
-                        <label className="flex items-center gap-2">
-                            <input
-                                type="radio"
-                                name="volunteerType"
-                                checked={volunteerType === "Lead driver"}
-                                onChange={() => setVolunteerType("Lead driver")}
-                            />
-                            Lead driver
-                        </label>
+                            <div className="flex flex-col gap-2">
+                                {selectedTB.volunteerGroups.map((group) => (
+                                    <label
+                                        key={group.name}
+                                        className="flex items-center gap-2 cursor-pointer"
+                                    >
+                                        <input
+                                            type="radio"
+                                            name="volunteerGroup"
+                                            value={group.name}
+                                            checked={
+                                                selectedGroup === group.name
+                                            }
+                                            onChange={() =>
+                                                setSelectedGroup(group.name)
+                                            }
+                                        />
+                                        {group.name}
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
 
-                        <label className="flex items-center gap-2">
-                            <input
-                                type="radio"
-                                name="volunteerType"
-                                checked={volunteerType === "General volunteer"}
-                                onChange={() =>
-                                    setVolunteerType("General volunteer")
-                                }
-                            />
-                            General volunteer
-                        </label>
+                        <p className="text-sm text-gray-600">
+                            Are you sure you are available for this shift?
+                        </p>
                     </div>
-                    <p className="mt-5">
-                        Are you sure you are available this date?
-                    </p>
                 </ConfirmModal>
             )}
 
-            {/* drop model */}
+            {/* drop modal */}
             {selectedTB && action === "drop" && (
                 <ConfirmModal
-                    title="Drop shift"
                     confirmLabel="Drop shift"
                     onCancel={() => {
                         setSelectedTB(null);
@@ -450,24 +361,13 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
 
                         const updatedTB = {
                             ...selectedTB,
-
-                            // remove from IDs
-                            volunteerGroups: selectedTB.volunteerGroups.map(
-                                (group) => ({
+                            volunteerGroups:
+                                selectedTB.volunteerGroups.map((group) => ({
                                     ...group,
                                     volunterIDs: group.volunterIDs.filter(
                                         (id) => id !== currentUserID
                                     ),
-                                })
-                            ),
-
-                            // remove from volunteerTypes too
-                            volunteerTypes: Object.fromEntries(
-                                Object.entries(
-                                    (selectedTB as TBWithTypes)
-                                        .volunteerTypes || {}
-                                ).filter(([id]) => id !== currentUserID)
-                            ),
+                                })),
                         };
 
                         setTimeblockToast(updatedTB);

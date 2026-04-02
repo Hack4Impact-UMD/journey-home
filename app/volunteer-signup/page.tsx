@@ -14,6 +14,7 @@ export default function VolunteerSignupPage() {
         isError,
         error,
     } = useTimeBlocks();
+
     const { state } = useAuth();
     const user = state.currentUser;
 
@@ -29,13 +30,14 @@ export default function VolunteerSignupPage() {
 
     const filteredTimeBlocks = timeBlocks.filter((tb) => {
         const type =
-            tb.tasks.length > 0 && "donor" in tb.tasks[0]
+            tb.type === "Pickup/Delivery"
                 ? "Pickups / Deliveries"
                 : "Warehouse";
 
         const isAvailable = tb.volunteerGroups.some(
             (group) => group.volunterIDs.length < group.maxNum
         );
+
         const availability = isAvailable ? "Available" : "Full";
 
         return (
@@ -45,14 +47,7 @@ export default function VolunteerSignupPage() {
     });
 
     if (!user) return null;
-    if (isLoading) {
-        return (
-            <div className="flex justify-center items-center h-full">
-                <Spinner className="size-6 text-primary" />
-            </div>
-        );
-    }
-    
+
     if (isError) {
         return (
             <div className="flex justify-center items-center h-full">
@@ -66,10 +61,9 @@ export default function VolunteerSignupPage() {
     }
 
     return (
-        <div className="flex flex-col h-full">
-            <div className="bg-white rounded-l px-6 py-1">
-                {/* shift type + spots available dropdwon */}
-                <div className="flex items-center gap-4 py-3 border-b border-gray-200">
+        <>
+            <div className="flex flex-col">
+                <div className="flex gap-3 mt-2 mb-5 ml-4">
                     <DropdownMultiselect
                         label="Shift type"
                         options={["Warehouse", "Pickups / Deliveries"]}
@@ -83,16 +77,24 @@ export default function VolunteerSignupPage() {
                         selected={selectedAvailability}
                         setSelected={setSelectedAvailability}
                     />
+
+                    {isLoading && (
+                        <div className="flex items-center">
+                            <Spinner className="size-5 text-primary" />
+                        </div>
+                    )}
                 </div>
 
-                {/* list view */}
-                <div className="flex mt-4">
-                    <ShiftListView
-                        timeBlocks={filteredTimeBlocks}
-                        currentUserID={user.uid}
-                    />
-                </div>
+                <div className="border-b border-gray-200 w-full" />
             </div>
-        </div>
+
+            {/* content */}
+            <div className="flex-1 overflow-auto min-h-0">
+                <ShiftListView
+                    timeBlocks={filteredTimeBlocks}
+                    currentUserID={user.uid}
+                />
+            </div>
+        </>
     );
 }
