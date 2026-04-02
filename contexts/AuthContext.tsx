@@ -5,7 +5,7 @@ import { User, onAuthStateChanged } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import { UserData, UserRole, AuthContextType } from "../types/user";
 import { getUserByUID, updateEmailVerificationStatus } from "../lib/services/users";
-import { login, logout, signUp } from "@/lib/services/auth";
+import { login, logout, signUp, sendVerificationEmail } from "@/lib/services/auth";
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -76,6 +76,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return (await logout())
   }
 
+  async function _sendVerificationEmail(): Promise<void> {
+    const user = auth.currentUser;
+    if (!user) return;
+    await sendVerificationEmail(user);
+  }
+
+  async function _checkVerification(): Promise<{ verified: boolean }> {
+    const user = auth.currentUser;
+    if (!user) return { verified: false };
+
+    await user.reload();
+
+    if (user.emailVerified) {
+      try {
+        await updateEmailVerificationStatus(user.uid, true);
+      } catch (err) {
+        console.error("Failed to sync email verification status:", err);
+      }
+      await _refreshUser();
+      return { verified: true };
+    }
+
+    return { verified: false };
+  }
+
   async function _refreshUser(): Promise<void> {
     const user = auth.currentUser;
     if (!user) return;
@@ -88,7 +113,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ state: authState, signup: _signup, login: _login, logout: _logout, refreshUser: _refreshUser }}>
+    <AuthContext.Provider value={{ state: authState, signup: _signup, login: _login, logout: _logout, refreshUser: _refreshUser, sendVerificationEmail: _sendVerificationEmail, checkVerification: _checkVerification }}>
       {children}
     </AuthContext.Provider>
   );

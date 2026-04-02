@@ -1,9 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { resendVerificationEmail } from '@/lib/services/auth';
-import { updateEmailVerificationStatus } from '@/lib/services/users';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/lib/firebase';
 import AuthMobileNavbar from '@/components/auth/AuthMobileNavbar';
@@ -16,12 +14,36 @@ export default function VerifyEmailPage() {
   const [checking, setChecking] = useState(false);
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
+  const redirectTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hasSentEmail = useRef(false);
 
   useEffect(() => {
-    if (!authContext.state.loading && !authContext.state.currentUser) {
+    return () => {
+      if (redirectTimeout.current) clearTimeout(redirectTimeout.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (authContext.state.loading) return;
+    if (!authContext.state.currentUser) {
       router.push('/login');
+      return;
     }
-  }, [authContext.state, router]);
+    if (hasSentEmail.current) return;
+    hasSentEmail.current = true;
+
+    authContext.checkVerification().then(({ verified }) => {
+      if (verified) {
+        router.push('/');
+        return;
+      }
+      authContext.sendVerificationEmail().catch((error) => {
+        console.error('Error sending verification email:', error);
+        setIsError(true);
+        setMessage('Failed to send verification email. Please try again.');
+      });
+    });
+  }, [authContext, router]);
 
   if (authContext.state.loading || !authContext.state.userData) {
     return (
@@ -31,22 +53,17 @@ export default function VerifyEmailPage() {
     );
   }
 
-  const effectiveRole = authContext.state.userData.pending ?? authContext.state.userData.role;
-
   const handleLogout = async () => {
     await authContext.logout();
     router.push('/login');
   };
 
   const handleResend = async () => {
-    const currentUser = auth.currentUser;
-    if (!currentUser) return;
-
     setSending(true);
     setMessage('');
 
     try {
-      await resendVerificationEmail(currentUser);
+      await authContext.sendVerificationEmail();
       setIsError(false);
       setMessage('Verification email sent! Check your inbox.');
     } catch (error) {
@@ -61,23 +78,18 @@ export default function VerifyEmailPage() {
   const handleCheckVerification = async () => {
     if (checking) return;
 
+    if (!auth.currentUser) {
+      setIsError(true);
+      setMessage('Session expired. Please log in again.');
+      redirectTimeout.current = setTimeout(() => router.push('/login'), 2000);
+      return;
+    }
+
     setChecking(true);
     try {
-      const currentUser = auth.currentUser;
-      if (!currentUser) {
-        setIsError(true);
-        setMessage('Session expired. Please log in again.');
-        setTimeout(() => router.push('/login'), 2000);
-        return;
-      }
-
-      await currentUser.reload();
-
-      if (currentUser.emailVerified) {
-        await updateEmailVerificationStatus(currentUser.uid, true);
-        await authContext.refreshUser();
-
-        if (effectiveRole === 'Volunteer') {
+      const { verified } = await authContext.checkVerification();
+      if (verified) {
+        if (!authContext.state.userData?.pending) {
           router.push('/status/account-created');
         } else {
           router.push('/status/account-pending');
@@ -92,7 +104,7 @@ export default function VerifyEmailPage() {
       setIsError(true);
       if (firebaseError.code === 'auth/user-token-expired') {
         setMessage('Session expired. Please log in again to continue.');
-        setTimeout(() => router.push('/login'), 2000);
+        redirectTimeout.current = setTimeout(() => router.push('/login'), 2000);
       } else {
         setMessage('Error checking verification. Please try again.');
       }
