@@ -283,6 +283,15 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                     onConfirm={() => {
                         if (!selectedTB || !selectedGroup) return;
 
+                        const targetGroup = selectedTB.volunteerGroups.find(
+                            (group) => group.name === selectedGroup
+                        );
+                        
+                        if (!targetGroup) return;
+                        
+                        // doesn't allow add if full
+                        if (targetGroup.volunterIDs.length >= targetGroup.maxNum) return;
+
                         const updatedTB = {
                             ...selectedTB,
                             volunteerGroups:
@@ -328,6 +337,7 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                             type="radio"
                                             name="volunteerGroup"
                                             value={group.name}
+                                            disabled={group.volunterIDs.length >= group.maxNum}
                                             checked={
                                                 selectedGroup === group.name
                                             }
