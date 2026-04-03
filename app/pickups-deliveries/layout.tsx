@@ -13,8 +13,8 @@ export default function PickupsDeliveriesLayout({ children }: { children: ReactN
         <ProtectedRoute allow={["Admin"]}>
             <div className="h-full w-full flex flex-col font-family-roboto overflow-hidden">
                 <div className="flex flex-1 min-h-0">
-                    <SideNavbar />
-                    <div className="flex-1 min-h-0 bg-[#F7F7F7] pt-8 pb-4 px-6 flex flex-col">
+                    <SideNavbar pageTitle="Pickups & Deliveries" />
+                    <div className="flex-1 min-h-0 bg-[#F7F7F7] pt-8 max-md:pt-14 pb-4 px-6 flex flex-col">
                         <span className="text-2xl text-primary font-extrabold block">
                             Pickups and Deliveries
                         </span>
