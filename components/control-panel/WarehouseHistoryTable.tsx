@@ -56,7 +56,7 @@ export function WarehouseHistoryTable({ changes, onRevert, isReverting }: Wareho
                 />
             )}
 
-            <div className="w-full h-full flex flex-col overflow-auto min-h-0">
+            <div className="w-full h-full flex flex-col overflow-auto min-h-0 gap-2">
                 {changes.length === 0 && (
                     <div className="flex items-center justify-center h-24 text-sm text-[#A2A2A2]">
                         No history entries found.
@@ -80,17 +80,17 @@ function buildDescription(change: WarehouseChange): string {
     const abs = Math.abs(changeAmount);
     switch (changeType) {
         case "Add":
-            return `added ${abs} ${itemName} (was ${amountBefore}, now ${amountAfter}).`;
+            return `added ${abs} ${itemName} (${amountBefore}→${amountAfter})`;
         case "Remove":
-            return `removed ${abs} ${itemName} (was ${amountBefore}, now ${amountAfter}).`;
+            return `removed ${abs} ${itemName} (${amountBefore}→${amountAfter})`;
         case "Create":
-            return `created ${itemName} with ${amountAfter} in stock.`;
+            return `created ${itemName} with ${amountAfter} in stock`;
         case "Delete":
-            return `deleted ${itemName}. Had ${amountBefore} in stock.`;
+            return `deleted ${itemName} (had ${amountBefore} in stock)`;
         case "Set":
-            return `set ${itemName} from ${amountBefore} to ${amountAfter}.`;
+            return `set ${itemName} (${amountBefore}→${amountAfter})`;
         default:
-            return `${changeType} ${itemName}.`;
+            return `${changeType} ${itemName}`;
     }
 }
 
@@ -118,19 +118,22 @@ function WarehouseHistoryRow({
         .join(" ");
 
     return (
-        <div className={`flex items-center gap-3 px-4 py-2.5 border-b border-[#DCDDDD] text-sm font-family-roboto ${rowBg}`}>
+        <div className={`flex items-center gap-3 px-4 py-3 rounded-sm border border-[#DCDDDD] text-sm font-family-roboto ${rowBg}`}>
             <div className="shrink-0 w-5 h-5">
                 {isPositive ? (
-                    <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 text-[#69C22E]">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
+                    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5 text-[#69C22E]">
+                        <circle cx="10" cy="10" r="8" />
+                        <path d="M10 6v8M6 10h8" strokeLinecap="round" />
                     </svg>
                 ) : isNegative ? (
-                    <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 text-[#E16060]">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+                    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5 text-[#E16060]">
+                        <circle cx="10" cy="10" r="8" />
+                        <path d="M6 10h8" strokeLinecap="round" />
                     </svg>
                 ) : (
-                    <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 text-blue-400">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-7a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+                    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5 text-blue-400">
+                        <circle cx="10" cy="10" r="8" />
+                        <path d="M10 7v6M7 10h6" strokeLinecap="round" />
                     </svg>
                 )}
             </div>
