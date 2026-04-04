@@ -43,13 +43,6 @@ export async function signUp(
 
     await createUserInDB(userRecord);
 
-    // Send verification email (don't fail signup if this fails)
-    try {
-        await sendEmailVerification(user);
-    } catch (error) {
-        console.error("Failed to send verification email:", error);
-    }
-
     return user;
 }
 
@@ -68,6 +61,6 @@ export async function logout(): Promise<void> {
     await signOut(auth);
 }
 
-export async function resendVerificationEmail(user: User): Promise<void> {
+export async function sendVerificationEmail(user: User): Promise<void> {
     await sendEmailVerification(user);
 }
