@@ -26,11 +26,16 @@ export function ConfirmModal({
     const descId = useId();
 
     useEffect(() => {
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
         const handleEscape = (e: KeyboardEvent) => {
             if (e.key === "Escape") onCancel();
         };
         document.addEventListener("keydown", handleEscape);
-        return () => document.removeEventListener("keydown", handleEscape);
+        return () => {
+            document.body.style.overflow = previousOverflow;
+            document.removeEventListener("keydown", handleEscape);
+        };
     }, [onCancel]);
 
     return createPortal(

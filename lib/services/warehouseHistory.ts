@@ -12,9 +12,22 @@ import {
 
 export const WAREHOUSE_HISTORY_COLLECTION = "warehouseHistory";
 
-/**
- * Get all warehouse change entries, optionally filtered by date range.
- */
+function isWarehouseChange(data: Record<string, unknown>): data is WarehouseChange {
+    return (
+        typeof data.id === "string" &&
+        typeof data.itemId === "string" &&
+        typeof data.itemName === "string" &&
+        typeof data.changeType === "string" &&
+        typeof data.changeAmount === "number" &&
+        typeof data.amountBefore === "number" &&
+        typeof data.amountAfter === "number" &&
+        typeof data.userId === "string" &&
+        typeof data.userEmail === "string" &&
+        data.timestamp != null
+    );
+}
+
+
 export async function getWarehouseHistory(
     startDate?: Date,
     endDate?: Date
@@ -38,12 +51,8 @@ export async function getWarehouseHistory(
 
     const snapshot = await getDocs(q);
     return snapshot.docs
-        .map((d) => {
-            const data = d.data();
-            if (!data.id || !data.itemId || !data.timestamp) return null;
-            return data as WarehouseChange;
-        })
-        .filter((entry): entry is WarehouseChange => entry !== null);
+        .map((d) => d.data() as Record<string, unknown>)
+        .filter(isWarehouseChange);
 }
 
 /**

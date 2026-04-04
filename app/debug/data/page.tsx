@@ -778,16 +778,17 @@ async function generateInventoryChanges(count: number): Promise<WarehouseChange[
     const user = userDocs[Math.floor(Math.random() * userDocs.length)];
 
     const amountBefore = runningQty[cat.id];
-    const delta = Math.floor(Math.random() * 9) - 3;
-    const amountAfter = Math.max(0, amountBefore + delta);
+    const rawDelta = Math.floor(Math.random() * 9) - 3;
+    const amountAfter = Math.max(0, amountBefore + rawDelta);
+    const changeAmount = amountAfter - amountBefore;
     runningQty[cat.id] = amountAfter;
 
     return {
       id: crypto.randomUUID(),
       itemId: cat.id,
       itemName: cat.name,
-      changeType: delta >= 0 ? "Add" : "Remove",
-      changeAmount: delta,
+      changeType: changeAmount > 0 ? "Add" : changeAmount < 0 ? "Remove" : "Set",
+      changeAmount,
       amountBefore,
       amountAfter,
       timestamp: Timestamp.fromMillis(ts),

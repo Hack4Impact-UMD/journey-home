@@ -14,7 +14,7 @@ export default function ControlPanelLayout({ children }: { children: ReactNode }
             <div className="h-full w-full flex flex-col font-family-roboto overflow-hidden">
                 <div className="flex flex-1 min-h-0 min-w-0">
                     <SideNavbar />
-                    <div className="flex-1 min-h-0 min-w-0 bg-[#F7F7F7] py-4 px-10 flex flex-col items-center overflow-hidden">
+                    <div className="flex-1 min-h-0 min-w-0 bg-[#F7F7F7] pt-8 pb-4 px-6 flex flex-col items-center overflow-hidden">
                         <div className="w-full max-w-5xl flex flex-col min-h-0 flex-1">
                             <span className="text-2xl text-primary font-extrabold block">
                                 Control Panel

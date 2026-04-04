@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { WarehouseChange } from "@/types/changelog";
 import { getWarehouseHistory, setWarehouseChange } from "../services/warehouseHistory";
-import { setInventoryRecord, getInventoryRecord } from "../services/inventory";
+import { deleteInventoryRecord, setInventoryRecord, getInventoryRecord } from "../services/inventory";
 import { Timestamp } from "firebase/firestore";
 import { toast } from "sonner";
 
@@ -26,23 +26,35 @@ export function useWarehouseHistory(startDate?: Date, endDate?: Date) {
             const item = await getInventoryRecord(change.itemId);
             if (!item) throw new Error("Item not found");
 
-            const reverted = { ...item, quantity: change.amountBefore };
-            const success = await setInventoryRecord(reverted);
+            const isCreate = change.changeType === "Create";
+            const success = isCreate
+                ? await deleteInventoryRecord(change.itemId)
+                : await setInventoryRecord({ ...item, quantity: change.amountBefore });
             if (!success) throw new Error("Failed to update inventory during revert");
 
             const revertEntry: WarehouseChange = {
                 id: crypto.randomUUID(),
                 itemId: change.itemId,
                 itemName: change.itemName,
-                changeType: "Set",
-                changeAmount: change.amountBefore - item.quantity,
-                amountBefore: item.quantity,
+                changeType: isCreate ? "Delete" : change.amountBefore >= change.amountAfter ? "Add" : "Remove",
+                changeAmount: change.amountBefore - change.amountAfter,
+                amountBefore: change.amountAfter,
                 amountAfter: change.amountBefore,
                 timestamp: Timestamp.now(),
                 userId: actor?.userId ?? change.userId,
                 userEmail: actor?.userEmail ?? change.userEmail,
             };
-            await setWarehouseChange(revertEntry);
+
+            try {
+                await setWarehouseChange(revertEntry);
+            } catch (historyErr) {
+                // rollback inventory
+                const rollbackSuccess = isCreate
+                    ? await setInventoryRecord(item)
+                    : await setInventoryRecord(item);
+                if (!rollbackSuccess) throw new Error("Revert failed and rollback also failed");
+                throw historyErr;
+            }
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: CHANGELOG_QUERY_KEY });
