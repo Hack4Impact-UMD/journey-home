@@ -13,11 +13,16 @@ const type_dot_color: Record<TimeBlock["type"], string> = {
     "Warehouse": "bg-[#02AFC7]",
 }
 
+function formatTime(ts:{toDate:() => Date}) {
+    return ts.toDate().toLocaleTimeString("en-US", {
+        hour:"numeric",
+        minute:"2-digit",
+    }).replace(":00", "").toLowerCase();
+}
+
 export default function AdminCalendarSummary(){
 
     const {allTB, isLoading} = useTimeBlocks();
-
-    
 
     return (
         <div className = "rounded-2xl border border-[#E7E7E7] bg-white shadow-[0_0_4px_0rgba(0,0,0,0.25)]">
