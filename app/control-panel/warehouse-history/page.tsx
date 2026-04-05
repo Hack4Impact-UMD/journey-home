@@ -10,7 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { SortStatus } from "@/types/inventory";
 import { InventoryChangeType, WarehouseChange } from "@/types/changelog";
 
-const ALL_CHANGE_TYPES: InventoryChangeType[] = ["Add", "Remove", "Create", "Delete", "Set"];
+const ALL_CHANGE_TYPES: InventoryChangeType[] = ["Addition", "Removal"];
 
 export default function WarehouseHistoryPage() {
     const { state: { userData } } = useAuth();

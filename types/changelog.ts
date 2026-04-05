@@ -1,6 +1,6 @@
 import { Timestamp } from "firebase/firestore";
 
-export type InventoryChangeType = "Set" | "Add" | "Remove" | "Delete" | "Create";
+export type InventoryChangeType = "Addition" | "Removal";
 
 export type WarehouseChange = {
   id: string,

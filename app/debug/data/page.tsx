@@ -787,7 +787,7 @@ async function generateInventoryChanges(count: number): Promise<WarehouseChange[
       id: crypto.randomUUID(),
       itemId: cat.id,
       itemName: cat.name,
-      changeType: changeAmount > 0 ? "Add" : changeAmount < 0 ? "Remove" : "Set",
+      changeType: changeAmount >= 0 ? "Addition" : "Removal",
       changeAmount,
       amountBefore,
       amountAfter,

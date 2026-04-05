@@ -11,18 +11,14 @@ type WarehouseHistoryTableProps = {
 };
 
 function buildRevertMessage(change: WarehouseChange): string {
-    const { changeType, itemName, changeAmount, amountBefore, amountAfter } = change;
+    const { changeType, itemName, changeAmount, amountBefore } = change;
     const abs = Math.abs(changeAmount);
     const item = itemName.toLowerCase();
     switch (changeType) {
-        case "Add":
-            return `${abs} ${item}${abs !== 1 ? "s" : ""} will be removed back to the ${amountBefore} in inventory. The amount of ${item}s will be set to ${amountBefore}.`;
-        case "Remove":
-            return `${abs} ${item}${abs !== 1 ? "s" : ""} will be added back to the ${amountBefore} in inventory. The amount of ${item}s will be set to ${amountBefore}.`;
-        case "Set":
-            return `${itemName} will be reverted from ${amountAfter} back to ${amountBefore}.`;
-        case "Create":
-            return `${itemName} will be removed from inventory.`;
+        case "Addition":
+            return `${abs} ${item} will be removed back to the ${amountBefore} in inventory.`;
+        case "Removal":
+            return `${abs} ${item} will be added back to the ${amountBefore} in inventory.`;
         default:
             return `This change to ${itemName} will be reverted.`;
     }
@@ -79,16 +75,10 @@ function buildDescription(change: WarehouseChange): string {
     const { changeType, itemName, changeAmount, amountBefore, amountAfter } = change;
     const abs = Math.abs(changeAmount);
     switch (changeType) {
-        case "Add":
+        case "Addition":
             return `added ${abs} ${itemName} (${amountBefore}→${amountAfter})`;
-        case "Remove":
+        case "Removal":
             return `removed ${abs} ${itemName} (${amountBefore}→${amountAfter})`;
-        case "Create":
-            return `created ${itemName} with ${amountAfter} in stock`;
-        case "Delete":
-            return `deleted ${itemName} (had ${amountBefore} in stock)`;
-        case "Set":
-            return `set ${itemName} (${amountBefore}→${amountAfter})`;
         default:
             return `${changeType} ${itemName}`;
     }
@@ -107,8 +97,8 @@ function WarehouseHistoryRow({
     const dateStr = date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
     const timeStr = date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
 
-    const isPositive = change.changeType === "Add" || change.changeType === "Create";
-    const isNegative = change.changeType === "Remove" || change.changeType === "Delete";
+    const isPositive = change.changeType === "Addition";
+    const isNegative = change.changeType === "Removal";
     const rowBg = isPositive ? "bg-[#F2FAF2]" : isNegative ? "bg-[#FAF2F2]" : "bg-white";
 
     const namePart = change.userEmail.split("@")[0];
@@ -153,8 +143,8 @@ function WarehouseHistoryRow({
             <button
                 className="shrink-0 flex items-center gap-1 text-xs border border-[#BBBDBE] rounded-full px-3 py-1 bg-[#BBBDBE] text-white hover:bg-gray-400 disabled:opacity-40 disabled:cursor-not-allowed"
                 onClick={onRevert}
-                disabled={isReverting || change.changeType === "Delete"}
-                title={change.changeType === "Delete" ? "Cannot revert a deletion" : "Revert this change"}
+                disabled={isReverting}
+                title="Revert this change"
             >
                 <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
                     <path d="M2 8a6 6 0 106-6H5M2 8l3-3M2 8l3 3" strokeLinecap="round" strokeLinejoin="round" />
