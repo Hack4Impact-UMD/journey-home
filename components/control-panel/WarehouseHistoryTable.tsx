@@ -2,7 +2,7 @@
 
 import { WarehouseChange } from "@/types/changelog";
 import { useState } from "react";
-import { ConfirmModal } from "./ConfirmModal";
+import { ConfirmModal } from "@/components/control-panel/ConfirmModal";
 
 type WarehouseHistoryTableProps = {
     changes: WarehouseChange[];

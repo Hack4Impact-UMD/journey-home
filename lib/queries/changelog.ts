@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { WarehouseChange } from "@/types/changelog";
-import { getWarehouseHistory, setWarehouseChange } from "../services/warehouseHistory";
-import { setInventoryRecord, getInventoryRecord, deleteInventoryRecord } from "../services/inventory";
+import { getWarehouseHistory, setWarehouseChange } from "@/lib/services/warehouseHistory";
+import { setInventoryRecord, getInventoryRecord, deleteInventoryRecord } from "@/lib/services/inventory";
 import { Timestamp } from "firebase/firestore";
 import { toast } from "sonner";
 
@@ -25,6 +25,9 @@ export function useWarehouseHistory(startDate?: Date, endDate?: Date) {
         }) => {
             const item = await getInventoryRecord(change.itemId);
             if (!item) throw new Error("Item not found");
+            if (item.quantity !== change.amountAfter) {
+                throw new Error("Cannot revert: inventory has changed since this entry was recorded.");
+            }
 
             const success = change.amountBefore === 0
                 ? await deleteInventoryRecord(change.itemId)

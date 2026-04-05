@@ -66,7 +66,17 @@ export async function setInventoryRecord(
                 userId: actor.userId,
                 userEmail: actor.userEmail,
             };
-            await setWarehouseChange(change);
+            try {
+                await setWarehouseChange(change);
+            } catch {
+                // rollback inventory
+                if (prevSnap.exists()) {
+                    await setDoc(docRef, prevSnap.data());
+                } else {
+                    await deleteDoc(docRef);
+                }
+                throw new Error("Failed to write audit log; inventory change rolled back.");
+            }
         }
         return true;
     } catch (e) {
@@ -99,7 +109,13 @@ export async function deleteInventoryRecord(
                 userId: actor.userId,
                 userEmail: actor.userEmail,
             };
-            await setWarehouseChange(change);
+            try {
+                await setWarehouseChange(change);
+            } catch {
+                // rollback deletion
+                await setDoc(docRef, record);
+                throw new Error("Failed to write audit log; deletion rolled back.");
+            }
         }
         return true;
     } catch (e) {
