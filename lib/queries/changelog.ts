@@ -36,7 +36,13 @@ export function useWarehouseHistory(startDate?: Date, endDate?: Date) {
                 id: crypto.randomUUID(),
                 itemId: change.itemId,
                 itemName: change.itemName,
-                changeType: isCreate ? "Delete" : change.amountBefore >= change.amountAfter ? "Add" : "Remove",
+                changeType: isCreate
+                    ? "Delete"
+                    : change.amountBefore > change.amountAfter
+                        ? "Add"
+                        : change.amountBefore < change.amountAfter
+                            ? "Remove"
+                            : "Set",
                 changeAmount: change.amountBefore - change.amountAfter,
                 amountBefore: change.amountAfter,
                 amountAfter: change.amountBefore,
@@ -49,9 +55,7 @@ export function useWarehouseHistory(startDate?: Date, endDate?: Date) {
                 await setWarehouseChange(revertEntry);
             } catch (historyErr) {
                 // rollback inventory
-                const rollbackSuccess = isCreate
-                    ? await setInventoryRecord(item)
-                    : await setInventoryRecord(item);
+                const rollbackSuccess = await setInventoryRecord(item);
                 if (!rollbackSuccess) throw new Error("Revert failed and rollback also failed");
                 throw historyErr;
             }
