@@ -102,10 +102,10 @@ function WarehouseHistoryRow({
     const rowBg = isPositive ? "bg-[#F2FAF2]" : isNegative ? "bg-[#FAF2F2]" : "bg-white";
 
     const namePart = change.userEmail.split("@")[0];
-    const displayName = namePart
-        .split(/[._-]/)
-        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-        .join(" ");
+    const parts = namePart.split(/[._-]/).map((w: string) => w.charAt(0).toUpperCase() + w.slice(1));
+    const displayName = parts.length > 1 && parts.length <= 3 && parts.every((w) => /^[A-Za-z]+$/.test(w))
+        ? parts.join(" ")
+        : namePart;
 
     return (
         <div className={`flex items-center gap-3 px-4 py-3 rounded-sm border border-[#DCDDDD] text-sm font-family-roboto ${rowBg}`}>

@@ -111,10 +111,13 @@ export async function deleteInventoryRecord(
             };
             try {
                 await setWarehouseChange(change);
-            } catch {
-                // rollback deletion
-                await setDoc(docRef, record);
-                throw new Error("Failed to write audit log; deletion rolled back.");
+            } catch (auditErr) {
+                try {
+                    await setDoc(docRef, record);
+                    throw new Error("Failed to write audit log; deletion rolled back.");
+                } catch {
+                    throw new Error(`Audit write failed and rollback also failed: ${auditErr}`);
+                }
             }
         }
         return true;

@@ -60,8 +60,8 @@ export function useWarehouseHistory(startDate?: Date, endDate?: Date) {
             queryClient.invalidateQueries({ queryKey: CHANGELOG_QUERY_KEY });
             toast.success("Change reverted successfully.");
         },
-        onError: () => {
-            toast.error("Failed to revert change.");
+        onError: (error: Error) => {
+            toast.error(error?.message || "Failed to revert change.");
         },
     });
 
