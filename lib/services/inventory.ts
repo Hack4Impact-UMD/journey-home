@@ -50,7 +50,6 @@ export async function setInventoryRecord(
         const docRef = doc(db, WAREHOUSE_COLLECTION, record.id);
         const prevSnap = await getDoc(docRef);
         const prevQty = prevSnap.exists() ? (prevSnap.data() as InventoryRecord).quantity : 0;
-        const isCreate = !prevSnap.exists();
 
         await setDoc(docRef, record);
 
