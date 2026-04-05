@@ -16,9 +16,9 @@ function buildRevertMessage(change: WarehouseChange): string {
     const item = itemName.toLowerCase();
     switch (changeType) {
         case "Addition":
-            return `${abs} ${item} will be removed back to the ${amountBefore} in inventory.`;
+            return `${abs} ${item} will be removed, restoring inventory to ${amountBefore}.`;
         case "Removal":
-            return `${abs} ${item} will be added back to the ${amountBefore} in inventory.`;
+            return `${abs} ${item} will be added back, restoring inventory to ${amountBefore}.`;
         default:
             return `This change to ${itemName} will be reverted.`;
     }
