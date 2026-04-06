@@ -21,7 +21,8 @@ function formatTime(ts: { toDate: () => Date }) {
             minute: "2-digit",
         })
         .replace(":00", "")
-        .toLowerCase();
+        .toLowerCase()
+        .replaceAll(" ", "");
 }
 
 export default function AdminCalendarSummary() {
@@ -34,14 +35,14 @@ export default function AdminCalendarSummary() {
     }, [allTB]);
 
     return (
-        <div className="w-[35em] h-[18em] rounded-2xl border border-[#E7E7E7] bg-[#FFFFFF] shadow-lg shadow-[0px_0px_4px_0px_rgba(0,0,0,0.25)]">
-            <span> Calendar </span>
+        <div className="w-[90%] h-[20em] px-[1rem] rounded-2xl border border-[#E7E7E7] bg-[#FFFFFF] shadow-lg shadow-[0px_0px_4px_0px_rgba(0,0,0,0.25)]">
+            <div className = "my-[1rem] font-bold "> Calendar </div>
             {isLoading ? (
                 <p className = "flex justify-center"> Loading... </p>
             ) : upcomingEvents.length === 0 ? (
                 <p className = "flex justify-center">No Upcoming Timeblocks</p>
             ) : (
-                <div className = "flex flex-col w-">
+                <div className = "flex flex-col">
                     {upcomingEvents.map((tb) => {
                         const start = tb.startTime.toDate()
                         const dayNumber = start.getDate();
@@ -51,19 +52,15 @@ export default function AdminCalendarSummary() {
                         const lowVol = volCount <= Low_Volunteer_Threshold;
 
                         return (
-                            <div key = {tb.id} className = "flex items-center ">
-                                <div>
-                                    <div className = "h-9 w-9 flex items-center justify-center rounded-full text-sm font-bold bg-[#666666] text-white">
-                                        {dayNumber}
-                                    </div>
-                                    <span>
-                                        {month}, {weekday}
-                                    </span>
+                            <div key = {tb.id} className = "grid grid-cols-[2.5rem_6rem_1rem_7rem_1fr_auto] items-center gap-3">
+                                <div className = "h-9 w-9 flex items-center justify-center rounded-full text-sm font-bold bg-[#02AFC7] text-white">
+                                    {dayNumber}
                                 </div>
+                                <span className = "text-[#6B7A99] font-semibold">{month}, {weekday} </span>
                                 <span className = {`h-5 w-5 rounded-full ${type_dot_color[tb.type]}`}/>
-                                <span> {formatTime(tb.startTime)} - {formatTime(tb.endTime)}</span>
+                                <span> {formatTime(tb.startTime)}-{formatTime(tb.endTime)}</span>
                                 <span> {tb.type}</span>
-                                <span className={`flex ${lowVol ? "text-[#E16060]" : "text-[#000000]"}`}>
+                                <span className={`flex items-center gap-[0.25rem] ${lowVol ? "text-[#E16060]" : "text-[#000000]"}`}>
                                     <AdminCalendarPeople fill={lowVol ? "#E16060" : "#000000"}/>
                                     {volCount}
                                 </span>
