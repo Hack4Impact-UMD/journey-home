@@ -63,16 +63,21 @@ function DialArc({ quantity, low, high }: { quantity: number; low: number; high:
         </svg>
     );
 }
+interface ItemDialProps {
+    category: InventoryCategory;
+    onClick: () => void;
+}
 
-export function ItemDial({ category }: { category: InventoryCategory }) {
+export function ItemDial({ category, onClick }: ItemDialProps) {
     const { name, quantity, lowThreshold, highThreshold } = category;
     const color = getStockColor(quantity, lowThreshold, highThreshold);
     const bg = getStockBg(quantity, lowThreshold, highThreshold);
 
     return (
         <div
-            className="rounded-2xl border border-light-border shadow-sm flex flex-col items-center justify-center pt-4 pb-5 px-4 w-full max-w-[240px] mx-auto cursor-default select-none"
+            className="rounded-2xl border border-light-border shadow-sm flex flex-col items-center justify-center pt-4 pb-5 px-4 w-full max-w-[240px] mx-auto cursor-pointer select-none hover:brightness-95 transition-all"
             style={{ backgroundColor: bg }}
+            onClick={onClick}
         >
             <div className="relative flex items-center justify-center">
                 <DialArc quantity={quantity} low={lowThreshold} high={highThreshold} />

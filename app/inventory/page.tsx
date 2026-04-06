@@ -7,7 +7,6 @@ import { SortOption } from "@/components/inventory/SortOption";
 import { CategoryDialsGrid } from "@/components/inventory/CategoryDialsGrid";
 import { useInventoryCategories } from "@/lib/queries/inventory";
 import { SortStatus } from "@/types/inventory";
-import { PlusIcon, UploadIcon } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 
 type StockStatus = "Red" | "Yellow" | "Green";
