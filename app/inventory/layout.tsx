@@ -10,8 +10,8 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
             <div className="h-full w-full flex flex-col font-family-roboto overflow-hidden">
                 <div className="flex flex-1 min-h-0">
                     <SideNavbar pageTitle="Inventory" />
-                    <div className="flex-1 min-h-0 bg-[#F7F7F7] pt-8 max-md:pt-14 pb-4 px-6 flex flex-col">
-                        <span className="text-2xl text-primary font-extrabold block">
+                    <div className="flex-1 min-h-0 bg-[#F7F7F7] pt-8 max-md:pt-26 pb-4 px-6 flex flex-col">
+                        <span className="text-2xl text-primary font-extrabold block max-md:hidden">
                             Inventory
                         </span>
                         <div className="bg-background rounded-xl my-2 flex-1 py-4 px-6 min-h-0 overflow-hidden flex flex-col">

@@ -17,13 +17,14 @@ export default function SideNavbar({ pageTitle }: { pageTitle?: string }) {
     const auth = useAuth();
     const [drawerOpen, setDrawerOpen] = useState(false);
 
-    const navLinks = (
+    const navLinks = (isMobile: boolean) => (
         <>
             <SideNavbarLink
                 icon={InventoryIcon}
                 name="Inventory"
                 path="/inventory"
                 roles={["Admin"]}
+                isMobile={isMobile}
                 onClick={() => setDrawerOpen(false)}
             />
             <SideNavbarLink
@@ -31,6 +32,7 @@ export default function SideNavbar({ pageTitle }: { pageTitle?: string }) {
                 name="Donor Requests"
                 path="/donation-requests"
                 roles={["Admin"]}
+                isMobile={isMobile}
                 onClick={() => setDrawerOpen(false)}
             />
             <SideNavbarLink
@@ -38,6 +40,7 @@ export default function SideNavbar({ pageTitle }: { pageTitle?: string }) {
                 name="Client Requests"
                 path="/client-requests"
                 roles={["Admin", "Case Manager"]}
+                isMobile={isMobile}
                 onClick={() => setDrawerOpen(false)}
             />
             <SideNavbarLink
@@ -45,6 +48,7 @@ export default function SideNavbar({ pageTitle }: { pageTitle?: string }) {
                 name="Pickups & Deliveries"
                 path="/pickups-deliveries"
                 roles={["Admin"]}
+                isMobile={isMobile}
                 onClick={() => setDrawerOpen(false)}
             />
             <SideNavbarLink
@@ -52,6 +56,7 @@ export default function SideNavbar({ pageTitle }: { pageTitle?: string }) {
                 name="User Management"
                 path="/user-management"
                 roles={["Admin"]}
+                isMobile={isMobile}
                 onClick={() => setDrawerOpen(false)}
             />
             <SideNavbarLink
@@ -59,12 +64,14 @@ export default function SideNavbar({ pageTitle }: { pageTitle?: string }) {
                 name="Control Panel"
                 path="/control-panel"
                 roles={["Admin"]}
+                isMobile={isMobile}
                 onClick={() => setDrawerOpen(false)}
             />
             <SideNavbarLink
                 name="Donation Form"
                 path="/donate"
                 roles={[]}
+                isMobile={isMobile}
                 onClick={() => setDrawerOpen(false)}
             />
         </>
@@ -85,7 +92,7 @@ export default function SideNavbar({ pageTitle }: { pageTitle?: string }) {
                     </div>
                 </Link>
                 <div className="px-4 h-full w-full flex flex-col">
-                    {navLinks}
+                    {navLinks(false)}
                     <div className="mt-auto w-full mb-4">
                         <Link href="/profile">
                             <div className="pt-2 pb-2 pl-4 pr-2 border border-light-border rounded-lg w-full flex items-center justify-between">
@@ -147,6 +154,7 @@ export default function SideNavbar({ pageTitle }: { pageTitle?: string }) {
                 className={`hidden max-md:flex fixed top-0 left-0 h-full w-63 z-50 bg-white flex-col transition-transform duration-300 ${
                     drawerOpen ? "translate-x-0" : "-translate-x-full"
                 }`}
+                inert={!drawerOpen ? true : undefined}
             >
                 <div className="flex justify-center pt-12.5 pb-2.5 px-4 border-b border-[#EFF3F5]">
                     <Link href="/" onClick={() => setDrawerOpen(false)}>
@@ -159,7 +167,7 @@ export default function SideNavbar({ pageTitle }: { pageTitle?: string }) {
                     </Link>
                 </div>
                 <div className="pt-1 h-full flex flex-col">
-                    {navLinks}
+                    {navLinks(true)}
                     <div className="mt-auto w-full mb-10 px-4.75">
                         <Link href="/profile" onClick={() => setDrawerOpen(false)}>
                             <div className="pt-2 pb-2 pl-4 pr-2 border border-light-border rounded-lg w-full flex items-center justify-between">
@@ -170,7 +178,7 @@ export default function SideNavbar({ pageTitle }: { pageTitle?: string }) {
                                                 {auth.state.userData.firstName}{" "}
                                                 {auth.state.userData.lastName}
                                             </>
-                                        )}git
+                                        )}
                                     </div>
                                     <div className="text-xs font-family-opensans text-[#666666]">
                                         {auth.state.userData?.role ?? "Loading..."}
@@ -191,12 +199,14 @@ function SideNavbarLink({
     path,
     roles,
     icon: Icon = ClientRequestIcon,
+    isMobile = false,
     onClick,
 }: {
     name: string;
     path: string;
     roles: UserRole[];
     icon?: React.FC;
+    isMobile?: boolean;
     onClick?: () => void;
 }) {
     const pathname = usePathname();
@@ -213,14 +223,14 @@ function SideNavbarLink({
         <Link
             href={path}
             onClick={onClick}
-            className={`hover:text-primary w-full h-10 px-4 flex items-center gap-1 ${
-                pathname?.startsWith(path) ? "text-primary font-semibold" : ""
-            }`}
+            className={`hover:text-primary flex items-center ${
+                isMobile
+                    ? "w-full h-10 px-4 gap-1"
+                    : "pb-4 text-sm gap-2"
+            } ${pathname?.startsWith(path) ? "text-primary font-semibold" : ""}`}
         >
-            <div className="w-6 h-6 flex items-center justify-center shrink-0">
-                <Icon />
-            </div>
-            <span className="font-family-roboto font-normal text-[16px]">{name}</span>
+            <Icon />
+            {name}
         </Link>
     );
 }

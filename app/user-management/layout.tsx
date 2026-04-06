@@ -14,8 +14,8 @@ export default function UserManagementLayout({ children }: { children: ReactNode
             <div className="h-full w-full flex flex-col font-family-roboto overflow-hidden">
                 <div className="flex flex-1 min-h-0">
                     <SideNavbar pageTitle="User Management" />
-                    <div className="flex-1 min-h-0 bg-[#F7F7F7] pt-8 max-md:pt-14 pb-4 px-6 flex flex-col">
-                        <span className="text-2xl text-primary font-extrabold block font-family-roboto">
+                    <div className="flex-1 min-h-0 bg-[#F7F7F7] pt-8 max-md:pt-26 pb-4 px-6 flex flex-col">
+                        <span className="text-2xl text-primary font-extrabold block max-md:hidden font-family-roboto">
                             User Management
                         </span>
                         <div className="flex gap-8 text-sm">
