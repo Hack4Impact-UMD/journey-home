@@ -75,6 +75,11 @@ export default function SideNavbar() {
                     path="/donate"
                     roles={[]}
                 />
+                <SideNavbarLink
+                    name="Shift Tasks"
+                    path="/volunteer-tasks"
+                    roles={["Volunteer"]}
+                />
 
                 <div className="mt-auto w-full mb-4">
                     <Link href="/profile">
