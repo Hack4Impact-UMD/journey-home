@@ -13,12 +13,14 @@ export default function CheckInOutFlow({ onAddItem, onClose }: Props) {
     useInventoryCategories();
 
   return (
-    <ItemSearcm
-      categories={inventoryCategories}
-      isLoading={isLoading}
-      isError={isError}
-      onAdd={onAddItem}
-      onClose={onClose}
-    />
+    <div className="box-shadow-md relative z-50">
+        <ItemSearcm
+        categories={inventoryCategories}
+        isLoading={isLoading}
+        isError={isError}
+        onAdd={onAddItem}
+        onClose={onClose}
+        />
+    </div>
   );
 }

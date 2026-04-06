@@ -67,7 +67,7 @@ export default function VolunteerTasks() {
                                     {Object.entries(items).map(([name, qty]) => (
                                         <div
                                             key={name}
-                                            className="flex justify-between bg-white p-3 rounded-lg shadow"
+                                            className="flex justify-between font-bold"
                                         >
                                             <span>{name}</span>
                                             <span className="text-[#02AFC7] font-semibold">
@@ -88,7 +88,7 @@ export default function VolunteerTasks() {
                             )}
 
                             {open && (
-                                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                                <div className="fixed inset-0 z-50 flex items-center justify-center">
                                     <div className="w-full max-w-md mx-auto">
                                         <CheckInOutFlow
                                             onClose={() => setOpen(false)}
@@ -115,7 +115,7 @@ export default function VolunteerTasks() {
                                     {Object.entries(items).map(([name, qty]) => (
                                         <div
                                             key={name}
-                                            className="flex justify-between bg-white p-4 rounded-xl shadow"
+                                            className="flex justify-between font-bold"
                                         >
                                             <span>{name}</span>
                                             <span className="text-[#02AFC7] font-semibold">

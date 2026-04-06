@@ -40,14 +40,14 @@ export default function ItemSearcm({
       qty: Number(quantity),
     });
 
-    // reset ONLY local state
     setSelectedItem(null);
     setQuantity("");
     setSearchQuery("");
   };
 
   return (
-    <div className="flex flex-col bg-white rounded-2xl p-6 w-full h-[80%] overflow-y-auto relative shadow-xl">
+    <div className="fixed inset-0 flex items-center justify-center z-50" onClick={onClose}>
+    <div className="flex flex-col bg-white rounded-2xl p-6 w-full h-[80%] overflow-y-auto relative shadow-xl"  onClick={(e) => e.stopPropagation()}>
 
       {!selectedItem && (
         <>
@@ -83,18 +83,19 @@ export default function ItemSearcm({
             <Badge text={selectedItem} color="blue"/>
           </div>
 
-          <div className="flex items-center gap-3 px-4 py-3 border-b">
-            <BoxIcon />
-            <input
-              type="number"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              placeholder="Quantity"
-              className="w-full outline-none"
-            />
-          </div>
-
-          {quantity && (
+          
+        </> )}
+      <div className="flex items-center gap-3 px-4 py-3 border-b">
+        <BoxIcon />
+        <input
+            type="number"
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
+            placeholder="Quantity"
+            className="w-full outline-none"
+         />
+    </div>
+    {quantity && (
             <div className="px-4 pt-4">
               <button
                 onClick={handleAdd}
@@ -104,15 +105,7 @@ export default function ItemSearcm({
               </button>
             </div>
           )}
-
-          <button
-            onClick={onClose}
-            className="mt-3 text-sm text-gray-500"
-          >
-            Close
-          </button>
-        </>
-      )}
+    </div>
     </div>
   );
 }
