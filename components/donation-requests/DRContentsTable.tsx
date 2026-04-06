@@ -1,7 +1,7 @@
 import { DonationItem, DonationRequest } from "@/types/donations";
-import { Badge } from "../inventory/Badge";
-import { ViewIcon } from "../icons/ViewIcon";
-import { TrashIcon } from "../icons/TrashIcon";
+import { Badge } from "@/components/inventory/Badge";
+import { ViewIcon } from "@/components/icons/ViewIcon";
+import { TrashIcon } from "@/components/icons/TrashIcon";
 
 export function DRContentsTable({
     request,
