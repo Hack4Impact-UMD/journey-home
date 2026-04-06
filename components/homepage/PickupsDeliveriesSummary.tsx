@@ -68,7 +68,7 @@ export function PickupsDeliveriesSummary() {
         <div className="bg-white rounded-sm border border-light-border p-5 flex flex-col gap-3">
             <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-text-1">Upcoming pickups/deliveries</span>
-                <span className="text-sm text-[#666]"><span className="font-semibold text-text-1">{todayBlocks.length}</span> today</span>
+                <span className="text-sm text-[#666]"><span className="font-semibold text-text-1">{rows.length}</span> today</span>
             </div>
             {isLoading ? (
                 <span className="text-sm text-[#A2A2A2]">Loading...</span>
