@@ -1,6 +1,7 @@
 import { ProtectedRoute } from "@/components/general/ProtectedRoute";
 import SideNavbar from "@/components/general/SideNav";
 import AdminCalendarSummary from "./AdminCalendarSummary";
+import WarehouseHistorySummary from "./WarehouseHistorySummary";
 
 export default function AdminHomePage() {
     return (
@@ -15,6 +16,7 @@ export default function AdminHomePage() {
                             <div className = "flex gap-4 flex-1">
                                 <div className = "flex flex-col gap-4 w-[45%]"> 
                                     Left Col Placeholder
+                                    <WarehouseHistorySummary/>
                                 </div>
                                 <div className = "flex flex-col gap-4 flex-1">
                                     Right Col Placeholder

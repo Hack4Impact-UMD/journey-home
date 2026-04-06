@@ -34,8 +34,8 @@ export default function AdminCalendarSummary() {
     }, [allTB]);
 
     return (
-        <div className="w-full h-full rounded-2xl border border-[#E7E7E7] bg-[#FFFFFF] shadow-lg shadow-[0px_0px_4px_0px_rgba(0,0,0,0.25)]">
-            <h2> Calendar </h2>
+        <div className="w-[35em] h-[18em] rounded-2xl border border-[#E7E7E7] bg-[#FFFFFF] shadow-lg shadow-[0px_0px_4px_0px_rgba(0,0,0,0.25)]">
+            <span> Calendar </span>
             {isLoading ? (
                 <p className = "flex justify-center"> Loading... </p>
             ) : upcomingEvents.length === 0 ? (
