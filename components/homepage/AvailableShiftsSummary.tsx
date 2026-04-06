@@ -7,7 +7,6 @@ export default function AvailableShiftsSummary() {
     const { allTB: timeblocks = [] } = useTimeBlocks();
 
     const now = new Date();
-    now.setDate(now.getDate() - 30);
 
     const availableShifts = timeblocks
         .filter((tb) => {
@@ -33,15 +32,15 @@ export default function AvailableShiftsSummary() {
                     const start = tb.startTime.toDate();
 
                     // total volunteers across all groups
-                    const totalVolunteers = tb.volunteerGroups.reduce(
+                    const totalVolunteers = tb.volunteerGroups?.reduce(
                         (sum, g) => sum + g.volunterIDs.length,
                         0
-                    );
-
-                    const totalCapacity = tb.volunteerGroups.reduce(
+                    ) ?? 0;
+                    
+                    const totalCapacity = tb.volunteerGroups?.reduce(
                         (sum, g) => sum + g.maxNum,
                         0
-                    );
+                    ) ?? 0;
 
                     // show the types
                     const displayType =
@@ -84,6 +83,13 @@ export default function AvailableShiftsSummary() {
 
                             {/* right */}
                             <div className="flex items-center gap-3">
+                                <div
+                                    className={`w-3 h-3 rounded-full ${
+                                        tb.type === "Warehouse"
+                                            ? "bg-secondary"
+                                            : "bg-primary"
+                                    }`}
+                                />
                                 <div className="text-sm">
                                     {start.toLocaleTimeString([], {
                                         hour: "numeric",

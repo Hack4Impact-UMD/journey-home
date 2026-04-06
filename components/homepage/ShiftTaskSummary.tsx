@@ -9,28 +9,25 @@ export default function ShiftTaskSummary() {
     const { state } = useAuth();
     const userId = state.currentUser?.uid;
 
-    const now = new Date(); // to filter out past shifts
+    const now = new Date();
 
     const myShifts = timeblocks
         .filter((tb) => {
             if (!userId) return false;
 
-            // const isSignedUp = tb.volunteerGroups?.some((group) =>
-            //     group.volunterIDs?.includes(userId)
-            // );
-            console.log("USER ID:", userId);
-            console.log("GROUPS:", tb.volunteerGroups);
+            // show only the shifts signed up by this user
+            const isSignedUp = tb.volunteerGroups?.some((group) =>
+                group.volunterIDs?.includes(userId)
+            );
 
-            // shows the shift user is in and the future ones
             const start = tb.startTime.toDate();
-            return start > now;
+            return isSignedUp && start > now;
         })
         .sort(
             (a, b) =>
                 a.startTime.toDate().getTime() - b.startTime.toDate().getTime()
         )
         .slice(0, 2); // shows only two shifts
-    console.log("myShift:", myShifts);
 
     return (
         <div>
@@ -47,15 +44,17 @@ export default function ShiftTaskSummary() {
                     const isToday =
                         start.toDateString() === new Date().toDateString();
 
-                    const totalVolunteers = tb.volunteerGroups.reduce(
-                        (sum, g) => sum + g.volunterIDs.length,
-                        0
-                    );
+                    const totalVolunteers =
+                        tb.volunteerGroups?.reduce(
+                            (sum, g) => sum + g.volunterIDs.length,
+                            0
+                        ) ?? 0;
 
-                    const totalCapacity = tb.volunteerGroups.reduce(
-                        (sum, g) => sum + g.maxNum,
-                        0
-                    );
+                    const totalCapacity =
+                        tb.volunteerGroups?.reduce(
+                            (sum, g) => sum + g.maxNum,
+                            0
+                        ) ?? 0;
 
                     return (
                         <div
@@ -93,6 +92,13 @@ export default function ShiftTaskSummary() {
 
                             {/* right side  */}
                             <div className="flex items-center gap-3">
+                                <div
+                                    className={`w-3 h-3 rounded-full ${
+                                        tb.type === "Warehouse"
+                                            ? "bg-secondary"
+                                            : "bg-primary"
+                                    }`}
+                                />
                                 <div className="text-sm">
                                     {start.toLocaleTimeString([], {
                                         hour: "numeric",
