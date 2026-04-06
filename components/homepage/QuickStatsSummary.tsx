@@ -29,7 +29,6 @@ type StatCardProps = {
     count: number;
     newCount?: number;
     icon: React.ReactNode;
-    href?: string;
 };
 
 function StatCard({ label, count, newCount, icon }: StatCardProps) {
@@ -43,7 +42,6 @@ function StatCard({ label, count, newCount, icon }: StatCardProps) {
             {newCount !== undefined && newCount > 0 && (
                 <span className="text-xs text-primary font-medium">{newCount} new</span>
             )}
-            {newCount === undefined && <span className="text-xs text-transparent select-none">—</span>}
             <div className="absolute bottom-2 right-3 opacity-[0.07] scale-[2.2] origin-bottom-right">
                 {icon}
             </div>
