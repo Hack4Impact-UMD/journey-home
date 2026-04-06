@@ -40,7 +40,7 @@ function LocationIcon() {
 }
 
 type DeliveryRow = {
-    id: string;
+    key: string;
     timeRange: string;
     name: string;
     location: string;
@@ -56,10 +56,10 @@ export function PickupsDeliveriesSummary() {
         return tb.tasks.map((task) => {
             if ("client" in task) {
                 const cr = task as ClientRequest;
-                return { id: cr.id, timeRange, name: `${cr.client.firstName} ${cr.client.lastName}`, location: cr.client.address?.city ?? "", type: "D" as const };
+                return { key: `${tb.id}-${cr.id}`, timeRange, name: `${cr.client.firstName} ${cr.client.lastName}`, location: cr.client.address?.city ?? "", type: "D" as const };
             } else {
                 const dr = task as DonationRequest;
-                return { id: dr.id, timeRange, name: `${dr.donor.firstName} ${dr.donor.lastName}`, location: dr.donor.address?.city ?? "", type: "P" as const };
+                return { key: `${tb.id}-${dr.id}`, timeRange, name: `${dr.donor.firstName} ${dr.donor.lastName}`, location: dr.donor.address?.city ?? "", type: "P" as const };
             }
         });
     });
@@ -68,7 +68,9 @@ export function PickupsDeliveriesSummary() {
         <div className="bg-white rounded-sm border border-light-border p-5 flex flex-col gap-3">
             <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-text-1">Upcoming pickups/deliveries</span>
-                <span className="text-sm text-[#666]"><span className="font-semibold text-text-1">{rows.length}</span> today</span>
+                <span className="text-sm text-[#666]">
+                    {isLoading ? "..." : <><span className="font-semibold text-text-1">{rows.length}</span> today</>}
+                </span>
             </div>
             {isLoading ? (
                 <span className="text-sm text-[#A2A2A2]">Loading...</span>
@@ -77,7 +79,7 @@ export function PickupsDeliveriesSummary() {
             ) : (
                 <div className="flex flex-col gap-2">
                     {rows.map((row) => (
-                        <div key={row.id} className="flex items-center gap-3">
+                        <div key={row.key} className="flex items-center gap-3">
                             <span className={`w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0 ${row.type === "P" ? "bg-primary" : "bg-secondary-1"}`}>{row.type}</span>
                             <span className="w-20 shrink-0 text-xs text-[#666]">{row.timeRange}</span>
                             <span className="flex items-center gap-1 flex-1 text-xs text-[#666]"><PersonIcon />{row.name}</span>
