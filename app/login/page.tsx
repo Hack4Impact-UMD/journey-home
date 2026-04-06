@@ -33,7 +33,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <div className="h-full max-w-[30em] overflow-hidden flex justify-center items-center">
+      <div className="hidden md:flex h-full max-w-[30em] overflow-hidden justify-center items-center">
         <img
           src="/background.png"
           alt="Login Background"
@@ -41,16 +41,21 @@ export default function LoginPage() {
         />
       </div>
 
-      <div className="flex-1 flex items-center justify-center">
+      <div className="flex-1 flex items-center justify-center" style={{ paddingLeft: '2em', paddingRight: '2em' }}>
         <form
           onSubmit={handleLogin}
-          className="w-[24em] h-[35em] flex flex-col text-black space-y-[1.2em]"
+          className="w-full max-w-[24em] h-[35em] flex flex-col text-black space-y-[1.2em]"
         >
           <div className="flex justify-center">
             <img
               src="/journey-home-logo.png"
               alt="Journey Home"
-              className="h-[6em] w-[22em]"
+              className="hidden md:block h-[6em] w-[22em]"
+            />
+            <img
+              src="/house-mobile-logo.png"
+              alt="Journey Home"
+              className="md:hidden w-full h-auto"
             />
           </div>
 
