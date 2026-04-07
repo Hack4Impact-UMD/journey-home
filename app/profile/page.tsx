@@ -2,7 +2,6 @@
 
 import { ProtectedRoute } from "@/components/general/ProtectedRoute";
 import SideNavbar from "@/components/general/SideNav";
-import TopNavbar from "@/components/general/TopNav";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAccount } from "@/lib/queries/users";
 import { useEffect, useState } from "react";
@@ -54,7 +53,6 @@ export default function ProfilePage() {
         return (
             <ProtectedRoute allow={["Admin", "Case Manager", "Volunteer"]}>
                 <div className="h-full w-full flex flex-col font-family-roboto">
-                    <TopNavbar />
                     <div className="flex flex-1">
                         <SideNavbar />
                         <div className="flex-1 bg-[#F7F7F7] py-4 px-6 flex flex-col">
@@ -73,7 +71,6 @@ export default function ProfilePage() {
         return (
             <ProtectedRoute allow={["Admin", "Case Manager", "Volunteer"]}>
                 <div className="h-full w-full flex flex-col font-family-roboto">
-                    <TopNavbar />
                     <div className="flex flex-1">
                         <SideNavbar />
                         <div className="flex-1 bg-[#F7F7F7] py-4 px-6 flex flex-col">
@@ -103,19 +100,15 @@ export default function ProfilePage() {
             return;
         }
 
-        try {
-            // Convert date string to Firestore Timestamp
-            const dobTimestamp = dob ? Timestamp.fromDate(new Date(dob)) : null;
-            await editAccount({
-                ...account,
-                firstName: firstName.trim(),
-                lastName: lastName.trim(),
-                dob: dobTimestamp,
-                phoneNumber: phoneNumber.trim(),
-            });
-        } catch (error) {
-            // Error already handled by toast.promise in editAccount
-        }
+        // Convert date string to Firestore Timestamp
+        const dobTimestamp = dob ? Timestamp.fromDate(new Date(dob)) : null;
+        await editAccount({
+            ...account,
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
+            dob: dobTimestamp,
+            phoneNumber: phoneNumber.trim(),
+        });
     };
 
     const handleCancel = () => {
@@ -187,7 +180,6 @@ export default function ProfilePage() {
     return (
         <ProtectedRoute allow={["Admin", "Case Manager", "Volunteer"]}>
             <div className="h-full w-full flex flex-col font-family-roboto">
-                <TopNavbar />
                 <div className="flex flex-1">
                     <SideNavbar />
                     <div className="flex-1 bg-[#F7F7F7] py-4 px-6 flex flex-col items-center">
