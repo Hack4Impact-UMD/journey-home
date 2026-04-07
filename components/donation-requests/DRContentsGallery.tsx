@@ -1,7 +1,6 @@
 import { DonationItem, DonationRequest } from "@/types/donations";
 import { Badge } from "@/components/inventory/Badge";
 
-
 export function DRContentsGallery({
     request,
     openItem,
@@ -11,7 +10,7 @@ export function DRContentsGallery({
 }) {
     return (
         <div className="w-full">
-            <div className="grid grid-cols-3 gap-4 pt-2 pb-4">
+            <div className="grid grid-cols-4 gap-[10px] pt-2 pb-4">
                 {request.items.map((item) => (
                     <DRGalleryCard
                         key={item.item.id + request.id}
@@ -33,27 +32,27 @@ function DRGalleryCard({
 }) {
     return (
         <div
-            className="border border-[#E1E1E1] rounded bg-white hover:bg-blue-50 cursor-pointer flex flex-col overflow-hidden shadow-[0_1px_6.7px_0_rgba(145,145,145,0.25)]"
+            className="border border-[#E1E1E1] rounded-[4px] bg-white hover:bg-blue-50 cursor-pointer flex flex-col px-2.5 pt-2.5 pb-3 gap-[10px]"
             onClick={onOpen}
         >
-            <div className="w-full aspect-square bg-[#FAFAFB] flex items-center justify-center overflow-hidden">
+            <div className="w-full aspect-square bg-[#FAFAFB] rounded-[4px] overflow-hidden flex items-center justify-center">
                 {item.item.photos.length > 0 ? (
                     <img
                         src={item.item.photos[0].url}
                         alt={item.item.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover rounded-[4px]"
                     />
                 ) : (
                     <span className="text-xs text-gray-400">No image</span>
                 )}
             </div>
 
-            <div className="p-2 flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1">
                 <span className="text-sm font-bold text-text-1 truncate">
                     {item.item.name}
                 </span>
 
-                <div className="flex flex-wrap gap-1 items-center">
+                <div className="flex gap-1 items-center text-xs">
                     <Badge text={item.item.category} color="blue" />
                     <Badge
                         text={item.item.size}
