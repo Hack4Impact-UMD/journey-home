@@ -2,22 +2,34 @@
 
 import Link from "next/link";
 import { useTimeBlocks } from "@/lib/queries/timeblocks";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function AvailableShiftsSummary() {
     const { allTB: timeblocks = [] } = useTimeBlocks();
-
+    const { state } = useAuth();
+    const userId = state.currentUser?.uid;
+    
     const now = new Date();
 
     const availableShifts = timeblocks
         .filter((tb) => {
-            const start = tb.startTime.toDate();
-            return start > now;
+            if (!userId) return false;
+
+            const startTime = tb.startTime.toDate();
+            if (!(tb.published === true && startTime > now)) return false;
+
+            // check if signedup
+            const isSignedUp = tb.volunteerGroups?.some((group) =>
+                group.volunterIDs?.includes(userId)
+            );
+
+            return !isSignedUp;
         })
         .sort(
             (a, b) =>
-                a.startTime.toDate().getTime() - b.startTime.toDate().getTime()
-        )
-        .slice(0, 3);
+                a.startTime.toDate().getTime() -
+                b.startTime.toDate().getTime()
+        );
 
     return (
         <div>
@@ -26,23 +38,23 @@ export default function AvailableShiftsSummary() {
                     <h2 className="text-lg text-gray-800">Sign-Up {">"}</h2>
                 </div>
             </Link>
-            {/* list */}
-            <div className="flex flex-col">
-                {availableShifts.map((tb) => {
+
+            <div className="border bg-white overflow-hidden">
+                {availableShifts.map((tb, index) => {
                     const start = tb.startTime.toDate();
 
-                    // total volunteers across all groups
-                    const totalVolunteers = tb.volunteerGroups?.reduce(
-                        (sum, g) => sum + g.volunterIDs.length,
-                        0
-                    ) ?? 0;
-                    
-                    const totalCapacity = tb.volunteerGroups?.reduce(
-                        (sum, g) => sum + g.maxNum,
-                        0
-                    ) ?? 0;
+                    const totalVolunteers =
+                        tb.volunteerGroups?.reduce(
+                            (sum, g) => sum + (g.volunterIDs?.length ?? 0),
+                            0
+                        ) ?? 0;
 
-                    // show the types
+                    const totalCapacity =
+                        tb.volunteerGroups?.reduce(
+                            (sum, g) => sum + (g.maxNum ?? 0),
+                            0
+                        ) ?? 0;
+
                     const displayType =
                         tb.type === "Pickup/Delivery"
                             ? "Pickups / Deliveries"
@@ -51,16 +63,20 @@ export default function AvailableShiftsSummary() {
                     return (
                         <div
                             key={tb.id}
-                            className="border p-3 flex items-center justify-between bg-white"
+                            className={`p-4 flex items-center justify-between ${
+                                index !== availableShifts.length - 1
+                                    ? "border-b"
+                                    : ""
+                            }`}
                         >
                             {/* left */}
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-start gap-3">
                                 <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-semibold">
                                     {start.getDate()}
                                 </div>
 
                                 <div>
-                                    <div className="text-sm text-gray-500 font-semibold">
+                                    <div className="text-sm text-gray-500">
                                         {`${start.toLocaleDateString(
                                             undefined,
                                             { month: "short" }
@@ -70,36 +86,36 @@ export default function AvailableShiftsSummary() {
                                         )}`.toUpperCase()}
                                     </div>
 
-                                    <div className="text-sm font-medium">
+                                    <div className="text-sm">
                                         {displayType}
                                     </div>
 
                                     <div className="text-xs text-primary">
-                                        {totalVolunteers}/{totalCapacity}{" "}
-                                        volunteers
+                                        {totalVolunteers}/{totalCapacity} volunteers
                                     </div>
                                 </div>
                             </div>
 
                             {/* right */}
-                            <div className="flex items-center gap-3">
-                                <div
-                                    className={`w-3 h-3 rounded-full ${
-                                        tb.type === "Warehouse"
-                                            ? "bg-secondary"
-                                            : "bg-primary"
-                                    }`}
-                                />
-                                <div className="text-sm">
-                                    {start.toLocaleTimeString([], {
-                                        hour: "numeric",
-                                        minute: "2-digit",
-                                    })}
+                            <div className="flex flex-col items-end gap-2 ml-auto">
+                                <div className="flex items-center gap-2">
+                                    <div
+                                        className={`w-3 h-3 rounded-full ${
+                                            tb.type === "Warehouse"
+                                                ? "bg-secondary"
+                                                : "bg-primary"
+                                        }`}
+                                    />
+                                    <div className="text-sm">
+                                        {start.toLocaleTimeString([], {
+                                            hour: "numeric",
+                                            minute: "2-digit",
+                                        })}
+                                    </div>
                                 </div>
 
-                                {/* sign up button -> shift signup page */}
                                 <Link href="/volunteer-signup">
-                                    <button className="bg-primary text-white px-4 py-1 text-xs rounded-xs">
+                                    <button className="bg-primary text-white h-8 px-4 py-1 text-xs rounded-xs">
                                         Sign up
                                     </button>
                                 </Link>

@@ -15,61 +15,63 @@ export default function ShiftTaskSummary() {
         .filter((tb) => {
             if (!userId) return false;
 
-            // show only the shifts signed up by this user
+            const startTime = tb.startTime.toDate();
+            if (startTime <= now) return false;
+
+            // check if signedup
             const isSignedUp = tb.volunteerGroups?.some((group) =>
                 group.volunterIDs?.includes(userId)
             );
 
-            const start = tb.startTime.toDate();
-            return isSignedUp && start > now;
+            return isSignedUp;
         })
         .sort(
             (a, b) =>
-                a.startTime.toDate().getTime() - b.startTime.toDate().getTime()
-        )
-        .slice(0, 2); // shows only two shifts
+                a.startTime.toDate().getTime() -
+                b.startTime.toDate().getTime()
+        );
 
     return (
         <div>
-            {/* link to shift task page */}
             <Link href="/volunteer-tasks">
                 <div className="flex items-center justify-between mb-4 cursor-pointer">
                     <h2 className="text-lg text-gray-800">Shift Tasks {">"}</h2>
                 </div>
             </Link>
-            <div className="flex flex-col">
-                {myShifts.map((tb) => {
-                    const start = tb.startTime.toDate();
 
+            <div className="border bg-white overflow-hidden">
+                {myShifts.map((tb, index) => {
+                    const start = tb.startTime.toDate();
                     const isToday =
-                        start.toDateString() === new Date().toDateString();
+                        start.toDateString() === now.toDateString();
 
                     const totalVolunteers =
                         tb.volunteerGroups?.reduce(
-                            (sum, g) => sum + g.volunterIDs.length,
+                            (sum, g) => sum + (g.volunterIDs?.length ?? 0),
                             0
                         ) ?? 0;
 
                     const totalCapacity =
                         tb.volunteerGroups?.reduce(
-                            (sum, g) => sum + g.maxNum,
+                            (sum, g) => sum + (g.maxNum ?? 0),
                             0
                         ) ?? 0;
 
                     return (
                         <div
                             key={tb.id}
-                            className="border p-3 flex items-center justify-between bg-white"
+                            className={`p-4 flex items-center justify-between ${
+                                index !== myShifts.length - 1 ? "border-b" : ""
+                            }`}
                         >
-                            {/* left side (date + type of volunteer) */}
-                            <div className="flex items-center gap-3">
+                            {/* left */}
+                            <div className="flex items-start gap-3">
                                 <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-semibold">
                                     {start.getDate()}
                                 </div>
 
-                                {/* shift details  */}
                                 <div>
-                                    <div className="text-sm text-gray-500 font-semibold">
+                                    <div className="text-sm text-gray-500">
                                         {`${start.toLocaleDateString(
                                             undefined,
                                             { month: "short" }
@@ -79,43 +81,42 @@ export default function ShiftTaskSummary() {
                                         )}`.toUpperCase()}
                                     </div>
 
-                                    <div className="text-sm font-medium">
+                                    <div className="text-sm">
                                         {tb.type}
                                     </div>
 
                                     <div className="text-xs text-primary">
-                                        {totalVolunteers}/{totalCapacity}{" "}
-                                        volunteers
+                                        {totalVolunteers}/{totalCapacity} volunteers
                                     </div>
                                 </div>
                             </div>
 
-                            {/* right side  */}
-                            <div className="flex items-center gap-3">
-                                <div
-                                    className={`w-3 h-3 rounded-full ${
-                                        tb.type === "Warehouse"
-                                            ? "bg-secondary"
-                                            : "bg-primary"
-                                    }`}
-                                />
-                                <div className="text-sm">
-                                    {start.toLocaleTimeString([], {
-                                        hour: "numeric",
-                                        minute: "2-digit",
-                                    })}
+                            {/* right */}
+                            <div className="flex flex-col items-end gap-2 ml-auto">
+                                <div className="flex items-center gap-2">
+                                    <div
+                                        className={`w-3 h-3 rounded-full ${
+                                            tb.type === "Warehouse"
+                                                ? "bg-secondary"
+                                                : "bg-primary"
+                                        }`}
+                                    />
+                                    <div className="text-sm">
+                                        {start.toLocaleTimeString([], {
+                                            hour: "numeric",
+                                            minute: "2-digit",
+                                        })}
+                                    </div>
                                 </div>
 
-                                {/* if the shift is today, show the open button, then lead to the shift task page */}
                                 {isToday ? (
                                     <Link href="/volunteer-tasks">
-                                        <button className="bg-primary text-white px-4 py-1 rounded-md text-sm">
+                                        <button className="bg-primary text-white h-8 px-4 py-1 rounded-xs text-sm">
                                             Open
                                         </button>
                                     </Link>
                                 ) : (
-                                    // show upcoming label if not today
-                                    <div className="border px-4 py-1 text-xs rounded-xs text-primary">
+                                    <div className="border px-4 h-8 rounded-xs text-primary flex items-center justify-center text-xs">
                                         Upcoming
                                     </div>
                                 )}
