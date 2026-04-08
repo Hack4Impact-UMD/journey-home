@@ -3,8 +3,7 @@
 import { createDonationRequest } from "@/lib/services/donations";
 import { setInventoryCategory, uploadImage } from "@/lib/services/inventory";
 import { DonationItem, DonationRequest } from "@/types/donations";
-import { InventoryCategory, InventoryPhoto } from "@/types/inventory";
-import { WarehouseChange } from "@/types/changelog";
+import { InventoryCategory, InventoryChange, InventoryPhoto } from "@/types/inventory";
 import { query, Timestamp, where } from "@firebase/firestore";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
@@ -751,13 +750,13 @@ const DEFAULT_INVENTORY_CATEGORIES: Omit<InventoryCategory, "quantity">[] = [
     { id: crypto.randomUUID(), name: "End Tables",        lowThreshold: 5,  highThreshold: 10 },
 ];
 
-async function generateInventoryChanges(count: number): Promise<WarehouseChange[]> {
+async function generateInventoryChanges(count: number): Promise<InventoryChange[]> {
   const users = await getDocs(
     query(collection(db, "users"), where("role", "in", ["Volunteer", "Admin"]))
   );
-  const userDocs = users.docs.map((doc) => ({ id: doc.id, email: (doc.data() as { email?: string }).email ?? "" }));
+  const userIds = users.docs.map((doc) => doc.id);
 
-  if (userDocs.length === 0) throw new Error("no volunteers");
+  if (userIds.length === 0) throw new Error("no volunteers");
 
   const runningQty = Object.fromEntries(
     DEFAULT_INVENTORY_CATEGORIES.map((cat) => [
@@ -769,31 +768,26 @@ async function generateInventoryChanges(count: number): Promise<WarehouseChange[
   const now = Date.now();
   const twoMonthsMs = 60 * 86_400_000;
 
+  // Generate and sort timestamps first
   const timestamps = Array.from({ length: count }, () =>
     now - Math.floor(Math.random() * twoMonthsMs)
-  ).sort((a, b) => a - b);
+  ).sort((a, b) => a - b); // oldest first
 
-  return timestamps.map((ts): WarehouseChange => {
+  return timestamps.map((ts): InventoryChange => {
     const cat = DEFAULT_INVENTORY_CATEGORIES[Math.floor(Math.random() * DEFAULT_INVENTORY_CATEGORIES.length)];
-    const user = userDocs[Math.floor(Math.random() * userDocs.length)];
 
-    const amountBefore = runningQty[cat.id];
-    const rawDelta = Math.floor(Math.random() * 9) - 3;
-    const amountAfter = Math.max(0, amountBefore + rawDelta);
-    const changeAmount = amountAfter - amountBefore;
-    runningQty[cat.id] = amountAfter;
+    const oldQuantity = runningQty[cat.id];
+    const delta = Math.floor(Math.random() * 9) - 3;
+    const newQuantity = Math.max(0, oldQuantity + delta);
+    const reverted = Math.random() < 0.2;
+    runningQty[cat.id] = reverted ? oldQuantity : newQuantity;
 
     return {
       id: crypto.randomUUID(),
-      itemId: cat.id,
-      itemName: cat.name,
-      changeType: changeAmount >= 0 ? "Addition" : "Removal",
-      changeAmount,
-      amountBefore,
-      amountAfter,
+      userId: userIds[Math.floor(Math.random() * userIds.length)],
       timestamp: Timestamp.fromMillis(ts),
-      userId: user.id,
-      userEmail: user.email,
+      change: { category: cat.name, oldQuantity, newQuantity },
+      reverted,
     };
   });
 }

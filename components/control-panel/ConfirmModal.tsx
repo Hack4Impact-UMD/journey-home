@@ -1,30 +1,16 @@
 "use client";
 
 import { createPortal } from "react-dom";
-import { useId, useEffect } from "react";
+import { useEffect } from "react";
 
 type ConfirmModalProps = {
     title: string;
     message: string;
-    confirmLabel?: string;
-    cancelLabel?: string;
-    disabled?: boolean;
     onConfirm: () => void;
     onCancel: () => void;
 };
 
-export function ConfirmModal({
-    title,
-    message,
-    confirmLabel = "Confirm",
-    cancelLabel = "Cancel",
-    disabled = false,
-    onConfirm,
-    onCancel,
-}: ConfirmModalProps) {
-    const titleId = useId();
-    const descId = useId();
-
+export function ConfirmModal({ title, message, onConfirm, onCancel }: ConfirmModalProps) {
     useEffect(() => {
         const previousOverflow = document.body.style.overflow;
         document.body.style.overflow = "hidden";
@@ -39,37 +25,14 @@ export function ConfirmModal({
     }, [onCancel]);
 
     return createPortal(
-        <div className="fixed inset-0 z-50 flex items-center justify-center font-family-roboto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center font-family-roboto bg-black/25">
             <div className="absolute inset-0" onClick={onCancel} />
-            <div
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby={titleId}
-                aria-describedby={descId}
-                className="relative bg-white border-2 border-dashed border-primary rounded-sm w-full max-w-md max-h-[80vh] mx-4 flex flex-col"
-            >
-                <div className="sticky top-0 bg-white px-6 py-4 shadow-[0_2px_6px_rgba(0,0,0,0.08)]">
-                    <h2 id={titleId} className="font-bold text-xl text-text-1">{title}</h2>
-                </div>
-
-                <div className="flex-1 overflow-y-auto px-6 py-4">
-                    <p id={descId} className="text-sm text-[#888]">{message}</p>
-                </div>
-
-                <div className="sticky bottom-0 bg-white px-6 py-4 shadow-[0_-2px_6px_rgba(0,0,0,0.08)] flex gap-6 justify-end">
-                    <button
-                        className="text-sm font-medium text-primary hover:opacity-75"
-                        onClick={onCancel}
-                    >
-                        {cancelLabel}
-                    </button>
-                    <button
-                        className="text-sm font-medium text-primary hover:opacity-75 disabled:opacity-40 disabled:cursor-not-allowed"
-                        onClick={onConfirm}
-                        disabled={disabled}
-                    >
-                        {confirmLabel}
-                    </button>
+            <div className="relative bg-white w-full max-w-sm px-6 py-4 flex flex-col rounded-xl">
+                <h1 className="text-xl font-semibold mb-2">{title}</h1>
+                <p className="text-[#8D8D8D] text-sm font-family-opensans mb-8">{message}</p>
+                <div className="flex gap-8 justify-end">
+                    <button className="text-sm text-primary hover:opacity-75" onClick={onCancel}>Cancel</button>
+                    <button className="text-sm text-primary hover:opacity-75" onClick={onConfirm}>Confirm</button>
                 </div>
             </div>
         </div>,

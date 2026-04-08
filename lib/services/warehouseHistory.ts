@@ -1,37 +1,19 @@
-import { WarehouseChange } from "@/types/changelog";
+import { InventoryChange } from "@/types/inventory";
 import { db } from "../firebase";
 import {
     collection,
-    doc,
     getDocs,
     query,
-    setDoc,
     Timestamp,
     where,
 } from "firebase/firestore";
 
 export const WAREHOUSE_HISTORY_COLLECTION = "warehouseHistory";
 
-function isWarehouseChange(data: Record<string, unknown>): data is WarehouseChange {
-    return (
-        typeof data.id === "string" &&
-        typeof data.itemId === "string" &&
-        typeof data.itemName === "string" &&
-        typeof data.changeType === "string" &&
-        typeof data.changeAmount === "number" &&
-        typeof data.amountBefore === "number" &&
-        typeof data.amountAfter === "number" &&
-        typeof data.userId === "string" &&
-        typeof data.userEmail === "string" &&
-        data.timestamp != null
-    );
-}
-
-
 export async function getWarehouseHistory(
     startDate?: Date,
     endDate?: Date
-): Promise<WarehouseChange[]> {
+): Promise<InventoryChange[]> {
     const col = collection(db, WAREHOUSE_HISTORY_COLLECTION);
 
     let q;
@@ -50,15 +32,5 @@ export async function getWarehouseHistory(
     }
 
     const snapshot = await getDocs(q);
-    return snapshot.docs
-        .map((d) => d.data() as Record<string, unknown>)
-        .filter(isWarehouseChange);
-}
-
-/**
- * Write or update a single warehouse change entry.
- */
-export async function setWarehouseChange(change: WarehouseChange): Promise<void> {
-    const docRef = doc(db, WAREHOUSE_HISTORY_COLLECTION, change.id);
-    await setDoc(docRef, change);
+    return snapshot.docs.map((d) => d.data() as InventoryChange);
 }

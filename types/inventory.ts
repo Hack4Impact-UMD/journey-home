@@ -29,3 +29,16 @@ export type InventoryCategory = {
   highThreshold: number,
 }
 
+export type CategoryQuantityChange = {
+  category: string,
+  oldQuantity: number,
+  newQuantity: number,
+}
+
+export type InventoryChange = {
+  id: string,
+  userId: string,
+  timestamp: Timestamp,
+  change: CategoryQuantityChange,
+  reverted: boolean,
+}
