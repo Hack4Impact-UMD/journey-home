@@ -34,10 +34,10 @@ export function WarehouseHistoryTable({ changes, userById, inventoryCategories, 
                 <ConfirmModal
                     title="Revert this change?"
                     message={buildRevertMessage(pendingRevert, categoryByName.get(pendingRevert.change.category)?.quantity)}
-                    onConfirm={() => {
+                    onConfirm={async () => {
                         const change = pendingRevert;
                         setPendingRevert(null);
-                        onRevert(change);
+                        await onRevert(change);
                     }}
                     onCancel={() => setPendingRevert(null)}
                 />

@@ -51,10 +51,21 @@ export default function WarehouseHistoryPage() {
 
     async function handleRevert(change: InventoryChange) {
         const category = inventoryCategories.find(c => c.name === change.change.category);
-        if (!category) throw new Error("Category not found");
+        if (!category) {
+            toast.error("Category not found.");
+            return;
+        }
+        if (!userId) {
+            toast.error("User ID not available.");
+            return;
+        }
         const delta = change.change.newQuantity - change.change.oldQuantity;
-        await setInventoryCategory({ ...category, quantity: category.quantity - delta }, userId!, change);
-        toast.success("Change reverted successfully.");
+        const promise = setInventoryCategory({ ...category, quantity: category.quantity - delta }, userId, change);
+        await toast.promise(promise, {
+            loading: "Reverting change...",
+            success: "Change reverted successfully.",
+            error: "Failed to revert change.",
+        });
     }
 
     return (
