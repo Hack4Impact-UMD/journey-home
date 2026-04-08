@@ -9,9 +9,9 @@ type SearchBoxProps = {
 export function SearchBox({ value, onChange, onSubmit }: SearchBoxProps) {
     return (
         <>
-            <div className="border border-light-border rounded-xs flex w-full">
+            <div className="border border-light-border rounded-xs flex">
                 <form
-                    className="flex w-full"
+                    className="flex"
                     onSubmit={(e) => {
                         e.preventDefault();
                         onSubmit();
@@ -19,7 +19,7 @@ export function SearchBox({ value, onChange, onSubmit }: SearchBoxProps) {
                 >
                     <input
                         type="text"
-                        className="flex-1 min-w-0 h-8 text-sm text-text-1 placeholder:text-[#BFBFBF] px-3 outline-none"
+                        className="w-60 h-8 text-sm text-text-1 placeholder:text-[#BFBFBF] px-3 outline-none"
                         placeholder="Search"
                         value={value}
                         onChange={(e) => onChange(e.target.value)}
