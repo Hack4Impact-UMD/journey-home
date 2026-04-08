@@ -5,8 +5,9 @@ import { useTimeBlocks } from "@/lib/queries/timeblocks";
 import { TimeBlock } from "@/types/schedule";
 import { AdminCalendarPeople } from "../icons/AdminCalendarPeople";
 
-// within volunteer group type, there isn't a low volunteer threshold for where the icon turns red
+// threshold for volunteer = half of max and then lead driver max for all otherwise red
 const Low_Volunteer_Threshold = 2;
+const Lead_Driver_Threshold = 1; //insert nums here 
 
 const type_dot_color: Record<TimeBlock["type"], string> = {
     "Pickup/Delivery": "bg-[#FBCF0B]",
@@ -37,12 +38,14 @@ export default function AdminCalendarSummary() {
     return (
         <div className="w-[90%] h-[40%] px-[1rem] rounded-2xl border border-[#E7E7E7] bg-[#FFFFFF] shadow-lg shadow-[0px_0px_4px_0px_rgba(0,0,0,0.25)]">
             <div className = "my-[1rem] font-bold text-lg"> Calendar </div>
+            {/* border here */}
+            <div className = ""> </div> 
             {isLoading ? (
                 <p className = "flex justify-center"> Loading... </p>
             ) : upcomingEvents.length === 0 ? (
                 <p className = "flex justify-center">No Upcoming Timeblocks</p>
             ) : (
-                <div className = "mt-[2rem] flex flex-col justify-center divide-y gap-7">
+                <div className = "mt-[1rem] flex flex-col gap-4">
                     {upcomingEvents.map((tb) => {
                         const start = tb.startTime.toDate()
                         const dayNumber = start.getDate();
@@ -52,7 +55,7 @@ export default function AdminCalendarSummary() {
                         const lowVol = volCount <= Low_Volunteer_Threshold;
 
                         return (
-                            <div key = {tb.id} className = "grid grid-cols-[2.5rem_6rem_1rem_7rem_1fr_auto] items-center gap-2">
+                            <div key = {tb.id} className = "grid grid-cols-[2.5rem_6rem_1rem_7rem_1fr_auto] items-center text-center gap-2 border-b border-[#E3E3E3] py-3 last:border-0">
                                 <div className = "h-9 w-9 flex items-center justify-center rounded-full text-sm font-bold bg-[#02AFC7] text-white">
                                     {dayNumber}
                                 </div>
@@ -64,15 +67,15 @@ export default function AdminCalendarSummary() {
                                     <AdminCalendarPeople fill={lowVol ? "#E16060" : "#000000"}/>
                                     {volCount}
                                 </span>
-                                <span/>
                             </div>
                         )
                     })}
 
                 </div>
             )
-
+            
             }
+            <div className = ""></div>
         </div>
     );
 }
