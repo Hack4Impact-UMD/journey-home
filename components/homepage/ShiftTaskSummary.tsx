@@ -22,13 +22,11 @@ export default function ShiftTaskSummary() {
             const isSignedUp = tb.volunteerGroups?.some((group) =>
                 group.volunterIDs?.includes(userId)
             );
-
             return isSignedUp;
         })
         .sort(
             (a, b) =>
-                a.startTime.toDate().getTime() -
-                b.startTime.toDate().getTime()
+                a.startTime.toDate().getTime() - b.startTime.toDate().getTime()
         );
 
     return (
@@ -42,8 +40,7 @@ export default function ShiftTaskSummary() {
             <div className="border bg-white overflow-hidden">
                 {myShifts.map((tb, index) => {
                     const start = tb.startTime.toDate();
-                    const isToday =
-                        start.toDateString() === now.toDateString();
+                    const isToday = start.toDateString() === now.toDateString();
 
                     const totalVolunteers =
                         tb.volunteerGroups?.reduce(
@@ -81,12 +78,11 @@ export default function ShiftTaskSummary() {
                                         )}`.toUpperCase()}
                                     </div>
 
-                                    <div className="text-sm">
-                                        {tb.type}
-                                    </div>
+                                    <div className="text-sm">{tb.type}</div>
 
                                     <div className="text-xs text-primary">
-                                        {totalVolunteers}/{totalCapacity} volunteers
+                                        {totalVolunteers}/{totalCapacity}{" "}
+                                        volunteers
                                     </div>
                                 </div>
                             </div>
@@ -110,10 +106,11 @@ export default function ShiftTaskSummary() {
                                 </div>
 
                                 {isToday ? (
-                                    <Link href="/volunteer-tasks">
-                                        <button className="bg-primary text-white h-8 px-4 py-1 rounded-xs text-sm">
-                                            Open
-                                        </button>
+                                    <Link
+                                        href="/volunteer-tasks"
+                                        className="bg-primary text-white h-8 px-4 py-1 rounded-xs text-sm inline-flex items-center"
+                                    >
+                                        Open
                                     </Link>
                                 ) : (
                                     <div className="border px-4 h-8 rounded-xs text-primary flex items-center justify-center text-xs">

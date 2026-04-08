@@ -8,7 +8,7 @@ export default function AvailableShiftsSummary() {
     const { allTB: timeblocks = [] } = useTimeBlocks();
     const { state } = useAuth();
     const userId = state.currentUser?.uid;
-    
+
     const now = new Date();
 
     const availableShifts = timeblocks
@@ -23,12 +23,23 @@ export default function AvailableShiftsSummary() {
                 group.volunterIDs?.includes(userId)
             );
 
-            return !isSignedUp;
+            const totalVolunteers =
+                tb.volunteerGroups?.reduce(
+                    (sum, g) => sum + (g.volunterIDs?.length ?? 0),
+                    0
+                ) ?? 0;
+            const totalCapacity =
+                tb.volunteerGroups?.reduce(
+                    (sum, g) => sum + (g.maxNum ?? 0),
+                    0
+                ) ?? 0;
+            const hasCapacity = totalVolunteers < totalCapacity;
+
+            return !isSignedUp && hasCapacity;
         })
         .sort(
             (a, b) =>
-                a.startTime.toDate().getTime() -
-                b.startTime.toDate().getTime()
+                a.startTime.toDate().getTime() - b.startTime.toDate().getTime()
         );
 
     return (
@@ -86,12 +97,11 @@ export default function AvailableShiftsSummary() {
                                         )}`.toUpperCase()}
                                     </div>
 
-                                    <div className="text-sm">
-                                        {displayType}
-                                    </div>
+                                    <div className="text-sm">{displayType}</div>
 
                                     <div className="text-xs text-primary">
-                                        {totalVolunteers}/{totalCapacity} volunteers
+                                        {totalVolunteers}/{totalCapacity}{" "}
+                                        volunteers
                                     </div>
                                 </div>
                             </div>
@@ -114,10 +124,11 @@ export default function AvailableShiftsSummary() {
                                     </div>
                                 </div>
 
-                                <Link href="/volunteer-signup">
-                                    <button className="bg-primary text-white h-8 px-4 py-1 text-xs rounded-xs">
-                                        Sign up
-                                    </button>
+                                <Link
+                                    href="/volunteer-signup"
+                                    className="bg-primary text-white h-8 px-4 py-1 text-xs rounded-xs inline-flex items-center"
+                                >
+                                    Sign up
                                 </Link>
                             </div>
                         </div>
