@@ -17,12 +17,12 @@ export default function WarehouseHistorySummary(){
 
     return (
         <div className = "w-[95%] h-[45%] rounded-2xl border border-[#E7E7E7] bg-[#FFFFFF] shadow-lg shadow-[0px_0px_4px_0px_rgba(0,0,0,0.25)]">
-            <div className = "flex flex-row place-content-between">
-                <span>
+            <div className = "flex flex-row place-content-between my-[1.5rem] mx-[1rem]">
+                <span className = "font-semibold">
                     Latest inventory updates
                 </span>
                 <span>
-                     *insert num here* new changes
+                     {warehouseChanges.length} new changes
                 </span> 
             </div>
             {isLoading ? (
@@ -31,7 +31,9 @@ export default function WarehouseHistorySummary(){
                 <p>No inventory changes were made</p>
             ) : (
                 <div>
-                    {/* waiting on data */}
+                    <div className = "">
+                            
+                    </div>
                 </div>
             )}
         </div>
