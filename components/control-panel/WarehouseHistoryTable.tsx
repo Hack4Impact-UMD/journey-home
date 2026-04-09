@@ -3,7 +3,7 @@
 import { InventoryChange, InventoryCategory } from "@/types/inventory";
 import { UserData } from "@/types/user";
 import { useState } from "react";
-import { ConfirmModal } from "@/components/control-panel/ConfirmModal";
+import { ConfirmModal } from "@/components/general/ConfirmModal";
 import { RevertIcon } from "@/components/icons/RevertIcon";
 
 type WarehouseHistoryTableProps = {

@@ -3,7 +3,7 @@
 import { createPortal } from "react-dom";
 import { useEffect, useState } from "react";
 
-type ConfirmModalProps = {
+interface ConfirmModalProps {
     title: string;
     message: string;
     onConfirm: () => void | Promise<void>;

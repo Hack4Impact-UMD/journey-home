@@ -5,6 +5,7 @@ import SideNavbar from "@/components/general/SideNav";
 import { ReactNode } from "react";
 
 export default function InventoryLayout({ children }: { children: ReactNode }) {
+
     return (
         <ProtectedRoute allow={["Admin"]}>
             <div className="h-full w-full flex flex-col font-family-roboto overflow-hidden">
