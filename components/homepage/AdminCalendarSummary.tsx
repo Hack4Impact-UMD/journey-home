@@ -36,7 +36,7 @@ export default function AdminCalendarSummary() {
     }, [allTB]);
 
     return (
-        <div className="w-[90%] h-[40%] px-[1rem] rounded-2xl border border-[#E7E7E7] bg-[#FFFFFF] shadow-lg shadow-[0px_0px_4px_0px_rgba(0,0,0,0.25)]">
+        <div className="w-[95%] h-[40%] px-[1rem] rounded-2xl border border-[#E7E7E7] bg-[#FFFFFF] shadow-lg shadow-[0px_0px_4px_0px_rgba(0,0,0,0.25)]">
             <div className = "my-[1rem] font-bold text-lg"> Calendar </div>
             <div className="mt-[1rem] border-b border-[#E3E3E3]" />
             {isLoading ? (
@@ -55,7 +55,7 @@ export default function AdminCalendarSummary() {
                         const lowDrive = false; // will be edited when field is added into type for driver
 
                         return (
-                            <div key = {tb.id} className = "grid grid-cols-[2.5rem_6rem_1rem_7rem_1fr_auto_auto] items-center text-center gap-2 border-b border-[#E3E3E3] py-4">
+                            <div key = {tb.id} className = "grid grid-cols-[2.5rem_6rem_1rem_7rem_1fr_3rem_3rem] items-center text-center gap-2 border-b border-[#E3E3E3] py-4">
                                 <div className = "h-9 w-9 flex items-center justify-center rounded-full text-sm font-bold bg-[#02AFC7] text-white">
                                     {dayNumber}
                                 </div>
@@ -67,10 +67,14 @@ export default function AdminCalendarSummary() {
                                     <AdminCalendarPeople fill={lowVol ? "#E16060" : "#000000"}/>
                                     {volCount}
                                 </span>
+                                {lowDrive ? (
                                 <span className={`flex items-center gap-[0.25rem] ${lowDrive ? "text-[#E16060]" : "text-[#000000]"}`}>
                                     <AdminCalendarDriver fill={lowDrive ? "#E16060" : "#000000"}/>
                                     {volCount}
-                                </span>
+                                </span>): 
+                                (
+                                    <div/>
+                                )}
                             </div>
                         )
                     })}

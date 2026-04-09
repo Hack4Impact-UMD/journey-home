@@ -2,6 +2,8 @@ import { ProtectedRoute } from "@/components/general/ProtectedRoute";
 import SideNavbar from "@/components/general/SideNav";
 import AdminCalendarSummary from "./AdminCalendarSummary";
 import WarehouseHistorySummary from "./WarehouseHistorySummary";
+import { QuickStatsSummary } from "./QuickStatsSummary";
+import { PickupsDeliveriesSummary } from "./PickupsDeliveriesSummary";
 
 export default function AdminHomePage() {
     return (
@@ -13,13 +15,18 @@ export default function AdminHomePage() {
                         
                         <div className = "flex flex-col w-[90%] h-[93%] bg-[#FFFFFF] mx-[2%] mt-[2.5%] rounded-xl">
                             <h1 className = ""> Welcome __! </h1>
-                            <div className = "flex gap-4 flex-1">
-                                <div className = "flex flex-col gap-4 w-[45%]"> 
-                                    Left Col Placeholder
+                            <div></div>
+                            <div className = "flex flex-1">
+                                <div className = "flex flex-col items-center gap-4 w-[45%]"> 
+                                    <div className = "w-[90%]">
+                                    <QuickStatsSummary/>
+                                    </div>
                                     <WarehouseHistorySummary/>
                                 </div>
-                                <div className = "flex flex-col gap-4 flex-1">
-                                    Right Col Placeholder
+                                <div className = "flex flex-col items-center gap-4 flex-1">
+                                    <div className = "w-[95%]">
+                                    <PickupsDeliveriesSummary/>
+                                    </div>
                                     <AdminCalendarSummary/>
                                 </div>
                             </div>
