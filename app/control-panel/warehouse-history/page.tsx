@@ -72,13 +72,11 @@ export default function WarehouseHistoryPage() {
         <>
             <div className="flex flex-col mb-6">
                 <div className="flex gap-3">
-                    <div className="w-90 shrink-0">
-                        <SearchBox
-                            value={searchQuery}
-                            onChange={setSearchQuery}
-                            onSubmit={() => {}}
-                        />
-                    </div>
+                    <SearchBox
+                        value={searchQuery}
+                        onChange={setSearchQuery}
+                        onSubmit={() => {}}
+                    />
                     <SortOption
                         label="Date"
                         status={dateSortStatus}
