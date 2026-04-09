@@ -15,7 +15,7 @@ Next.js 16 (App Router, static export) + Firebase (Auth, Firestore, Storage, Fun
 
 ## Directory Layout
 - `app/` — Pages. `providers.tsx` wraps app in Auth + React Query contexts.
-- `components/` — Feature-organized: `auth/`, `form/`, `general/`, `donation-requests/`, `inventory/`, `pickups-deliveries/`, `control-panel/`, `icons/`, `ui/`
+- `components/` — Feature-organized: `auth/`, `form/`, `general/`, `donation-requests/`, `inventory/`, `pickups-deliveries/`, `control-panel/`, `icons/`, `ui/`, `profile/`
 - `lib/services/` — All Firebase logic (`auth.ts`, `donations.ts`, `inventory.ts`, `users.ts`, `warehouseHistory.ts`). Never call Firestore from components.
 - `lib/queries/` — React Query hooks wrapping services.
 - `lib/firebase.ts` — Connects to emulators when `NEXT_PUBLIC_USE_FIREBASE_EMULATOR=true`.
@@ -57,7 +57,8 @@ Copy `.env.example` → `.env`. Emulator vars pre-configured. `NEXT_PUBLIC_FIREB
 
 ## Coding Preferences
 - **Parallel writes:** Use `Promise.all` for independent Firestore writes — don't chain `await` calls that can run simultaneously.
-- **Toast + await:** Use `toast.promise(promise, {...})` then `await promise` on the same variable so errors still propagate.
+- **Toast + await:** Use `toast.promise(promise, {...})` then `await promise` on the same variable so errors still propagate. Never use empty `catch` blocks — they silently swallow errors and make debugging harder. Only catch specific known error codes (e.g. Firebase auth errors); always rethrow anything unexpected.
+- **Inline loading/error states:** Don't repeat the full page shell in guard clauses. Inline loading and error states within the existing layout using a ternary: `{isLoading ? <p>Loading...</p> : !data ? <p>Error</p> : <content />}`. Early returns that duplicate `ProtectedRoute` + `SideNavbar` are a red flag.
 - **Modals:** Use `createPortal(..., document.body)` + `useEffect` to set `document.body.style.overflow = "hidden"` while open. Modal inner structure: sticky header bar outside scroll area, `flex-1 overflow-y-auto` scroll region, sticky footer bar outside scroll area. Both bars use `shadow-[0_±2px_6px_rgba(0,0,0,0.08)]` pointing inward.
 - **Don't extract tiny single-use components** — inline them directly (e.g. a simple button doesn't need its own file)
 - **Sidebar links:** Add nav items in `components/general/SideNav.tsx` using `SideNavbarLink` with `name`, `path`, `roles` (empty = all roles), and optional `icon` props.
