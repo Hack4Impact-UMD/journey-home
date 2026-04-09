@@ -4,9 +4,9 @@ import { useMemo } from "react";
 import { useTimeBlocks } from "@/lib/queries/timeblocks";
 import { TimeBlock } from "@/types/schedule";
 import { AdminCalendarPeople } from "../icons/AdminCalendarPeople";
+import { AdminCalendarDriver } from "../icons/AdminCalandarDriver";
 
-// threshold for volunteer = half of max and then lead driver max for all otherwise red
-const Low_Volunteer_Threshold = 2;
+
 const Lead_Driver_Threshold = 1; //insert nums here 
 
 const type_dot_color: Record<TimeBlock["type"], string> = {
@@ -38,24 +38,24 @@ export default function AdminCalendarSummary() {
     return (
         <div className="w-[90%] h-[40%] px-[1rem] rounded-2xl border border-[#E7E7E7] bg-[#FFFFFF] shadow-lg shadow-[0px_0px_4px_0px_rgba(0,0,0,0.25)]">
             <div className = "my-[1rem] font-bold text-lg"> Calendar </div>
-            {/* border here */}
-            <div className = ""> </div> 
+            <div className="mt-[1rem] border-b border-[#E3E3E3]" />
             {isLoading ? (
                 <p className = "flex justify-center"> Loading... </p>
             ) : upcomingEvents.length === 0 ? (
                 <p className = "flex justify-center">No Upcoming Timeblocks</p>
             ) : (
-                <div className = "mt-[1rem] flex flex-col gap-4">
+                <div className = " flex flex-col">
                     {upcomingEvents.map((tb) => {
                         const start = tb.startTime.toDate()
                         const dayNumber = start.getDate();
                         const month = start.toLocaleDateString("en-US", {month: "short"}).toUpperCase();
                         const weekday = start.toLocaleDateString("en-US", {weekday: "short"}).toUpperCase();
                         const volCount  = tb.volunteerGroups.reduce((sum, group) => sum + (group.volunterIDs?.length ?? 0), 0);
-                        const lowVol = volCount <= Low_Volunteer_Threshold;
+                        const lowVol = volCount <= tb.volunteerGroups.reduce((half, group) => half + (group.maxNum ?? 0 / 2), 0);
+                        const lowDrive = false; // will be edited when field is added into type for driver
 
                         return (
-                            <div key = {tb.id} className = "grid grid-cols-[2.5rem_6rem_1rem_7rem_1fr_auto] items-center text-center gap-2 border-b border-[#E3E3E3] py-3 last:border-0">
+                            <div key = {tb.id} className = "grid grid-cols-[2.5rem_6rem_1rem_7rem_1fr_auto_auto] items-center text-center gap-2 border-b border-[#E3E3E3] py-4">
                                 <div className = "h-9 w-9 flex items-center justify-center rounded-full text-sm font-bold bg-[#02AFC7] text-white">
                                     {dayNumber}
                                 </div>
@@ -67,15 +67,17 @@ export default function AdminCalendarSummary() {
                                     <AdminCalendarPeople fill={lowVol ? "#E16060" : "#000000"}/>
                                     {volCount}
                                 </span>
+                                <span className={`flex items-center gap-[0.25rem] ${lowDrive ? "text-[#E16060]" : "text-[#000000]"}`}>
+                                    <AdminCalendarDriver fill={lowDrive ? "#E16060" : "#000000"}/>
+                                    {volCount}
+                                </span>
                             </div>
                         )
                     })}
-
                 </div>
             )
             
             }
-            <div className = ""></div>
         </div>
     );
 }
