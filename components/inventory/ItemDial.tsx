@@ -75,7 +75,7 @@ export function ItemDial({ category, onClick }: ItemDialProps) {
 
     return (
         <div
-            className="rounded-2xl border border-light-border shadow-sm flex flex-col items-center justify-center pt-4 pb-5 px-4 w-full max-w-[240px] mx-auto cursor-pointer select-none hover:brightness-95 transition-all"
+            className="rounded-2xl border border-light-border flex flex-col items-center justify-center pt-4 pb-5 px-4 w-full max-w-60 mx-auto cursor-pointer select-none hover:brightness-95 transition-all"
             style={{ backgroundColor: bg }}
             onClick={onClick}
         >

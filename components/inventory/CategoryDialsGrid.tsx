@@ -4,8 +4,9 @@ import { useState } from "react";
 import { InventoryCategory } from "@/types/inventory";
 import { ItemDial } from "./ItemDial";
 import { EditCountModal } from "./EditCountModal";
-import { ConfirmChangeModal } from "./ConfirmChangeModal";
+import { ConfirmModal } from "@/components/general/ConfirmModal";
 import { useInventoryCategories } from "../../lib/queries/inventory";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ModalState {
     category: InventoryCategory;
@@ -16,6 +17,7 @@ interface ModalState {
 export function CategoryDialsGrid({ categories }: { categories: InventoryCategory[] }) {
     const [modal, setModal] = useState<ModalState | null>(null);
     const { setInventoryCategoryWithToast } = useInventoryCategories();
+    const { state: { userData } } = useAuth();
 
     function handleCardClick(category: InventoryCategory) {
         setModal({ category, stage: "edit" });
@@ -31,7 +33,7 @@ export function CategoryDialsGrid({ categories }: { categories: InventoryCategor
         await setInventoryCategoryWithToast({
             ...modal.category,
             quantity: modal.pendingCount,
-        });
+        }, userData!.uid);
         setModal(null);
     }
 
@@ -67,14 +69,19 @@ export function CategoryDialsGrid({ categories }: { categories: InventoryCategor
                 />
             )}
 
-            {modal?.stage === "confirm" && modal.pendingCount !== undefined && (
-                <ConfirmChangeModal
-                    category={modal.category}
-                    newCount={modal.pendingCount}
-                    onClose={handleClose}
-                    onConfirm={handleConfirm}
-                />
-            )}
+            {modal?.stage === "confirm" && modal.pendingCount !== undefined && (() => {
+                const diff = modal.pendingCount - modal.category.quantity;
+                const action = diff > 0 ? "added to" : "removed from";
+                const message = `${Math.abs(diff)} ${modal.category.name} will be ${action} the ${modal.category.quantity} in inventory. There will be ${modal.pendingCount} ${modal.category.name} total.`;
+                return (
+                    <ConfirmModal
+                        title="Change item count?"
+                        message={message}
+                        onConfirm={handleConfirm}
+                        onCancel={handleClose}
+                    />
+                );
+            })()}
         </>
     );
 }

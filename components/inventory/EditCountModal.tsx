@@ -29,10 +29,10 @@ export function EditCountModal({ category, onClose, onSubmit }: EditCountModalPr
             onClick={onClose}
         >
             <div
-                className="relative bg-white rounded-2xl shadow-xl w-[340px] p-6 overflow-hidden"
+                className="relative isolate bg-white rounded-2xl shadow-xl w-85 p-6 overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className="absolute -bottom-6 -right-6 pointer-events-none select-none opacity-10">
+                <div className="absolute -bottom-6 -right-6 pointer-events-none select-none opacity-10 -z-10">
                     <BoxIcon className="w-52 h-52 text-gray-400" strokeWidth={1} />
                 </div>
 
@@ -62,9 +62,9 @@ export function EditCountModal({ category, onClose, onSubmit }: EditCountModalPr
 
                 <div className="flex justify-end">
                     <button
-                        disabled={!isValid}
+                        disabled={!isValid || change === 0}
                         onClick={() => isValid && onSubmit(parsed)}
-                        className="bg-[#17B8C4] hover:bg-[#13a3ae] disabled:opacity-40 text-white font-medium px-8 py-2.5 rounded-xl transition-colors"
+                        className="bg-[#17B8C4] enabled:hover:bg-[#13a3ae] disabled:bg-gray-300 disabled:text-gray-400 text-white font-medium px-8 py-2.5 rounded-xl transition-colors"
                     >
                         Submit
                     </button>

@@ -21,7 +21,7 @@ function getStockStatus(quantity: number, low: number, high: number): StockStatu
 const ALL_STOCK_STATUSES: StockStatus[] = ["Red", "Yellow", "Green"];
 
 export default function InventoryPage() {
-    const { inventoryCategories, isLoading } = useInventoryCategories();
+    const { inventoryCategories, isLoading, isFetching, isError, refetch } = useInventoryCategories();
 
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedStatuses, setSelectedStatuses] = useState<StockStatus[]>([...ALL_STOCK_STATUSES]);
@@ -58,13 +58,11 @@ export default function InventoryPage() {
     return (
         <>
             <div className="flex items-center gap-3 mb-8 mt-2">
-                <div className="w-1/2 [&>div]:w-full [&>div]:flex [&_form]:w-full [&_input]:flex-1 [&_input]:w-auto">
-                    <SearchBox
-                        value={searchQuery}
-                        onChange={setSearchQuery}
-                        onSubmit={() => {}}
-                    />
-                </div>
+                <SearchBox
+                    value={searchQuery}
+                    onChange={setSearchQuery}
+                    onSubmit={refetch}
+                />
 
                 <div className="h-8 flex items-stretch">
                     <DropdownMultiselect
@@ -96,13 +94,17 @@ export default function InventoryPage() {
                   />
                 </div>
 
-                {/* add export button heree */}
+                {isFetching && !isLoading && <Spinner className="size-4 text-primary ml-auto" />}
             </div>
 
-            <div className="px-4">
+            <div className="flex-1 overflow-auto min-h-0 px-4">
                 {isLoading ? (
                     <div className="w-full flex items-center justify-center text-sm text-[#BFBFBF] py-10">
                         <Spinner className="size-5 text-primary" />
+                    </div>
+                ) : isError ? (
+                    <div className="w-full flex items-center justify-center text-sm text-red-500 py-10">
+                        Failed to load inventory.
                     </div>
                 ) : (
                     <CategoryDialsGrid categories={filtered} />
