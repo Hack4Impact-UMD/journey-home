@@ -13,7 +13,6 @@ export type UserData = {
     phone?: string;
     phoneExtension?: string;
     dob: Timestamp | null;
-    phoneNumber?: string;
     role: UserRole;
     pending: UserRole | null;
     emailVerified: boolean;

@@ -2,35 +2,24 @@
 
 import { ProtectedRoute } from "@/components/general/ProtectedRoute";
 import SideNavbar from "@/components/general/SideNav";
+import PasswordResetSection from "@/components/profile/PasswordResetSection";
 import { useAuth } from "@/contexts/AuthContext";
-import { useAccount } from "@/lib/queries/users";
+import { useAllActiveAccounts } from "@/lib/queries/users";
 import { useEffect, useState } from "react";
-import FormInput from "@/components/form/FormInput";
-import Button from "@/components/form/Button";
 import { Timestamp } from "firebase/firestore";
-import {
-    EmailAuthProvider,
-    reauthenticateWithCredential,
-    updatePassword,
-} from "firebase/auth";
 import { toast } from "sonner";
 
 export default function ProfilePage() {
-    const { state } = useAuth();
+    const { state, logout } = useAuth();
     const currentUser = state.userData;
-    const { account, editAccount, isLoading } = useAccount(
-        currentUser?.uid || "",
-    );
+    const { allAccounts, editAccount, isLoading } = useAllActiveAccounts();
+    const account = allAccounts.find((u) => u.uid === currentUser?.uid) ?? null;
 
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [dob, setDob] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
     const [showPasswordReset, setShowPasswordReset] = useState(false);
-
-    const [currentPassword, setCurrentPassword] = useState("");
-    const [newPassword, setNewPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
 
     useEffect(() => {
         if (account) {
@@ -45,48 +34,11 @@ export default function ProfilePage() {
             } else {
                 setDob("");
             }
-            setPhoneNumber(account.phoneNumber || "");
+            setPhoneNumber(account.phone || "");
         }
     }, [account]);
 
-    if (isLoading) {
-        return (
-            <ProtectedRoute allow={["Admin", "Case Manager", "Volunteer"]}>
-                <div className="h-full w-full flex flex-col font-family-roboto">
-                    <div className="flex flex-1">
-                        <SideNavbar />
-                        <div className="flex-1 bg-[#F7F7F7] py-4 px-6 flex flex-col">
-                            <h1 className="text-2xl text-primary font-extrabold">
-                                Profile
-                            </h1>
-                            <p>Loading...</p>
-                        </div>
-                    </div>
-                </div>
-            </ProtectedRoute>
-        );
-    }
-
-    if (!account) {
-        return (
-            <ProtectedRoute allow={["Admin", "Case Manager", "Volunteer"]}>
-                <div className="h-full w-full flex flex-col font-family-roboto">
-                    <div className="flex flex-1">
-                        <SideNavbar />
-                        <div className="flex-1 bg-[#F7F7F7] py-4 px-6 flex flex-col">
-                            <h1 className="text-2xl text-primary font-extrabold">
-                                Profile
-                            </h1>
-                            <p className="text-red-600">User not found</p>
-                        </div>
-                    </div>
-                </div>
-            </ProtectedRoute>
-        );
-    }
-
     const handleSave = async () => {
-        // Validation
         if (!firstName.trim()) {
             toast.error("First name is required");
             return;
@@ -100,14 +52,20 @@ export default function ProfilePage() {
             return;
         }
 
-        // Convert date string to Firestore Timestamp
-        const dobTimestamp = dob ? Timestamp.fromDate(new Date(dob)) : null;
+        if (!account) return;
+
+        let dobTimestamp: Timestamp | null = null;
+        if (dob) {
+            const [y, m, d] = dob.split("-").map(Number);
+            dobTimestamp = Timestamp.fromDate(new Date(y, m - 1, d, 12, 0, 0));
+        }
+
         await editAccount({
             ...account,
             firstName: firstName.trim(),
             lastName: lastName.trim(),
             dob: dobTimestamp,
-            phoneNumber: phoneNumber.trim(),
+            phone: phoneNumber.trim(),
         });
     };
 
@@ -124,57 +82,8 @@ export default function ProfilePage() {
             } else {
                 setDob("");
             }
-            setPhoneNumber(account.phoneNumber || "");
+            setPhoneNumber(account.phone || "");
         }
-    };
-
-    const handlePasswordReset = async () => {
-        if (newPassword !== confirmPassword) {
-            toast.error("New passwords don't match");
-            return;
-        }
-        if (newPassword.length < 6) {
-            toast.error("Password must be at least 6 characters long");
-            return;
-        }
-        if (!state.currentUser || !state.currentUser.email) {
-            toast.error("No user logged in");
-            return;
-        }
-
-        try {
-            // Reauthenticate user with current password
-            const credential = EmailAuthProvider.credential(
-                state.currentUser.email,
-                currentPassword,
-            );
-            await reauthenticateWithCredential(state.currentUser, credential);
-
-            // Update password
-            await updatePassword(state.currentUser, newPassword);
-
-            toast.success("Password updated successfully!");
-            resetPasswordForm();
-        } catch (error: unknown) {
-            const firebaseError = error as { code?: string };
-            if (
-                firebaseError.code === "auth/wrong-password" ||
-                firebaseError.code === "auth/invalid-credential"
-            ) {
-                toast.error("Current password is incorrect");
-            } else if (firebaseError.code === "auth/weak-password") {
-                toast.error("New password is too weak");
-            } else {
-                toast.error("Error updating password");
-            }
-        }
-    };
-
-    const resetPasswordForm = () => {
-        setShowPasswordReset(false);
-        setCurrentPassword("");
-        setNewPassword("");
-        setConfirmPassword("");
     };
 
     return (
@@ -182,185 +91,131 @@ export default function ProfilePage() {
             <div className="h-full w-full flex flex-col font-family-roboto">
                 <div className="flex flex-1">
                     <SideNavbar />
-                    <div className="flex-1 bg-[#F7F7F7] py-4 px-6 flex flex-col items-center">
-                        <div className="w-full max-w-3xl bg-white rounded-[10px] border border-gray-300 p-8 shadow-sm">
-                            {/* Header */}
-                            <h1 className="text-2xl text-primary font-extrabold">
-                                Account Info
-                            </h1>
-                            <p className="text-gray-700 mb-4">{account.role}</p>
-                            <hr className="mb-6 -mx-8" />
+                    <div className="flex-1 bg-[#F7F7F7] pt-8 pb-4 px-6 flex flex-col items-center justify-center">
+                        {isLoading ? (
+                            <p>Loading...</p>
+                        ) : !account ? (
+                            <p className="text-red-600">User not found</p>
+                        ) : (
+                            <div className="w-full max-w-3xl bg-white rounded-[0.625rem] border border-gray-300">
+                                <div className="border-b border-light-border py-4 px-7">
+                                    <h1 className="text-2xl text-primary font-bold mb-1">
+                                        Account Info
+                                    </h1>
+                                    <p className="text-[#666666]">{account.role}</p>
+                                </div>
 
-                            {/* Conditional rendering: show profile form or password reset form */}
-                            <div className="px-12">
-                                {!showPasswordReset ? (
-                                    <>
-                                        {/* Personal Information Section */}
-                                        <h2 className="text-xl font-semibold mb-6">
-                                            Personal
-                                        </h2>
-                                        <div className="space-y-4 mb-6">
-                                            <div className="flex gap-4">
-                                                <FormInput
-                                                    label="First Name"
-                                                    value={firstName}
-                                                    onChange={(e) =>
-                                                        setFirstName(
-                                                            e.target.value,
-                                                        )
-                                                    }
-                                                    className="flex-1"
-                                                />
-                                                <FormInput
-                                                    label="Last Name"
-                                                    value={lastName}
-                                                    onChange={(e) =>
-                                                        setLastName(
-                                                            e.target.value,
-                                                        )
-                                                    }
-                                                    className="flex-1"
-                                                />
-                                            </div>
-                                            <div className="flex gap-4">
-                                                <FormInput
-                                                    label="Date of Birth"
-                                                    type="date"
-                                                    value={dob}
-                                                    onChange={(e) =>
-                                                        setDob(e.target.value)
-                                                    }
-                                                    className="flex-1"
-                                                />
-                                                <FormInput
-                                                    label="Phone Number"
-                                                    type="tel"
-                                                    value={phoneNumber}
-                                                    onChange={(e) =>
-                                                        setPhoneNumber(
-                                                            e.target.value,
-                                                        )
-                                                    }
-                                                    className="flex-1"
-                                                />
-                                            </div>
-                                        </div>
-
-                                        {/* Login Information Section */}
-                                        <h2 className="text-xl font-semibold mb-6">
-                                            Login
-                                        </h2>
-                                        <div className="space-y-4 mb-6">
-                                            <div className="flex gap-4">
-                                                <div className="flex-1">
-                                                    <label className="block mb-2">
-                                                        <span className="text-sm text-gray-700">
-                                                            Email
-                                                        </span>
-                                                    </label>
-                                                    <input
-                                                        type="email"
-                                                        value={account.email}
-                                                        disabled
-                                                        className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100 text-gray-500 cursor-not-allowed"
-                                                    />
-                                                </div>
-                                                <div className="flex-1">
-                                                    <label className="block mb-2">
-                                                        <span className="text-sm text-gray-700">
-                                                            Password
-                                                        </span>
-                                                    </label>
-                                                    <input
-                                                        type="password"
-                                                        value="********"
-                                                        disabled
-                                                        className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100 text-gray-500 cursor-not-allowed"
-                                                    />
-                                                    <button
-                                                        onClick={() =>
-                                                            setShowPasswordReset(
-                                                                true,
-                                                            )
-                                                        }
-                                                        className="text-blue-600 text-sm mt-2 text-right w-full hover:text-blue-700"
-                                                    >
-                                                        Change Password
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Save Button */}
-                                        <div className="flex gap-3 justify-end">
-                                            <Button onClick={handleSave}>
-                                                Save
-                                            </Button>
-                                            <Button
-                                                variant="secondary"
-                                                onClick={handleCancel}
-                                            >
-                                                Cancel
-                                            </Button>
-                                        </div>
-                                    </>
+                                <div className="px-20 pt-6 pb-8">
+                                {showPasswordReset ? (
+                                    <PasswordResetSection onBack={() => setShowPasswordReset(false)} />
                                 ) : (
                                     <>
-                                        {/* Reset Password Section */}
-                                        <h2 className="text-xl font-semibold mb-6">
-                                            Reset Password
-                                        </h2>
-                                        <div className="space-y-4 mb-6">
-                                            <FormInput
-                                                label="Current Password"
-                                                type="password"
-                                                value={currentPassword}
-                                                onChange={(e) =>
-                                                    setCurrentPassword(
-                                                        e.target.value,
-                                                    )
-                                                }
-                                            />
-                                            <FormInput
-                                                label="New Password"
-                                                type="password"
-                                                value={newPassword}
-                                                onChange={(e) =>
-                                                    setNewPassword(
-                                                        e.target.value,
-                                                    )
-                                                }
-                                            />
-                                            <FormInput
-                                                label="Confirm New Password"
-                                                type="password"
-                                                value={confirmPassword}
-                                                onChange={(e) =>
-                                                    setConfirmPassword(
-                                                        e.target.value,
-                                                    )
-                                                }
+                                    {/* Personal Information Section */}
+                                    <h2 className="text-xl font-semibold mb-4">
+                                        Personal
+                                    </h2>
+                                    <div className="space-y-4 mb-8">
+                                        <div className="flex gap-4">
+                                            <div className="flex-1">
+                                                <label className="block mb-1 text-sm text-text-1">First Name</label>
+                                                <input
+                                                    type="text"
+                                                    value={firstName}
+                                                    onChange={(e) => setFirstName(e.target.value)}
+                                                    className="w-full border border-gray-300 rounded-xs h-10 px-3"
+                                                />
+                                            </div>
+                                            <div className="flex-1">
+                                                <label className="block mb-1 text-sm text-text-1">Last Name</label>
+                                                <input
+                                                    type="text"
+                                                    value={lastName}
+                                                    onChange={(e) => setLastName(e.target.value)}
+                                                    className="w-full border border-gray-300 rounded-xs h-10 px-3"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-4">
+                                            <div className="flex-1">
+                                                <label className="block mb-1 text-sm text-text-1">Date of Birth</label>
+                                                <input
+                                                    type="date"
+                                                    value={dob}
+                                                    onChange={(e) => setDob(e.target.value)}
+                                                    className="w-full border border-gray-300 rounded-xs h-10 px-3"
+                                                />
+                                            </div>
+                                            <div className="flex-1">
+                                                <label className="block mb-1 text-sm text-text-1">Phone Number</label>
+                                                <input
+                                                    type="tel"
+                                                    value={phoneNumber}
+                                                    onChange={(e) => setPhoneNumber(e.target.value)}
+                                                    className="w-full border border-gray-300 rounded-xs h-10 px-3"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Login Information Section */}
+                                    <h2 className="text-xl font-semibold mb-4">
+                                        Login
+                                    </h2>
+                                    <div className="flex gap-4 mb-16">
+                                        <div className="flex-1">
+                                            <label className="block mb-1 text-sm text-text-1">Email</label>
+                                            <input
+                                                type="email"
+                                                value={account.email}
+                                                disabled
+                                                className="w-full border border-gray-300 rounded-xs h-10 px-3 bg-gray-100 text-gray-500 cursor-not-allowed"
                                             />
                                         </div>
+                                        <div className="flex-1">
+                                            <label className="block mb-1 text-sm text-text-1">Password</label>
+                                            <input
+                                                type="password"
+                                                value="********"
+                                                disabled
+                                                className="w-full border border-gray-300 rounded-xs h-10 px-3 bg-gray-100 text-gray-500 cursor-not-allowed"
+                                            />
+                                            <button
+                                                onClick={() => setShowPasswordReset(true)}
+                                                className="text-primary text-sm mt-2 text-right w-full hover:text-primary/80"
+                                            >
+                                                Change Password
+                                            </button>
+                                        </div>
+                                    </div>
 
-                                        {/* Buttons */}
-                                        <div className="flex gap-3 justify-end">
-                                            <Button
-                                                onClick={handlePasswordReset}
+                                    {/* Buttons */}
+                                    <div className="flex justify-between items-center">
+                                        <button
+                                            onClick={logout}
+                                            className="text-red-600 text-sm hover:text-red-700"
+                                        >
+                                            Log Out
+                                        </button>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={handleSave}
+                                                className="h-8 px-4 text-sm rounded-xs border border-primary bg-primary text-white cursor-pointer"
                                             >
                                                 Save
-                                            </Button>
-                                            <Button
-                                                variant="secondary"
-                                                onClick={resetPasswordForm}
+                                            </button>
+                                            <button
+                                                onClick={handleCancel}
+                                                className="h-8 px-4 text-sm rounded-xs border border-gray-300 bg-white text-gray-700 cursor-pointer"
                                             >
-                                                Cancel
-                                            </Button>
+                                                Reset
+                                            </button>
                                         </div>
+                                    </div>
                                     </>
                                 )}
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 </div>
             </div>
