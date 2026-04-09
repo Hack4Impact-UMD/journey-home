@@ -15,8 +15,8 @@ Next.js 16 (App Router, static export) + Firebase (Auth, Firestore, Storage, Fun
 
 ## Directory Layout
 - `app/` — Pages. `providers.tsx` wraps app in Auth + React Query contexts.
-- `components/` — Feature-organized: `auth/`, `form/`, `general/`, `donation-requests/`, `inventory/`, `pickups-deliveries/`, `icons/`, `ui/`
-- `lib/services/` — All Firebase logic (`auth.ts`, `donations.ts`, `inventory.ts`, `users.ts`). Never call Firestore from components.
+- `components/` — Feature-organized: `auth/`, `form/`, `general/`, `donation-requests/`, `inventory/`, `pickups-deliveries/`, `control-panel/`, `icons/`, `ui/`, `profile/`
+- `lib/services/` — All Firebase logic (`auth.ts`, `donations.ts`, `inventory.ts`, `users.ts`, `warehouseHistory.ts`). Never call Firestore from components.
 - `lib/queries/` — React Query hooks wrapping services.
 - `lib/firebase.ts` — Connects to emulators when `NEXT_PUBLIC_USE_FIREBASE_EMULATOR=true`.
 - `types/` — Shared TS types. `general.ts` holds cross-domain primitives (`Address`, `ContactInfo`, `LocationContact`, `ReviewStatus`). Domain files (`donations.ts`, `client-requests.ts`, etc.) import from `general.ts` rather than duplicating.
@@ -37,27 +37,30 @@ Next.js 16 (App Router, static export) + Firebase (Auth, Firestore, Storage, Fun
 - `donors` — Donor contact history
 - `inventory` — Warehouse items with photos
 - `timeblocks` — Shifts/time blocks; queried via `lib/queries/timeblocks.ts` (`useTimeBlocks`, `setTimeblockToast`)
+- `warehouseHistory` — `InventoryChange` audit log. Written atomically via `useInventoryCategories` set mutation (never written directly). Fields: `id`, `userId`, `timestamp`, `change: { category, oldQuantity, newQuantity }`, `reverted`. Queried via `lib/queries/warehouse-history.ts` (`useWarehouseHistory`).
 
 ## Pages
 **Public:** `/login`, `/signup`, `/donate` (4-step form via `DonorFormContext`), `/status/*`
 
 **Protected (all roles):** `/`, `/inventory/warehouse`, `/profile`
 
-**Admin only:** `/donation-requests/new`, `/donation-requests/reviewed`, `/user-management/all-accounts`, `/user-management/account-requests`, `/user-management/past-donors`, `/pickups-deliveries/unscheduled`, `/pickups-deliveries/scheduled`, `/control-panel`, `/client-requests/admin`
+**Admin only:** `/donation-requests/new`, `/donation-requests/reviewed`, `/user-management/all-accounts`, `/user-management/account-requests`, `/user-management/past-donors`, `/pickups-deliveries/unscheduled`, `/pickups-deliveries/scheduled`, `/control-panel/warehouse-history`, `/client-requests/admin`
 
 **Case Manager only:** `/client-requests/case-manager`, `/client-request-form` (no nav chrome — full-screen form)
 
 **Admin + Case Manager:** `/client-requests` (redirects to role-specific sub-page)
 
-`/inventory` → `/inventory/warehouse`, `/donation-requests` → `/donation-requests/new`, `/user-management` → `/user-management/all-accounts`, `/pickups-deliveries` → `/pickups-deliveries/unscheduled` (all `permanentRedirect`). `/client-requests` redirects to `/admin` or `/case-manager` based on role.
+`/inventory` → `/inventory/warehouse`, `/donation-requests` → `/donation-requests/new`, `/user-management` → `/user-management/all-accounts`, `/pickups-deliveries` → `/pickups-deliveries/unscheduled`, `/control-panel` → `/control-panel/warehouse-history` (all `permanentRedirect`). `/client-requests` redirects to `/admin` or `/case-manager` based on role.
 
 ## Env
 Copy `.env.example` → `.env`. Emulator vars pre-configured. `NEXT_PUBLIC_FIREBASE_*` needed for production.
 
 ## Coding Preferences
 - **Parallel writes:** Use `Promise.all` for independent Firestore writes — don't chain `await` calls that can run simultaneously.
-- **Toast + await:** Use `toast.promise(promise, {...})` then `await promise` on the same variable so errors still propagate.
+- **Toast + await:** Use `toast.promise(promise, {...})` then `await promise` on the same variable so errors still propagate. Never use empty `catch` blocks — they silently swallow errors and make debugging harder. Only catch specific known error codes (e.g. Firebase auth errors); always rethrow anything unexpected.
+- **Inline loading/error states:** Don't repeat the full page shell in guard clauses. Inline loading and error states within the existing layout using a ternary: `{isLoading ? <p>Loading...</p> : !data ? <p>Error</p> : <content />}`. Early returns that duplicate `ProtectedRoute` + `SideNavbar` are a red flag.
 - **Modals:** Use `createPortal(..., document.body)` + `useEffect` to set `document.body.style.overflow = "hidden"` while open. Modal inner structure: sticky header bar outside scroll area, `flex-1 overflow-y-auto` scroll region, sticky footer bar outside scroll area. Both bars use `shadow-[0_±2px_6px_rgba(0,0,0,0.08)]` pointing inward.
 - **Don't extract tiny single-use components** — inline them directly (e.g. a simple button doesn't need its own file)
 - **Sidebar links:** Add nav items in `components/general/SideNav.tsx` using `SideNavbarLink` with `name`, `path`, `roles` (empty = all roles), and optional `icon` props.
 - **Multi-select dropdown:** Reusable `DropdownMultiselect<T>` lives at `components/inventory/DropdownMultiselect.tsx` — use it anywhere, not just inventory.
+- **Tailwind sizing:** Never use `px` units in arbitrary Tailwind values (e.g. no `w-[360px]`). Use numbered scale classes (`w-96`) when possible; use `rem` for arbitrary values (`w-[22.5rem]`).
