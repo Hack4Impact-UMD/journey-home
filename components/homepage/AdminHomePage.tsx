@@ -18,7 +18,7 @@ export default function AdminHomePage() {
                             <div></div>
                             <div className = "flex flex-1">
                                 <div className = "flex flex-col items-center gap-4 w-[45%]"> 
-                                    <div className = "w-[90%]">
+                                    <div className = "w-[95%]">
                                     <QuickStatsSummary/>
                                     </div>
                                     <WarehouseHistorySummary/>
