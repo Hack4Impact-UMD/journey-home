@@ -11,7 +11,7 @@ import { CloseIcon } from "@/components/icons/CloseIcon";
 import { toast } from "sonner";
 import { PlusIcon } from "lucide-react";
 import Image from "next/image";
-import { useCategories } from "@/lib/queries/categories";
+import { useInventoryCategories } from "@/lib/queries/inventory";
 
 
 export default function Step2AddDonations() {
@@ -39,7 +39,8 @@ export default function Step2AddDonations() {
         setCurrentStep(3);
     };
 
-    const {allCategories: categoryOptions} = useCategories();
+    const { inventoryCategories } = useInventoryCategories();
+    const categoryOptions = inventoryCategories.map((c) => c.name);
 
     const fileInputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
 
