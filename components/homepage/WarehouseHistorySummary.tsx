@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-// import { InventoryChange } from "@/types/inventory";
 import { AdminWarehousePlus } from "../icons/AdminWarehousePlus";
 import { AdminWarehouseMinus } from "../icons/AdminWarehouseMinus";
 import { useWarehouseHistory } from "@/lib/queries/warehouse-history";
@@ -20,9 +19,9 @@ export default function WarehouseHistorySummary(){
     const mostRecent = sortedChanges.slice(0,5);
 
     return (
-        <div className = "w-[95%] h-[45%] rounded-2xl border border-[#E7E7E7] bg-[#FFFFFF] shadow-lg px-[1rem] shadow-[0px_0px_4px_0px_rgba(0,0,0,0.25)]">
+        <div className = "w-[95%] h-[47%] rounded-2xl border border-[#E7E7E7] bg-[#FFFFFF] shadow-lg px-[1rem] shadow-[0px_0px_4px_0px_rgba(0,0,0,0.25)]">
             <div className = "flex flex-row place-content-between my-[1.5rem]">
-                <span className = "font-semibold">
+                <span className = "font-semibold text-lg">
                     Latest inventory updates
                 </span>
                 <span>
@@ -40,7 +39,7 @@ export default function WarehouseHistorySummary(){
                             const diff = c.change.newQuantity-c.change.oldQuantity;
                             const isPositive = diff > 0;
                             return(
-                                <div key = {c.id} className = {`grid grid-cols-[0.35fr_0.65fr] my-[0.25rem] rounded-lg py-[1rem] border-[#DCDDDD] border-[1px] ${isPositive ? "bg-[#F2FAF2]": "bg-[#FAF2F2]"}`}>
+                                <div key = {c.id} className = {`grid grid-cols-[0.35fr_0.65fr] my-[0.25rem] rounded-lg py-[1rem] items-center border-[#DCDDDD] border-[1px] ${isPositive ? "bg-[#F2FAF2]": "bg-[#FAF2F2]"}`}>
                                     <div className = "flex flex-row ">
                                         <div className = "pl-[1rem] pr-[0.5rem]">
                                             {isPositive?(
