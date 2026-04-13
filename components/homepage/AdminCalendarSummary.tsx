@@ -50,9 +50,12 @@ export default function AdminCalendarSummary() {
                         const dayNumber = start.getDate();
                         const month = start.toLocaleDateString("en-US", {month: "short"}).toUpperCase();
                         const weekday = start.toLocaleDateString("en-US", {weekday: "short"}).toUpperCase();
-                        const volCount  = tb.volunteerGroups.reduce((sum, group) => sum + (group.volunterIDs?.length ?? 0), 0);
-                        const lowVol = volCount <= tb.volunteerGroups.reduce((half, group) => half + (group.maxNum ?? 0 / 2), 0);
-                        const lowDrive = false; // will be edited when field is added into type for driver
+                        const volGroup = tb.volunteerGroups.find(group => group.name === "Volunteers")
+                        const volCount = volGroup?.volunterIDs?.length ?? 0; 
+                        const lowVol = volCount <= (volGroup?.maxNum ?? 0)/2
+                        const driveGroup = tb.volunteerGroups.find(group => group.name === "Lead Drivers ONLY")
+                        const driveCount = driveGroup?.volunterIDs.length ?? 0; 
+                        const lowDrive = driveCount !== driveGroup?.maxNum
 
                         return (
                             <div key = {tb.id} className = "grid grid-cols-[2.5rem_6rem_1rem_7rem_1fr_3rem_3rem] items-center text-center gap-2 border-b border-[#E3E3E3] py-4">
