@@ -65,7 +65,7 @@ export function PickupsDeliveriesSummary() {
     });
 
     return (
-        <div className="bg-white rounded-2xl border border-light-border p-5 flex flex-col gap-3">
+        <div className="h-[26.5%] bg-white rounded-2xl border border-light-border p-5 flex flex-col gap-3">
             <div className="flex items-center justify-between">
                 <span className="text-lg font-bold text-text-1">Upcoming pickups/deliveries</span>
                 <span className="text-sm text-gray-400">
