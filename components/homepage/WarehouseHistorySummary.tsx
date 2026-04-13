@@ -20,46 +20,39 @@ export default function WarehouseHistorySummary(){
 
     return (
         <div className="w-full rounded-2xl border border-[#E7E7E7] bg-white shadow-sm p-4 flex flex-col gap-3">
-            <div className = "flex flex-row place-content-between">
-                <span className = "font-semibold text-lg">
+            <div className="flex flex-row place-content-between items-center">
+                <span className="font-bold text-lg text-text-1">
                     Latest inventory updates
                 </span>
-                <span>
-                     {twoDaysAfter} new changes
-                </span> 
+                <span className="text-sm text-gray-400">
+                    <span className="font-semibold text-text-1">{twoDaysAfter}</span> new changes
+                </span>
             </div>
             {isLoading ? (
-                <p>Loading...</p>
+                <p className="text-sm text-gray-400">Loading...</p>
             ): mostRecent.length === 0 ? (
-                <p>No inventory changes were made</p>
+                <p className="text-sm text-gray-400">No inventory changes were made</p>
             ) : (
-                <div>
-                    <div className = "">
-                        {mostRecent.map((c)=>{
-                            const diff = c.change.newQuantity-c.change.oldQuantity;
-                            const isPositive = diff > 0;
-                            return(
-                                <div key = {c.id} className = {`grid grid-cols-[0.35fr_0.65fr] my-[0.25rem] rounded-lg py-[1rem] items-center border-[#DCDDDD] border-[1px] ${isPositive ? "bg-[#F2FAF2]": "bg-[#FAF2F2]"}`}>
-                                    <div className = "flex flex-row ">
-                                        <div className = "pl-[1rem] pr-[0.5rem]">
-                                            {isPositive?(
-                                                <AdminWarehousePlus/>
-                                            ):(
-                                                <AdminWarehouseMinus/>
-                                            )}
-                                        </div>
-                                        <div className = "pr-[0.5rem] text-[#666666]">
-                                            {c.timestamp.toDate().toLocaleDateString("en-US", {weekday: "short", month:"short", day:"numeric", hour:"numeric", minute:"2-digit"})}
-                                        </div>
-                                    </div>
-                                    <div className = "pl-[1rem] border-l border-[#D9D9D9]">
-                                        {isPositive?("added "):("removed ")}
-                                        {Math.abs(diff)} {c.change.category} ({c.change.oldQuantity} → {c.change.newQuantity})
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
+                <div className="flex flex-col gap-2">
+                    {mostRecent.map((c) => {
+                        const diff = c.change.newQuantity - c.change.oldQuantity;
+                        const isPositive = diff > 0;
+                        return (
+                            <div key={c.id} className="flex items-center gap-3 border border-light-border px-3 py-2">
+                                <span className="shrink-0">
+                                    {isPositive ? <AdminWarehousePlus /> : <AdminWarehouseMinus />}
+                                </span>
+                                <span className="text-xs text-gray-400 shrink-0">
+                                    {c.timestamp.toDate().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
+                                </span>
+                                <span className="border-l border-gray-200 self-stretch" />
+                                <span className="text-sm text-gray-700">
+                                    {isPositive ? "added " : "removed "}
+                                    {Math.abs(diff)} {c.change.category} ({c.change.oldQuantity} → {c.change.newQuantity})
+                                </span>
+                            </div>
+                        );
+                    })}
                 </div>
             )}
         </div>
