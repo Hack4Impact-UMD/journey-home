@@ -3,8 +3,8 @@
 import { useMemo } from "react";
 import { useTimeBlocks } from "@/lib/queries/timeblocks";
 import { TimeBlock } from "@/types/schedule";
-import { AdminCalendarPeople } from "../icons/AdminCalendarPeople";
-import { AdminCalendarDriver } from "../icons/AdminCalandarDriver";
+import { AdminCalendarPeople } from "@/components/icons/AdminCalendarPeople";
+import { AdminCalendarDriver } from "@/components/icons/AdminCalandarDriver";
 
 const type_dot_color: Record<TimeBlock["type"], string> = {
     "Pickup/Delivery": "bg-[#FBCF0B]",
@@ -51,8 +51,7 @@ export default function AdminCalendarSummary() {
                         const volCount = volGroup?.volunterIDs?.length ?? 0; 
                         const lowVol = volCount <= (volGroup?.maxNum ?? 0)/2
                         const driveGroup = tb.volunteerGroups.find(group => group.name === "Lead Drivers ONLY")
-                        const driveCount = driveGroup?.volunterIDs.length ?? 0; 
-                        const lowDrive = driveCount !== driveGroup?.maxNum
+                        const lowDrive = (driveGroup?.volunterIDs.length ?? 0) !== driveGroup?.maxNum
 
                         return (
                             <div key = {tb.id} className = "grid grid-cols-[2.5rem_6rem_1rem_7rem_1fr_3rem_3rem] items-center text-center gap-2 border-b border-[#E3E3E3] py-4">

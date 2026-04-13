@@ -4,13 +4,13 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserRole } from "@/types/user";
 import Link from "next/link";
-import { InventoryIcon } from "../icons/InventoryIcon";
-import { DonorRequestsIcon } from "../icons/DonorRequestsIcon";
-import { ClientRequestIcon } from "../icons/ClientRequestIcon";
-import { PickupDeliveryIcon } from "../icons/PickupDeliveryIcon";
-import { UserManagementIcon } from "../icons/UserManagementIcon";
-import { ControlPanelIcon } from "../icons/ControlPanelIcon";
-import { ViewIcon } from "../icons/ViewIcon";
+import { InventoryIcon } from "@/components/icons/InventoryIcon";
+import { DonorRequestsIcon } from "@/components/icons/DonorRequestsIcon";
+import { ClientRequestIcon } from "@/components/icons/ClientRequestIcon";
+import { PickupDeliveryIcon } from "@/components/icons/PickupDeliveryIcon";
+import { UserManagementIcon } from "@/components/icons/UserManagementIcon";
+import { ControlPanelIcon } from "@/components/icons/ControlPanelIcon";
+import { ViewIcon } from "@/components/icons/ViewIcon";
 import { AdminCalendarPeople } from "@/components/icons/AdminCalendarPeople";
 
 export default function SideNavbar() {

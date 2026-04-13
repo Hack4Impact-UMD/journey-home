@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import { AdminWarehousePlus } from "../icons/AdminWarehousePlus";
-import { AdminWarehouseMinus } from "../icons/AdminWarehouseMinus";
+import { AdminWarehousePlus } from "@/components/icons/AdminWarehousePlus";
+import { AdminWarehouseMinus } from "@/components/icons/AdminWarehouseMinus";
 import { useWarehouseHistory } from "@/lib/queries/warehouse-history";
 
 export default function WarehouseHistorySummary(){
