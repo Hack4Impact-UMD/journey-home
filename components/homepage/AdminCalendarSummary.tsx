@@ -36,7 +36,7 @@ export default function AdminCalendarSummary() {
     }, [allTB]);
 
     return (
-        <div className="w-[95%] h-[40%] px-[1rem] rounded-2xl border border-[#E7E7E7] bg-[#FFFFFF] shadow-lg shadow-[0px_0px_4px_0px_rgba(0,0,0,0.25)]">
+        <div className="w-full rounded-2xl border border-[#E7E7E7] bg-white shadow-sm px-4 pb-4 flex flex-col gap-3">
             <div className = "my-[1rem] font-bold text-lg"> Calendar </div>
             <div className="mt-[1rem] border-b border-[#E3E3E3]" />
             {isLoading ? (

@@ -65,25 +65,25 @@ export function PickupsDeliveriesSummary() {
     });
 
     return (
-        <div className="bg-white rounded-sm border border-light-border p-5 flex flex-col gap-3">
+        <div className="bg-white rounded-2xl border border-light-border p-5 flex flex-col gap-3">
             <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-text-1">Upcoming pickups/deliveries</span>
-                <span className="text-sm text-[#666]">
+                <span className="text-lg font-bold text-text-1">Upcoming pickups/deliveries</span>
+                <span className="text-sm text-gray-400">
                     {isLoading ? "..." : <><span className="font-semibold text-text-1">{rows.length}</span> today</>}
                 </span>
             </div>
             {isLoading ? (
-                <span className="text-sm text-[#A2A2A2]">Loading...</span>
+                <span className="text-sm text-gray-400">Loading...</span>
             ) : rows.length === 0 ? (
-                <span className="text-sm text-[#A2A2A2]">No pickups or deliveries today</span>
+                <span className="text-sm text-gray-400">No pickups or deliveries today</span>
             ) : (
                 <div className="flex flex-col gap-2">
                     {rows.map((row) => (
-                        <div key={row.key} className="flex items-center gap-3">
-                            <span className={`w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0 ${row.type === "P" ? "bg-primary" : "bg-secondary-1"}`}>{row.type}</span>
-                            <span className="w-20 shrink-0 text-xs text-[#666]">{row.timeRange}</span>
-                            <span className="flex items-center gap-1 flex-1 text-xs text-[#666]"><PersonIcon />{row.name}</span>
-                            <span className="flex items-center gap-1 text-xs text-[#666]"><LocationIcon />{row.location}</span>
+                        <div key={row.key} className="flex items-center gap-3 border border-light-border px-3 py-2">
+                            <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold shrink-0 ${row.type === "P" ? "bg-[#D6E8F0] text-[#4A8FA8]" : "bg-[#F5E0E0] text-[#A87070]"}`}>{row.type}</span>
+                            <span className="w-20 shrink-0 text-xs text-gray-500">{row.timeRange}</span>
+                            <span className="flex items-center gap-1 flex-1 text-xs text-gray-500"><PersonIcon />{row.name}</span>
+                            <span className="flex items-center gap-1 text-xs text-gray-500"><LocationIcon />{row.location}</span>
                         </div>
                     ))}
                 </div>

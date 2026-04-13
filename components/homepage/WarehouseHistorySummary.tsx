@@ -6,11 +6,11 @@ import { AdminWarehouseMinus } from "../icons/AdminWarehouseMinus";
 import { useWarehouseHistory } from "@/lib/queries/warehouse-history";
 
 export default function WarehouseHistorySummary(){
-     const {changes: warehouseChanges = [], isLoading} = useWarehouseHistory();
+    const {changes: warehouseChanges = [], isLoading} = useWarehouseHistory();
 
     const now = useMemo(()=> Date.now(), []);
     const sortedChanges = useMemo(() => 
-    [...warehouseChanges].filter((c) => c.change.newQuantity !== c.change.oldQuantity).sort((a,b) => b.timestamp.toDate().getTime() - a.timestamp.toDate().getTime()), [warehouseChanges]
+        [...warehouseChanges].filter((c) => c.change.newQuantity !== c.change.oldQuantity).sort((a,b) => b.timestamp.toDate().getTime() - a.timestamp.toDate().getTime()), [warehouseChanges]
     );
     const twoDaysAfter = useMemo(() => 
         warehouseChanges.filter((c)=> now - c.timestamp.toDate().getTime() <= 48*60*60*1000).length, [warehouseChanges, now]    
@@ -19,8 +19,8 @@ export default function WarehouseHistorySummary(){
     const mostRecent = sortedChanges.slice(0,5);
 
     return (
-        <div className = "w-[95%] h-[47%] rounded-2xl border border-[#E7E7E7] bg-[#FFFFFF] shadow-lg px-[1rem] shadow-[0px_0px_4px_0px_rgba(0,0,0,0.25)]">
-            <div className = "flex flex-row place-content-between my-[1.5rem]">
+        <div className="w-full rounded-2xl border border-[#E7E7E7] bg-white shadow-sm p-4 flex flex-col gap-3">
+            <div className = "flex flex-row place-content-between">
                 <span className = "font-semibold text-lg">
                     Latest inventory updates
                 </span>
@@ -55,13 +55,10 @@ export default function WarehouseHistorySummary(){
                                     <div className = "pl-[1rem] border-l border-[#D9D9D9]">
                                         {isPositive?("added "):("removed ")}
                                         {Math.abs(diff)} {c.change.category} ({c.change.oldQuantity} → {c.change.newQuantity})
-            
                                     </div>
-                                    
                                 </div>
                             );
                         })}
-                            
                     </div>
                 </div>
             )}

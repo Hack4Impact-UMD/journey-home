@@ -17,9 +17,9 @@ function isWithin48Hours(seconds: number): boolean {
 
 function ArrowIcon() {
     return (
-        <svg className="w-5 h-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <circle cx="10" cy="10" r="8" />
-            <path d="M7.5 12.5l5-5M12.5 7.5H7.5M12.5 7.5v5" strokeLinecap="round" strokeLinejoin="round" />
+        <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M9 15l6-6M15 9H9M15 9v6" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
     );
 }
@@ -29,20 +29,21 @@ type StatCardProps = {
     count: number;
     newCount?: number;
     icon: React.ReactNode;
+    iconClassName?: string;
 };
 
-function StatCard({ label, count, newCount, icon }: StatCardProps) {
+function StatCard({ label, count, newCount, icon, iconClassName }: StatCardProps) {
     return (
-        <div className="bg-white rounded-sm border border-light-border p-4 flex flex-col gap-1 relative overflow-hidden flex-1">
+        <div className="bg-white rounded-2xl border border-light-border p-4 flex flex-col gap-1 relative overflow-hidden h-40">
             <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-text-1">{label}</span>
-                <span className="text-text-1 opacity-60"><ArrowIcon /></span>
+                <span className="text-sm font-semibold text-text-1">{label}</span>
+                <span className="text-text-1 opacity-70"><ArrowIcon /></span>
             </div>
-            <span className="text-4xl font-bold text-text-1 mt-1">{count}</span>
-            {newCount !== undefined && newCount > 0 && (
-                <span className="text-xs text-primary font-medium">{newCount} new</span>
-            )}
-            <div className="absolute bottom-2 right-3 opacity-[0.07] scale-[2.2] origin-bottom-right">
+            <span className="text-5xl font-normal text-text-1 mt-1">{count}</span>
+            <span className="text-xs text-gray-400 mt-auto">
+                {newCount !== undefined ? `${newCount} new today` : ""}
+            </span>
+            <div className={`absolute opacity-[0.15] text-[#a0c4d8] text-[5rem] ${iconClassName ?? "bottom-[-1.25rem] right-[-1.25rem]"}`}>
                 {icon}
             </div>
         </div>
@@ -75,10 +76,10 @@ export function QuickStatsSummary() {
 
     return (
         <div className="grid grid-cols-2 gap-3">
-            <StatCard label="Low stock items" count={lowStockCount} icon={<InventoryIcon />} />
-            <StatCard label="Donation requests" count={notReviewedDR.length} newCount={newDR} icon={<DonorRequestsIcon />} />
-            <StatCard label="Account requests" count={accountRequests.length} icon={<UserManagementIcon />} />
-            <StatCard label="Client requests" count={notReviewedCR.length} newCount={newCR} icon={<ClientRequestIcon />} />
+            <StatCard label="Low stock items" count={lowStockCount} newCount={0} icon={<InventoryIcon />} iconClassName="bottom-[-1.25rem] right-[-1.25rem]" />
+            <StatCard label="Donation requests" count={notReviewedDR.length} newCount={newDR} icon={<DonorRequestsIcon />} iconClassName="bottom-[-0.5rem] right-[-1rem]" />
+            <StatCard label="Account requests" count={accountRequests.length} newCount={0} icon={<UserManagementIcon />} iconClassName="bottom-[-0.25rem] right-[-1rem]" />
+            <StatCard label="Client requests" count={notReviewedCR.length} newCount={newCR} icon={<ClientRequestIcon />} iconClassName="bottom-[-0.75rem] right-[0rem]" />
         </div>
     );
 }
