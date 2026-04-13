@@ -11,7 +11,7 @@ import { PickupDeliveryIcon } from "../icons/PickupDeliveryIcon";
 import { UserManagementIcon } from "../icons/UserManagementIcon";
 import { ControlPanelIcon } from "../icons/ControlPanelIcon";
 import { ViewIcon } from "../icons/ViewIcon";
-import { AdminCalendarPeople } from "../icons/AdminCalendarPeople";
+import { AdminCalendarPeople } from "@/components/icons/AdminCalendarPeople";
 
 export default function SideNavbar() {
     const auth = useAuth();

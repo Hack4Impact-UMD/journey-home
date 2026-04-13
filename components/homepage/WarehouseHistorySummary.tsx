@@ -8,12 +8,17 @@ import { useWarehouseHistory } from "@/lib/queries/warehouse-history";
 export default function WarehouseHistorySummary(){
     const {changes: warehouseChanges = [], isLoading} = useWarehouseHistory();
 
-    const now = useMemo(()=> Date.now(), []);
-    const sortedChanges = useMemo(() => 
-        [...warehouseChanges].filter((c) => c.change.newQuantity !== c.change.oldQuantity).sort((a,b) => b.timestamp.toDate().getTime() - a.timestamp.toDate().getTime()), [warehouseChanges]
+    const sortedChanges = useMemo(() =>
+        [...warehouseChanges]
+            .filter((c) => c.change.newQuantity !== c.change.oldQuantity)
+            .sort((a, b) => b.timestamp.toDate().getTime() - a.timestamp.toDate().getTime()),
+        [warehouseChanges]
     );
-    const twoDaysAfter = useMemo(() => 
-        warehouseChanges.filter((c)=> now - c.timestamp.toDate().getTime() <= 48*60*60*1000).length, [warehouseChanges, now]    
+    const twoDaysAfter = useMemo(() =>
+        sortedChanges.filter(
+            (c) => Date.now() - c.timestamp.toDate().getTime() <= 48 * 60 * 60 * 1000,
+        ).length,
+        [sortedChanges]
     );
 
     const mostRecent = sortedChanges.slice(0,5);

@@ -48,7 +48,7 @@ type DeliveryRow = {
 };
 
 export function PickupsDeliveriesSummary() {
-    const { allTB, isLoading } = useTimeBlocks();
+    const { allTB, isLoading, isError } = useTimeBlocks();
     const todayBlocks = allTB.filter(isTodayBlock);
 
     const rows: DeliveryRow[] = todayBlocks.flatMap((tb) => {
@@ -74,6 +74,8 @@ export function PickupsDeliveriesSummary() {
             </div>
             {isLoading ? (
                 <span className="text-sm text-gray-400">Loading...</span>
+            ) : isError ? (
+                <span className="text-sm text-gray-400">Unable to load pickups or deliveries</span>
             ) : rows.length === 0 ? (
                 <span className="text-sm text-gray-400">No pickups or deliveries today</span>
             ) : (

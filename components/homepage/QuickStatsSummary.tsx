@@ -9,10 +9,14 @@ import { DonorRequestsIcon } from "@/components/icons/DonorRequestsIcon";
 import { UserManagementIcon } from "@/components/icons/UserManagementIcon";
 import { ClientRequestIcon } from "@/components/icons/ClientRequestIcon";
 
-const FORTY_EIGHT_HOURS_MS = 48 * 60 * 60 * 1000;
-
-function isWithin48Hours(seconds: number): boolean {
-    return Date.now() - seconds * 1000 <= FORTY_EIGHT_HOURS_MS;
+function isFromToday(seconds: number): boolean {
+    const itemDate = new Date(seconds * 1000);
+    const now = new Date();
+    return (
+        itemDate.getFullYear() === now.getFullYear() &&
+        itemDate.getMonth() === now.getMonth() &&
+        itemDate.getDate() === now.getDate()
+    );
 }
 
 function ArrowIcon() {
@@ -61,12 +65,12 @@ export function QuickStatsSummary() {
     const lowStockCount = inventoryCategories.filter((c) => c.quantity <= c.lowThreshold).length;
 
     const notReviewedCR = clientRequests.filter((cr) => cr.status === "Not Reviewed");
-    const newCR = notReviewedCR.filter((cr) => isWithin48Hours(cr.date.seconds)).length;
+    const newCR = notReviewedCR.filter((cr) => isFromToday(cr.date.seconds)).length;
 
     const notReviewedDR = donationRequests.filter((dr) =>
         dr.items.some((item) => item.status === "Not Reviewed")
     );
-    const newDR = notReviewedDR.filter((dr) => isWithin48Hours(dr.date.seconds)).length;
+    const newDR = notReviewedDR.filter((dr) => isFromToday(dr.date.seconds)).length;
 
     if (isLoading) {
         return <div className="grid grid-cols-2 gap-3 animate-pulse">
