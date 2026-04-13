@@ -11,6 +11,7 @@ import { PickupDeliveryIcon } from "../icons/PickupDeliveryIcon";
 import { UserManagementIcon } from "../icons/UserManagementIcon";
 import { ControlPanelIcon } from "../icons/ControlPanelIcon";
 import { ViewIcon } from "../icons/ViewIcon";
+import { AdminCalendarPeople } from "../icons/AdminCalendarPeople";
 
 export default function SideNavbar() {
     const auth = useAuth();
@@ -53,6 +54,13 @@ export default function SideNavbar() {
                     icon={PickupDeliveryIcon}
                     name="Pickups & Deliveries"
                     path="/pickups-deliveries"
+                    roles={["Admin"]}
+                />
+
+                <SideNavbarLink
+                    icon={AdminCalendarPeople}
+                    name="Schedule"
+                    path="/schedule"
                     roles={["Admin"]}
                 />
 
