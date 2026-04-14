@@ -4,7 +4,7 @@ import { SearchBox } from "@/components/inventory/SearchBox";
 import { DonorsTable } from "@/components/user-management/DonorsTable";
 import { fetchAllDonors } from "@/lib/services/donations";
 import { LocationContact } from "@/types/general";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { useExport } from "@/contexts/UserExportContext";
 
 function escapeCSVField(value: string | null | undefined): string {
@@ -20,32 +20,23 @@ function escapeCSVField(value: string | null | undefined): string {
     return str;
 }
 
-function getDonorKey(donor: LocationContact): string {
-    return donor.email;
-}
-
 export default function PastDonorsPage() {
-    const [searchQuery, setSearchQuery] = useState<string>("");
+    const [searchQuery, setSearchQuery] = useState("");
     const [allDonors, setAllDonors] = useState<LocationContact[]>([]);
-    const [selectedDonorKeys, setSelectedDonorKeys] = useState<string[]>([]);
+    const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
 
     const { setOnExport, setSelectedCount } = useExport();
 
+    // fetch donors initially
     useEffect(() => {
         fetchAllDonors().then(setAllDonors);
     }, []);
 
-    const filteredDonors = useMemo(() => {
+    // filtered donors
+    const filtered = useMemo(() => {
         return allDonors
-            .filter((donor) =>
-                (
-                    "" +
-                    donor.firstName +
-                    donor.lastName +
-                    donor.email +
-                    donor.phoneNumber
-                )
-                    .trim()
+            .filter((d) =>
+                (d.firstName + d.lastName + d.email)
                     .toLowerCase()
                     .replace(/\s/g, "")
                     .includes(searchQuery.toLowerCase().trim())
@@ -57,25 +48,8 @@ export default function PastDonorsPage() {
             );
     }, [allDonors, searchQuery]);
 
-    function handleToggleDonor(donor: LocationContact) {
-        const key = getDonorKey(donor);
-        setSelectedDonorKeys((prev) =>
-            prev.includes(key)
-                ? prev.filter((k) => k !== key)
-                : [...prev, key]
-        );
-    }
-
-    function handleToggleAll() {
-        const filteredKeys = filteredDonors.map(getDonorKey);
-        const allSelected =
-            filteredKeys.length > 0 &&
-            filteredKeys.every((key) => selectedDonorKeys.includes(key));
-
-        setSelectedDonorKeys(allSelected ? [] : filteredKeys);
-    }
-
-    function handleExport(donors: LocationContact[]) {
+    // export function 
+    const handleExport = useCallback((donors: LocationContact[]) => {
         const headers = [
             "First Name",
             "Last Name",
@@ -87,52 +61,50 @@ export default function PastDonorsPage() {
             "Zip Code",
         ];
 
-        const rows = donors.map((donor) =>
+        const rows = donors.map((d) =>
             [
-                donor.firstName,
-                donor.lastName,
-                donor.email,
-                donor.phoneNumber,
-                donor.address.streetAddress,
-                donor.address.city,
-                donor.address.state,
-                donor.address.zipCode,
+                d.firstName,
+                d.lastName,
+                d.email,
+                d.phoneNumber,
+                d.address.streetAddress,
+                d.address.city,
+                d.address.state,
+                d.address.zipCode,
             ].map(escapeCSVField)
         );
 
-        const csv = [headers, ...rows].map((row) => row.join(",")).join("\n");
+        const csv = [headers, ...rows].map((r) => r.join(",")).join("\n");
 
         const blob = new Blob([csv], { type: "text/csv" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
         a.download =
-            selectedDonorKeys.length > 0 ? "selected_donors.csv" : "donors.csv";
+            donors.length === selectedKeys.length && selectedKeys.length > 0
+                ? "selected_donors.csv"
+                : "donors.csv";
         a.click();
         URL.revokeObjectURL(url);
-    }
+    }, [selectedKeys]);
 
+    // sync selection + export button
     useEffect(() => {
-        const visibleKeys = new Set(filteredDonors.map(getDonorKey));
-        setSelectedDonorKeys((prev) => prev.filter((key) => visibleKeys.has(key)));
-    }, [filteredDonors]);
-
-    useEffect(() => {
-        const selectedDonors = filteredDonors.filter((donor) =>
-            selectedDonorKeys.includes(getDonorKey(donor))
+        const selected = filtered.filter((d) =>
+            selectedKeys.includes(d.email)
         );
 
-        setSelectedCount(selectedDonors.length);
+        setSelectedCount(selected.length);
 
         setOnExport(() => () =>
-            handleExport(selectedDonors.length > 0 ? selectedDonors : filteredDonors)
+            handleExport(selected.length > 0 ? selected : filtered)
         );
 
         return () => {
             setOnExport(null);
             setSelectedCount(0);
         };
-    }, [filteredDonors, selectedDonorKeys, setOnExport, setSelectedCount]);
+    }, [filtered, selectedKeys, handleExport, setOnExport, setSelectedCount]);
 
     return (
         <>
@@ -141,17 +113,29 @@ export default function PastDonorsPage() {
                     <SearchBox
                         value={searchQuery}
                         onChange={setSearchQuery}
-                        onSubmit={() => fetchAllDonors().then(setAllDonors)}
+                        onSubmit={() => fetchAllDonors().then(setAllDonors)} // ✅ FIX
                     />
                 </div>
             </div>
 
             <div className="flex-1 overflow-auto min-h-0">
                 <DonorsTable
-                    donors={filteredDonors}
-                    selectedDonorKeys={selectedDonorKeys}
-                    onToggleDonor={handleToggleDonor}
-                    onToggleAll={handleToggleAll}
+                    donors={filtered}
+                    selectedDonorKeys={selectedKeys}
+                    onToggleDonor={(d) =>
+                        setSelectedKeys((prev) =>
+                            prev.includes(d.email)
+                                ? prev.filter((k) => k !== d.email)
+                                : [...prev, d.email]
+                        )
+                    }
+                    onToggleAll={() =>
+                        setSelectedKeys(
+                            selectedKeys.length === filtered.length
+                                ? []
+                                : filtered.map((d) => d.email)
+                        )
+                    }
                 />
             </div>
         </>
