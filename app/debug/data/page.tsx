@@ -13,6 +13,7 @@ import { UserData } from "@/types/user";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { TimeBlock } from "@/types/schedule";
 import { collection, getDocs } from "firebase/firestore";
+import { useWarehouseHistory } from "@/lib/queries/warehouse-history";
 import { toast, Toaster } from "sonner";
 
 
@@ -427,7 +428,6 @@ const SEED_REQS = [
         password: "password",
         first: "Marcus",
         last: "Johnson",
-        dob: Timestamp.fromDate(new Date("1983-05-12T08:30:00")),
         role: "Admin",
     },
     {
@@ -435,7 +435,6 @@ const SEED_REQS = [
         password: "password",
         first: "Elena",
         last: "Rodriguez",
-        dob: Timestamp.fromDate(new Date("1988-11-20T14:15:00")),
         role: "Admin",
     },
     {
@@ -443,7 +442,6 @@ const SEED_REQS = [
         password: "password",
         first: "William",
         last: "Chen",
-        dob: Timestamp.fromDate(new Date("1985-02-14T09:45:00")),
         role: "Admin",
     },
     {
@@ -451,7 +449,6 @@ const SEED_REQS = [
         password: "password",
         first: "Samantha",
         last: "Wright",
-        dob: Timestamp.fromDate(new Date("1991-08-05T11:20:00")),
         role: "Admin",
     },
     {
@@ -459,7 +456,6 @@ const SEED_REQS = [
         password: "password",
         first: "Jonathan",
         last: "Davis",
-        dob: Timestamp.fromDate(new Date("1980-12-01T16:00:00")),
         role: "Admin",
     },
 
@@ -469,7 +465,6 @@ const SEED_REQS = [
         password: "password",
         first: "Jessica",
         last: "Taylor",
-        dob: Timestamp.fromDate(new Date("1994-03-22T10:00:00")),
         role: "Case Manager",
     },
     {
@@ -477,7 +472,6 @@ const SEED_REQS = [
         password: "password",
         first: "Anthony",
         last: "Moore",
-        dob: Timestamp.fromDate(new Date("1995-07-11T13:30:00")),
         role: "Case Manager",
     },
     {
@@ -485,7 +479,6 @@ const SEED_REQS = [
         password: "password",
         first: "Ashley",
         last: "Jackson",
-        dob: Timestamp.fromDate(new Date("1992-09-28T09:10:00")),
         role: "Case Manager",
     },
     {
@@ -493,7 +486,6 @@ const SEED_REQS = [
         password: "password",
         first: "Brian",
         last: "White",
-        dob: Timestamp.fromDate(new Date("1990-04-16T15:20:00")),
         role: "Case Manager",
     },
     {
@@ -501,7 +493,6 @@ const SEED_REQS = [
         password: "password",
         first: "Melissa",
         last: "Harris",
-        dob: Timestamp.fromDate(new Date("1996-10-04T11:05:00")),
         role: "Case Manager",
     },
     {
@@ -509,7 +500,6 @@ const SEED_REQS = [
         password: "password",
         first: "Christopher",
         last: "Martin",
-        dob: Timestamp.fromDate(new Date("1993-01-09T14:40:00")),
         role: "Case Manager",
     },
     {
@@ -517,7 +507,6 @@ const SEED_REQS = [
         password: "password",
         first: "Stephanie",
         last: "Clark",
-        dob: Timestamp.fromDate(new Date("1997-06-18T08:55:00")),
         role: "Case Manager",
     },
     {
@@ -525,7 +514,6 @@ const SEED_REQS = [
         password: "password",
         first: "Matthew",
         last: "Lewis",
-        dob: Timestamp.fromDate(new Date("1991-11-25T12:15:00")),
         role: "Case Manager",
     },
     {
@@ -533,7 +521,6 @@ const SEED_REQS = [
         password: "password",
         first: "Rachel",
         last: "Martinez",
-        dob: Timestamp.fromDate(new Date("1998-02-03T09:50:00")),
         role: "Case Manager",
     },
     {
@@ -541,7 +528,6 @@ const SEED_REQS = [
         password: "password",
         first: "Justin",
         last: "Walker",
-        dob: Timestamp.fromDate(new Date("1995-12-14T16:25:00")),
         role: "Case Manager",
     },
 ];
@@ -768,28 +754,45 @@ async function generateInventoryChanges(count: number): Promise<InventoryChange[
   const now = Date.now();
   const twoMonthsMs = 60 * 86_400_000;
 
-  // Generate and sort timestamps first
   const timestamps = Array.from({ length: count }, () =>
     now - Math.floor(Math.random() * twoMonthsMs)
-  ).sort((a, b) => a - b); // oldest first
+  ).sort((a, b) => a - b);
 
-  return timestamps.map((ts): InventoryChange => {
+  const result: InventoryChange[] = [];
+
+  for (const ts of timestamps) {
     const cat = DEFAULT_INVENTORY_CATEGORIES[Math.floor(Math.random() * DEFAULT_INVENTORY_CATEGORIES.length)];
-
     const oldQuantity = runningQty[cat.id];
     const delta = Math.floor(Math.random() * 9) - 3;
     const newQuantity = Math.max(0, oldQuantity + delta);
-    const reverted = Math.random() < 0.2;
-    runningQty[cat.id] = reverted ? oldQuantity : newQuantity;
+    const willBeReverted = Math.random() < 0.2;
 
-    return {
+    const original: InventoryChange = {
       id: crypto.randomUUID(),
       userId: userIds[Math.floor(Math.random() * userIds.length)],
       timestamp: Timestamp.fromMillis(ts),
       change: { category: cat.name, oldQuantity, newQuantity },
-      reverted,
+      reverted: willBeReverted,
     };
-  });
+    result.push(original);
+
+    if (willBeReverted) {
+      // Revert entry: inverts the delta, timestamped a few minutes later
+      const revertTs = ts + Math.floor(Math.random() * 10 + 1) * 60_000;
+      result.push({
+        id: crypto.randomUUID(),
+        userId: userIds[Math.floor(Math.random() * userIds.length)],
+        timestamp: Timestamp.fromMillis(revertTs),
+        change: { category: cat.name, oldQuantity: newQuantity, newQuantity: oldQuantity },
+        reverted: false,
+      });
+      runningQty[cat.id] = oldQuantity; // revert restores original qty
+    } else {
+      runningQty[cat.id] = newQuantity;
+    }
+  }
+
+  return result;
 }
 
 async function seedInventoryChanges(count: number) {
@@ -843,7 +846,6 @@ const SEED_USERS = [
         password: "password",
         first: "Sarah",
         last: "Thompson",
-        dob: Timestamp.fromDate(new Date("1987-03-14T09:15:00")),
         role: "Admin",
     },
     {
@@ -851,7 +853,6 @@ const SEED_USERS = [
         password: "password",
         first: "David",
         last: "Lee",
-        dob: Timestamp.fromDate(new Date("1985-11-02T14:20:00")),
         role: "Admin",
     },
     {
@@ -859,7 +860,6 @@ const SEED_USERS = [
         password: "password",
         first: "Amanda",
         last: "Brooks",
-        dob: Timestamp.fromDate(new Date("1990-01-25T08:40:00")),
         role: "Admin",
     },
     {
@@ -867,7 +867,6 @@ const SEED_USERS = [
         password: "password",
         first: "Kevin",
         last: "Mitchell",
-        dob: Timestamp.fromDate(new Date("1982-07-18T11:05:00")),
         role: "Admin",
     },
     {
@@ -875,7 +874,6 @@ const SEED_USERS = [
         password: "password",
         first: "Lisa",
         last: "Reynolds",
-        dob: Timestamp.fromDate(new Date("1989-09-09T16:30:00")),
         role: "Admin",
     },
     {
@@ -883,7 +881,6 @@ const SEED_USERS = [
         password: "password",
         first: "Admin",
         last: "John",
-        dob: Timestamp.fromDate(new Date("1989-09-09T16:30:00")),
         role: "Admin",
     },
 
@@ -893,7 +890,6 @@ const SEED_USERS = [
         password: "password",
         first: "Maria",
         last: "Garcia",
-        dob: Timestamp.fromDate(new Date("1993-07-21T10:10:00")),
         role: "Case Manager",
     },
     {
@@ -901,7 +897,6 @@ const SEED_USERS = [
         password: "password",
         first: "Jordan",
         last: "Patel",
-        dob: Timestamp.fromDate(new Date("1991-05-30T13:50:00")),
         role: "Case Manager",
     },
     {
@@ -909,7 +904,6 @@ const SEED_USERS = [
         password: "password",
         first: "Emily",
         last: "Nguyen",
-        dob: Timestamp.fromDate(new Date("1996-09-12T09:25:00")),
         role: "Case Manager",
     },
     {
@@ -917,7 +911,6 @@ const SEED_USERS = [
         password: "password",
         first: "Michael",
         last: "Robinson",
-        dob: Timestamp.fromDate(new Date("1989-01-18T15:40:00")),
         role: "Case Manager",
     },
     {
@@ -925,7 +918,6 @@ const SEED_USERS = [
         password: "password",
         first: "Olivia",
         last: "Hughes",
-        dob: Timestamp.fromDate(new Date("1994-04-11T08:05:00")),
         role: "Case Manager",
     },
     {
@@ -933,7 +925,6 @@ const SEED_USERS = [
         password: "password",
         first: "Daniel",
         last: "Kim",
-        dob: Timestamp.fromDate(new Date("1992-12-03T17:10:00")),
         role: "Case Manager",
     },
     {
@@ -941,7 +932,6 @@ const SEED_USERS = [
         password: "password",
         first: "Natalie",
         last: "Foster",
-        dob: Timestamp.fromDate(new Date("1990-06-15T11:55:00")),
         role: "Case Manager",
     },
     {
@@ -949,7 +939,6 @@ const SEED_USERS = [
         password: "password",
         first: "Ryan",
         last: "Bailey",
-        dob: Timestamp.fromDate(new Date("1995-02-28T14:45:00")),
         role: "Case Manager",
     },
     {
@@ -957,7 +946,6 @@ const SEED_USERS = [
         password: "password",
         first: "Chloe",
         last: "Sanders",
-        dob: Timestamp.fromDate(new Date("1997-08-19T09:35:00")),
         role: "Case Manager",
     },
     {
@@ -965,7 +953,6 @@ const SEED_USERS = [
         password: "password",
         first: "Ethan",
         last: "Price",
-        dob: Timestamp.fromDate(new Date("1993-10-07T12:20:00")),
         role: "Case Manager",
     },
     {
@@ -973,7 +960,6 @@ const SEED_USERS = [
         password: "password",
         first: "CaseManager",
         last: "John",
-        dob: Timestamp.fromDate(new Date("1993-10-07T12:20:00")),
         role: "Case Manager",
     },
 ];
@@ -983,7 +969,6 @@ const SEED_VOLUNTEERS = [
         password: "password",
         first: "Volunteer",
         last: "John",
-        dob: Timestamp.fromDate(new Date("1999-02-14T09:20:00")),
         role: "Volunteer",
     },
     {
@@ -991,7 +976,6 @@ const SEED_VOLUNTEERS = [
         password: "password",
         first: "Alex",
         last: "Morgan",
-        dob: Timestamp.fromDate(new Date("1999-02-14T09:20:00")),
         role: "Volunteer",
     },
     {
@@ -999,7 +983,6 @@ const SEED_VOLUNTEERS = [
         password: "password",
         first: "Hannah",
         last: "Wright",
-        dob: Timestamp.fromDate(new Date("2001-06-08T13:45:00")),
         role: "Volunteer",
     },
     {
@@ -1007,7 +990,6 @@ const SEED_VOLUNTEERS = [
         password: "password",
         first: "Liam",
         last: "Turner",
-        dob: Timestamp.fromDate(new Date("1998-11-21T10:30:00")),
         role: "Volunteer",
     },
     {
@@ -1015,7 +997,6 @@ const SEED_VOLUNTEERS = [
         password: "password",
         first: "Zoe",
         last: "Bennett",
-        dob: Timestamp.fromDate(new Date("2000-04-03T16:10:00")),
         role: "Volunteer",
     },
     {
@@ -1023,7 +1004,6 @@ const SEED_VOLUNTEERS = [
         password: "password",
         first: "Noah",
         last: "Rivera",
-        dob: Timestamp.fromDate(new Date("1997-09-12T08:55:00")),
         role: "Volunteer",
     },
     {
@@ -1031,7 +1011,6 @@ const SEED_VOLUNTEERS = [
         password: "password",
         first: "Grace",
         last: "Hall",
-        dob: Timestamp.fromDate(new Date("2002-01-30T14:05:00")),
         role: "Volunteer",
     },
     {
@@ -1039,7 +1018,6 @@ const SEED_VOLUNTEERS = [
         password: "password",
         first: "Jacob",
         last: "Morris",
-        dob: Timestamp.fromDate(new Date("1996-07-18T11:50:00")),
         role: "Volunteer",
     },
     {
@@ -1047,7 +1025,6 @@ const SEED_VOLUNTEERS = [
         password: "password",
         first: "Maya",
         last: "Edwards",
-        dob: Timestamp.fromDate(new Date("2001-10-25T09:40:00")),
         role: "Volunteer",
     },
     {
@@ -1055,7 +1032,6 @@ const SEED_VOLUNTEERS = [
         password: "password",
         first: "Caleb",
         last: "Jenkins",
-        dob: Timestamp.fromDate(new Date("1999-05-06T12:35:00")),
         role: "Volunteer",
     },
     {
@@ -1063,7 +1039,6 @@ const SEED_VOLUNTEERS = [
         password: "password",
         first: "Ella",
         last: "Howard",
-        dob: Timestamp.fromDate(new Date("2000-12-17T15:25:00")),
         role: "Volunteer",
     },
 ];
@@ -1082,7 +1057,6 @@ async function seedUsers() {
             uid, // store it in document too
             firstName: user.first,
             lastName: user.last,
-            dob: user.dob,
             role: user.role,
             email: user.email,
             pending: (user.role === "Volunteer" && Math.random() > 0.75) ? "Case Manager" : null,
@@ -1100,7 +1074,6 @@ async function accountReqs() {
 
         // Map your seed data to match the screenshot schema exactly
         const pendingUserData = {
-            dob: user.dob,
             email: user.email,
             emailVerified: false,
             firstName: user.first,
@@ -1368,6 +1341,8 @@ const CLIENT_NOTES = [
 ];
 export default function page() {
     const btnClass = "border border-gray-400 rounded px-6 py-2 hover:bg-gray-100 text-sm w-64";
+    const { changes, isLoading } = useWarehouseHistory();
+    const sorted = [...changes].sort((a, b) => a.timestamp.seconds - b.timestamp.seconds);
 
     return (
         <div className="flex flex-col gap-8 m-10 items-center">
