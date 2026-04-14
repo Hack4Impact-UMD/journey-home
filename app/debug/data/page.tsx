@@ -768,28 +768,45 @@ async function generateInventoryChanges(count: number): Promise<InventoryChange[
   const now = Date.now();
   const twoMonthsMs = 60 * 86_400_000;
 
-  // Generate and sort timestamps first
   const timestamps = Array.from({ length: count }, () =>
     now - Math.floor(Math.random() * twoMonthsMs)
-  ).sort((a, b) => a - b); // oldest first
+  ).sort((a, b) => a - b);
 
-  return timestamps.map((ts): InventoryChange => {
+  const result: InventoryChange[] = [];
+
+  for (const ts of timestamps) {
     const cat = DEFAULT_INVENTORY_CATEGORIES[Math.floor(Math.random() * DEFAULT_INVENTORY_CATEGORIES.length)];
-
     const oldQuantity = runningQty[cat.id];
     const delta = Math.floor(Math.random() * 9) - 3;
     const newQuantity = Math.max(0, oldQuantity + delta);
-    const reverted = Math.random() < 0.2;
-    runningQty[cat.id] = reverted ? oldQuantity : newQuantity;
+    const willBeReverted = Math.random() < 0.2;
 
-    return {
+    const original: InventoryChange = {
       id: crypto.randomUUID(),
       userId: userIds[Math.floor(Math.random() * userIds.length)],
       timestamp: Timestamp.fromMillis(ts),
       change: { category: cat.name, oldQuantity, newQuantity },
-      reverted,
+      reverted: willBeReverted,
     };
-  });
+    result.push(original);
+
+    if (willBeReverted) {
+      // Revert entry: inverts the delta, timestamped a few minutes later
+      const revertTs = ts + Math.floor(Math.random() * 10 + 1) * 60_000;
+      result.push({
+        id: crypto.randomUUID(),
+        userId: userIds[Math.floor(Math.random() * userIds.length)],
+        timestamp: Timestamp.fromMillis(revertTs),
+        change: { category: cat.name, oldQuantity: newQuantity, newQuantity: oldQuantity },
+        reverted: false,
+      });
+      runningQty[cat.id] = oldQuantity; // revert restores original qty
+    } else {
+      runningQty[cat.id] = newQuantity;
+    }
+  }
+
+  return result;
 }
 
 async function seedInventoryChanges(count: number) {
