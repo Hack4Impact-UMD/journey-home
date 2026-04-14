@@ -12,9 +12,9 @@ export default function UserManagementLayout({ children }: { children: ReactNode
     return (
         <ProtectedRoute allow={["Admin"]}>
             <div className="h-full w-full flex flex-col font-family-roboto overflow-hidden">
-                <div className="flex flex-1 min-h-0">
+                <div className="flex flex-1 min-h-0 max-md:flex-col">
                     <SideNavbar pageTitle="User Management" />
-                    <div className="flex-1 min-h-0 bg-[#F7F7F7] pt-8 max-md:pt-26 pb-4 px-6 flex flex-col">
+                    <div className="flex-1 min-h-0 bg-[#F7F7F7] pt-8 max-md:pt-1 pb-4 px-6 flex flex-col">
                         <span className="text-2xl text-primary font-extrabold block max-md:hidden font-family-roboto">
                             User Management
                         </span>

@@ -117,7 +117,7 @@ export default function SideNavbar({ pageTitle }: { pageTitle?: string }) {
             </div>
 
             {/* Mobile top bar */}
-            <div className={`hidden max-md:flex fixed top-0 left-0 right-0 z-50 items-center pl-5.5 pr-4 pt-11.75 pb-4.25 bg-white border-b border-[#EFF3F5] font-family-roboto ${pageTitle ? "gap-2" : "justify-between"}`}>
+            <div className={`hidden max-md:flex items-center pl-5.5 pr-4 pt-11.75 pb-4.25 bg-white border-b border-[#EFF3F5] font-family-roboto ${pageTitle ? "gap-2" : "justify-between"}`}>
                 <button
                     onClick={() => setDrawerOpen(true)}
                     className="px-0.5 text-text-1"
@@ -130,7 +130,7 @@ export default function SideNavbar({ pageTitle }: { pageTitle?: string }) {
                         {pageTitle}
                     </span>
                 ) : (
-                    <Link href="/" className="pr-6.25">
+                    <Link href="/" className="pr-5.5">
                         <span className="text-primary font-family-raleway font-light text-[16px]">
                             JOURNEY
                         </span>

@@ -10,9 +10,9 @@ export default function ProfilePage() {
     return (
         <ProtectedRoute allow={["Admin", "Case Manager", "Volunteer"]}>
             <div className="h-full w-full flex flex-col font-family-roboto">
-                <div className="flex flex-1">
+                <div className="flex flex-1 max-md:flex-col">
                     <SideNavbar pageTitle="Profile" />
-                    <div className="flex-1 bg-[#F7F7F7] pt-8 max-md:pt-26 pb-4 px-6 flex flex-col">
+                    <div className="flex-1 bg-[#F7F7F7] pt-8 max-md:pt-1 pb-4 px-6 flex flex-col">
                         <h1 className="text-2xl text-primary font-extrabold max-md:hidden">
                             Profile
                         </h1>
