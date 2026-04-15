@@ -10,10 +10,9 @@ import { ClientRequestIcon } from "@/components/icons/ClientRequestIcon";
 import { PickupDeliveryIcon } from "@/components/icons/PickupDeliveryIcon";
 import { UserManagementIcon } from "@/components/icons/UserManagementIcon";
 import { ControlPanelIcon } from "@/components/icons/ControlPanelIcon";
-import { ViewIcon } from "@/components/icons/ViewIcon";
+// import { ViewIcon } from "@/components/icons/ViewIcon";
 import { AdminCalendarPeople } from "@/components/icons/AdminCalendarPeople";
 import { DogPeekingIcon } from "../icons/DogPeekingIcon";
-import { Dog } from "lucide-react";
 
 export default function SideNavbar() {
     const auth = useAuth();
