@@ -11,6 +11,7 @@ import { PickupDeliveryIcon } from "@/components/icons/PickupDeliveryIcon";
 import { UserManagementIcon } from "@/components/icons/UserManagementIcon";
 import { ControlPanelIcon } from "@/components/icons/ControlPanelIcon";
 import { DogPeekingIcon } from "../icons/DogPeekingIcon";
+import { HomeIcon } from "../icons/HomeIcon";
 
 export default function SideNavbar() {
     const auth = useAuth();
@@ -28,6 +29,13 @@ export default function SideNavbar() {
                 </div>
             </Link>
             <div className="px-4 h-full w-full flex flex-col">
+
+                <SideNavbarLink 
+                    icon = {HomeIcon}
+                    name = "Home"
+                    path = "/"
+                    roles = {["Admin", "Case Manager"]}
+                />
 
                 <SideNavbarLink
                     icon={InventoryIcon}
@@ -125,7 +133,9 @@ function SideNavbarLink({
         return <></>;
     }
 
-    const isActive = pathname?.startsWith(path)
+    const isActive =
+    path === "/" ? pathname === "/" :
+    pathname?.startsWith(path);
 
     return (
         <Link
