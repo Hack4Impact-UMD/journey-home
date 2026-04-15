@@ -12,6 +12,8 @@ import { UserManagementIcon } from "@/components/icons/UserManagementIcon";
 import { ControlPanelIcon } from "@/components/icons/ControlPanelIcon";
 import { ViewIcon } from "@/components/icons/ViewIcon";
 import { AdminCalendarPeople } from "@/components/icons/AdminCalendarPeople";
+import { DogPeekingIcon } from "../icons/DogPeekingIcon";
+import { Dog } from "lucide-react";
 
 export default function SideNavbar() {
     const auth = useAuth();
@@ -86,8 +88,8 @@ export default function SideNavbar() {
 
                 <div className="mt-auto w-full mb-4">
                     <Link href="/profile">
-                        <div className="pt-2 pb-2 pl-4 pr-2 border border-light-border rounded-lg w-full flex items-center justify-between">
-                            <div>
+                        <div className="relative pt-2 pl-4 pr-2 border border-light-border rounded-lg w-full flex items-center justify-between">
+                            <div className = "pb-2">
                                 <div className="text-text-1 text-sm font-family-opensans">
                                     {auth.state.userData && (
                                         <>
@@ -100,8 +102,12 @@ export default function SideNavbar() {
                                     {auth.state.userData?.role ?? "Loading..."}
                                 </div>
                             </div>
-                            <ViewIcon />
+                            <div className = "absolute bottom-0 right-2 translate-y-1/16">
+                                <DogPeekingIcon/>
+                            </div>
+                            {/* <ViewIcon /> */}
                         </div>
+                        
                     </Link>
                 </div>
             </div>

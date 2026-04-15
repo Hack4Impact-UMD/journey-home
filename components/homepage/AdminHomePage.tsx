@@ -16,7 +16,7 @@ export default function AdminHomePage() {
             <div className="h-full w-full flex flex-col font-family-roboto">
                 <div className="flex flex-1 min-h-0">
                     <SideNavbar />
-                    <div className="flex-1 flex flex-col bg-[#F7F7F7] overflow-auto pt-8 pb-4 px-6 gap-4">
+                    <div className="flex-1 flex flex-col overflow-auto pt-8 pb-4 px-6 gap-4 bg-linear-to-r from-[#F8FDFE] to-[#DAF2F5]">
                         <h1 className="text-4xl text-primary font-extrabold">
                             Welcome, {userData?.firstName ?? ""}!
                         </h1>
