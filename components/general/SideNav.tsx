@@ -56,12 +56,12 @@ export default function SideNavbar() {
                     roles={["Admin"]}
                 />
 
-                <SideNavbarLink
+                {/* <SideNavbarLink
                     icon={AdminCalendarPeople}
                     name="Schedule"
                     path="/schedule"
                     roles={["Admin"]}
-                />
+                /> */}
 
                 <SideNavbarLink
                     icon={UserManagementIcon}
