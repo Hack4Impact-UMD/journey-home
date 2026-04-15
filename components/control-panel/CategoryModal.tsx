@@ -2,22 +2,20 @@
 
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { CategoryAttributes } from "@/types/inventory";
+import { InventoryCategory } from "@/types/inventory";
 import { CloseIcon } from "@/components/icons/CloseIcon";
-import Button from "@/components/form/Button";
-import { toast } from "sonner";
 
-type Props = {
-  category: CategoryAttributes | null;
-  categories: CategoryAttributes[];
-  setCategoriesWithToast: (cats: CategoryAttributes[]) => Promise<void>;
+interface Props {
+  category: InventoryCategory | null;
+  categories: InventoryCategory[];
+  onSave: (category: InventoryCategory) => Promise<void>;
   onClose: () => void;
-};
+}
 
 export function CategoryModal({
   category,
   categories,
-  setCategoriesWithToast,
+  onSave,
   onClose,
 }: Props) {
   const isEdit = category !== null;
@@ -26,8 +24,6 @@ export function CategoryModal({
   const [min, setMin] = useState(0);
   const [mid, setMid] = useState(0);
   const [error, setError] = useState("");
-
-  const sectionWidth = 100 / 3;
 
   useEffect(() => {
     if (category) {
@@ -44,7 +40,15 @@ export function CategoryModal({
     }
 
     if (min >= mid) {
-      setError("Min must be less than Mid");
+      setError("Very Low Threshold must be less than Low Threshold");
+      return false;
+    }
+
+    const duplicate = categories.some(
+      (c) => c.name === name && c.id !== category?.id
+    );
+    if (duplicate) {
+      setError("Category name already exists");
       return false;
     }
 
@@ -55,34 +59,17 @@ export function CategoryModal({
   const save = async () => {
     if (!validate()) return;
 
-    if (!isEdit && categories.some((c) => c.name === name)) {
-      toast.error("Category name already exists");
-      return;
-    }
+    const updated: InventoryCategory = isEdit
+      ? { ...category!, name, lowThreshold: min, highThreshold: mid }
+      : { id: crypto.randomUUID(), name, quantity: 0, lowThreshold: min, highThreshold: mid };
 
-    let updated: CategoryAttributes[];
-
-    if (isEdit && category) {
-      updated = categories.map((cat) =>
-        cat.name === category.name
-          ? { ...cat, name, lowThreshold: min, highThreshold: mid }
-          : cat
-      );
-    } else {
-      updated = [
-        ...categories,
-        { name, lowThreshold: min, highThreshold: mid },
-      ];
-    }
-
-    await setCategoriesWithToast(updated);
-
+    await onSave(updated);
     onClose();
   };
 
   return createPortal(
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl w-140 p-8 shadow-lg relative">
+      <div className="bg-white rounded-xl w-140 p-8 shadow-lg relative font-family-roboto">
 
         <button
           aria-label="Close modal"
@@ -101,7 +88,7 @@ export function CategoryModal({
         </label>
 
         <input
-          className="border border-gray-300 w-full px-3 py-2 mb-6 rounded"
+          className="border border-[#D9D9D9] w-full px-3 py-2.5 mb-6 rounded-xs text-sm"
           placeholder="Add"
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -111,14 +98,14 @@ export function CategoryModal({
 
           <div>
             <label className="text-gray-600 text-sm block mb-1">
-              Min
+              Very Low
             </label>
 
             <input
               type="number"
               min="0"
               placeholder="< Amt"
-              className="border border-red-400 px-3 py-2 w-25 rounded"
+              className="border border-red-400 px-3 py-2.5 w-25 rounded-xs text-sm"
               value={min === 0 ? "" : min}
               onChange={(e) => setMin(Number(e.target.value) || 0)}
             />
@@ -126,14 +113,14 @@ export function CategoryModal({
 
           <div>
             <label className="text-gray-600 text-sm block mb-1">
-              Mid
+              Low
             </label>
 
             <input
               type="number"
               min="0"
               placeholder="< Amt"
-              className="border border-yellow-400 px-3 py-2 w-25 rounded"
+              className="border border-yellow-400 px-3 py-2.5 w-25 rounded-xs text-sm"
               value={mid === 0 ? "" : mid}
               onChange={(e) => setMid(Number(e.target.value) || 0)}
             />
@@ -143,25 +130,28 @@ export function CategoryModal({
 
         {/* threshold bar */}
 
-        <div className="mb-8">
-          <div className="flex h-1.5 rounded overflow-hidden">
+        <div className="relative mb-8 pt-7">
 
-            <div
-              className="bg-red-400"
-              style={{ width: `${sectionWidth}%` }}
-            />
-
-            <div
-              className="bg-yellow-400"
-              style={{ width: `${sectionWidth}%` }}
-            />
-
-            <div
-              className="bg-green-500"
-              style={{ width: `${sectionWidth}%` }}
-            />
-
+          <div className="absolute top-0 left-1/3 -translate-x-1/2 bg-[#505050] text-white text-xs px-2 h-5 flex items-center rounded-full">
+            {min || 0}
           </div>
+
+          <div className="absolute top-0 left-2/3 -translate-x-1/2 bg-[#505050] text-white text-xs px-2 h-5 flex items-center rounded-full">
+            {mid || 0}
+          </div>
+
+          <div className="flex h-1.5 rounded overflow-hidden">
+            <div className="w-1/3 bg-red-400" />
+            <div className="w-1/3 bg-yellow-400" />
+            <div className="w-1/3 bg-green-500" />
+          </div>
+
+          <div className="flex mt-2 text-xs text-[#BFBFBF]">
+            <span className="w-1/3 text-center">Very low</span>
+            <span className="w-1/3 text-center">Low</span>
+            <span className="w-1/3 text-center">Good</span>
+          </div>
+
         </div>
 
         {error && (
@@ -169,9 +159,12 @@ export function CategoryModal({
         )}
 
         <div className="mt-6">
-          <Button className="px-6 py-2" onClick={save}>
+          <button
+            className="bg-primary text-white text-sm px-6 py-2 rounded-xs cursor-pointer"
+            onClick={save}
+          >
             Save
-          </Button>
+          </button>
         </div>
 
       </div>

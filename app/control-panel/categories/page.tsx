@@ -1,150 +1,104 @@
 "use client";
 
 import { useState } from "react";
-import { useCategories } from "@/lib/queries/categories";
-import { CategoryAttributes } from "@/types/inventory";
+import { useInventoryCategories } from "@/lib/queries/inventory";
+import { useAuth } from "@/contexts/AuthContext";
+import { InventoryCategory } from "@/types/inventory";
+import { Plus } from "lucide-react";
 import { EditIcon } from "@/components/icons/EditIcon";
-import { TrashIcon } from "@/components/icons/TrashIcon";
-import Button from "@/components/form/Button";
 import { SearchBox } from "@/components/inventory/SearchBox";
+import { Badge } from "@/components/inventory/Badge";
 import { CategoryModal } from "@/components/control-panel/CategoryModal";
 
 export default function CategoriesPage() {
-  const { allAttrs: categories, isLoading, setCategoriesWithToast } =
-    useCategories();
+  const { state: { userData } } = useAuth();
+  const { inventoryCategories, isLoading, setInventoryCategoryWithToast } =
+    useInventoryCategories();
 
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [selectedCategory, setSelectedCategory] =
-    useState<CategoryAttributes | null>(null);
+    useState<InventoryCategory | null>(null);
 
-  if (isLoading) return null;
-
-  const filteredCategories = categories.filter((category) =>
-    category.name.toLowerCase().includes(search.trim().toLowerCase())
+  const filteredCategories = inventoryCategories.filter((category) =>
+    category.name.replace(/\s/g, "").toLowerCase().includes(search.trim().toLowerCase().replace(/\s/g, ""))
   );
 
-  const deleteCategory = async (name: string) => {
-    const updated = categories.filter((cat) => cat.name !== name);
-    await setCategoriesWithToast(updated);
-  };
-
   return (
-    <div className="flex gap-8">
+    <>
+      <div className="flex mb-6 gap-3">
+        <SearchBox
+          value={search}
+          onChange={setSearch}
+          onSubmit={() => {}}
+        />
+        <button
+          className="flex items-center gap-1 px-3 py-2 h-8 text-sm rounded-xs bg-primary text-white cursor-pointer"
+          onClick={() => {
+            setSelectedCategory(null);
+            setShowModal(true);
+          }}
+        >
+          <Plus className="w-4 h-4" /> Add
+        </button>
+      </div>
 
-      {/* LEFT: categories section */}
+      {isLoading ? (
+        <div className="flex-1 flex items-center justify-center text-sm text-[#A2A2A2]">
+          Loading categories...
+        </div>
+      ) : (
+        <div className="flex-1 min-h-0 flex flex-col">
 
-      <div className="flex-1">
-
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-
-          {/* search + add */}
-
-          <div className="flex items-center gap-4 mb-6">
-
-            <SearchBox
-              value={search}
-              onChange={setSearch}
-              onSubmit={() => {}}
-            />
-
-            <Button
-              className="px-3! py-1! text-sm! h-8.5!"
-              onClick={() => {
-                setSelectedCategory(null);
-                setShowModal(true);
-              }}
-            >
-              + Add
-            </Button>
-
+          <div className="h-12 bg-[#FAFAFB] border-light-border border flex items-center font-family-roboto font-bold text-sm text-text-1 shrink-0">
+            <span className="w-[58%] border-l-2 border-light-border px-4">Items</span>
+            <span className="w-[34%] border-l-2 border-light-border px-4">Stock Thresholds</span>
+            <span className="w-[8%] border-l-2 border-light-border px-4">Actions</span>
           </div>
 
-          {/* table header */}
-
-          <div className="grid grid-cols-[2fr_1.2fr_120px] px-6 py-3 text-sm font-semibold text-gray-700 bg-gray-100 border border-gray-200">
-            <span>Items</span>
-            <span>Stock Thresholds</span>
-            <span className="text-right">Actions</span>
-          </div>
-
-          {/* rows */}
-
-          <div className="border-l border-r border-b border-gray-200">
-
-            {filteredCategories.map((category) => (
-
-              <div
-                key={category.name}
-                className="grid grid-cols-[2fr_1.2fr_120px] px-6 py-3 border-b border-gray-200 items-center hover:bg-gray-50"
-              >
-
-                {/* item name */}
-
-                <span className="text-[14px] text-gray-800">
-                  {category.name}
-                </span>
-
-                {/* thresholds */}
-
-                <div className="flex gap-2">
-
-                  <span className="bg-red-100 text-red-700 text-xs px-3 py-1 rounded">
-                    Very low: {category.lowThreshold ?? 0}
-                  </span>
-
-                  <span className="bg-yellow-100 text-yellow-700 text-xs px-3 py-1 rounded">
-                    Low: {category.highThreshold ?? 0}
-                  </span>
-
-                </div>
-
-                {/* actions */}
-
-                <div className="flex justify-end gap-5 text-gray-400">
-
-                  <button
-                    onClick={() => {
-                      setSelectedCategory(category);
-                      setShowModal(true);
-                    }}
-                  >
-                    <EditIcon />
-                  </button>
-
-                  <button
-                    onClick={() => deleteCategory(category.name)}
-                  >
-                    <TrashIcon />
-                  </button>
-
-                </div>
-
+          <div className="flex-1 overflow-auto min-h-0">
+            {filteredCategories.length === 0 ? (
+              <div className="flex items-center justify-center h-24 text-sm text-[#A2A2A2]">
+                No categories found.
               </div>
-
-            ))}
-
+            ) : (
+              filteredCategories.map((category) => (
+                <div
+                  key={category.id}
+                  className="h-10 border-light-border border-b border-x flex items-center font-family-roboto text-sm text-text-1 hover:bg-blue-50 cursor-pointer"
+                  onClick={() => { setSelectedCategory(category); setShowModal(true); }}
+                >
+                  <div className="w-[58%] px-4">{category.name}</div>
+                  <div className="w-[34%] px-4 flex gap-2">
+                    <Badge text={`Very low: ${category.lowThreshold}`} color="red" />
+                    <Badge text={`Low: ${category.highThreshold}`} color="yellow" />
+                  </div>
+                  <div className="w-[8%] px-4 flex gap-3 text-gray-400">
+                    <button
+                      onClick={() => {
+                        setSelectedCategory(category);
+                        setShowModal(true);
+                      }}
+                    >
+                      <EditIcon />
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
 
         </div>
-
-      </div>
-
-      {/* blank right sidebar */}
-
-      <div className="w-[320px]" />
-
-      {/* modal */}
+      )}
 
       {showModal && (
         <CategoryModal
           category={selectedCategory}
-          categories={categories}
-          setCategoriesWithToast={setCategoriesWithToast}
+          categories={inventoryCategories}
+          onSave={async (cat) => { await setInventoryCategoryWithToast(cat, userData!.uid); }}
           onClose={() => setShowModal(false)}
         />
       )}
-
-    </div>
+    </>
   );
 }
