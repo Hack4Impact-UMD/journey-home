@@ -86,7 +86,7 @@ export default function SideNavbar() {
                 />
 
                 <div className="mt-auto w-full mb-4">
-                    <Link href="/profile">
+                    <Link href="/profile/settings">
                         <div className="relative pt-2 pl-4 pr-2 border border-light-border rounded-lg w-full flex items-center justify-between">
                             <div className = "pb-2">
                                 <div className="text-text-1 text-sm font-family-opensans">
@@ -101,7 +101,7 @@ export default function SideNavbar() {
                                     {auth.state.userData?.role ?? "Loading..."}
                                 </div>
                             </div>
-                            <div className = "absolute bottom-0 right-2 translate-y-1/16">
+                            <div className = "absolute bottom-0 right-2 translate-y-[0.0625rem]">
                                 <DogPeekingIcon/>
                             </div>
                             {/* <ViewIcon /> */}
