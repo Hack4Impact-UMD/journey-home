@@ -28,6 +28,7 @@ export default function SideNavbar() {
                 </div>
             </Link>
             <div className="px-4 h-full w-full flex flex-col">
+
                 <SideNavbarLink
                     icon={InventoryIcon}
                     name="Inventory"
@@ -55,7 +56,7 @@ export default function SideNavbar() {
                     path="/pickups-deliveries"
                     roles={["Admin"]}
                 />
-                
+
                 <SideNavbarLink
                     icon={UserManagementIcon}
                     name="User Management"
@@ -95,9 +96,7 @@ export default function SideNavbar() {
                             <div className = "absolute bottom-0 right-2 translate-y-1/16">
                                 <DogPeekingIcon/>
                             </div>
-                            {/* <ViewIcon /> */}
                         </div>
-                        
                     </Link>
                 </div>
             </div>
@@ -126,15 +125,19 @@ function SideNavbarLink({
         return <></>;
     }
 
+    const isActive = pathname?.startsWith(path)
+
     return (
         <Link
             href={path}
-            className={`hover:text-primary pb-4 text-sm flex items-center gap-2 ${
-                pathname?.startsWith(path) ? "text-primary font-semibold" : ""
-            }`}
+            className = "gap-2"
         >
+            <div className = {`flex items-center gap-[0.5rem] px-[0.75rem] py-[0.75rem] text-sm rounded-md transition-all ${
+                isActive ? "bg-[#F2FBFD] text-[#125C6D]" : "hover:text-primary"
+            }`}>
             <Icon />
             {name}
+            </div>
         </Link>
     );
 }
