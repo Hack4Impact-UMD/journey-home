@@ -5,7 +5,6 @@ import SideNavbar from "@/components/general/SideNav";
 import ShiftTaskSummary from "./ShiftTaskSummary";
 import AvailableShiftsSummary from "./AvailableShiftsSummary";
 import { useAuth } from "@/contexts/AuthContext";
-import { ChevronRightIcon } from "@/components/icons/ChevronRightIcon"; 
 
 
 export default function VolunteerHomePage() {
