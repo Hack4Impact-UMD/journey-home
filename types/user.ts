@@ -1,7 +1,6 @@
 "use client";
 
 import { User } from "firebase/auth";
-import { Timestamp } from "firebase/firestore";
 
 export type UserRole = "Admin" | "Case Manager" | "Volunteer";
 
