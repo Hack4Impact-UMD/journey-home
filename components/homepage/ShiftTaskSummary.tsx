@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useTimeBlocks } from "@/lib/queries/timeblocks";
 import { useAuth } from "@/contexts/AuthContext";
+import { ChevronRightIcon } from "@/components/icons/ChevronRightIcon";
 
 export default function ShiftTaskSummary() {
     const { allTB: timeblocks = [] } = useTimeBlocks();
@@ -18,57 +19,53 @@ export default function ShiftTaskSummary() {
             const startTime = tb.startTime.toDate();
             if (startTime <= now) return false;
 
-            // check if signedup
+            // check if user is signed up in any group
             const isSignedUp = tb.volunteerGroups?.some((group) =>
                 group.volunterIDs?.includes(userId)
             );
+
             return isSignedUp;
         })
         .sort(
             (a, b) =>
                 a.startTime.toDate().getTime() - b.startTime.toDate().getTime()
-        );
+        )
+        .slice(0, 2); // limit to 2
 
     return (
         <div>
             <Link href="/volunteer-tasks">
-                <div className="flex items-center justify-between mb-4 cursor-pointer">
-                    <h2 className="text-lg text-gray-800">Shift Tasks {">"}</h2>
+                <div className="flex items-center mb-4 cursor-pointer gap-2">
+                    <h2 className="text-[20px] font-semibold text-gray-800 leading-none">
+                        Shift Tasks
+                    </h2>
+                    <ChevronRightIcon />
                 </div>
             </Link>
 
             <div className="border bg-white overflow-hidden">
                 {myShifts.map((tb, index) => {
                     const start = tb.startTime.toDate();
-                    const isToday = start.toDateString() === now.toDateString();
+                    const end = tb.endTime?.toDate();
 
-                    const totalVolunteers =
-                        tb.volunteerGroups?.reduce(
-                            (sum, g) => sum + (g.volunterIDs?.length ?? 0),
-                            0
-                        ) ?? 0;
-
-                    const totalCapacity =
-                        tb.volunteerGroups?.reduce(
-                            (sum, g) => sum + (g.maxNum ?? 0),
-                            0
-                        ) ?? 0;
+                    // for the open button
+                    const isOngoing = start <= now && end && now <= end;
 
                     return (
                         <div
                             key={tb.id}
-                            className={`p-4 flex items-center justify-between ${
+                            className={`p-4 flex items-start justify-between ${
                                 index !== myShifts.length - 1 ? "border-b" : ""
                             }`}
                         >
                             {/* left */}
-                            <div className="flex items-start gap-3">
-                                <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-semibold">
+                            <div className="flex items-start">
+                                <div className="w-7 h-7 mr-3 rounded-full bg-primary text-white flex items-center justify-center font-semibold text-[14px] leading-[11.59px] tracking-[0px] font-[Roboto]">
                                     {start.getDate()}
                                 </div>
 
                                 <div>
-                                    <div className="text-sm text-gray-500">
+                                    <div className="text-gray-500 text-[14px] leading-[11.59px] font-semibold tracking-[0px] font-[Roboto] mb-2">
                                         {`${start.toLocaleDateString(
                                             undefined,
                                             { month: "short" }
@@ -80,15 +77,28 @@ export default function ShiftTaskSummary() {
 
                                     <div className="text-sm">{tb.type}</div>
 
-                                    <div className="text-xs text-primary">
-                                        {totalVolunteers}/{totalCapacity}{" "}
-                                        volunteers
+                                    <div className="flex flex-col gap-1 mt-1">
+                                        {tb.volunteerGroups?.map((group) => {
+                                            const filled =
+                                                group.volunterIDs?.length ?? 0;
+                                            const capacity = group.maxNum ?? 0;
+
+                                            return (
+                                                <div
+                                                    key={group.name}
+                                                    className="text-xs text-primary"
+                                                >
+                                                    {filled}/{capacity}{" "}
+                                                    {group.name.toLowerCase()}
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             </div>
 
                             {/* right */}
-                            <div className="flex flex-col items-end gap-2 ml-auto">
+                            <div className="flex flex-col items-start gap-2 ml-auto mr-6">
                                 <div className="flex items-center gap-2">
                                     <div
                                         className={`w-3 h-3 rounded-full ${
@@ -105,15 +115,15 @@ export default function ShiftTaskSummary() {
                                     </div>
                                 </div>
 
-                                {isToday ? (
+                                {isOngoing ? (
                                     <Link
                                         href="/volunteer-tasks"
-                                        className="bg-primary text-white h-8 px-4 py-1 rounded-xs text-sm inline-flex items-center"
+                                        className="h-8 px-4 text-sm bg-primary text-white rounded-sm flex items-center justify-center"
                                     >
                                         Open
                                     </Link>
                                 ) : (
-                                    <div className="border px-4 h-8 rounded-xs text-primary flex items-center justify-center text-xs">
+                                    <div className="h-8 px-4 text-sm bg-white text-primary rounded-sm flex items-center justify-center border border-gray-300">
                                         Upcoming
                                     </div>
                                 )}

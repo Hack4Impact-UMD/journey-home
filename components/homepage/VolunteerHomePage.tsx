@@ -5,24 +5,23 @@ import SideNavbar from "@/components/general/SideNav";
 import ShiftTaskSummary from "./ShiftTaskSummary";
 import AvailableShiftsSummary from "./AvailableShiftsSummary";
 import { useAuth } from "@/contexts/AuthContext";
+import { ChevronRightIcon } from "@/components/icons/ChevronRightIcon"; 
+
 
 export default function VolunteerHomePage() {
     // display the name of the user 
     const { state } = useAuth();
-    const user = state.currentUser;
+    const user = state.userData;
 
-    const name =
-        user?.displayName ||
-        user?.email?.split("@")[0] ||
-        "Volunteer";
+    const name = user?.firstName ||"Volunteer";
 
     return (
         <ProtectedRoute allow={["Volunteer"]}>
             <div className="h-full w-full flex flex-col font-family-roboto">
                 <div className="flex flex-1">
                     <SideNavbar />
-                    <div className="flex-1 bg-[#F7F7F7] pt-8 pb-4 px-6 flex flex-col gap-6">
-                        <span className="text-2xl text-primary font-extrabold block">
+                    <div className="flex-1 bg-white pt-8 pb-4 px-6 flex flex-col gap-6">
+                    <span className="text-[36px] font-semibold text-primary leading-none block">
                             Welcome, {name}!
                         </span>
 
