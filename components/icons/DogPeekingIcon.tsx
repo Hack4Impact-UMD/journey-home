@@ -12,52 +12,52 @@ export function DogPeekingIcon() {
             <path
                 d="M12.4491 18.7287C11.7315 21.0153 9.602 22.5709 7.1995 22.5787C4.41479 22.5787 0.296226 21.7931 3.93117 16.4187C8.22914 10.072 9.50839 7.10089 11.5599 7.64533C12.4101 7.87089 13.0029 8.64089 13.0809 9.512C13.2369 11.4487 13.4242 15.6176 12.4491 18.7287Z"
                 stroke="#D1D1D1"
-                stroke-width="1.25"
-                stroke-miterlimit="10"
+                strokeWidth="1.25"
+                strokeMiterlimit="10"
             />
             <path
                 d="M34.0093 6.32324C34.0093 6.32324 37.4882 10.3132 36.8174 16.9944C36.8174 16.9944 37.964 20.3077 40.5537 17.7177C43.1512 15.1277 43.1512 14.2488 40.5537 11.1921C37.9562 8.13546 39.9843 6.42435 34.0093 6.32324Z"
                 stroke="#D1D1D1"
-                stroke-width="1.25"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="1.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
             />
             <path
                 d="M11.5601 7.64574C11.5601 7.64574 12.6053 7.45908 14.9922 5.78685C17.3791 4.11463 26.8877 0.0312973 34.0094 6.32352"
                 stroke="#D1D1D1"
-                stroke-width="1.25"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="1.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
             />
             <path
                 d="M12.0828 19.6152C12.0828 19.6152 11.724 25.8452 20.0703 27.2608"
                 stroke="#D1D1D1"
-                stroke-width="1.25"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="1.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
             />
             <path
                 d="M36.8957 14.8008C36.8957 14.8008 37.1843 21.3963 32.9331 24.803"
                 stroke="#D1D1D1"
-                stroke-width="1.25"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="1.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
             />
             <path
                 d="M31.8719 14.4359C32.4578 14.4359 32.9327 13.9623 32.9327 13.3781C32.9327 12.7939 32.4578 12.3203 31.8719 12.3203C31.286 12.3203 30.811 12.7939 30.811 13.3781C30.811 13.9623 31.286 14.4359 31.8719 14.4359Z"
                 fill="#BBBDBE"
                 stroke="#BBBDBE"
-                stroke-width="1.25"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="1.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
             />
             <path
                 d="M19.7972 15.4935C20.3831 15.4935 20.858 15.0199 20.858 14.4357C20.858 13.8515 20.3831 13.3779 19.7972 13.3779C19.2113 13.3779 18.7363 13.8515 18.7363 14.4357C18.7363 15.0199 19.2113 15.4935 19.7972 15.4935Z"
                 fill="#BBBDBE"
                 stroke="#BBBDBE"
-                stroke-width="1.25"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="1.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
             />
             <path
                 d="M27.6133 15.501C29.688 15.4855 31.069 16.8391 30.2969 18.3945C30.1019 18.7912 29.5318 19.4679 29.2744 19.709C28.8064 20.1366 28.0498 20.0126 27.457 19.7871C26.833 19.546 25.9512 19.1259 25.3428 18.4492H25.3506C24.8982 17.9514 24.8443 17.2124 25.2188 16.6602C25.64 16.0535 26.3809 15.5088 27.6133 15.501Z"
@@ -70,30 +70,30 @@ export function DogPeekingIcon() {
             <path
                 d="M12.7612 32.0677C12.7612 32.0677 12.7612 27.0977 18.5179 27.0977C23.7441 27.0977 23.7441 32.0677 23.7441 32.0677"
                 stroke="#D1D1D1"
-                stroke-width="1.25"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="1.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
             />
             <path
                 d="M37.184 32.0677C37.184 32.0677 37.184 27.0977 31.4274 27.0977C26.2012 27.0977 26.2012 32.0677 26.2012 32.0677"
                 stroke="#D1D1D1"
-                stroke-width="1.25"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="1.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
             />
             <path
                 d="M13.7443 24.0645C13.7443 24.0645 12.0828 29.2678 9.15771 32.0678"
                 stroke="#D1D1D1"
-                stroke-width="1.25"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="1.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
             />
             <path
                 d="M34.8987 22.5791C34.8987 22.5791 34.0094 26.2347 35.9907 28.9024"
                 stroke="#D1D1D1"
-                stroke-width="1.25"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="1.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
             />
         </svg>
     );

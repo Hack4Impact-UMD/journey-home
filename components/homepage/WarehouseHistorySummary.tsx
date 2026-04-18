@@ -24,7 +24,7 @@ export default function WarehouseHistorySummary(){
     const mostRecent = sortedChanges.slice(0,5);
 
     return (
-        <div className="w-full rounded-2xl border border-[#E7E7E7] bg-white shadow-sm p-4 flex flex-col gap-3">
+        <div className="w-full h-full rounded-2xl border border-[#E7E7E7] bg-white shadow-sm p-4 flex flex-col gap-3">
             <div className="flex flex-row place-content-between items-center">
                 <span className="font-bold text-lg text-text-1">
                     Latest inventory updates

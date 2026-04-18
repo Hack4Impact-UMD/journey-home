@@ -65,11 +65,11 @@ export function PickupsDeliveriesSummary() {
     });
 
     return (
-        <div className="h-[26.5%] bg-white rounded-2xl border border-light-border p-5 flex flex-col gap-3">
+        <div className="h-full bg-white rounded-2xl border border-light-border p-5 flex flex-col gap-3">
             <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-text-1">Upcoming pickups/deliveries</span>
-                <span className="text-sm text-gray-400">
-                    {isLoading ? "..." : <><span className="font-semibold text-text-1">{rows.length}</span> today</>}
+                <span className="text-base font-semibold text-text-1">Upcoming pickups/deliveries</span>
+                <span className="text-sm text-[#383838]">
+                    {isLoading ? "..." : <><span>{rows.length}</span> today</>}
                 </span>
             </div>
             {isLoading ? (
