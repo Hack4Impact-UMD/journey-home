@@ -21,16 +21,16 @@ export default function WarehouseHistorySummary(){
         [sortedChanges]
     );
 
-    const mostRecent = sortedChanges.slice(0,5);
+    const mostRecent = useMemo(()=> sortedChanges.slice(0,5), [sortedChanges]);
 
     return (
-        <div className="w-full h-full rounded-2xl border border-[#E7E7E7] bg-white shadow-sm p-4 flex flex-col gap-3">
+        <div className="w-full h-full rounded-2xl border border-[#E7E7E7] shadow-sm py-6 px-5 flex flex-col gap-3 bg-white/70">
             <div className="flex flex-row place-content-between items-center">
-                <span className="font-bold text-lg text-text-1">
+                <span className="font-semibold text-text-1">
                     Latest inventory updates
                 </span>
-                <span className="text-sm text-gray-400">
-                    <span className="font-semibold text-text-1">{twoDaysAfter}</span> new changes
+                <span className="text-sm text-[#383838]">
+                    {twoDaysAfter} new changes
                 </span>
             </div>
             {isLoading ? (
@@ -43,12 +43,12 @@ export default function WarehouseHistorySummary(){
                         const diff = c.change.newQuantity - c.change.oldQuantity;
                         const isPositive = diff > 0;
                         return (
-                            <div key={c.id} className="flex items-center gap-3 border border-light-border px-3 py-2">
+                            <div key={c.id} className="flex items-center gap-3 bg-white/70 border border-[#DCDDDD] rounded-sm px-3 py-2">
                                 <span className="shrink-0">
                                     {isPositive ? <AdminWarehousePlus /> : <AdminWarehouseMinus />}
                                 </span>
                                 <span className="text-xs text-gray-400 shrink-0">
-                                    {c.timestamp.toDate().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
+                                    {c.timestamp.toDate().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).replaceAll(",","").replace(" AM", "am").replace(" PM", "pm")}
                                 </span>
                                 <span className="border-l border-gray-200 self-stretch" />
                                 <span className="text-sm text-gray-700">

@@ -21,7 +21,7 @@ function isFromToday(seconds: number): boolean {
 
 function ArrowIcon() {
     return (
-        <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
             <circle cx="12" cy="12" r="10" />
             <path d="M9 15l6-6M15 9H9M15 9v6" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
@@ -38,7 +38,7 @@ type StatCardProps = {
 
 function StatCard({ label, count, newCount, icon, iconClassName }: StatCardProps) {
     return (
-        <div className="bg-white rounded-2xl border border-light-border p-4 flex flex-col gap-1 relative overflow-hidden h-40">
+        <div className="bg-white/70 shadow-sm rounded-2xl border border-light-border p-4 flex flex-col gap-1 relative overflow-hidden">
             <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-text-1">{label}</span>
                 <span className="text-text-1 opacity-70"><ArrowIcon /></span>
@@ -79,7 +79,7 @@ export function QuickStatsSummary() {
     }
 
     return (
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 h-full w-full">
             <StatCard label="Low stock items" count={lowStockCount} newCount={0} icon={<InventoryIcon />} iconClassName="bottom-[-1.25rem] right-[-1.25rem]" />
             <StatCard label="Donation requests" count={notReviewedDR.length} newCount={newDR} icon={<DonorRequestsIcon />} iconClassName="bottom-[-0.5rem] right-[-1rem]" />
             <StatCard label="Account requests" count={accountRequests.length} newCount={0} icon={<UserManagementIcon />} iconClassName="bottom-[-0.25rem] right-[-1rem]" />

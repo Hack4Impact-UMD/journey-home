@@ -65,7 +65,7 @@ export function PickupsDeliveriesSummary() {
     });
 
     return (
-        <div className="h-full bg-white rounded-2xl border border-light-border p-5 flex flex-col gap-3">
+        <div className="h-full w-full bg-white/70 rounded-2xl border border-light-border p-5 flex flex-col gap-3 shadow-sm">
             <div className="flex items-center justify-between">
                 <span className="text-base font-semibold text-text-1">Upcoming pickups/deliveries</span>
                 <span className="text-sm text-[#383838]">
@@ -81,11 +81,11 @@ export function PickupsDeliveriesSummary() {
             ) : (
                 <div className="flex flex-col gap-2">
                     {rows.map((row) => (
-                        <div key={row.key} className="flex items-center gap-3 border border-light-border px-3 py-2">
+                        <div key={row.key} className="flex items-center gap-3 border border-light-border px-3 py-2 rounded-sm">
                             <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold shrink-0 ${row.type === "P" ? "bg-[#D6E8F0] text-[#4A8FA8]" : "bg-[#F5E0E0] text-[#A87070]"}`}>{row.type}</span>
-                            <span className="w-20 shrink-0 text-xs text-gray-500">{row.timeRange}</span>
-                            <span className="flex items-center gap-1 flex-1 text-xs text-gray-500"><PersonIcon />{row.name}</span>
-                            <span className="flex items-center gap-1 text-xs text-gray-500"><LocationIcon />{row.location}</span>
+                            <span className="w-20 shrink-0 text-sm">{row.timeRange}</span>
+                            <span className="flex items-center gap-1 flex-1 text-sm "><PersonIcon />{row.name}</span>
+                            <span className="flex items-center gap-1 text-sm "><LocationIcon />{row.location}</span>
                         </div>
                     ))}
                 </div>
