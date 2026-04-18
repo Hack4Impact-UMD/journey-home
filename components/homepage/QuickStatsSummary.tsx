@@ -40,11 +40,11 @@ function StatCard({ label, count, newCount, icon, iconClassName }: StatCardProps
     return (
         <div className="bg-white/70 shadow-sm rounded-2xl border border-light-border p-4 flex flex-col gap-1 relative overflow-hidden">
             <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-text-1">{label}</span>
-                <span className="text-text-1 opacity-70"><ArrowIcon /></span>
+                <span className="text-base font-semibold text-text-1">{label}</span>
+                <span className="text-text-1"><ArrowIcon /></span>
             </div>
             <span className="text-5xl font-normal text-text-1 mt-1">{count}</span>
-            <span className="text-xs text-gray-400 mt-auto">
+            <span className="text-base text-[#919393] mt-auto">
                 {newCount !== undefined ? `${newCount} new today` : ""}
             </span>
             <div className={`absolute opacity-[0.15] text-[#a0c4d8] text-[5rem] ${iconClassName ?? "bottom-[-1.25rem] right-[-1.25rem]"}`}>
@@ -73,7 +73,7 @@ export function QuickStatsSummary() {
     const newDR = notReviewedDR.filter((dr) => isFromToday(dr.date.seconds)).length;
 
     if (isLoading) {
-        return <div className="grid grid-cols-2 gap-3 animate-pulse">
+        return <div className="grid grid-cols-2 gap-3 animate-pulse h-full w-full">
             {[...Array(4)].map((_, i) => <div key={i} className="bg-white rounded-sm border border-light-border h-28" />)}
         </div>;
     }
