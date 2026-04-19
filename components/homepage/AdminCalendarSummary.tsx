@@ -59,7 +59,7 @@ export default function AdminCalendarSummary() {
     },[upcomingEvents]);
 
     return (
-        <div className="w-full h-full rounded-xl border border-[#E7E7E7] shadow-sm px-4 pb-4 flex flex-col gap-3 bg-white/70">
+        <div className="w-full h-full rounded-xl border border-[#E7E7E7] shadow-sm px-4 pb-4 flex flex-col gap-3 bg-white/70 overflow-hidden">
             <div className = "flex flex-row pt-6 justify-between ">
                 <div className = "font-semibold text-base"> Calendar </div>
                 <div className = "text-sm text-[#383838] "> {unfilledCount}/{upcomingEvents.length} shifts unfilled</div>
@@ -69,7 +69,7 @@ export default function AdminCalendarSummary() {
             ) : groupedEvents.length === 0 ? (
                 <p className = "flex justify-center">No upcoming shifts!</p>
             ) : (
-                <div className = " flex flex-col gap-2">
+                <div className="flex flex-col gap-2 overflow-auto">
                     {groupedEvents.map(({dateKey, date, events }) => {
                         const dayNumber = date.getDate()
                         const weekday = date.toLocaleDateString("en-US", {weekday: "short"}).toUpperCase();

@@ -4,6 +4,8 @@ import { useTimeBlocks } from "@/lib/queries/timeblocks";
 import { ClientRequest } from "@/types/client-requests";
 import { DonationRequest } from "@/types/donations";
 import { TimeBlock } from "@/types/schedule";
+import { PersonIcon } from "@/components/icons/PersonIcon";
+import { LocationIcon } from "@/components/icons/LocationIcon";
 
 function isTodayBlock(tb: TimeBlock): boolean {
     const d = new Date(tb.startTime.seconds * 1000);
@@ -19,24 +21,6 @@ function formatTimeRange(tb: TimeBlock): string {
     const fmt = (ts: { seconds: number }) =>
         new Date(ts.seconds * 1000).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
     return `${fmt(tb.startTime)}-${fmt(tb.endTime)}`;
-}
-
-function PersonIcon() {
-    return (
-        <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <circle cx="8" cy="5" r="3" />
-            <path d="M2 14c0-3.314 2.686-6 6-6s6 2.686 6 6" strokeLinecap="round" />
-        </svg>
-    );
-}
-
-function LocationIcon() {
-    return (
-        <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path d="M8 1.5C5.515 1.5 3.5 3.515 3.5 6c0 3.75 4.5 8.5 4.5 8.5S12.5 9.75 12.5 6c0-2.485-2.015-4.5-4.5-4.5z" />
-            <circle cx="8" cy="6" r="1.5" />
-        </svg>
-    );
 }
 
 type DeliveryRow = {
@@ -67,9 +51,9 @@ export function PickupsDeliveriesSummary() {
     return (
         <div className="h-full w-full bg-white/70 rounded-2xl border border-light-border p-5 flex flex-col gap-3 shadow-sm">
             <div className="flex items-center justify-between">
-                <span className="text-base font-semibold text-text-1">Upcoming pickups/deliveries</span>
+                <span className="text-base font-bold text-text-1">Upcoming pickups/deliveries</span>
                 <span className="text-sm text-[#383838]">
-                    {isLoading ? "..." : <><span>{rows.length}</span> today</>}
+                    {isLoading ? "..." : <><span className="font-semibold text-text-1">{rows.length}</span> today</>}
                 </span>
             </div>
             {isLoading ? (
@@ -80,12 +64,12 @@ export function PickupsDeliveriesSummary() {
                 <span className="text-sm text-gray-400">No pickups or deliveries today</span>
             ) : (
                 <div className="flex flex-col gap-2">
-                    {rows.map((row) => (
-                        <div key={row.key} className="flex items-center gap-3 border border-light-border px-3 py-2 rounded-sm">
-                            <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold shrink-0 ${row.type === "P" ? "bg-[#D6E8F0] text-[#4A8FA8]" : "bg-[#F5E0E0] text-[#A87070]"}`}>{row.type}</span>
-                            <span className="w-20 shrink-0 text-sm">{row.timeRange}</span>
-                            <span className="flex items-center gap-1 flex-1 text-sm "><PersonIcon />{row.name}</span>
-                            <span className="flex items-center gap-1 text-sm "><LocationIcon />{row.location}</span>
+                    {rows.slice(0, 4).map((row) => (
+                        <div key={row.key} className="flex items-center gap-3 border border-light-border rounded-xl px-3 py-2">
+                            <span className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-semibold shrink-0 ${row.type === "P" ? "bg-[#D6E8F0] text-[#4A8FA8]" : "bg-[#F5E0E0] text-[#A87070]"}`}>{row.type}</span>
+                            <span className="w-20 shrink-0 text-sm text-gray-500">{row.timeRange}</span>
+                            <span className="flex items-center gap-1 text-sm text-gray-500"><PersonIcon />{row.name}</span>
+                            <span className="flex items-center gap-1 text-sm text-gray-500 ml-4"><LocationIcon />{row.location}</span>
                         </div>
                     ))}
                 </div>
