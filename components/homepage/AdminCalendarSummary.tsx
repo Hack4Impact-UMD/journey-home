@@ -52,8 +52,8 @@ export default function AdminCalendarSummary() {
         return upcomingEvents.filter((tb) => {
             const driveGroup = tb.volunteerGroups.find((g) => g.name === "Lead Drivers ONLY");
             const volGroup = tb.volunteerGroups.find((g)=> g.name === "Volunteers");
-            const lowDrive = (driveGroup?.volunterIDs.length?? 0) !== driveGroup?.maxNum;
-            const lowVol = (volGroup?.volunterIDs?.length ?? 0) <= (volGroup?.maxNum ?? 0) /2;
+            const lowDrive = driveGroup ? (driveGroup.volunterIDs.length?? 0) < (driveGroup.maxNum ?? 0) : false;
+            const lowVol = volGroup ? (volGroup.volunterIDs?.length ?? 0) <= ((volGroup.maxNum ?? 0) /2) : false;
             return lowDrive || lowVol;
         }).length
     },[upcomingEvents]);
