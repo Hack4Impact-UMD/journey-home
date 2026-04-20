@@ -9,9 +9,9 @@ import * as PhosphorIcons from "@phosphor-icons/react";
 import { EditIcon } from "@/components/icons/EditIcon";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { Badge } from "@/components/inventory/Badge";
-import { CategoryModal } from "@/components/control-panel/CategoryModal";
+import { CategoryModal, DEFAULT_ICONS } from "@/components/control-panel/CategoryModal";
 
-function isValidIcon(val: unknown): val is React.ComponentType<{ size?: number }> {
+function isValidIcon(val: unknown): val is React.ComponentType<{ size?: number; strokeWidth?: number }> {
   if (!val) return false;
   if (typeof val === "function") return true;
   if (typeof val === "object" && val !== null && "render" in val) return true;
@@ -68,8 +68,9 @@ export default function CategoriesPage() {
                 const iconRecord = PhosphorIcons as Record<string, unknown>;
                 const iconVal = category.icon ? iconRecord[category.icon] : null;
                 const IconComp = isValidIcon(iconVal)
-                  ? iconVal
-                  : PhosphorIcons.Package;
+                  ? (iconVal as React.ComponentType<{ size?: number; strokeWidth?: number }>)
+                  : (DEFAULT_ICONS.find((d) => d.key === category.icon)?.Component ?? PhosphorIcons.Package);
+
                 return (
                   <div
                     key={category.id}
@@ -77,7 +78,7 @@ export default function CategoriesPage() {
                     onClick={() => { setSelectedCategory(category); setShowModal(true); }}
                   >
                     <div className="w-[58%] px-4 flex items-center gap-2">
-                      <IconComp size={18} className="text-gray-500 shrink-0" />
+                      <IconComp size={18} strokeWidth={1.5} className="text-gray-500 shrink-0" />
                       {category.name}
                     </div>
                     <div className="w-[34%] px-4 flex gap-2">

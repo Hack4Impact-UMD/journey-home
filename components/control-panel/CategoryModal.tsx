@@ -3,12 +3,12 @@
 import { useState, useMemo } from "react";
 import { X, MagnifyingGlass } from "@phosphor-icons/react";
 import * as PhosphorIcons from "@phosphor-icons/react";
-import { Icon as PhosphorIcon } from "@phosphor-icons/react";
+import { BedSingle, BedDouble, ShelvingUnit, Microwave } from "lucide-react";
 import { InventoryCategory } from "@/types/inventory";
 
 const WEIGHT_SUFFIXES = ["", "Light", "Thin", "Regular", "Bold", "Fill", "Duotone"];
 
-function isValidIcon(val: unknown): val is React.ComponentType<{ size?: number }> {
+function isValidIcon(val: unknown): val is React.ComponentType<{ size?: number; strokeWidth?: number }> {
   if (!val) return false;
   if (typeof val === "function") return true;
   if (typeof val === "object" && val !== null && "render" in val) return true;
@@ -23,15 +23,34 @@ function resolveIconName(base: string): string | null {
   return null;
 }
 
-const DEFAULT_ICON_BASES = [
-  "Rug", "Armchair", "Coffee", "Bed", "PaintBrushHousehold",
-  "Chair", "SprayBottle", "Desk", "Basket", "CookingPot",
-  "ForkKnife", "ToiletPaper", "Dresser", "Television",
-];
+function resolveIconComponent(base: string): React.ComponentType<{ size?: number; strokeWidth?: number }> | null {
+  const resolved = resolveIconName(base);
+  if (!resolved) return null;
+  const val = (PhosphorIcons as Record<string, unknown>)[resolved];
+  return isValidIcon(val) ? val : null;
+}
 
-const DEFAULT_ICON_NAMES = DEFAULT_ICON_BASES
-  .map(resolveIconName)
-  .filter((x): x is string => x !== null);
+type IconEntry = { key: string; Component: React.ComponentType<{ size?: number; strokeWidth?: number }> };
+
+export const DEFAULT_ICONS: IconEntry[] = [
+  { key: "Rug", Component: resolveIconComponent("Rug") ?? PhosphorIcons.Package },
+  { key: "Armchair", Component: resolveIconComponent("Armchair") ?? PhosphorIcons.Package },
+  { key: "Coffee", Component: resolveIconComponent("Coffee") ?? PhosphorIcons.Package },
+  { key: "BedSingle", Component: BedSingle },
+  { key: "BedDouble", Component: BedDouble },
+  { key: "PaintBrushHousehold", Component: resolveIconComponent("PaintBrushHousehold") ?? PhosphorIcons.Package },
+  { key: "Chair", Component: resolveIconComponent("Chair") ?? PhosphorIcons.Package },
+  { key: "SprayBottle", Component: resolveIconComponent("SprayBottle") ?? PhosphorIcons.Package },
+  { key: "Desk", Component: resolveIconComponent("Desk") ?? PhosphorIcons.Package },
+  { key: "Basket", Component: resolveIconComponent("Basket") ?? PhosphorIcons.Package },
+  { key: "CookingPot", Component: resolveIconComponent("CookingPot") ?? PhosphorIcons.Package },
+  { key: "ForkKnife", Component: resolveIconComponent("ForkKnife") ?? PhosphorIcons.Package },
+  { key: "Shelves", Component: ShelvingUnit },
+  { key: "Microwave", Component: Microwave },
+  { key: "ToiletPaper", Component: resolveIconComponent("ToiletPaper") ?? PhosphorIcons.Package },
+  { key: "Dresser", Component: resolveIconComponent("Dresser") ?? PhosphorIcons.Package },
+  { key: "Television", Component: resolveIconComponent("Television") ?? PhosphorIcons.Package },
+];
 
 interface CategoryModalProps {
   category: InventoryCategory | null;
@@ -43,7 +62,7 @@ interface CategoryModalProps {
 export function CategoryModal({ category, categories, onSave, onClose }: CategoryModalProps) {
   const [name, setName] = useState(category?.name ?? "");
   const [icon, setIcon] = useState<string>(
-    category?.icon ?? resolveIconName("Dresser") ?? DEFAULT_ICON_NAMES[0] ?? "Package"
+    category?.icon ?? DEFAULT_ICONS[0].key
   );
   const [lowThreshold, setLowThreshold] = useState(category?.lowThreshold ?? 0);
   const [highThreshold, setHighThreshold] = useState(category?.highThreshold ?? 0);
@@ -54,9 +73,10 @@ export function CategoryModal({ category, categories, onSave, onClose }: Categor
   const sliderMax = 50;
 
   const iconRecord = PhosphorIcons as Record<string, unknown>;
-  const IconComponent = isValidIcon(iconRecord[icon])
-    ? (iconRecord[icon] as React.ComponentType<{ size?: number }>)
-    : PhosphorIcons.Package;
+  const IconComponent =
+    isValidIcon(iconRecord[icon])
+      ? iconRecord[icon] as React.ComponentType<{ size?: number; strokeWidth?: number }>
+      : (DEFAULT_ICONS.find((d) => d.key === icon)?.Component ?? PhosphorIcons.Package);
 
   const allIconNames = useMemo(() => {
     const map = new Map<string, string>();
@@ -74,7 +94,7 @@ export function CategoryModal({ category, categories, onSave, onClose }: Categor
   }, []);
 
   const displayedIcons = useMemo(() => {
-    if (!iconSearch.trim()) return DEFAULT_ICON_NAMES;
+    if (!iconSearch.trim()) return [];
     const q = iconSearch.toLowerCase();
     return allIconNames
       .filter((key) => {
@@ -131,29 +151,46 @@ export function CategoryModal({ category, categories, onSave, onClose }: Categor
             </div>
 
             <div className="grid grid-cols-5 gap-2 overflow-y-auto flex-1 content-start">
-              {displayedIcons.map((iconName) => {
-                const val = (PhosphorIcons as Record<string, unknown>)[iconName];
-                if (!isValidIcon(val)) return null;
-                const Icon = val as React.ComponentType<{ size?: number }>;
-                return (
+              {!iconSearch.trim() ? (
+                DEFAULT_ICONS.map(({ key, Component }) => (
                   <button
-                    key={iconName}
-                    onClick={() => { setIcon(iconName); setShowIconPicker(false); }}
+                    key={key}
+                    onClick={() => { setIcon(key); setShowIconPicker(false); }}
                     className={[
                       "flex items-center justify-center w-full aspect-square rounded-md border transition-colors",
-                      icon === iconName
+                      icon === key
                         ? "border-primary bg-primary/10"
                         : "border-light-border hover:border-primary hover:bg-blue-50",
                     ].join(" ")}
-                    title={iconName
-                      .replace(/(Thin|Light|Regular|Bold|Fill|Duotone)$/, "")
-                      .replace(/Icon$/, "")}
+                    title={key}
                   >
-                    <Icon size={24} />
+                    <Component size={24} strokeWidth={1.5} />
                   </button>
-                );
-              })}
-              {displayedIcons.length === 0 && (
+                ))
+              ) : displayedIcons.length > 0 ? (
+                displayedIcons.map((iconName) => {
+                  const val = (PhosphorIcons as Record<string, unknown>)[iconName];
+                  if (!isValidIcon(val)) return null;
+                  const Icon = val;
+                  return (
+                    <button
+                      key={iconName}
+                      onClick={() => { setIcon(iconName); setShowIconPicker(false); }}
+                      className={[
+                        "flex items-center justify-center w-full aspect-square rounded-md border transition-colors",
+                        icon === iconName
+                          ? "border-primary bg-primary/10"
+                          : "border-light-border hover:border-primary hover:bg-blue-50",
+                      ].join(" ")}
+                      title={iconName
+                        .replace(/(Thin|Light|Regular|Bold|Fill|Duotone)$/, "")
+                        .replace(/Icon$/, "")}
+                    >
+                      <Icon size={24} />
+                    </button>
+                  );
+                })
+              ) : (
                 <div className="col-span-5 text-center text-sm text-gray-400 py-6">
                   No icons found.
                 </div>
@@ -192,7 +229,7 @@ export function CategoryModal({ category, categories, onSave, onClose }: Categor
                 : "border-light-border hover:border-primary hover:bg-blue-50",
             ].join(" ")}
           >
-            <IconComponent size={28} />
+            <IconComponent size={28} strokeWidth={1.5} />
           </button>
 
           <div className="flex gap-4 mb-4">
