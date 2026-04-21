@@ -1,25 +1,61 @@
-@import 'react-big-calendar/lib/sass/styles';
-
-.rbc-event {
-    background-color: #F5FAFA !important;
-    border: 1px solid #02AFC7 !important;
-    color: #3D4B6B !important;
-}
+@import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 .rbc-event-content {
-    color: #3D4B6B !important;
-    font-size: 12px;
-    white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
 }
 
-.rbc-month-view .rbc-event {
-    background-color: #F5FAFA !important;
-    border: 1px solid #02AFC7 !important;
-    color: #3D4B6B !important;
+.rbc-allday-cell {
+    display: none;
 }
 
-.rbc-month-view .rbc-event-content {
-    color: #3D4B6B !important;
+.rbc-time-header-content > .rbc-row:last-child {
+    border-bottom: none;
+}
+
+.rbc-current-time-indicator {
+    background-color: #FF6633;
+}
+
+.rbc-event:focus {
+    outline: none;
+}
+
+.rbc-event-label {
+    display: none;
+}
+
+.rbc-day-slot .rbc-event {
+    right: 0;
+}
+
+.rbc-header {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: none;
+}
+
+.rbc-time-header {
+    border-bottom: none;
+}
+
+.rbc-time-content {
+    border-top: 1px solid #DDE1E7;
+}
+
+.rbc-time-gutter .rbc-time-slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rbc-time-gutter .rbc-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.rbc-time-gutter,
+.rbc-time-header-gutter {
+    width: 2.75rem !important;
+    min-width: 2.75rem !important;
+    max-width: 2.75rem !important;
 }

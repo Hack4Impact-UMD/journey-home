@@ -1,80 +1,108 @@
 "use client";
-import { Calendar, momentLocalizer, View } from "react-big-calendar";
-import moment from "moment";
 import { useState, useEffect, useCallback } from "react";
-import { TimeBlock, MyEvent } from "../../../types/schedule";
+import { View } from "react-big-calendar";
+import { TimeBlock } from "../../../types/schedule";
 import { fetchAllTB } from "../../../lib/services/timeblocks";
-import { CustomToolbar } from "../../../components/schedule/CustomToolbar";
+import { MasterCalendar } from "../../../components/schedule/MasterCalendar";
+import { AddShiftOverlay } from "../../../components/schedule/AddShiftOverlay";
 import { ShiftDetailOverlay } from "../../../components/schedule/ShiftDetailOverlay";
 
-type CalendarEvent = MyEvent & { timeBlock: TimeBlock };
-
-export default function CalendarView() {
-    const localizer = momentLocalizer(moment);
-    const [events, setEvents] = useState<CalendarEvent[]>([]);
-    const [view, setView] = useState<View>("month");
+export default function CalendarPage() {
+    const [timeblocks, setTimeblocks] = useState<TimeBlock[]>([]);
+    const [view, setView] = useState<View>("week");
     const [date, setDate] = useState(new Date());
     const [selectedTimeBlock, setSelectedTimeBlock] = useState<TimeBlock | null>(null);
+    const [showAddOverlay, setShowAddOverlay] = useState(false);
 
-    const loadEvents = useCallback(async () => {
-        const tbs: TimeBlock[] = await fetchAllTB();
-        const mapped: CalendarEvent[] = tbs.map((tb) => ({
-            title: `${tb.startTime.toDate().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} - ${tb.endTime.toDate().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`,
-            start: tb.startTime.toDate(),
-            end: tb.endTime.toDate(),
-            timeBlock: tb,
-        }));
-        setEvents(mapped);
+    const loadTimeblocks = useCallback(async () => {
+        setTimeblocks(await fetchAllTB());
     }, []);
 
-    useEffect(() => { loadEvents(); }, [loadEvents]);
+    useEffect(() => { loadTimeblocks(); }, [loadTimeblocks]);
 
-    const handleSelectEvent = (event: MyEvent) => {
-        const calEvent = event as CalendarEvent;
-        setSelectedTimeBlock(calEvent.timeBlock ?? null);
-    };
+    const now = new Date();
+    const todayHighlight =
+        view === "week"
+            ? (() => { const end = new Date(date); end.setDate(end.getDate() + 6); return now >= date && now <= end; })()
+            : date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
 
     return (
         <>
-            <div className="h-full text-[#6B7A99]" style={{ height: 600 }}>
-                <Calendar
-                    localizer={localizer}
-                    events={events as MyEvent[]}
-                    startAccessor="start"
-                    endAccessor="end"
-                    view={view}
-                    onView={(v) => setView(v)}
-                    date={date}
-                    onNavigate={(d) => setDate(d)}
-                    onSelectEvent={handleSelectEvent}
-                    components={{
-                        toolbar: (props) => <CustomToolbar {...props} onShiftCreated={loadEvents} />,
-                        event: ({ event }) => (
-                            <span className="text-xs text-[#3D4B6B]">
-                                {view === "month" ? event.title : ""}
-                            </span>
-                        ),
-                    }}
-                    eventPropGetter={() => ({
-                        style: {
-                            height: "auto",
-                            minHeight: 30,
-                            margin: 0,
-                            padding: 0,
-                            backgroundColor: "#F5FAFA",
-                            border: "1px solid #02AFC7",
-                            color: "#3D4B6B",
-                            boxSizing: "border-box",
-                            cursor: "pointer",
-                        },
-                    })}
-                />
+            {/* Toolbar */}
+            <div className="grid grid-cols-3 items-center mb-4">
+                <div className="flex items-center gap-3">
+                    <button onClick={() => setDate(new Date())} className="px-4 py-1 rounded-full border border-[#F5F6F7] text-sm bg-white shadow-[0_1px_3px_rgba(38,51,77,0.06)]">
+                        <span className={todayHighlight ? "text-[#02AFC7]" : "text-[#6B7A99]"}>Today</span>
+                    </button>
+                    <div className="flex border border-[#F5F6F7] rounded-full overflow-hidden bg-white shadow-[0_1px_3px_rgba(38,51,77,0.06)]">
+                        <button onClick={() => setView("week")} className="px-4 py-1 text-sm">
+                            <span className={view === "week" ? "text-[#02AFC7]" : "text-[#6B7A99]"}>Week</span>
+                        </button>
+                        <button onClick={() => setView("month")} className="px-4 py-1 text-sm border-l border-[#F5F6F7]">
+                            <span className={view === "month" ? "text-[#02AFC7]" : "text-[#6B7A99]"}>Month</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div className="flex items-center justify-center gap-4">
+                    <button onClick={() => {
+                        const d = new Date(date);
+                        view === "week" ? d.setDate(d.getDate() - 7) : d.setMonth(d.getMonth() - 1);
+                        setDate(d);
+                    }}>
+                        <img src="/left-arrow.png" alt="prev" />
+                    </button>
+                    <span className="font-semibold text-lg text-[#6B7A99] w-56 text-center">
+                        {view === "week"
+                            ? (() => {
+                                const start = new Date(date);
+                                start.setDate(start.getDate() - start.getDay());
+                                const end = new Date(start);
+                                end.setDate(end.getDate() + 6);
+                                return start.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+                                    + " – "
+                                    + end.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+                              })()
+                            : date.toLocaleDateString("en-US", { month: "long", year: "numeric" })
+                        }
+                    </span>
+                    <button onClick={() => {
+                        const d = new Date(date);
+                        view === "week" ? d.setDate(d.getDate() + 7) : d.setMonth(d.getMonth() + 1);
+                        setDate(d);
+                    }}>
+                        <img src="/right-arrow.png" alt="next" />
+                    </button>
+                </div>
+
+                <div className="flex justify-end relative">
+                    <button
+                        onClick={() => setShowAddOverlay(v => !v)}
+                        className="px-4 py-1.5 rounded-full cursor-pointer text-white text-sm bg-[#02AFC7]"
+                    >
+                        + Add Shift
+                    </button>
+                    <AddShiftOverlay
+                        isOpen={showAddOverlay}
+                        onClose={() => setShowAddOverlay(false)}
+                        onShiftCreated={loadTimeblocks}
+                    />
+                </div>
             </div>
+
+            <MasterCalendar
+                timeblocks={timeblocks}
+                view={view}
+                date={date}
+                onView={setView}
+                onNavigate={setDate}
+                onSelectEvent={setSelectedTimeBlock}
+            />
 
             <ShiftDetailOverlay
                 timeBlock={selectedTimeBlock}
                 onClose={() => setSelectedTimeBlock(null)}
-                onSaved={() => { loadEvents(); setSelectedTimeBlock(null); }}
+                onSaved={() => { loadTimeblocks(); setSelectedTimeBlock(null); }}
             />
         </>
     );

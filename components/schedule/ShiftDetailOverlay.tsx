@@ -80,8 +80,9 @@ export const ShiftDetailOverlay = ({
   const startDate = timeBlock.startTime.toDate();
   const endDate = timeBlock.endTime.toDate();
 
+  const allVolunteerIDs = timeBlock.volunteerGroups?.flatMap(g => g.volunterIDs) ?? [];
   const volunteers = allAccounts.filter((user) =>
-    timeBlock.volunteerIDs.includes(user.uid)
+    allVolunteerIDs.includes(user.uid)
   );
 
   return (

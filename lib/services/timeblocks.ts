@@ -38,10 +38,12 @@ export const createTB = async (date: string, startTime: string, endTime: string,
 
     const newBlock: TimeBlock = {
         id: crypto.randomUUID(),
+        name: "",
+        type: "Pickup/Delivery",
+        notes: "",
         startTime: Timestamp.fromDate(start),
         endTime: Timestamp.fromDate(end),
-        maxVolunteers,
-        volunteerIDs: [],
+        volunteerGroups: maxVolunteers > 0 ? [{ name: "General", maxNum: maxVolunteers, volunterIDs: [] }] : [],
         tasks: [],
         published: false,
     };

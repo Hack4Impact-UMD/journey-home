@@ -1,5 +1,7 @@
 export default function ListView() {
-    <div>
-        <p>...</p>
-    </div>
+    return (
+        <div>
+            <p>...</p>
+        </div>
+    );
 }

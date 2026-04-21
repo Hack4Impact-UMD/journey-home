@@ -48,7 +48,7 @@ export default function ScheduleLayout({ children }: { children: ReactNode }) {
                                 List View
                             </Link>
                         </div>
-                        <div className="bg-background rounded-xl flex-wrap my-2 flex-1 py-4 px-6 min-h-0 overflow-hidden">
+                        <div className="bg-background rounded-xl my-2 flex-1 py-4 px-6 min-h-0 overflow-hidden flex flex-col">
                             { children }
                         </div>
                     </div>

@@ -41,9 +41,10 @@ export function EditShiftOverlay({ isOpen, timeBlock, onClose, onSaved }: Props)
                 : "warehouse"
             : null
     );
-    const [openToVolunteers, setOpenToVolunteers] = useState(timeBlock.maxVolunteers > 0);
+    const totalMaxVols = timeBlock.volunteerGroups?.reduce((s, g) => s + g.maxNum, 0) ?? 0;
+    const [openToVolunteers, setOpenToVolunteers] = useState(totalMaxVols > 0);
     const [maxVolunteers, setMaxVolunteers] = useState(
-        timeBlock.maxVolunteers > 0 ? String(timeBlock.maxVolunteers) : ""
+        totalMaxVols > 0 ? String(totalMaxVols) : ""
     );
     const [error, setError] = useState("");
 
@@ -52,8 +53,9 @@ export function EditShiftOverlay({ isOpen, timeBlock, onClose, onSaved }: Props)
         setDate(toDateString(timeBlock.startTime));
         setStartTime(toTimeString(timeBlock.startTime));
         setEndTime(toTimeString(timeBlock.endTime));
-        setOpenToVolunteers(timeBlock.maxVolunteers > 0);
-        setMaxVolunteers(timeBlock.maxVolunteers > 0 ? String(timeBlock.maxVolunteers) : "");
+        const syncedMax = timeBlock.volunteerGroups?.reduce((s, g) => s + g.maxNum, 0) ?? 0;
+        setOpenToVolunteers(syncedMax > 0);
+        setMaxVolunteers(syncedMax > 0 ? String(syncedMax) : "");
         setShiftType(
             timeBlock.tasks.length > 0
                 ? timeBlock.tasks.some((t) => "donor" in t || "client" in t)
@@ -72,11 +74,14 @@ export function EditShiftOverlay({ isOpen, timeBlock, onClose, onSaved }: Props)
         }
         setError("");
 
+        const newMax = openToVolunteers ? Number(maxVolunteers) : 0;
         const updated: TimeBlock = {
             ...timeBlock,
             startTime: buildTimestamp(date, startTime),
             endTime: buildTimestamp(date, endTime),
-            maxVolunteers: openToVolunteers ? Number(maxVolunteers) : 0,
+            volunteerGroups: newMax > 0
+                ? [{ name: "General", maxNum: newMax, volunterIDs: timeBlock.volunteerGroups?.flatMap(g => g.volunterIDs) ?? [] }]
+                : [],
         };
 
         await setTimeblockToast(updated);
@@ -84,7 +89,8 @@ export function EditShiftOverlay({ isOpen, timeBlock, onClose, onSaved }: Props)
         onClose();
     };
 
-    const volunteers = allAccounts.filter((u) => timeBlock.volunteerIDs.includes(u.uid));
+    const allVolunteerIDs = timeBlock.volunteerGroups?.flatMap(g => g.volunterIDs) ?? [];
+    const volunteers = allAccounts.filter((u) => allVolunteerIDs.includes(u.uid));
 
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center">
