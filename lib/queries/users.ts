@@ -18,7 +18,7 @@ function useAllAccounts(onlyActive: boolean) {
         queryKey: ["users", onlyActive],
         queryFn: async () => {
             const allUsers = await fetchAllUsers();
-            return allUsers.filter(user => ((user.pending == null) == onlyActive));
+            return allUsers.filter(user => ((user.pending === null) == onlyActive));
         },
     });
 
@@ -39,14 +39,11 @@ function useAllAccounts(onlyActive: boolean) {
 
             return { prevData };
         },
-        onError: (error, newUserData, context) => {
+        onError: (_error, _newUserData, context) => {
             if (context?.prevData) {
                 queryClient.setQueryData(["users"], context.prevData);
             }
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["users"] });
-        }
     });
 
     const updateAccount = async (newUserData: UserData) => {

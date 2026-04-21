@@ -7,9 +7,10 @@ export type ClientRequest = {
     client: Client,
     caseManagerID: string,
     notes: string,
-    status: ReviewStatus,
-    date: Timestamp,
-    items: ItemRequest[]
+    status: ReviewStatus
+    items: ItemRequest[],
+    associatedTimeBlockID: string | null
+    date: Timestamp
 };
 
 export type Client = LocationContact & {

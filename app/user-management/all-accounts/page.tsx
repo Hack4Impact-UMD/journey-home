@@ -25,7 +25,8 @@ export default function AllAccountsPage() {
     const [selectedAccount, setSelectedAccount] = useState<UserData | null>(
         null,
     );
-
+    console.log("Account stuff: ");
+    console.log(allAccounts);
     return (
         <>
             {selectedAccount && (
@@ -55,6 +56,7 @@ export default function AllAccountsPage() {
                     )}
                 </div>
             </div>
+            <div className="flex-1 overflow-auto min-h-0">
             <UserTable
                 users={allAccounts
                     .filter((user) => selectedRoles.includes(user.role))
@@ -76,6 +78,7 @@ export default function AllAccountsPage() {
                     setSelectedAccount(user);
                 }}
             />
+            </div>
         </>
     );
 }
