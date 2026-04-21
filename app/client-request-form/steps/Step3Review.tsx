@@ -98,6 +98,7 @@ export default function Step3Review() {
                 caseManagerID: uid,
                 notes: client.questions.notes ?? "",
                 status: "Not Reviewed",
+                associatedTimeBlockID: null,
                 date: Timestamp.now(),
                 items,
             };
