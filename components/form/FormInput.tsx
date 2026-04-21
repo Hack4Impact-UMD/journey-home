@@ -32,8 +32,8 @@ export default function FormInput({
         min={min}
         disabled={disabled}
         {...(onChange
-          ? { value: value ?? "", onChange }   // controlled
-          : { defaultValue: value })}          // uncontrolled
+          ? { value: value ?? "", onChange }
+          : { value: value ?? "", readOnly: true })}
         className="w-full border border-gray-300 rounded px-3 py-2"
       />
     </div>

@@ -1,6 +1,5 @@
 "use client";
 
-// import { ProtectedRoute } from "@/components/general/ProtectedRoute";
 import { useCaseForm } from "./caseContext";
 import Step1ClientInfo from "./steps/Step1ClientInfo";
 import Step2Requests from "./steps/Step2Requests";

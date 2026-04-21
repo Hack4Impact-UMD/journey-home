@@ -1,4 +1,5 @@
-import { ProtectedRoute } from "@/components/general/ProtectedRoute";
+"use client";
+
 import StepIndicator from "../../../components/form/StepIndicator";
 import CategoryBox from "@/components/form/CategoryBox";
 import { useCaseForm } from "../caseContext";
@@ -30,8 +31,7 @@ export default function Step2Requests() {
         setCurrentStep(3);
     };
     return (
-        <ProtectedRoute allow={["Case Manager"]}>
-            <div className="space-y-6">
+        <div className="space-y-6">
                 <div className="flex justify-center mb-8">
                     <Image
                         src="/journey-home-logo.png"
@@ -111,7 +111,6 @@ export default function Step2Requests() {
                             Next
                         </Button>
                     </div>
-            </div>
-        </ProtectedRoute>
+        </div>
     );
 }

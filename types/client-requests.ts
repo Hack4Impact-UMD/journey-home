@@ -7,12 +7,14 @@ export type ClientRequest = {
     client: Client,
     caseManagerID: string,
     notes: string,
-    status: ReviewStatus
+    status: ReviewStatus,
+    date: Timestamp,
     items: ItemRequest[]
 };
 
 export type Client = LocationContact & {
     hmis: string,
+    programName: string,
     secondaryContact: ClientSecondaryContact,
     questions: ClientQuestions
 }

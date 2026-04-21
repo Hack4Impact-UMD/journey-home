@@ -58,6 +58,7 @@ const defaultState: CaseFormState = {
   currentStep: 1,
   clientInfoAndNewHome: {
     hmis: "",
+    programName: "",
     secondaryContact: {
         name: "",
         relationship: "",

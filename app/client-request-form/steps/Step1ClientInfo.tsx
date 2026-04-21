@@ -1,6 +1,5 @@
 "use client";
 
-import { ProtectedRoute } from "@/components/general/ProtectedRoute";
 import StepIndicator from "../../../components/form/StepIndicator";
 import FormInput from "../../../components/form/FormInput";
 import FormSelect from "../../../components/form/FormSelect";
@@ -28,6 +27,7 @@ export default function Step1ClientInfo() {
         if (!client.firstName) newErrors.firstName = "First name is required";
         if (!client.lastName) newErrors.lastName = "Last name is required";
         if (!client.hmis) newErrors.hmis = "HMIS number is required";
+        if (!client.programName) newErrors.programName = "Program name is required";
         if (!client.phoneNumber)
             newErrors.phoneNumber = "Client Phone number is required";
         else if (!/^\d{3}-\d{3}-\d{4}$/.test(client.phoneNumber))
@@ -114,8 +114,7 @@ export default function Step1ClientInfo() {
         }
     };
     return (
-        <ProtectedRoute allow={["Case Manager"]}>
-            <div className="space-y-6">
+        <div className="space-y-6">
                 <div className="flex justify-center mb-8">
                     <Image
                         src="/journey-home-logo.png"
@@ -194,6 +193,23 @@ export default function Step1ClientInfo() {
                             {errors.hmis && (
                                 <p className="text-red-500 text-sm">
                                     {errors.hmis}
+                                </p>
+                            )}
+
+                            <FormInput
+                                label="Program Name"
+                                required
+                                value={
+                                    formState.clientInfoAndNewHome.programName ?? ""
+                                }
+                                onChange={(e) => {
+                                    updateClientInfo({ programName: e.target.value });
+                                    clearError("programName");
+                                }}
+                            />
+                            {errors.programName && (
+                                <p className="text-red-500 text-sm">
+                                    {errors.programName}
                                 </p>
                             )}
 
@@ -701,7 +717,6 @@ export default function Step1ClientInfo() {
                         </Button>
                     </div>
                 </form>
-            </div>
-        </ProtectedRoute>
+        </div>
     );
 }

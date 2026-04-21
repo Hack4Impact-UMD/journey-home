@@ -1,5 +1,4 @@
 "use client";
-import { ProtectedRoute } from "@/components/general/ProtectedRoute";
 import StepIndicator from "../../../components/form/StepIndicator";
 import Image from "next/image";
 import { useCaseForm } from "../caseContext";
@@ -99,6 +98,7 @@ export default function Step3Review() {
                 caseManagerID: uid,
                 notes: client.questions.notes ?? "",
                 status: "Not Reviewed",
+                date: Timestamp.now(),
                 items,
             };
 
@@ -118,8 +118,7 @@ export default function Step3Review() {
     ];
 
     return (
-        <ProtectedRoute allow={["Case Manager"]}>
-            <div className="space-y-6">
+        <div className="space-y-6">
                 <div className="flex justify-center mb-8">
                     <Image
                         src="/journey-home-logo.png"
@@ -147,6 +146,9 @@ export default function Step3Review() {
 
                             <div className="font-semibold">HMIS number</div>
                             <div>{client.hmis}</div>
+
+                            <div className="font-semibold">Program name</div>
+                            <div>{client.programName}</div>
 
                             <div className="font-semibold">
                                 Client phone number
@@ -205,6 +207,9 @@ export default function Step3Review() {
 
                             <div className="font-semibold">Move-in date</div>
                             <div>{formatDate(questions.moveInDate)}</div>
+
+                            <div className="font-semibold">Notes</div>
+                            <div>{questions.notes}</div>
                         </div>
                     </div>
 
@@ -412,7 +417,6 @@ export default function Step3Review() {
                         Submit {submitLoading && <Spinner className="text-white inline"/>}
                     </Button>
                 </div>
-            </div>
-        </ProtectedRoute>
+        </div>
     );
 }

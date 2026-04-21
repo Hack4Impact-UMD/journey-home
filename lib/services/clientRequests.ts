@@ -1,5 +1,5 @@
 import { db } from "@/lib/firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { ClientRequest } from "@/types/client-requests";
 
 export async function createClientRequest(
@@ -10,7 +10,7 @@ export async function createClientRequest(
 
         await setDoc(docRef, {
             ...request,
-            createdAt: new Date(),
+            createdAt: serverTimestamp(),
         });
 
     } catch (error) {
