@@ -38,7 +38,7 @@ export default function UnscheduledTasksPage() {
         "Deliveries",
     ]
     return (
-        <div>
+        <div className="flex flex-col flex-1 min-h-0">
             <div className="flex flex-col mb-6">
                 <div className="flex">
                     <div className="flex flex-wrap gap-3">
@@ -74,7 +74,8 @@ export default function UnscheduledTasksPage() {
                 </div>
                                     
             </div>
-            <div className="w-full h-full flex flex-wrap gap-x-3 gap-y-6 content-start">
+            <div className="flex-1 overflow-auto min-h-0">
+            <div className="w-full flex flex-wrap gap-x-3 gap-y-6 content-start">
                 {[...approvedItems, ...deliveryItems]
                 .filter(item =>
                     selectedOptions.includes("All") ||
@@ -93,6 +94,7 @@ export default function UnscheduledTasksPage() {
                     <Request donation={item} key={item.id} />
                 ))
             }
+            </div>
             </div>
         </div>
     )
