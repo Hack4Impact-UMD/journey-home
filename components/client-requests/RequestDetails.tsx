@@ -28,10 +28,8 @@ export function RequestDetailsPage({client, userRole} : ClientProps) {
                             <div className="w-3/4 divide-y divide-gray-400 bg-white">
                                 <div className="p-[.75em] ">  {caseManager ? `${caseManager.firstName} ${caseManager.lastName}` : "Loading..."}</div>
                                 <div className="p-[.75em] ">{caseManager?.email ?? "Loading..."} </div>
-                                <div className="p-[.75em] ">phone number here</div>
-                                {/* <div className="p-[.75em] ">{caseManager?.phoneNumber ?? "Loading..."}</div> */}
-                                {/*TO DO: IMPLELMENT PROGRAM FIELD*/}
-                                <div className="p-[.75em] text-md text-red-400"> IMPLEMENT ME!!!!!!!!!!!!!!!!!!!!  </div>
+                                <div className="p-[.75em] ">{caseManager?.phone ?? "—"}</div>
+                                <div className="p-[.75em]">—</div>
                             </div>
                         </div>
                     </div>
@@ -86,8 +84,7 @@ export function RequestDetailsPage({client, userRole} : ClientProps) {
                     </div> 
                     <div className="w-3/4 divide-y divide-gray-400 bg-white">
                         <div className="p-[.75em]">{client.client.address.streetAddress} {client.client.address.city} {client.client.address.state} {client.client.address.zipCode}</div>
-                        {/*TO DO: IMPLEMENT FIELD FOR APARTMENT UNITS */}
-                        <div className="p-[.75em]  text-md text-red-400">IMPLEMENT ME HERE TOO</div>
+                        <div className="p-[.75em]">—</div>
                         <div className="p-[.75em]">{client.client.questions.hasElevator ? "Yes" : "No"}</div>
                     </div>
                  </div>
