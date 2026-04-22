@@ -1,21 +1,11 @@
 "use client";
 
 import { DogSitIcon } from "@/components/icons/DogSitIcon";
-import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 
 export default function MissingUserData() {
-    const auth = useAuth();
     const router = useRouter();
 
-    const handleLogout = async () => {
-        try {
-            await auth.logout();
-            router.push("/login");
-        } catch (error) {
-            console.error("Logout failed", error);
-        }
-    };
 
     return (
         <>

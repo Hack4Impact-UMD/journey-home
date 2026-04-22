@@ -1,21 +1,21 @@
 "use client";
 
 import { DogSitIcon } from "@/components/icons/DogSitIcon";
-import { useAuth } from "@/contexts/AuthContext";
+// import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 
 export default function InvalidPerms() {
     const router = useRouter();
-    const auth = useAuth();
+    // const auth = useAuth();
 
-    const handleLogout = async () => {
-        try {
-            await auth.logout();
-            router.push("/login");
-        } catch (error) {
-            console.error("Logout failed", error);
-        }
-    };
+    // const handleLogout = async () => {
+    //     try {
+    //         await auth.logout();
+    //         router.push("/login");
+    //     } catch (error) {
+    //         console.error("Logout failed", error);
+    //     }
+    // };
 
     return (
         <>
