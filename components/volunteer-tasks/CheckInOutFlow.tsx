@@ -13,7 +13,7 @@ export default function CheckInOutFlow({ onAddItem, onClose }: Props) {
     useInventoryCategories();
 
   return (
-    <div className="box-shadow-md relative z-50">
+    <div className="relative z-50">
         <ItemSearch
         categories={inventoryCategories}
         isLoading={isLoading}

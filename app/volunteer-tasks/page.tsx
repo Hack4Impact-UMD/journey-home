@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState} from "react";
 import CheckInOutFlow from "@/components/volunteer-tasks/CheckInOutFlow";
 import AddButton from "@/components/volunteer-tasks/AddButton";
 
@@ -21,34 +21,28 @@ export default function VolunteerTasks() {
         setInventoryCategoryWithToast,
     } = useInventoryCategories();
 
-    const inventoryMap = useMemo(() => {
-        return new Map(
-            inventoryCategories.map((item) => [
-                item.name,
-                item.quantity ?? 0,
-            ])
-        );
-    }, [inventoryCategories]);
 
-    const handleAddItem = async (item: { name: string; qty: number }) => {
-    setItems((prev) => ({
-        ...prev,
-        [item.name]: (prev[item.name] || 0) + item.qty,
-    }));
-
-
-    setOpen(false);
-
-    const currentQty = inventoryMap.get(item.name) ?? 0;
-
-    await setInventoryCategoryWithToast({
-        id: item.name,
-        name: item.name,
-        quantity: currentQty + item.qty,
-        lowThreshold: 0,
-        highThreshold: 9999,
-    });
-};
+    const handleAddItem = (item: { name: string; qty: number }) => {
+        setItems((prev) => ({
+            ...prev,
+            [item.name]: (prev[item.name] || 0) + item.qty,
+        }));
+        setOpen(false);
+    };
+    const handleConfirm = async () => {
+        for (const [name, qty] of Object.entries(items)) {
+            const category = inventoryCategories.find((c) => c.name === name);
+            if (!category) continue;
+            await setInventoryCategoryWithToast({
+                id: category.id,
+                name: category.name,
+                quantity: category.quantity - qty,
+                lowThreshold: category.lowThreshold,
+                highThreshold: category.highThreshold,
+            });
+        }
+        setScreen("summary");
+    };
     return (
         <div>
             {view === "Screen3" && (
@@ -153,10 +147,10 @@ export default function VolunteerTasks() {
 
                                 {Object.keys(items).length > 0 && (
                                     <button
-                                        onClick={() => setScreen("summary")}
+                                        onClick={handleConfirm}
                                         className="mt-6 w-full bg-[#02AFC7] text-white"
                                     >
-                                        Next
+                                        Confirm
                                     </button>
                                 )}
                             </div>
