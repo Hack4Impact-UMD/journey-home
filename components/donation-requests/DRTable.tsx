@@ -63,10 +63,11 @@ function DRTableRow({ request, onOpen }: { request: DonationRequest, onOpen: () 
             onClick={onOpen}
         >
             <div className="w-[30%] px-4 flex items-center">
-                <input
+                {/* Checkboxes */}
+                {/* <input
                     type="checkbox"
                     className="w-4 h-4 mr-4 rounded-xs cursor-pointer border-white"
-                ></input>
+                ></input> */}
                 <span>
                     {request.donor.firstName} {request.donor.lastName}
                 </span>
