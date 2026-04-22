@@ -1,22 +1,20 @@
 "use client";
 
 import { ProtectedRoute } from "@/components/general/ProtectedRoute";
-import SideNavbar from "@/components/general/SideNav";
+import { useAuth } from "@/contexts/AuthContext";
+import AdminHomePage from "@/components/homepage/AdminHomePage";
+import CaseManagerHomePage from "@/components/homepage/CaseManagerHomePage";
+import VolunteerHomePage from "@/components/homepage/VolunteerHomePage";
 
 export default function HomePage() {
+    const { state: { userData } } = useAuth();
+    const role = userData?.role;
 
     return (
         <ProtectedRoute allow={["Admin", "Case Manager", "Volunteer"]}>
-            <div className="h-full w-full flex flex-col font-family-roboto">
-                <div className="flex flex-1">
-                    <SideNavbar />
-                    <div className="flex-1  bg-[#F7F7F7] pt-8 pb-4 px-6 flex flex-col">
-                        <span className="text-2xl text-primary font-extrabold block">
-                            Journeying to the Home Page!
-                        </span>
-                    </div>
-                </div>
-            </div>
+            {role === "Admin" && <AdminHomePage />}
+            {role === "Case Manager" && <CaseManagerHomePage />}
+            {role === "Volunteer" && <VolunteerHomePage />}
         </ProtectedRoute>
     );
 }
