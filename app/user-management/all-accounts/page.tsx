@@ -34,7 +34,6 @@ export default function AllAccountsPage() {
             .filter((u) =>
                 (u.firstName + u.lastName + u.email)
                     .toLowerCase()
-                    .replace(/\s/g, "")
                     .includes(searchQuery.toLowerCase().trim())
             )
             .sort((a, b) =>
@@ -100,7 +99,7 @@ export default function AllAccountsPage() {
                 {isLoading && <Spinner className="size-5 text-primary" />}
             </div>
 
-            <div className="flex-1 overflow-auto">
+            <div className="flex-1 overflow-auto min-h-0">
                 <UserTable
                     users={filteredUsers}
                     onSelect={setSelectedAccount}

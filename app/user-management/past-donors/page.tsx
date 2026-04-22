@@ -35,7 +35,6 @@ export default function PastDonorsPage() {
             .filter((d) =>
                 (d.firstName + d.lastName + d.email)
                     .toLowerCase()
-                    .replace(/\s/g, "")
                     .includes(searchQuery.toLowerCase().trim())
             )
             .sort((a, b) =>
