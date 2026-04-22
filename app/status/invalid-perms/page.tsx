@@ -1,11 +1,13 @@
 "use client";
 
 import { DogSitIcon } from "@/components/icons/DogSitIcon";
-// import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 
 export default function InvalidPerms() {
     const router = useRouter();
+    const {userData} = useAuth().state;
+    const fallbackPath = userData?.role === "Volunteer" ? "/donate" : "/";
     // const auth = useAuth();
 
     // const handleLogout = async () => {
@@ -30,7 +32,7 @@ export default function InvalidPerms() {
                     <div className="flex flex-row gap-4">
                         <button
                             className="border border-light-border px-3 py-1 rounded-lg font-family-roboto mt-[1rem] bg-background text-text-2"
-                            onClick={() => router.push("/")}
+                            onClick={() => router.push(fallbackPath)}
                         >
                             Back to Home
                         </button>
