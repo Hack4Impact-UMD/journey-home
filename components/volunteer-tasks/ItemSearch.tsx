@@ -34,6 +34,8 @@ export default function ItemSearch({
 
   const handleAdd = () => {
     if (!selectedItem || !quantity) return;
+    const qty = Number(quantity);
+    if (!Number.isInteger(qty) || qty <= 0) return;
 
     onAdd({
       name: selectedItem,
@@ -93,6 +95,8 @@ export default function ItemSearch({
             onChange={(e) => setQuantity(e.target.value)}
             placeholder="Quantity"
             className="w-full outline-none"
+            min={1}
+            step={1}
          />
     </div>
     {quantity && (
