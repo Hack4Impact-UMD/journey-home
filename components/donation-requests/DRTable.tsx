@@ -2,14 +2,17 @@ import { DonationRequest } from "@/types/donations";
 import { Badge } from "../inventory/Badge";
 import { ViewIcon } from "../icons/ViewIcon";
 import { TrashIcon } from "../icons/TrashIcon";
+import { DRDropdown } from "./DRDropdown";
+import { useEffect, useState } from "react";
 
 export function DRTable({
     donationRequests,
-    openDR
+    openDR,
 }: {
     donationRequests: DonationRequest[];
     openDR: (dr: DonationRequest) => void;
 }) {
+    
     return (
         <div className="w-full min-w-3xl h-full flex flex-col">
             <div className="h-12 bg-[#FAFAFB] border-light-border border flex items-center font-family-roboto font-bold text-sm text-text-1 shrink-0">
@@ -34,17 +37,26 @@ export function DRTable({
             </div>
             <div className="flex-1 overflow-auto min-h-0">
                 {donationRequests.map((dr) => (
-                    <DRTableRow request={dr} onOpen={() => openDR(dr)} key={dr.id} />
+                    <DRTableRow
+                        request={dr}
+                        onOpen={() => openDR(dr)}
+                        key={dr.id}
+                    />
                 ))}
             </div>
         </div>
     );
 }
 
-function DRTableRow({ request, onOpen }: { request: DonationRequest, onOpen: () => void }) {
-
+function DRTableRow({
+    request,
+    onOpen,
+}: {
+    request: DonationRequest;
+    onOpen: () => void;
+}) {
     const numNotReviewed = request.items.filter(
-        (item) => item.status == "Not Reviewed"
+        (item) => item.status == "Not Reviewed",
     ).length;
     let statusText: string = "Unfinished";
     let statusColor: string = "orange";
@@ -56,6 +68,16 @@ function DRTableRow({ request, onOpen }: { request: DonationRequest, onOpen: () 
         statusText = "Not Started";
         statusColor = "red";
     }
+
+    const [selectedOptions, setSelectedOptions] = useState<string[]>(
+        request.responded ? ["Yes"] : ["No"]
+    );
+
+    useEffect(()=> {
+        setSelectedOptions(request.responded ?["Yes"]:["No"]);
+    }, [request.responded])
+    
+    const dropOptions = ["Yes", "No"]
 
     return (
         <div
@@ -72,10 +94,7 @@ function DRTableRow({ request, onOpen }: { request: DonationRequest, onOpen: () 
                 </span>
             </div>
             <div className="w-[10%] px-4 text-xs">
-                <Badge
-                    text={request.items.length.toString()}
-                    color="orange"
-                />
+                <Badge text={request.items.length.toString()} color="orange" />
             </div>
             <span className="w-[15%] px-4">
                 {request.date.toDate().toLocaleDateString("en-US", {
@@ -87,7 +106,14 @@ function DRTableRow({ request, onOpen }: { request: DonationRequest, onOpen: () 
             <span className="w-[20%] px-4 text-xs">
                 <Badge text={statusText} color={statusColor} />
             </span>
-            <span className="w-[15%] px-4">TBD</span>
+            <span className="w-[15%] px-4" onClick = {(e) =>e.stopPropagation() }> 
+                <DRDropdown 
+                options={dropOptions} 
+                selected = {selectedOptions}
+                setSelected = {setSelectedOptions}
+                donationRequest = {request}
+                />
+            </span>
             <div className="w-[10%] px-4 flex align-center">
                 <ViewIcon />
                 <TrashIcon />
