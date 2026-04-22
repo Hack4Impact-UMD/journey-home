@@ -44,7 +44,6 @@ export default function VolunteerTasks() {
                 highThreshold: category.highThreshold,
             }, currentUser.uid);
         }
-        setScreen("summary");
     };
     return (
         <div>
