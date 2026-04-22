@@ -15,6 +15,7 @@ export type ClientRequest = {
 
 export type Client = LocationContact & {
     hmis: string,
+    programName: string,
     secondaryContact: ClientSecondaryContact,
     questions: ClientQuestions
 }
@@ -26,16 +27,16 @@ export type ClientSecondaryContact = {
 }
 
 export type ClientQuestions = {
-    clientSpeaksEnglish: boolean,
-    adultsInFamily: number,
-    childrenInFamily: number,
-    isVeteran: boolean,
-    canPickUp: boolean,
-    wasChronic: boolean,
-    hasMovedIn: boolean,
-    moveInDate: Timestamp,
-    hasElevator: boolean,
-    notes: string
+    clientSpeaksEnglish?: boolean,
+    adultsInFamily?: number,
+    childrenInFamily?: number,
+    isVeteran?: boolean,
+    canPickUp?: boolean,
+    wasChronic?: boolean,
+    hasMovedIn?: boolean,
+    moveInDate: Timestamp | null,
+    hasElevator?: boolean,
+    notes?: string
 }
 
 export type ItemRequest = {
