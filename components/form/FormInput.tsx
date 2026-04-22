@@ -9,6 +9,7 @@ interface FormInputProps {
   className?: string;
   disabled?: boolean;
   min?: number;
+  id?: string;
 }
 
 export default function FormInput({
@@ -20,9 +21,10 @@ export default function FormInput({
   className = "",
   disabled = false,
   min,
+  id,
 }: FormInputProps) {
   return (
-    <div className={className}>
+    <div id={id} className={className}>
       <label className="block mb-2">
         {required && <span className="text-red-500">* </span>}
         <span className="text-sm text-gray-700">{label}</span>

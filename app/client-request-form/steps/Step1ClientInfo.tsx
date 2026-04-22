@@ -19,7 +19,7 @@ export default function Step1ClientInfo() {
     } = useCaseForm();
     const [errors, setErrors] = useState<Record<string, string>>({});
 
-    const validateForm = () => {
+    const validateForm = (): Record<string, string> => {
         const newErrors: Record<string, string> = {};
 
         const client = formState.clientInfoAndNewHome;
@@ -43,6 +43,8 @@ export default function Step1ClientInfo() {
             client.questions.childrenInFamily < 0
         )
             newErrors.childrenInFamily = "Children in family is required";
+        if (client.questions.clientSpeaksEnglish === undefined)
+            newErrors.clientSpeaksEnglish = "Please select English proficiency";
         if (client.questions.isVeteran === undefined)
             newErrors.isVeteran = "Please select if client is a veteran";
         if (client.questions.canPickUp === undefined)
@@ -52,28 +54,35 @@ export default function Step1ClientInfo() {
         if (client.questions.hasMovedIn === undefined)
             newErrors.hasMovedIn = "Please select move-in status";
         if (
-            client.questions.hasMovedIn &&
-            client.questions.moveInDate === undefined
+            client.secondaryContact?.phone &&
+            !/^\d{3}-\d{3}-\d{4}$/.test(client.secondaryContact.phone)
         )
-            newErrors.moveInDate = "Please select move-in date";
+            newErrors.secondaryContactPhone =
+                "Enter a valid 10-digit phone number (e.g. 555-867-5309)";
 
         if (!client.address?.streetAddress)
             newErrors.streetAddress = "Street address is required";
         if (!client.address?.city) newErrors.city = "City is required";
         if (!client.address?.zipCode)
             newErrors.zipCode = "Zip code is required";
+        else if (!/^\d{5}(-\d{4})?$/.test(client.address.zipCode))
+            newErrors.zipCode = "Enter a valid zip code (e.g. 06103 or 06103-1234)";
         if (client.questions.hasElevator === undefined)
             newErrors.hasElevator = "Please select elevator option";
 
         setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
+        return newErrors;
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (validateForm()) {
-            setCurrentStep(2);
+        const validationErrors = validateForm();
+        if (Object.keys(validationErrors).length > 0) {
+            const firstKey = Object.keys(validationErrors)[0];
+            document.getElementById(firstKey)?.scrollIntoView({ behavior: "smooth", block: "center" });
+            return;
         }
+        setCurrentStep(2);
     };
 
     const cityOptions = [
@@ -135,6 +144,7 @@ export default function Step1ClientInfo() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <FormInput
+                                id="firstName"
                                 label="First Name"
                                 required
                                 value={
@@ -157,6 +167,7 @@ export default function Step1ClientInfo() {
                         </div>
                         <div>
                             <FormInput
+                                id="lastName"
                                 label="Last Name"
                                 required
                                 value={
@@ -180,6 +191,7 @@ export default function Step1ClientInfo() {
 
                         <div className="md:col-span-2 space-y-6">
                             <FormInput
+                                id="hmis"
                                 label="HMIS Number"
                                 required
                                 value={
@@ -197,6 +209,7 @@ export default function Step1ClientInfo() {
                             )}
 
                             <FormInput
+                                id="programName"
                                 label="Program Name"
                                 required
                                 value={
@@ -214,6 +227,7 @@ export default function Step1ClientInfo() {
                             )}
 
                             <FormInput
+                                id="phoneNumber"
                                 label="Client Phone Number"
                                 required
                                 type="tel"
@@ -247,6 +261,7 @@ export default function Step1ClientInfo() {
                             )}
 
                             <FormInput
+                                id="secondaryContactPhone"
                                 label="Secondary Contact Phone Number"
                                 type="tel"
                                 value={
@@ -268,8 +283,14 @@ export default function Step1ClientInfo() {
                                     updateSecondaryContact({
                                         phone: formatted,
                                     });
+                                    clearError("secondaryContactPhone");
                                 }}
                             />
+                            {errors.secondaryContactPhone && (
+                                <p className="text-red-500 text-sm">
+                                    {errors.secondaryContactPhone}
+                                </p>
+                            )}
 
                             <FormInput
                                 label="Secondary Contact Name"
@@ -298,7 +319,9 @@ export default function Step1ClientInfo() {
                             />
 
                             <FormSelect
+                                id="clientSpeaksEnglish"
                                 label="Does the client speak and understand English?"
+                                required
                                 value={
                                     formState.clientInfoAndNewHome.questions
                                         .clientSpeaksEnglish === undefined
@@ -308,7 +331,7 @@ export default function Step1ClientInfo() {
                                           ? "Yes"
                                           : "No"
                                 }
-                                onChange={(e) =>
+                                onChange={(e) => {
                                     updateClientQuestions({
                                         clientSpeaksEnglish:
                                             e.target.value === "Yes"
@@ -316,12 +339,19 @@ export default function Step1ClientInfo() {
                                                 : e.target.value === "No"
                                                   ? false
                                                   : undefined,
-                                    })
-                                }
+                                    });
+                                    clearError("clientSpeaksEnglish");
+                                }}
                                 options={["Yes", "No"]}
                             />
+                            {errors.clientSpeaksEnglish && (
+                                <p className="text-red-500 text-sm mt-1">
+                                    {errors.clientSpeaksEnglish}
+                                </p>
+                            )}
 
                             <FormInput
+                                id="adultsInFamily"
                                 label="How many adults are in the family?"
                                 required
                                 type="number"
@@ -348,6 +378,7 @@ export default function Step1ClientInfo() {
                             )}
 
                             <FormInput
+                                id="childrenInFamily"
                                 label="How many kids (under 18) are in the family?"
                                 required
                                 type="number"
@@ -373,6 +404,7 @@ export default function Step1ClientInfo() {
                             )}
 
                             <FormSelect
+                                id="isVeteran"
                                 label="Is the client a veteran?"
                                 required
                                 value={
@@ -405,6 +437,7 @@ export default function Step1ClientInfo() {
                             )}
 
                             <FormSelect
+                                id="canPickUp"
                                 label="Can the client pick up items at the warehouse in Hartford?"
                                 required
                                 value={
@@ -437,6 +470,7 @@ export default function Step1ClientInfo() {
                             )}
 
                             <FormSelect
+                                id="wasChronic"
                                 label="Was this client chronic before housing?
                             Please do not submit a furniture request until a client has moved in AND the unit has passed inspection."
                                 required
@@ -470,6 +504,7 @@ export default function Step1ClientInfo() {
                             )}
 
                             <FormSelect
+                                id="hasMovedIn"
                                 label="Has the client moved in yet?"
                                 required
                                 value={
@@ -503,10 +538,6 @@ export default function Step1ClientInfo() {
 
                             <FormInput
                                 label="Move-in Date"
-                                required={
-                                    formState.clientInfoAndNewHome.questions
-                                        .hasMovedIn === true
-                                }
                                 type="date"
                                 value={
                                     formState.clientInfoAndNewHome.questions
@@ -543,19 +574,13 @@ export default function Step1ClientInfo() {
                                         });
                                     } else {
                                         updateClientQuestions({
-                                            moveInDate: undefined,
+                                            moveInDate: null,
                                         });
                                     }
 
                                     clearError("moveInDate");
                                 }}
                             />
-                            {errors.moveInDate && (
-                                <p className="text-red-500 text-sm mt-1">
-                                    {errors.moveInDate}
-                                </p>
-                            )}
-
                             <FormInput
                                 label="Notes/Comments"
                                 value={
@@ -573,6 +598,7 @@ export default function Step1ClientInfo() {
                                 Client&apos;s New Home
                             </h2>
                             <FormInput
+                                id="streetAddress"
                                 label="Street Address"
                                 required
                                 value={
@@ -617,6 +643,7 @@ export default function Step1ClientInfo() {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div className="flex flex-col">
                                     <FormSelect
+                                        id="city"
                                         label="City"
                                         required
                                         value={
@@ -647,6 +674,7 @@ export default function Step1ClientInfo() {
                                 <FormInput label="State" value="CT" disabled />
                                 <div className="flex flex-col">
                                     <FormInput
+                                        id="zipCode"
                                         label="Zip Code"
                                         required
                                         value={
@@ -654,12 +682,13 @@ export default function Step1ClientInfo() {
                                                 .address.zipCode ?? ""
                                         }
                                         onChange={(e) => {
+                                            const digits = e.target.value.replace(/[^\d-]/g, "");
                                             updateClientInfo({
                                                 address: {
                                                     ...formState
                                                         .clientInfoAndNewHome
                                                         .address,
-                                                    zipCode: e.target.value,
+                                                    zipCode: digits,
                                                 },
                                             });
 
@@ -675,6 +704,7 @@ export default function Step1ClientInfo() {
                             </div>
 
                             <FormSelect
+                                id="hasElevator"
                                 label="Does the building have a working elevator?"
                                 required
                                 value={

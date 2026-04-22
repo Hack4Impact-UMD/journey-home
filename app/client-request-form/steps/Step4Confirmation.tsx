@@ -2,8 +2,10 @@
 
 import Button from "../../../components/form/Button";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function Step4Confirmation() {
+  const router = useRouter();
   return (
     <div className="space-y-6 text-center py-12">
       <div className="flex justify-center mb-8">
@@ -23,7 +25,7 @@ export default function Step4Confirmation() {
 
         <div className="mt-12">
           <Button
-            onClick={() => window.location.href = "/"}
+            onClick={() => router.push("/")}
             variant="primary"
           >
             Return to Home

@@ -6,13 +6,14 @@ import { useState } from "react";
 import Button from "@/components/form/Button";
 import { Timestamp } from "firebase/firestore";
 import { ClientRequest, ItemRequest } from "@/types/client-requests";
-import { createClientRequest } from "@/lib/services/clientRequests";
+import { useClientRequests } from "@/lib/queries/client-requests";
 import { getAuth } from "firebase/auth";
 import { Spinner } from "@/components/ui/spinner";
 
 export default function Step3Review() {
     const auth = getAuth();
     const { formState, setCurrentStep } = useCaseForm();
+    const { setClientRequest } = useClientRequests();
 
     const [submitLoading, setSubmitLoading] = useState<boolean>(false);
 
@@ -24,7 +25,7 @@ export default function Step3Review() {
         setCurrentStep(2);
     };
 
-    const formatDate = (timestamp?: Timestamp) => {
+    const formatDate = (timestamp?: Timestamp | null) => {
         if (!timestamp) return "";
         return new Date(timestamp.toMillis()).toLocaleDateString();
     };
@@ -103,7 +104,7 @@ export default function Step3Review() {
                 items,
             };
 
-            await createClientRequest(request);
+            await setClientRequest(request);
 
             setCurrentStep(4);
         } catch (error) {

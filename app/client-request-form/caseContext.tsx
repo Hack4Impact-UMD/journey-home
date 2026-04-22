@@ -72,7 +72,7 @@ const defaultState: CaseFormState = {
       canPickUp: undefined,
       wasChronic: undefined,
       hasMovedIn: undefined,
-      moveInDate: undefined,
+      moveInDate: null,
       hasElevator: undefined,
       notes: ""
     },

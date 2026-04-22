@@ -34,7 +34,7 @@ export type ClientQuestions = {
     canPickUp?: boolean,
     wasChronic?: boolean,
     hasMovedIn?: boolean,
-    moveInDate?: Timestamp,
+    moveInDate: Timestamp | null,
     hasElevator?: boolean,
     notes?: string
 }
