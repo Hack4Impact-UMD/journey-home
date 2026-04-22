@@ -86,6 +86,9 @@ export default function Step3Review() {
                 { name: "Area rug", quantity: formState.other.arearug },
                 { name: "Towel set", quantity: formState.other.towelset },
                 { name: "Lamp", quantity: formState.other.lamp },
+                ...formState.customItems
+                    .filter((item) => item.name.trim() && item.quantity > 0)
+                    .map((item) => ({ name: item.name.trim(), quantity: item.quantity })),
             ].filter((item) => item.quantity > 0);
 
             const uid = auth.currentUser?.uid;
@@ -389,6 +392,20 @@ export default function Step3Review() {
                                             {item.label}
                                         </span>
                                         <span>{item.value}</span>
+                                    </div>
+                                ))}
+
+                            {formState.customItems
+                                .filter((item) => item.name.trim() && item.quantity > 0)
+                                .map((item) => (
+                                    <div
+                                        key={item.id}
+                                        className="flex justify-between p-2"
+                                    >
+                                        <span className="font-bold">
+                                            {item.name.trim()}
+                                        </span>
+                                        <span>{item.quantity}</span>
                                     </div>
                                 ))}
                         </div>

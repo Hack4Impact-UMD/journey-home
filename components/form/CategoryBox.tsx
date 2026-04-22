@@ -9,9 +9,10 @@ interface CategoryBoxProps<T> {
   categoryName: string;
   items: Item<T>[];
   onChange: (update: Partial<T>) => void;
+  footer?: React.ReactNode;
 }
 
-export default function CategoryBox<T>({ categoryName, items, onChange }: CategoryBoxProps<T>) {
+export default function CategoryBox<T>({ categoryName, items, onChange, footer }: CategoryBoxProps<T>) {
   const handleQuantityChange = (index: number, value: string) => {
     const parsed = Number(value);
     const numericValue = value === "" || isNaN(parsed) ? 0 : Math.max(0, parsed);
@@ -51,6 +52,7 @@ export default function CategoryBox<T>({ categoryName, items, onChange }: Catego
           </div>
         ))}
       </div>
+      {footer}
     </div>
   );
 }

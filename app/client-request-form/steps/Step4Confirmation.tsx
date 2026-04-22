@@ -20,7 +20,7 @@ export default function Step4Confirmation() {
 
       <div className="max-w-2xl mx-auto">
         <p className="text-gray-900 leading-relaxed">
-          We have received your request! You can expect to hear back from us within 2 business days. Thank you so much for your help!
+          We have received your request! You can expect to hear back from us within X business days. Thank you so much for your help!
         </p>
 
         <div className="mt-12">

@@ -52,6 +52,7 @@ interface CaseFormState {
   tables: Tables;
   kitchen: Kitchen;
   other: Other;
+  customItems: CustomItem[];
 }
 
 const defaultState: CaseFormState = {
@@ -118,7 +119,8 @@ const defaultState: CaseFormState = {
     arearug: 0,
     towelset: 0,
     lamp: 0
-  }
+  },
+  customItems: [],
 };
 
 export interface CaseFormContextType {
@@ -132,6 +134,10 @@ export interface CaseFormContextType {
   updateTables: (tables: Partial<Tables>) => void;
   updateKitchen: (kitchen: Partial<Kitchen>) => void;
   updateOther: (other: Partial<Other>) => void;
+
+  addCustomItem: () => void;
+  updateCustomItem: (id: string, updates: Partial<Omit<CustomItem, "id">>) => void;
+  removeCustomItem: (id: string) => void;
 
   setCurrentStep: (step: number) => void;
 }
@@ -217,6 +223,29 @@ export function CaseFormProvider({ children }: { children: ReactNode }) {
         }));
     };
 
+    const addCustomItem = () => {
+        setFormState((prev) => ({
+            ...prev,
+            customItems: [...prev.customItems, { id: crypto.randomUUID(), name: "", quantity: 0 }],
+        }));
+    };
+
+    const updateCustomItem = (id: string, updates: Partial<Omit<CustomItem, "id">>) => {
+        setFormState((prev) => ({
+            ...prev,
+            customItems: prev.customItems.map((item) =>
+                item.id === id ? { ...item, ...updates } : item
+            ),
+        }));
+    };
+
+    const removeCustomItem = (id: string) => {
+        setFormState((prev) => ({
+            ...prev,
+            customItems: prev.customItems.filter((item) => item.id !== id),
+        }));
+    };
+
     const setCurrentStep = (step: number) => {
     setFormState((prev) => ({
       ...prev,
@@ -234,6 +263,9 @@ export function CaseFormProvider({ children }: { children: ReactNode }) {
             updateTables,
             updateKitchen,
             updateOther,
+            addCustomItem,
+            updateCustomItem,
+            removeCustomItem,
             setCurrentStep,
         }}
         >
