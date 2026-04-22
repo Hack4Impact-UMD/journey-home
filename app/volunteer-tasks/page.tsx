@@ -6,10 +6,12 @@ import AddButton from "@/components/volunteer-tasks/AddButton";
 
 import { useInventoryCategories } from "@/lib/queries/inventory";
 import { CheckOutInventory } from "@/components/icons/CheckOutInventory";
+import { useAuth } from "@/contexts/AuthContext";
 
 type ItemMap = Record<string, number>;
 
 export default function VolunteerTasks() {
+    const { state: { currentUser } } = useAuth();
     const [view] = useState<"Screen3">("Screen3");
     const [screen, setScreen] = useState<"checkout" | "summary">("checkout");
 
@@ -30,6 +32,7 @@ export default function VolunteerTasks() {
         setOpen(false);
     };
     const handleConfirm = async () => {
+        if (!currentUser) return;
         for (const [name, qty] of Object.entries(items)) {
             const category = inventoryCategories.find((c) => c.name === name);
             if (!category) continue;
@@ -39,7 +42,7 @@ export default function VolunteerTasks() {
                 quantity: category.quantity - qty,
                 lowThreshold: category.lowThreshold,
                 highThreshold: category.highThreshold,
-            });
+            }, currentUser.uid);
         }
         setScreen("summary");
     };
