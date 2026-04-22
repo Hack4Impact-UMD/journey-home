@@ -64,6 +64,8 @@ export function PickupsDeliveriesSummary() {
         });
     });
 
+    const displayRows = rows.slice(0,4);
+
     return (
         <div className="h-full w-full bg-white/70 rounded-2xl border border-light-border p-5 flex flex-col gap-3 shadow-sm">
             <div className="flex items-center justify-between">
@@ -80,7 +82,7 @@ export function PickupsDeliveriesSummary() {
                 <span className="text-sm text-gray-400">No pickups or deliveries today</span>
             ) : (
                 <div className="flex flex-col gap-2">
-                    {rows.map((row) => (
+                    {displayRows.map((row) => (
                         <div key={row.key} className="flex items-center gap-3 border border-light-border px-3 py-2 rounded-sm">
                             <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold shrink-0 ${row.type === "P" ? "bg-[#D6E8F0] text-[#4A8FA8]" : "bg-[#F5E0E0] text-[#A87070]"}`}>{row.type}</span>
                             <span className="w-20 shrink-0 text-sm">{row.timeRange}</span>

@@ -8,6 +8,8 @@ import { InventoryIcon } from "@/components/icons/InventoryIcon";
 import { DonorRequestsIcon } from "@/components/icons/DonorRequestsIcon";
 import { UserManagementIcon } from "@/components/icons/UserManagementIcon";
 import { ClientRequestIcon } from "@/components/icons/ClientRequestIcon";
+import { useWarehouseHistory } from "@/lib/queries/warehouse-history";
+import { useMemo } from "react";
 
 function isFromToday(seconds: number): boolean {
     const itemDate = new Date(seconds * 1000);
@@ -47,7 +49,7 @@ function StatCard({ label, count, newCount, icon, iconClassName }: StatCardProps
             <span className="text-base text-[#919393] mt-auto">
                 {newCount !== undefined ? `${newCount} new today` : ""}
             </span>
-            <div className={`absolute opacity-[0.15] text-[#a0c4d8] text-[5rem] ${iconClassName ?? "bottom-[-1.25rem] right-[-1.25rem]"}`}>
+            <div className={`absolute text-[#CBDFE2] text-[5rem] ${iconClassName ?? "bottom-[-1.25rem] right-[-1.25rem]"}`}>
                 {icon}
             </div>
         </div>
@@ -55,12 +57,14 @@ function StatCard({ label, count, newCount, icon, iconClassName }: StatCardProps
 }
 
 export function QuickStatsSummary() {
-    const { inventoryCategories, isLoading: invLoading } = useInventoryCategories();
-    const { allAccounts: accountRequests, isLoading: usersLoading } = useAllAccountRequests();
-    const { clientRequests, isLoading: crLoading } = useClientRequests();
-    const { donationRequests, isLoading: drLoading } = useDonationRequests();
+    const { inventoryCategories, isLoading: invLoading, isError: invError} = useInventoryCategories();
+    const { allAccounts: accountRequests, isLoading: usersLoading, isError: usersError} = useAllAccountRequests();
+    const { clientRequests, isLoading: crLoading, isError: crError} = useClientRequests();
+    const { donationRequests, isLoading: drLoading, isError: drError } = useDonationRequests();
+    const { changes: warehouseHistory, isLoading: whLoading, isError: whError} = useWarehouseHistory();
 
-    const isLoading = invLoading || usersLoading || crLoading || drLoading;
+    const isLoading = invLoading || usersLoading || crLoading || drLoading || whLoading;
+    const isError = invError || usersError || crError || drError || whError;
 
     const lowStockCount = inventoryCategories.filter((c) => c.quantity <= c.lowThreshold).length;
 
@@ -72,15 +76,40 @@ export function QuickStatsSummary() {
     );
     const newDR = notReviewedDR.filter((dr) => isFromToday(dr.date.seconds)).length;
 
+    const newLowStock = useMemo(() => {
+        const oneDayAgo = Date.now() - 25*60*60*1000; 
+        const recentChanges = warehouseHistory.filter(
+            (entry) => entry.timestamp.toDate().getTime() >= oneDayAgo
+        );
+        const categoriesGoneLow = new Set(
+            recentChanges
+            .filter((entry) => {
+                const cat = inventoryCategories.find((c) => c.name == entry.change.category);
+                return cat && entry.change.newQuantity <= cat.lowThreshold && entry.change.oldQuantity > cat.lowThreshold;
+
+            }).map((entry) => entry.change.category)
+        );
+        return categoriesGoneLow.size;
+    }, [warehouseHistory, inventoryCategories]);
+
+
     if (isLoading) {
         return <div className="grid grid-cols-2 gap-3 animate-pulse h-full w-full">
             {[...Array(4)].map((_, i) => <div key={i} className="bg-white rounded-sm border border-light-border h-28" />)}
         </div>;
     }
 
+    if(isError){
+        return (
+            <div className = "h-full w-full flex itmes-center justify-center rounded-xl border border-light-border bg-white/70">
+                <p className = "text-sm  text-[#919393]"> Failed to load stats</p>
+            </div>
+        )
+    }
+
     return (
         <div className="grid grid-cols-2 gap-3 h-full w-full">
-            <StatCard label="Low stock items" count={lowStockCount} newCount={0} icon={<InventoryIcon />} iconClassName="bottom-[-1.25rem] right-[-1.25rem]" />
+            <StatCard label="Low stock items" count={lowStockCount} newCount={lowStockCount} icon={<InventoryIcon />} iconClassName="bottom-[-1.25rem] right-[-1.25rem]" />
             <StatCard label="Donation requests" count={notReviewedDR.length} newCount={newDR} icon={<DonorRequestsIcon />} iconClassName="bottom-[-0.5rem] right-[-1rem]" />
             <StatCard label="Account requests" count={accountRequests.length} newCount={0} icon={<UserManagementIcon />} iconClassName="bottom-[-0.25rem] right-[-1rem]" />
             <StatCard label="Client requests" count={notReviewedCR.length} newCount={newCR} icon={<ClientRequestIcon />} iconClassName="bottom-[-0.75rem] right-[0rem]" />
