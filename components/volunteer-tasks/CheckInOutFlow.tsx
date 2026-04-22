@@ -1,7 +1,7 @@
 "use client";
 
 import { useInventoryCategories } from "@/lib/queries/inventory";
-import ItemSearcm from "./ItemSearcm";
+import ItemSearch from "./ItemSearch";
 
 type Props = {
   onAddItem: (item: { name: string; qty: number }) => void;
@@ -14,7 +14,7 @@ export default function CheckInOutFlow({ onAddItem, onClose }: Props) {
 
   return (
     <div className="box-shadow-md relative z-50">
-        <ItemSearcm
+        <ItemSearch
         categories={inventoryCategories}
         isLoading={isLoading}
         isError={isError}

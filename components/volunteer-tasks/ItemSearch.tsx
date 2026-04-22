@@ -3,7 +3,7 @@
 import { useState } from "react";
 import BoxIcon from "../icons/BoxIcon";
 import { SearchIcon } from "../icons/SearchIcon";
-import { Badge } from "../../components/inventory/Badge";
+import { Badge } from "../inventory/Badge";
 import { InventoryCategory } from "@/types/inventory";
 
 type Props = {
@@ -14,7 +14,7 @@ type Props = {
   onClose: () => void;
 };
 
-export default function ItemSearcm({
+export default function ItemSearch({
   categories,
   isLoading,
   isError,
@@ -46,8 +46,8 @@ export default function ItemSearcm({
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50" onClick={onClose}>
-    <div className="flex flex-col bg-white rounded-2xl p-6 w-full h-[80%] overflow-y-auto relative shadow-xl"  onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 flex items-end justify-center" onClick={onClose}>
+    <div className="flex flex-col bg-white rounded-t-2xl p-6 w-full h-[80%]  relative shadow-[0_-4px_6px_rgba(0,0,0,0.1)]"  onClick={(e) => e.stopPropagation()}>
 
       {!selectedItem && (
         <>
@@ -63,7 +63,7 @@ export default function ItemSearcm({
 
           {isLoading && <p className="px-4 py-2">Loading...</p>}
           {isError && <p className="px-4 py-2 text-red-500">Error</p>}
-
+            
           {filteredItems.map((item) => (
             <div
               key={item.id}
@@ -84,7 +84,7 @@ export default function ItemSearcm({
           </div>
 
           
-        </> )}
+         
       <div className="flex items-center gap-3 px-4 py-3 border-b">
         <BoxIcon />
         <input
@@ -99,11 +99,15 @@ export default function ItemSearcm({
             <div className="px-4 pt-4">
               <button
                 onClick={handleAdd}
-                className="w-full bg-[#02AFC7] text-white py-3 rounded-full"
+                className="w-full h-[3em] bg-[#02AFC7] text-white "
               >
                 Add Item
               </button>
+              {/*there's not really a button functionality on the figma but i didn't know how to do it otherwise so i added it here
+              feel free to remove!  */}
             </div>
+          )}
+          </>
           )}
     </div>
     </div>

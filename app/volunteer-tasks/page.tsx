@@ -5,6 +5,7 @@ import CheckInOutFlow from "@/components/volunteer-tasks/CheckInOutFlow";
 import AddButton from "@/components/volunteer-tasks/AddButton";
 
 import { useInventoryCategories } from "@/lib/queries/inventory";
+import { CheckOutInventory } from "@/components/icons/CheckOutInventory";
 
 type ItemMap = Record<string, number>;
 
@@ -18,7 +19,6 @@ export default function VolunteerTasks() {
     const {
         inventoryCategories,
         setInventoryCategoryWithToast,
-        isLoading,
     } = useInventoryCategories();
 
     const inventoryMap = useMemo(() => {
@@ -55,56 +55,73 @@ export default function VolunteerTasks() {
                 <div>
                     {screen === "checkout" && (
                         <>
-                            <h1 className="text-[#02AFC7]">
-                                Checkout Inventory
-                            </h1>
+                            <div className="flex justify-center">
+                                <div className="flex flex-col items-center">
+                                    <h1 className="text-[#02AFC7] mb-[1em] font-bold">
+                                        Check out of warehouse
+                                    </h1>
+                                    <CheckOutInventory/>
+                                </div>
+                            </div>
+                            <p className="text-[#02AFC7] font-bold mt-4">Shift notes</p>
+                            <p>INSERT TIME BLOCK TEXT HERE!!!!</p>
+                            <p  className="text-[#02AFC7] font-bold mt-4">Check out of inventory</p>
 
-                            <AddButton onClick={() => setOpen(true)} />
-
-    
-                            {Object.keys(items).length > 0 && (
+                             {Object.keys(items).length > 0 && (
                                 <div className="mt-4 space-y-2">
                                     {Object.entries(items).map(([name, qty]) => (
                                         <div
                                             key={name}
-                                            className="flex justify-between font-bold"
+                                            className="flex justify-between "
                                         >
-                                            <span>{name}</span>
-                                            <span className="text-[#02AFC7] font-semibold">
+                                            <span className="font-bold">{name}</span>
+                                            <span>
                                                 {qty}
                                             </span>
                                         </div>
                                     ))}
                                 </div>
                             )}
-
-                            {Object.keys(items).length > 0 && (
-                                <button
-                                    onClick={() => setScreen("summary")}
-                                    className="mt-6 w-full bg-[#02AFC7] text-white py-3 rounded-full"
-                                >
-                                    Next
+                            <AddButton onClick={() => setOpen(true)} />
+                            
+                            <div className="flex flex-row gap-[1em] h-[4em] justify-center mt-auto ">
+                                <button className="mt-6 w-full border border-gray">
+                                    Back
                                 </button>
-                            )}
 
+                                {Object.keys(items).length > 0 && (
+                                    <button
+                                        onClick={() => setScreen("summary")}
+                                        className="mt-6 w-full bg-[#02AFC7] text-white"
+                                    >
+                                        Next
+                                    </button>
+                                )}
+                            </div>
                             {open && (
-                                <div className="fixed inset-0 z-50 flex items-center justify-center">
-                                    <div className="w-full max-w-md mx-auto">
-                                        <CheckInOutFlow
-                                            onClose={() => setOpen(false)}
-                                            onAddItem={handleAddItem}
-                                        />
-                                    </div>
+                           
+                            <div className="fixed top-0 left-0 w-screen h-screen flex items-center justify-center">
+                                <div className="w-full max-w-md mx-auto">
+                                    <CheckInOutFlow
+                                        onClose={() => setOpen(false)}
+                                        onAddItem={handleAddItem}
+                                    />
                                 </div>
-                            )}
+                            </div>
+                        )}
                         </>
                     )}
 
                     {screen === "summary" && (
                         <>
-                            <h1 className="text-[#02AFC7] mb-4">
-                                Summary
-                            </h1>
+                             <div className="flex justify-center">
+                                <div className="flex flex-col items-center">
+                                    <h1 className="text-[#02AFC7] mb-[1em] font-bold">
+                                        Summary
+                                    </h1>
+                                    <CheckOutInventory/>
+                                </div>
+                            </div>
 
                             {Object.keys(items).length === 0 ? (
                                 <p className="text-gray-400">
@@ -126,12 +143,23 @@ export default function VolunteerTasks() {
                                 </div>
                             )}
 
-                            <button
-                                onClick={() => setScreen("checkout")}
-                                className="mt-6 w-full bg-gray-200 py-3 rounded-full"
-                            >
-                                Back
-                            </button>
+                            <div className="flex flex-row gap-[1em] h-[4em] justify-center mt-auto ">
+                                <button 
+                                    onClick={() => setScreen("checkout")}
+                                    className="mt-6 w-full border border-gray"
+                                >
+                                    Back
+                                </button>
+
+                                {Object.keys(items).length > 0 && (
+                                    <button
+                                        onClick={() => setScreen("summary")}
+                                        className="mt-6 w-full bg-[#02AFC7] text-white"
+                                    >
+                                        Next
+                                    </button>
+                                )}
+                            </div>
                         </>
                     )}
                 </div>
