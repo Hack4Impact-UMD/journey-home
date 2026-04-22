@@ -23,16 +23,13 @@ function escapeCSVField(value: string | null | undefined): string {
 export default function PastDonorsPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [allDonors, setAllDonors] = useState<LocationContact[]>([]);
-    const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
 
-    const { setOnExport, setSelectedCount } = useExport();
+    const { setOnExport } = useExport();
 
-    // fetch donors initially
     useEffect(() => {
         fetchAllDonors().then(setAllDonors);
     }, []);
 
-    // filtered donors
     const filtered = useMemo(() => {
         return allDonors
             .filter((d) =>
@@ -48,7 +45,6 @@ export default function PastDonorsPage() {
             );
     }, [allDonors, searchQuery]);
 
-    // export function 
     const handleExport = useCallback((donors: LocationContact[]) => {
         const headers = [
             "First Name",
@@ -80,31 +76,18 @@ export default function PastDonorsPage() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download =
-            donors.length === selectedKeys.length && selectedKeys.length > 0
-                ? "selected_donors.csv"
-                : "donors.csv";
+        a.download = "donors.csv";
         a.click();
         URL.revokeObjectURL(url);
-    }, [selectedKeys]);
+    }, []);
 
-    // sync selection + export button
     useEffect(() => {
-        const selected = filtered.filter((d) =>
-            selectedKeys.includes(d.email)
-        );
-
-        setSelectedCount(selected.length);
-
-        setOnExport(() => () =>
-            handleExport(selected.length > 0 ? selected : filtered)
-        );
+        setOnExport(() => () => handleExport(filtered));
 
         return () => {
             setOnExport(null);
-            setSelectedCount(0);
         };
-    }, [filtered, selectedKeys, handleExport, setOnExport, setSelectedCount]);
+    }, [filtered, handleExport, setOnExport]);
 
     return (
         <>
@@ -113,30 +96,13 @@ export default function PastDonorsPage() {
                     <SearchBox
                         value={searchQuery}
                         onChange={setSearchQuery}
-                        onSubmit={() => fetchAllDonors().then(setAllDonors)} // ✅ FIX
+                        onSubmit={() => fetchAllDonors().then(setAllDonors)}
                     />
                 </div>
             </div>
 
             <div className="flex-1 overflow-auto min-h-0">
-                <DonorsTable
-                    donors={filtered}
-                    selectedDonorKeys={selectedKeys}
-                    onToggleDonor={(d) =>
-                        setSelectedKeys((prev) =>
-                            prev.includes(d.email)
-                                ? prev.filter((k) => k !== d.email)
-                                : [...prev, d.email]
-                        )
-                    }
-                    onToggleAll={() =>
-                        setSelectedKeys(
-                            selectedKeys.length === filtered.length
-                                ? []
-                                : filtered.map((d) => d.email)
-                        )
-                    }
-                />
+                <DonorsTable donors={filtered} />
             </div>
         </>
     );

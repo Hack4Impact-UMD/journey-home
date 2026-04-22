@@ -18,20 +18,15 @@ function escapeCSVField(value: string | null | undefined): string {
     return str;
 }
 
-function getUserKey(user: UserData) {
-    return user.email;
-}
-
 export default function AllAccountsPage() {
     const roleOptions: UserRole[] = ["Admin", "Case Manager", "Volunteer"];
 
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedRoles, setSelectedRoles] = useState<UserRole[]>(roleOptions);
     const [selectedAccount, setSelectedAccount] = useState<UserData | null>(null);
-    const [selectedUserKeys, setSelectedUserKeys] = useState<string[]>([]);
 
     const { allAccounts, editAccount, refetch, isLoading } = useAllActiveAccounts();
-    const { setOnExport, setSelectedCount } = useExport();
+    const { setOnExport } = useExport();
 
     const filteredUsers = useMemo(() => {
         return allAccounts
@@ -68,40 +63,21 @@ export default function AllAccountsPage() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = selectedUserKeys.length > 0 ? "selected_users.csv" : "users.csv";
+        a.download = "users.csv";
         a.click();
         URL.revokeObjectURL(url);
-    }, [selectedUserKeys]);
-
-    function toggleUser(user: UserData) {
-        const key = getUserKey(user);
-        setSelectedUserKeys((prev) =>
-            prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
-        );
-    }
-
-    function toggleAll() {
-        const keys = filteredUsers.map(getUserKey);
-        const allSelected = keys.every((k) => selectedUserKeys.includes(k));
-        setSelectedUserKeys(allSelected ? [] : keys);
-    }
-
+    }, []);
     useEffect(() => {
-        const selectedUsers = filteredUsers.filter((u) =>
-            selectedUserKeys.includes(getUserKey(u))
-        );
 
-        setSelectedCount(selectedUsers.length);
 
         setOnExport(() => () =>
-            handleExport(selectedUsers.length > 0 ? selectedUsers : filteredUsers)
+            handleExport(filteredUsers)
         );
 
         return () => {
             setOnExport(null);
-            setSelectedCount(0);
         };
-    }, [filteredUsers, selectedUserKeys, handleExport, setOnExport, setSelectedCount]);
+    }, [filteredUsers, handleExport, setOnExport]);
 
     return (
         <>
@@ -113,7 +89,7 @@ export default function AllAccountsPage() {
                 />
             )}
 
-            <div className="flex gap-3 mb-4">
+            <div className="flex gap-3 mb-6">
                 <SearchBox value={searchQuery} onChange={setSearchQuery} onSubmit={refetch} />
                 <DropdownMultiselect
                     label="User Type"
@@ -128,9 +104,6 @@ export default function AllAccountsPage() {
                 <UserTable
                     users={filteredUsers}
                     onSelect={setSelectedAccount}
-                    selectedUserKeys={selectedUserKeys}
-                    onToggleUser={toggleUser}
-                    onToggleAll={toggleAll}
                 />
             </div>
         </>

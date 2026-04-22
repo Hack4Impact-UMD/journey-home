@@ -5,11 +5,11 @@ import SideNavbar from "@/components/general/SideNav";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
-import { Upload, Trash2 } from "lucide-react";
+import { Upload } from "lucide-react";
 import { ExportProvider, useExport } from "@/contexts/UserExportContext";
 
 function ExportActions() {
-    const { onExport, selectedCount } = useExport();
+    const {onExport} = useExport();
     const pathname = usePathname();
 
     const isUserManagementPage =
@@ -21,23 +21,6 @@ function ExportActions() {
 
     return (
         <div className="flex items-center gap-2 shrink-0">
-            {selectedCount > 0 && (
-                <>
-                    <div className="bg-primary text-white px-3 py-1.5 text-sm min-w-[110px] text-center">
-                        {selectedCount} Selected
-                    </div>
-
-                    <button
-                        type="button"
-                        className="bg-primary text-white px-3 py-1.5 text-sm flex items-center gap-1.5 cursor-default"
-                        onClick={(e) => e.preventDefault()}
-                    >
-                        <Trash2 size={16} />
-                        Delete
-                    </button>
-                </>
-            )}
-
             <button
                 type="button"
                 className="bg-primary text-white px-3 py-1.5 text-sm flex items-center gap-1.5"

@@ -6,31 +6,17 @@ import { LocationContact } from "@/types/general";
 
 type DonorsTableProps = {
     donors: LocationContact[];
-    selectedDonorKeys: string[];
-    onToggleDonor: (donor: LocationContact) => void;
-    onToggleAll: () => void;
 };
 
 export function DonorsTable({
     donors,
-    selectedDonorKeys,
-    onToggleDonor,
-    onToggleAll,
 }: DonorsTableProps) {
-    const allSelected =
-        donors.length > 0 &&
-        donors.every((donor) => selectedDonorKeys.includes(donor.email));
+
 
     return (
         <div className="w-full min-w-3xl h-full flex flex-col">
             <div className="h-12 bg-[#FAFAFB] border-light-border border flex items-center font-family-roboto font-bold text-sm text-text-1 shrink-0">
                 <span className="w-[20%] border-l-2 border-light-border px-4 flex items-center">
-                    <input
-                        type="checkbox"
-                        className="w-4 h-4 mr-4 rounded-xs cursor-pointer border-white"
-                        checked={allSelected}
-                        onChange={onToggleAll}
-                    />
                     Name
                 </span>
 
@@ -56,8 +42,6 @@ export function DonorsTable({
                     <DonorsTableRow
                         key={donor.email}
                         donor={donor}
-                        isSelected={selectedDonorKeys.includes(donor.email)}
-                        onToggle={() => onToggleDonor(donor)}
                     />
                 ))}
             </div>
@@ -67,23 +51,13 @@ export function DonorsTable({
 
 function DonorsTableRow({
     donor,
-    isSelected,
-    onToggle,
 }: {
     donor: LocationContact;
-    isSelected: boolean;
-    onToggle: () => void;
+
 }) {
     return (
         <div className="h-10 border-light-border border-b border-x flex items-center font-family-roboto text-sm text-text-1 hover:bg-blue-50 cursor-pointer">
             <div className="w-[20%] px-4 flex items-center">
-                <input
-                    type="checkbox"
-                    className="w-4 h-4 mr-4 rounded-xs cursor-pointer border-white"
-                    checked={isSelected}
-                    onChange={onToggle}
-                    onClick={(e) => e.stopPropagation()}
-                />
                 <span>
                     {donor.firstName} {donor.lastName}
                 </span>
@@ -103,7 +77,7 @@ function DonorsTableRow({
             </span>
 
             <div
-                className="w-[20%] px-4 flex items-center gap-2"
+                className="w-[20%] px-4 flex items-center"
                 onClick={(e) => e.stopPropagation()}
             >
                 <button type="button">
