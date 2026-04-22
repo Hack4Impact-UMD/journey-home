@@ -2,9 +2,20 @@
 
 import { DogSitIcon } from "@/components/icons/DogSitIcon";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function MissingUserData() {
     const router = useRouter();
+    const auth = useAuth();
+
+    const handleLogout = async () => {
+        try {
+            await auth.logout();
+            router.push("/login");
+        } catch (error) {
+            console.error("Logout failed", error);
+        }
+    };
 
 
     return (
@@ -23,7 +34,15 @@ export default function MissingUserData() {
                             className="border border-light-border px-3 py-1 rounded-lg font-family-roboto mt-[1rem] bg-background text-text-2"
                             onClick={() => router.push("/")}
                         >
+                            
                             Back to Home
+                        </button>
+
+                        <button
+                            className="border border-light-border px-3 py-1 rounded-lg font-family-roboto mt-4 bg-background text-text-2"
+                            onClick={handleLogout}
+                        >
+                            Logout
                         </button>
                     </div>
                 </div>
