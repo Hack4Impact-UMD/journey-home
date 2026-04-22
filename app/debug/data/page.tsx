@@ -1273,6 +1273,7 @@ async function addCaseManagerRequests(count: number) {
                 ...baseClient,
 
                 hmis: randomHMIS(),
+                programName: "Seed Data Program",
 
                 secondaryContact: {
                     name: randomFrom(SEED_DONORS).firstName +
