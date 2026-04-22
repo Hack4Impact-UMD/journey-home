@@ -4,6 +4,8 @@ import { useTimeBlocks } from "@/lib/queries/timeblocks";
 import { ClientRequest } from "@/types/client-requests";
 import { DonationRequest } from "@/types/donations";
 import { TimeBlock } from "@/types/schedule";
+import { PersonIcon } from "@/components/icons/PersonIcon";
+import { LocationIcon } from "@/components/icons/LocationIcon";
 
 function isTodayBlock(tb: TimeBlock): boolean {
     const d = new Date(tb.startTime.seconds * 1000);
@@ -19,24 +21,6 @@ function formatTimeRange(tb: TimeBlock): string {
     const fmt = (ts: { seconds: number }) =>
         new Date(ts.seconds * 1000).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
     return `${fmt(tb.startTime)}-${fmt(tb.endTime)}`;
-}
-
-function PersonIcon() {
-    return (
-        <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <circle cx="8" cy="5" r="3" />
-            <path d="M2 14c0-3.314 2.686-6 6-6s6 2.686 6 6" strokeLinecap="round" />
-        </svg>
-    );
-}
-
-function LocationIcon() {
-    return (
-        <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path d="M8 1.5C5.515 1.5 3.5 3.515 3.5 6c0 3.75 4.5 8.5 4.5 8.5S12.5 9.75 12.5 6c0-2.485-2.015-4.5-4.5-4.5z" />
-            <circle cx="8" cy="6" r="1.5" />
-        </svg>
-    );
 }
 
 type DeliveryRow = {
@@ -69,9 +53,9 @@ export function PickupsDeliveriesSummary() {
     return (
         <div className="h-full w-full bg-white/70 rounded-2xl border border-light-border p-5 flex flex-col gap-3 shadow-sm">
             <div className="flex items-center justify-between">
-                <span className="text-base font-semibold text-text-1">Upcoming pickups/deliveries</span>
+                <span className="text-base font-bold text-text-1">Upcoming pickups/deliveries</span>
                 <span className="text-sm text-[#383838]">
-                    {isLoading ? "..." : <><span>{rows.length}</span> today</>}
+                    {isLoading ? "..." : <><span className="font-semibold text-text-1">{rows.length}</span> today</>}
                 </span>
             </div>
             {isLoading ? (
