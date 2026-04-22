@@ -20,6 +20,13 @@ export default function ControlPanelLayout({ children }: { children: ReactNode }
                         </span>
                         <div className="flex gap-8 text-sm">
                             <Link
+                                className={`py-4 font-family-roboto text-sm${pathname.startsWith("/control-panel/categories") ? " border-b-2 border-primary text-primary" : ""}`}
+                                href="/control-panel/categories"
+                                aria-current={pathname.startsWith("/control-panel/categories") ? "page" : undefined}
+                            >
+                                Categories
+                            </Link>
+                            <Link
                                 className={`py-4 font-family-roboto text-sm${pathname.startsWith("/control-panel/warehouse-history") ? " border-b-2 border-primary text-primary" : ""}`}
                                 href="/control-panel/warehouse-history"
                                 aria-current={pathname.startsWith("/control-panel/warehouse-history") ? "page" : undefined}
