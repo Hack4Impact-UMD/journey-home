@@ -1,7 +1,15 @@
 "use client";
 
 import { InventoryCategory } from "@/types/inventory";
-import { BoxIcon } from "lucide-react";
+import * as PhosphorIcons from "@phosphor-icons/react";
+import { DEFAULT_ICONS } from "@/components/control-panel/CategoryModal";
+
+function isValidIcon(val: unknown): val is React.ComponentType<{ size?: number; strokeWidth?: number }> {
+  if (!val) return false;
+  if (typeof val === "function") return true;
+  if (typeof val === "object" && val !== null && "render" in val) return true;
+  return false;
+}
 
 function getStockColor(quantity: number, low: number, high: number): string {
     if (quantity <= low) return "#E16060";
@@ -63,15 +71,22 @@ function DialArc({ quantity, low, high }: { quantity: number; low: number; high:
         </svg>
     );
 }
+
 interface ItemDialProps {
     category: InventoryCategory;
     onClick: () => void;
 }
 
 export function ItemDial({ category, onClick }: ItemDialProps) {
-    const { name, quantity, lowThreshold, highThreshold } = category;
+    const { name, quantity, lowThreshold, highThreshold, icon } = category;
     const color = getStockColor(quantity, lowThreshold, highThreshold);
     const bg = getStockBg(quantity, lowThreshold, highThreshold);
+
+    const iconRecord = PhosphorIcons as Record<string, unknown>;
+    const iconVal = icon ? iconRecord[icon] : null;
+    const IconComp = isValidIcon(iconVal)
+        ? (iconVal as React.ComponentType<{ size?: number; strokeWidth?: number }>)
+        : (DEFAULT_ICONS.find((d) => d.key === icon)?.Component ?? PhosphorIcons.Package);
 
     return (
         <div
@@ -82,7 +97,7 @@ export function ItemDial({ category, onClick }: ItemDialProps) {
             <div className="relative flex items-center justify-center">
                 <DialArc quantity={quantity} low={lowThreshold} high={highThreshold} />
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
-                    <BoxIcon className="w-10 h-10 text-[#333]" strokeWidth={1.5} />
+                    <IconComp size={40} strokeWidth={1.5} />
                     <span className="text-base font-semibold leading-none" style={{ color }}>
                         {quantity}
                     </span>
