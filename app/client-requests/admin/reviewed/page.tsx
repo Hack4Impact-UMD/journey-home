@@ -19,7 +19,7 @@ export default function ClientRequestsAdminPage() {
     const selectedCR = clientRequests.find((cr) => cr.id === selectedCRId) ?? null;
 
     const [searchQuery, setSearchQuery] = useState<string>("");
-    const [sortBy, setSortBy] = useState<"asc" | "desc" | "none">("none");
+    const [sortBy, setSortBy] = useState<"asc" | "desc" | "none">("desc");
     const [selectedStatus, setStatus] = useState<ReviewStatus[]>(statusOpts);
 
     const handleUpdateStatus = async (status: ReviewStatus) => {
@@ -99,24 +99,20 @@ export default function ClientRequestsAdminPage() {
                             })
                             .sort((req1, req2) => {
                                 let diff;
-                                //by name if default
                                 if (sortBy === "none") {
                                     diff = `${req1.client.lastName} ${req1.client.firstName}`.localeCompare(
                                         `${req2.client.lastName} ${req2.client.firstName}`,
                                     );
-                                }
-                                //by date ascending
-                                else if (sortBy === "asc") {
+                                } else if (sortBy === "asc") {
                                     diff = (req1.date?.seconds ?? 0) - (req2.date?.seconds ?? 0);
-                                }
-                                //by date descending
-                                else {
+                                } else {
                                     diff = (req2.date?.seconds ?? 0) - (req1.date?.seconds ?? 0);
                                 }
                                 return diff;
                             })
                         }
                         openCR={(cr) => setSelectedCRId(cr.id)}
+                        onUpdateStatus={async (cr, status) => setClientRequestToast({ ...cr, status })}
                     />
                 </div>
             )}

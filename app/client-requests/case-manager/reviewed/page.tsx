@@ -21,7 +21,7 @@ export default function ClientRequestsCaseManagerPage() {
     const selectedCR = clientRequests.find((cr) => cr.id === selectedCRId) ?? null;
 
     const [searchQuery, setSearchQuery] = useState<string>("");
-    const [sortBy, setSortBy] = useState<"asc" | "desc" | "none">("none");
+    const [sortBy, setSortBy] = useState<"asc" | "desc" | "none">("desc");
     const [selectedStatus, setStatus] = useState<ReviewStatus[]>(statusOpts);
 
     const { state: authState } = useAuth();
