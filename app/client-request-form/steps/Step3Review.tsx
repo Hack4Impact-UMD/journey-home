@@ -195,7 +195,7 @@ export default function Step3Review() {
                             <div className="font-semibold">
                                 Is the client a veteran?
                             </div>
-                            <div>{renderBoolean(questions.isVeteran)}</div>
+                            <div>{questions.isVeteran ?? "Unsure"}</div>
 
                             <div className="font-semibold">
                                 Can pick up at warehouse?
@@ -205,7 +205,7 @@ export default function Step3Review() {
                             <div className="font-semibold">
                                 Was chronic before housing?
                             </div>
-                            <div>{renderBoolean(questions.wasChronic)}</div>
+                            <div>{questions.wasChronic ?? "Unsure"}</div>
 
                             <div className="font-semibold">Moved in?</div>
                             <div>{renderBoolean(questions.hasMovedIn)}</div>
