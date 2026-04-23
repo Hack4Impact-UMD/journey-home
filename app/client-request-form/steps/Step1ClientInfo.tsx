@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useCaseForm } from "../caseContext";
 import Image from "next/image";
 import { Timestamp } from "firebase/firestore";
+import { YesNoUnsure } from "@/types/client-requests";
 
 export default function Step1ClientInfo() {
     const {
@@ -27,7 +28,6 @@ export default function Step1ClientInfo() {
         if (!client.firstName) newErrors.firstName = "First name is required";
         if (!client.lastName) newErrors.lastName = "Last name is required";
         if (!client.hmis) newErrors.hmis = "HMIS number is required";
-        if (!client.programName) newErrors.programName = "Program name is required";
         if (!client.phoneNumber)
             newErrors.phoneNumber = "Client Phone number is required";
         else if (!/^\d{3}-\d{3}-\d{4}$/.test(client.phoneNumber))
@@ -53,6 +53,8 @@ export default function Step1ClientInfo() {
             newErrors.wasChronic = "Please select chronic homelessness option";
         if (client.questions.hasMovedIn === undefined)
             newErrors.hasMovedIn = "Please select move-in status";
+        if (!client.questions.moveInDate)
+            newErrors.moveInDate = "Move-in date is required";
         if (
             client.secondaryContact?.phone &&
             !/^\d{3}-\d{3}-\d{4}$/.test(client.secondaryContact.phone)
@@ -211,7 +213,6 @@ export default function Step1ClientInfo() {
                             <FormInput
                                 id="programName"
                                 label="Program Name"
-                                required
                                 value={
                                     formState.clientInfoAndNewHome.programName ?? ""
                                 }
@@ -407,28 +408,14 @@ export default function Step1ClientInfo() {
                                 id="isVeteran"
                                 label="Is the client a veteran?"
                                 required
-                                value={
-                                    formState.clientInfoAndNewHome.questions
-                                        .isVeteran === undefined
-                                        ? ""
-                                        : formState.clientInfoAndNewHome
-                                                .questions.isVeteran
-                                          ? "Yes"
-                                          : "No"
-                                }
+                                value={formState.clientInfoAndNewHome.questions.isVeteran ?? ""}
                                 onChange={(e) => {
                                     updateClientQuestions({
-                                        isVeteran:
-                                            e.target.value === "Yes"
-                                                ? true
-                                                : e.target.value === "No"
-                                                  ? false
-                                                  : undefined,
+                                        isVeteran: e.target.value === "" ? undefined : e.target.value as YesNoUnsure,
                                     });
-
                                     clearError("isVeteran");
                                 }}
-                                options={["Yes", "No"]}
+                                options={["Yes", "No", "Unsure"]}
                             />
                             {errors.isVeteran && (
                                 <p className="text-red-500 text-sm mt-1">
@@ -471,31 +458,16 @@ export default function Step1ClientInfo() {
 
                             <FormSelect
                                 id="wasChronic"
-                                label="Was this client chronic before housing?
-                            Please do not submit a furniture request until a client has moved in AND the unit has passed inspection."
+                                label="Was this client chronic before housing?"
                                 required
-                                value={
-                                    formState.clientInfoAndNewHome.questions
-                                        .wasChronic === undefined
-                                        ? ""
-                                        : formState.clientInfoAndNewHome
-                                                .questions.wasChronic
-                                          ? "Yes"
-                                          : "No"
-                                }
+                                value={formState.clientInfoAndNewHome.questions.wasChronic ?? ""}
                                 onChange={(e) => {
                                     updateClientQuestions({
-                                        wasChronic:
-                                            e.target.value === "Yes"
-                                                ? true
-                                                : e.target.value === "No"
-                                                  ? false
-                                                  : undefined,
+                                        wasChronic: e.target.value === "" ? undefined : e.target.value as YesNoUnsure,
                                     });
-
                                     clearError("wasChronic");
                                 }}
-                                options={["Yes", "No"]}
+                                options={["Yes", "No", "Unsure"]}
                             />
                             {errors.wasChronic && (
                                 <p className="text-red-500 text-sm mt-1">
@@ -505,7 +477,7 @@ export default function Step1ClientInfo() {
 
                             <FormSelect
                                 id="hasMovedIn"
-                                label="Has the client moved in yet?"
+                                label="Has the client moved in yet? Please do not submit a furniture request until a client has moved in AND the unit has passed inspection."
                                 required
                                 value={
                                     formState.clientInfoAndNewHome.questions
@@ -537,7 +509,9 @@ export default function Step1ClientInfo() {
                             )}
 
                             <FormInput
+                                id="moveInDate"
                                 label="Move-in Date"
+                                required
                                 type="date"
                                 value={
                                     formState.clientInfoAndNewHome.questions
@@ -581,6 +555,11 @@ export default function Step1ClientInfo() {
                                     clearError("moveInDate");
                                 }}
                             />
+                            {errors.moveInDate && (
+                                <p className="text-red-500 text-sm">
+                                    {errors.moveInDate}
+                                </p>
+                            )}
                             <FormInput
                                 label="Notes/Comments"
                                 value={
