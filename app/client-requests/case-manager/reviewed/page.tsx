@@ -11,10 +11,10 @@ import { CaseMCRTable } from "@/components/client-requests/CaseMCRTable";
 import { useAuth } from "@/contexts/AuthContext";
 import { ReviewStatus } from "@/types/general";
 
+const statusOpts: ReviewStatus[] = ["Approved", "Denied"];
+
 export default function ClientRequestsCaseManagerPage() {
     const { clientRequests, refetch: refetchClientRequests } = useClientRequests();
-
-    const statusOpts: ReviewStatus[] = ["Approved", "Denied"];
 
     const [selectedCRId, setSelectedCRId] = useState<string | null>(null);
     const selectedCR = clientRequests.find((cr) => cr.id === selectedCRId) ?? null;
@@ -75,9 +75,14 @@ export default function ClientRequestsCaseManagerPage() {
                                     if (request.caseManagerID !== uidCM) return false;
                                     if (!selectedStatus.includes(request.status)) return false;
                                     if (request.status === "Not Reviewed") return false;
-                                    const clientFullName =
-                                        `${request.client.firstName} ${request.client.lastName}`.toLowerCase();
-                                    return clientFullName.includes(searchQuery.toLowerCase());
+                                    const norm = (s: string) => s.toLowerCase().replace(/\s/g, "");
+                                    const q = norm(searchQuery);
+                                    if (!q) return true;
+                                    return [
+                                        `${request.client.firstName}${request.client.lastName}`,
+                                        request.client.phoneNumber,
+                                        request.client.hmis,
+                                    ].some((field) => norm(field).includes(q));
                                 })
                                 .sort((req1, req2) => {
                                     let diff;

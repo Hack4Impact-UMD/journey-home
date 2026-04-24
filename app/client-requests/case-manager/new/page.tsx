@@ -63,9 +63,14 @@ export default function ClientRequestsCaseManagerPage() {
                                 .filter((request) => {
                                     if (request.caseManagerID !== uidCM) return false;
                                     if (request.status !== "Not Reviewed") return false;
-                                    const clientFullName =
-                                        `${request.client.firstName} ${request.client.lastName}`.toLowerCase();
-                                    return clientFullName.includes(searchQuery.toLowerCase());
+                                    const norm = (s: string) => s.toLowerCase().replace(/\s/g, "");
+                                    const q = norm(searchQuery);
+                                    if (!q) return true;
+                                    return [
+                                        `${request.client.firstName}${request.client.lastName}`,
+                                        request.client.phoneNumber,
+                                        request.client.hmis,
+                                    ].some((field) => norm(field).includes(q));
                                 })
                                 .sort((req1, req2) => {
                                     let diff;

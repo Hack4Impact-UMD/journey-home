@@ -13,12 +13,12 @@ import { useAllActiveAccounts } from "@/lib/queries/users";
 import { useState } from "react";
 import { ReviewStatus } from "@/types/general";
 
+const statusOpts: ReviewStatus[] = ["Approved", "Denied"];
+
 export default function ClientRequestsAdminPage() {
     const { clientRequests, refetch: refetchClientRequests, setClientRequest, setClientRequestToast } = useClientRequests();
     const { allAccounts } = useAllActiveAccounts();
     const userById = new Map(allAccounts.map((u) => [u.uid, u]));
-
-    const statusOpts: ReviewStatus[] = ["Approved", "Denied"];
 
     const [selectedCRId, setSelectedCRId] = useState<string | null>(null);
     const selectedCR = clientRequests.find((cr) => cr.id === selectedCRId) ?? null;

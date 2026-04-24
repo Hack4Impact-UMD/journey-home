@@ -49,9 +49,13 @@ export function RequestDetailsPage({ client, userRole }: ClientProps) {
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Client email</div>
                     <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{client.client.email || "—"}</div>
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Secondary contact number</div>
-                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{secondaryContact.phone}</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{secondaryContact.phone || "—"}</div>
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Name and relationship to secondary contact</div>
-                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{secondaryContact.name} - {secondaryContact.relationship}</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">
+                        {secondaryContact.name && secondaryContact.relationship
+                            ? `${secondaryContact.name} - ${secondaryContact.relationship}`
+                            : secondaryContact.name || secondaryContact.relationship || "—"}
+                    </div>
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Speaks/understands English?</div>
                     <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.clientSpeaksEnglish ? "Yes" : "No"}</div>
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Number of adults in the family</div>
@@ -59,11 +63,11 @@ export function RequestDetailsPage({ client, userRole }: ClientProps) {
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Number of kids in the family</div>
                     <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.childrenInFamily ?? "—"}</div>
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Veteran status</div>
-                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.isVeteran ?? "—"}</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.isVeteran == null ? "—" : questions.isVeteran ? "Yes" : "No"}</div>
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Pick up items at the warehouse?</div>
                     <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.canPickUp ? "Yes" : "No"}</div>
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Chronic before housing?</div>
-                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.wasChronic ?? "—"}</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.wasChronic == null ? "—" : questions.wasChronic ? "Yes" : "No"}</div>
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Moved in status</div>
                     <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.hasMovedIn ? "Yes" : "No"}</div>
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Moved in date</div>
