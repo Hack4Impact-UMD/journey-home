@@ -1,18 +1,18 @@
 "use client";
 
 import { ProtectedRoute } from "@/components/general/ProtectedRoute";
-import SideNavbar from "@/components/general/SideNav";
+import Navbar from "@/components/general/Navbar";
 import { ReactNode } from "react";
 
 export default function VolunteerLayout({ children }: { children: ReactNode }) {
     return (
         <ProtectedRoute allow={["Volunteer"]}>
             <div className="h-full w-full flex flex-col font-family-roboto overflow-hidden">
-                <div className="flex flex-1 min-h-0">
-                    <SideNavbar />
-                    <div className="flex-1 min-h-0 bg-[#F7F7F7] pt-8 pb-4 px-6 flex flex-col">
-                        <span className="text-2xl text-primary font-extrabold block">
-                            Shift Task
+                <div className="flex flex-1 min-h-0 max-md:flex-col">
+                    <Navbar pageTitle="Shift Tasks" />
+                    <div className="flex-1 min-h-0 bg-[#F7F7F7] pt-8 max-md:pt-1 pb-4 px-6 flex flex-col">
+                        <span className="text-2xl text-primary font-extrabold block max-md:hidden">
+                            Shift Tasks
                         </span>
                         <div className="bg-background rounded-xl my-2 flex-1 py-4 px-6 min-h-0 overflow-hidden flex flex-col">
                             {children}
