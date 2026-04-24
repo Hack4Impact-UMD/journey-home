@@ -21,7 +21,7 @@ export function DropdownMultiselect<T extends string>({ label, options, selected
         <>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild className="outline-0">
-                    <button className="border border-light-border rounded-xs flex justify-center items-center pl-4 pr-3 gap-2">
+                    <button className="h-8 shrink-0 border border-light-border rounded-xs flex justify-center items-center pl-4 pr-3 gap-2">
                         <span className="text-sm">{label}</span>
                         <DropdownIcon />
                     </button>

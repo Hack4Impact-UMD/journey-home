@@ -26,7 +26,7 @@ export default function CategoriesPage() {
 
   return (
     <>
-      <div className="flex mb-6 gap-3">
+      <div className="flex flex-wrap mb-6 gap-3">
         <SearchBox
           value={search}
           onChange={setSearch}
