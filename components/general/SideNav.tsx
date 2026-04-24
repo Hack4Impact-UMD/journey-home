@@ -12,6 +12,10 @@ import { UserManagementIcon } from "../icons/UserManagementIcon";
 import { ControlPanelIcon } from "../icons/ControlPanelIcon";
 import { ViewIcon } from "../icons/ViewIcon";
 import { Menu } from "lucide-react";
+import { HandHeartIcon, HouseIcon } from "@phosphor-icons/react";
+
+const CreateRequestIcon = () => <HandHeartIcon className="w-5 h-5" />;
+const HomeIcon = () => <HouseIcon className="w-5 h-5" />;
 
 export default function SideNavbar({ pageTitle }: { pageTitle?: string }) {
     const auth = useAuth();
@@ -19,6 +23,14 @@ export default function SideNavbar({ pageTitle }: { pageTitle?: string }) {
 
     const navLinks = (isMobile: boolean) => (
         <>
+            <SideNavbarLink
+                icon={HomeIcon}
+                name="Home"
+                path="/"
+                roles={[]}
+                isMobile={isMobile}
+                onClick={() => setDrawerOpen(false)}
+            />
             <SideNavbarLink
                 icon={InventoryIcon}
                 name="Inventory"
@@ -39,7 +51,7 @@ export default function SideNavbar({ pageTitle }: { pageTitle?: string }) {
                 icon={ClientRequestIcon}
                 name="Client Requests"
                 path="/client-requests"
-                roles={["Admin", "Case Manager"]}
+                roles={["Admin"]}
                 isMobile={isMobile}
                 onClick={() => setDrawerOpen(false)}
             />
@@ -68,9 +80,17 @@ export default function SideNavbar({ pageTitle }: { pageTitle?: string }) {
                 onClick={() => setDrawerOpen(false)}
             />
             <SideNavbarLink
+                icon={CreateRequestIcon}
+                name="Create Request"
+                path="/client-request-form"
+                roles={["Case Manager"]}
+                isMobile={isMobile}
+                onClick={() => setDrawerOpen(false)}
+            />
+            <SideNavbarLink
                 name="Donation Form"
                 path="/donate"
-                roles={[]}
+                roles={["Admin"]}
                 isMobile={isMobile}
                 onClick={() => setDrawerOpen(false)}
             />
@@ -81,7 +101,7 @@ export default function SideNavbar({ pageTitle }: { pageTitle?: string }) {
         <>
             {/* Desktop sidebar */}
             <div className="h-full w-[13em] flex flex-col font-family-roboto max-md:hidden">
-                <Link href="/" className="pb-4">
+                <Link href="/">
                     <div className="border border-[#EFF3F5] px-4 py-3">
                         <span className="text-primary font-family-raleway font-semibold text-xl">
                             Journey
@@ -91,7 +111,7 @@ export default function SideNavbar({ pageTitle }: { pageTitle?: string }) {
                         </span>
                     </div>
                 </Link>
-                <div className="px-4 h-full w-full flex flex-col">
+                <div className="px-4 py-2 h-full w-full flex flex-col">
                     {navLinks(false)}
                     <div className="mt-auto w-full mb-4">
                         <Link href="/profile">
@@ -219,17 +239,21 @@ function SideNavbarLink({
         return <></>;
     }
 
+    const isActive = path === "/" ? pathname === path : pathname?.startsWith(path);
+
     return (
         <Link
             href={path}
             onClick={onClick}
             className={`hover:text-primary flex items-center ${
                 isMobile
-                    ? "w-full h-10 px-4 gap-1"
-                    : "pb-4 text-sm gap-2"
-            } ${pathname?.startsWith(path) ? "text-primary font-semibold" : ""}`}
+                    ? `w-full h-10 px-4 gap-1 ${isActive ? "text-primary font-semibold" : ""}`
+                    : `px-2 h-10 text-sm gap-2 rounded-[0.625rem] ${isActive ? "bg-[#F2FBFD] text-[#125C6D] font-semibold" : ""}`
+            }`}
         >
-            <Icon />
+            <span className="w-5 h-5 flex items-center justify-center shrink-0">
+                <Icon />
+            </span>
             {name}
         </Link>
     );

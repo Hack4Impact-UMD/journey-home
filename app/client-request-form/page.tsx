@@ -1,15 +1,27 @@
 "use client";
 
-import { ProtectedRoute } from "@/components/general/ProtectedRoute";
+import { useCaseForm } from "./caseContext";
+import Step1ClientInfo from "./steps/Step1ClientInfo";
+import Step2Requests from "./steps/Step2Requests";
+import Step3Review from "./steps/Step3Review"
+import Step4Confirmation from "./steps/Step4Confirmation";
 
 export default function ClientRequestFormPage() {
-    return (
-        <ProtectedRoute allow={["Case Manager"]}>
-            <div className="h-full w-full bg-[#F7F7F7] py-4 px-6 flex flex-col font-family-roboto">
-                <h1 className="text-2xl text-primary font-extrabold max-md:hidden">
-                    Client Request Form
-                </h1>
-            </div>
-        </ProtectedRoute>
-    );
+
+    const { formState } = useCaseForm();
+
+    if (formState.currentStep === 1) {
+        return <Step1ClientInfo />;
+    }
+    if (formState.currentStep === 2) {
+        return <Step2Requests />;
+    }
+    if (formState.currentStep === 3) {
+        return <Step3Review />;
+    }
+    if (formState.currentStep === 4) {
+        return <Step4Confirmation />;
+    }
+    
+    return <Step1ClientInfo />;
 }

@@ -1,15 +1,16 @@
 "use client";
 
-interface StepIndicatorProps {
-  currentStep: number;
+interface Step {
+  number: number;
+  label: string;
 }
 
-export default function StepIndicator({ currentStep }: StepIndicatorProps) {
-  const steps = [
-    { number: 1, label: "Personal Information" },
-    { number: 2, label: "Donations" },
-    { number: 3, label: "Review" },
-  ];
+interface StepIndicatorProps {
+  currentStep: number;
+  steps: Step[];
+}
+
+export default function StepIndicator({ currentStep, steps }: StepIndicatorProps) {
 
   return (
     <div className="flex items-center justify-center gap-4 mb-8">
