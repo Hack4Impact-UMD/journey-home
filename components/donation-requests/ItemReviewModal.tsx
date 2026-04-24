@@ -224,13 +224,13 @@ export function ItemReviewModal({
 
                         <div className="flex gap-2 mt-8">
                             <button
-                                className="text-sm bg-primary rounded-xs h-8 px-4 text-white"
+                                className="text-sm bg-#E7F9E8 rounded-xs h-8 px-4 text-white"
                                 onClick={() => setStatus("Approved")}
                             >
                                 Approve
                             </button>
                             <button
-                                className="text-sm rounded-xs h-8 px-4 border border-light-border"
+                                className="text-sm rounded-xs bg-#FBDED9 h-8 px-4 border border-light-border"
                                 onClick={() => setStatus("Denied")}
                             >
                                 Deny

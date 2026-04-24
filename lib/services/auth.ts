@@ -7,7 +7,6 @@ import {
     sendEmailVerification,
 } from "firebase/auth";
 import { auth } from "../firebase";
-import { Timestamp } from "firebase/firestore";
 import { createUserInDB } from "./users";
 import { UserData } from "@/types/user";
 
@@ -18,7 +17,6 @@ export async function signUp(
     lastName: string,
     phone: string,
     phoneExtension: string,
-    dob: string,
     role: UserRole
 ): Promise<User> {
     const userCredential = await createUserWithEmailAndPassword(
@@ -35,7 +33,6 @@ export async function signUp(
         email: user.email!,
         ...(phone && { phone }),
         ...(phoneExtension && { phoneExtension }),
-        dob: dob ? Timestamp.fromDate(new Date(dob)) : null,
         role: "Volunteer",
         pending: (role == "Volunteer") ? null : role,
         emailVerified: user.emailVerified,

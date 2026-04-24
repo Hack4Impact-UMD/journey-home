@@ -19,7 +19,7 @@ export default function ClientRequestsCaseManagerPage() {
                                 href="/client-request-form"
                                 className="bg-primary text-white text-sm px-4 py-2 rounded-xs"
                             >
-                                Create Request
+                                New Request
                             </Link>
                         </div>
                     </div>

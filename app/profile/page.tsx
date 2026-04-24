@@ -6,7 +6,6 @@ import PasswordResetSection from "@/components/profile/PasswordResetSection";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAllActiveAccounts } from "@/lib/queries/users";
 import { useEffect, useState } from "react";
-import { Timestamp } from "firebase/firestore";
 import { toast } from "sonner";
 
 export default function ProfilePage() {
@@ -17,7 +16,6 @@ export default function ProfilePage() {
 
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
-    const [dob, setDob] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
     const [showPasswordReset, setShowPasswordReset] = useState(false);
 
@@ -25,15 +23,6 @@ export default function ProfilePage() {
         if (account) {
             setFirstName(account.firstName || "");
             setLastName(account.lastName || "");
-            if (account.dob) {
-                const date = new Date(account.dob.seconds * 1000);
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, "0");
-                const day = String(date.getDate()).padStart(2, "0");
-                setDob(`${year}-${month}-${day}`);
-            } else {
-                setDob("");
-            }
             setPhoneNumber(account.phone || "");
         }
     }, [account]);
@@ -54,17 +43,10 @@ export default function ProfilePage() {
 
         if (!account) return;
 
-        let dobTimestamp: Timestamp | null = null;
-        if (dob) {
-            const [y, m, d] = dob.split("-").map(Number);
-            dobTimestamp = Timestamp.fromDate(new Date(y, m - 1, d, 12, 0, 0));
-        }
-
         await editAccount({
             ...account,
             firstName: firstName.trim(),
             lastName: lastName.trim(),
-            dob: dobTimestamp,
             phone: phoneNumber.trim(),
         });
     };
@@ -73,15 +55,6 @@ export default function ProfilePage() {
         if (account) {
             setFirstName(account.firstName || "");
             setLastName(account.lastName || "");
-            if (account.dob) {
-                const date = new Date(account.dob.seconds * 1000);
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, "0");
-                const day = String(date.getDate()).padStart(2, "0");
-                setDob(`${year}-${month}-${day}`);
-            } else {
-                setDob("");
-            }
             setPhoneNumber(account.phone || "");
         }
     };
@@ -136,15 +109,6 @@ export default function ProfilePage() {
                                             </div>
                                         </div>
                                         <div className="flex gap-4">
-                                            <div className="flex-1">
-                                                <label className="block mb-1 text-sm text-text-1">Date of Birth</label>
-                                                <input
-                                                    type="date"
-                                                    value={dob}
-                                                    onChange={(e) => setDob(e.target.value)}
-                                                    className="w-full border border-gray-300 rounded-xs h-10 px-3"
-                                                />
-                                            </div>
                                             <div className="flex-1">
                                                 <label className="block mb-1 text-sm text-text-1">Phone Number</label>
                                                 <input

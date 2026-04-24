@@ -20,7 +20,6 @@ export default function SignUpInformation({
     const [last, setLast] = useState("");
     const [phone, setPhone] = useState("");
     const [phoneExtension, setPhoneExtension] = useState("");
-    const [dob, setDob] = useState("");
     const [pw, setPw] = useState("");
     const [pw2, setPw2] = useState("");
     const [loading, setLoading] = useState(false);
@@ -39,7 +38,7 @@ export default function SignUpInformation({
         setLoading(true);
         try {
 
-            await auth.signup(email, pw, first, last, phone, phoneExtension, dob, selectedRole);
+            await auth.signup(email, pw, first, last, phone, phoneExtension, selectedRole);
             onSuccess();
 
         } catch (e: unknown) {
@@ -111,14 +110,6 @@ export default function SignUpInformation({
                         />
                     </div>
                 </div>
-
-                <span className="text-sm">Date of Birth</span>
-                <input
-                    type="date"
-                    value={dob}
-                    onChange={(e) => setDob(e.target.value)}
-                    className="rounded-xs border-[#D9D9D9] py-1.5 px-3 text-sm border w-full mt-2 mb-6"
-                />
 
                 <span className="text-sm">
                     <span className="text-red-500">*</span> Email

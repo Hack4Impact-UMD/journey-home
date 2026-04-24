@@ -58,7 +58,7 @@ function AccountReqTableRow({
             </div>
             <div className="w-[20%] px-4 flex align-center gap-2.5">
                 <button
-                    className="font-family-roboto bg-primary rounded-xs px-2.5 text-white text-sm h-6 hover:shadow-sm"
+                    className="font-family-roboto bg-#E7F9E8 rounded-xs px-2.5 text-white text-sm h-6 hover:shadow-sm"
                     onClick={() => onAccept(user)}
                 >
                     Accept

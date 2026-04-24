@@ -24,9 +24,6 @@ export function UserTable({ users, onSelect }: UserTableProps) {
                     Email
                 </span>
                 <span className="w-[20%] border-l-2 border-light-border px-4">
-                    Date of Birth
-                </span>
-                <span className="w-[20%] border-l-2 border-light-border px-4">
                     Actions
                 </span>
             </div>
@@ -65,14 +62,6 @@ function UserTableRow({ user, onSelect }: { user: UserData, onSelect: () => void
                     {user.email}
                 </span>
             </div>
-            <span className="w-[20%] px-4">
-                {(user.dob) && user.dob.toDate().toLocaleDateString("en-US", {
-                    month: "2-digit",
-                    day: "2-digit",
-                    year: "numeric",
-                    timeZone: "UTC"
-                })}
-            </span>
             <div className="w-[20%] px-4 flex align-center">
                 <ViewIcon />
                 <TrashIcon />
