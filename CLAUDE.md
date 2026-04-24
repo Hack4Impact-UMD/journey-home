@@ -30,7 +30,7 @@ Next.js 16 (App Router, standalone) + Firebase (Auth, Firestore, Storage, Functi
 - **Public:** `/login`, `/signup`, `/donate` (4-step `DonorFormContext`), `/status/*`
 - **All roles:** `/`, `/inventory/warehouse`, `/profile`
 - **Admin:** `/donation-requests/{new,reviewed}`, `/user-management/{all-accounts,account-requests,past-donors}`, `/pickups-deliveries/{unscheduled,scheduled}`, `/control-panel/warehouse-history`, `/client-requests/admin`
-- **Case Manager:** `/client-requests/case-manager`, `/client-request-form` (full-screen, no nav)
+- **Case Manager:** `/client-requests/case-manager`, `/client-request-form` (full-screen, no nav). `/` redirects Case Managers to `/client-requests` via `useRouter().replace`.
 - **Admin + Case Manager:** `/client-requests` → redirects by role
 - Shortcut `permanentRedirect`s: `/inventory`, `/donation-requests`, `/user-management`, `/pickups-deliveries`, `/control-panel` → each default sub-page.
 
@@ -43,6 +43,6 @@ Copy `.env.example` → `.env`. Emulator vars pre-configured; `NEXT_PUBLIC_FIREB
 - **Loading/error states:** Inline with ternary inside the existing layout — never early-return duplicating `ProtectedRoute` + `SideNavbar`.
 - **Modals:** `createPortal(..., document.body)` + `overflow: hidden` on body. Structure: sticky header / `flex-1 overflow-y-auto` body / sticky footer. Both bars shadow inward: `shadow-[0_±2px_6px_rgba(0,0,0,0.08)]`.
 - **Components:** Don't extract single-use components — inline them.
-- **Sidebar links:** `SideNavbarLink` in `components/general/SideNav.tsx` — props: `name`, `path`, `roles` (empty = all), optional `icon`.
+- **Sidebar links:** `SideNavbarLink` in `components/general/SideNav.tsx` — props: `name`, `path`, `roles` (empty = all), optional `icon`. Active state uses exact match for `/`, `startsWith` otherwise. Icons from `@phosphor-icons/react` use `className="w-5 h-5"` (not the `size` prop); wrap in a local `() =>` component to satisfy `React.FC` type.
 - **Multi-select:** `DropdownMultiselect<T>` at `components/inventory/DropdownMultiselect.tsx` — reusable anywhere.
 - **Tailwind sizing:** No `px` in arbitrary values. Use scale classes (`w-96`) or `rem` (`w-[22.5rem]`).
