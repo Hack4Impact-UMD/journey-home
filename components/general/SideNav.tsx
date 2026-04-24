@@ -11,13 +11,17 @@ import { PickupDeliveryIcon } from "../icons/PickupDeliveryIcon";
 import { UserManagementIcon } from "../icons/UserManagementIcon";
 import { ControlPanelIcon } from "../icons/ControlPanelIcon";
 import { ViewIcon } from "../icons/ViewIcon";
+import { HandHeartIcon, HouseIcon } from "@phosphor-icons/react";
+
+const CreateRequestIcon = () => <HandHeartIcon className="w-5 h-5" />;
+const HomeIcon = () => <HouseIcon className="w-5 h-5" />;
 
 export default function SideNavbar() {
     const auth = useAuth();
 
     return (
         <div className="h-full w-[13em] flex flex-col font-family-roboto max-md:hidden">
-            <Link href="/" className="pb-4">
+            <Link href="/">
                 <div className="border border-[#EFF3F5] px-4 py-3">
                     <span className="text-primary font-family-raleway font-semibold text-xl">
                         Journey
@@ -27,7 +31,14 @@ export default function SideNavbar() {
                     </span>
                 </div>
             </Link>
-            <div className="px-4 h-full w-full flex flex-col">
+            <div className="px-4 py-2 h-full w-full flex flex-col">
+                <SideNavbarLink
+                    icon={HomeIcon}
+                    name="Home"
+                    path="/"
+                    roles={[]}
+                />
+
                 <SideNavbarLink
                     icon={InventoryIcon}
                     name="Inventory"
@@ -46,7 +57,7 @@ export default function SideNavbar() {
                     icon={ClientRequestIcon}
                     name="Client Requests"
                     path="/client-requests"
-                    roles={["Admin", "Case Manager"]}
+                    roles={["Admin"]}
                 />
 
                 <SideNavbarLink
@@ -71,9 +82,16 @@ export default function SideNavbar() {
                 />
 
                 <SideNavbarLink
+                    icon={CreateRequestIcon}
+                    name="Create Request"
+                    path="/client-request-form"
+                    roles={["Case Manager"]}
+                />
+
+                <SideNavbarLink
                     name="Donation Form"
                     path="/donate"
-                    roles={[]}
+                    roles={["Admin"]}
                 />
 
                 <div className="mt-auto w-full mb-4">
@@ -125,11 +143,13 @@ function SideNavbarLink({
     return (
         <Link
             href={path}
-            className={`hover:text-primary pb-4 text-sm flex items-center gap-2 ${
-                pathname?.startsWith(path) ? "text-primary font-semibold" : ""
+            className={`hover:text-primary px-2 h-10 text-sm flex items-center gap-2 rounded-[0.625rem] ${
+                (path === "/" ? pathname === path : pathname?.startsWith(path)) ? "bg-[#F2FBFD] text-[#125C6D] font-semibold" : ""
             }`}
         >
-            <Icon />
+            <span className="w-5 h-5 flex items-center justify-center shrink-0">
+                <Icon />
+            </span>
             {name}
         </Link>
     );

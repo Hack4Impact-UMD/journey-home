@@ -32,6 +32,10 @@ export default function Step1ClientInfo() {
             newErrors.phoneNumber = "Client Phone number is required";
         else if (!/^\d{3}-\d{3}-\d{4}$/.test(client.phoneNumber))
             newErrors.phoneNumber = "Enter a valid 10-digit phone number (e.g. 555-867-5309)";
+        if (!client.email)
+            newErrors.email = "Client email is required";
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(client.email))
+            newErrors.email = "Enter a valid email address";
 
         if (
             client.questions.adultsInFamily === undefined ||
@@ -262,6 +266,38 @@ export default function Step1ClientInfo() {
                             )}
 
                             <FormInput
+                                id="email"
+                                label="Client Email"
+                                required
+                                type="email"
+                                value={
+                                    formState.clientInfoAndNewHome.email ?? ""
+                                }
+                                onChange={(e) => {
+                                    updateClientInfo({ email: e.target.value });
+                                    clearError("email");
+                                }}
+                            />
+                            {errors.email && (
+                                <p className="text-red-500 text-sm">
+                                    {errors.email}
+                                </p>
+                            )}
+
+                            <FormInput
+                                label="Secondary Contact Name"
+                                value={
+                                    formState.clientInfoAndNewHome
+                                        .secondaryContact?.name ?? ""
+                                }
+                                onChange={(e) =>
+                                    updateSecondaryContact({
+                                        name: e.target.value,
+                                    })
+                                }
+                            />
+
+                            <FormInput
                                 id="secondaryContactPhone"
                                 label="Secondary Contact Phone Number"
                                 type="tel"
@@ -292,19 +328,6 @@ export default function Step1ClientInfo() {
                                     {errors.secondaryContactPhone}
                                 </p>
                             )}
-
-                            <FormInput
-                                label="Secondary Contact Name"
-                                value={
-                                    formState.clientInfoAndNewHome
-                                        .secondaryContact?.name ?? ""
-                                }
-                                onChange={(e) =>
-                                    updateSecondaryContact({
-                                        name: e.target.value,
-                                    })
-                                }
-                            />
 
                             <FormInput
                                 label="Secondary Contact Relationship to Client"
