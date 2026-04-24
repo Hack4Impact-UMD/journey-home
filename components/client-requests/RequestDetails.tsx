@@ -6,102 +6,104 @@ type ClientProps = {
   userRole: string;
 };
 
-export function RequestDetailsPage({client, userRole} : ClientProps) {
+export function RequestDetailsPage({ client, userRole }: ClientProps) {
     const { allAccounts } = useAllActiveAccounts();
 
     const caseManager = allAccounts.find(
-        (user: { uid: string; }) => user.uid === client.caseManagerID
+        (user: { uid: string }) => user.uid === client.caseManagerID
     );
+
+    const { questions, secondaryContact, address } = client.client;
+
     return (
-        <div className="flex flex-col divide-y divide-gray-400 border-2 w-full">
-            <div>
-                {userRole === "Admin" && (
-                    <div>
-                        <div className="border-b border-gray-400 text-[#02AFC7] bg-[#FAFAFB] font-bold p-[.75em]"> Case Manager</div>
-                        <div className="flex flex-row">
-                            <div className="w-1/2 divide-y divide-x divide-gray-400 bg-[#FAFAFB]">
-                                <div className="p-[.75em] font-bold">Name</div>
-                                <div className="p-[.75em] font-bold">Email</div>
-                                <div className="p-[.75em] font-bold" >Phone Number</div>
-                                <div className="border-r border-gray-400 p-[.75em] font-bold">Program</div>
-                            </div>
-                            <div className="w-3/4 divide-y divide-gray-400 bg-white">
-                                <div className="p-[.75em] ">  {caseManager ? `${caseManager.firstName} ${caseManager.lastName}` : "Loading..."}</div>
-                                <div className="p-[.75em] ">{caseManager?.email ?? "Loading..."} </div>
-                                <div className="p-[.75em] ">{caseManager?.phone ?? "—"}</div>
-                                <div className="p-[.75em]">—</div>
-                            </div>
+        <div className="flex flex-col w-full border-x border-b border-light-border">
+            {userRole === "Admin" && (
+                <div>
+                    <div className="relative font-bold text-primary py-3 pl-4 bg-[#FAFAFB] border-t border-b border-light-border before:content-[''] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-3.5 before:w-px before:bg-light-border after:content-[''] after:absolute after:right-0 after:top-1/2 after:-translate-y-1/2 after:h-3.5 after:w-px after:bg-light-border">
+                        Case Manager
+                    </div>
+                    <div className="grid grid-cols-2">
+                        <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Name</div>
+                        <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">
+                            {caseManager ? `${caseManager.firstName} ${caseManager.lastName}` : "Loading..."}
                         </div>
-                    </div>
-                    
-                    
-                )}
-            </div>
-            <div className="border-b border-gray-400 text-[#02AFC7] font-bold p-[.75em] bg-[#FAFAFB]">Client</div>
-                <div className="divide-x divide-gray-400">
-                <div className="flex flex-row">
-                    <div className="w-1/2 divide-y divide-x divide-gray-400 bg-[#FAFAFB]">
-                        <div className="p-[.75em] font-bold">Name</div>
-                        <div className="p-[.75em] font-bold">Email</div>
-                        <div className="p-[.75em] font-bold">HMIS number</div>
-                        <div className="p-[.75em] font-bold">Client phone number</div >
-                        <div className="p-[.75em] font-bold">Secondary contact number</div>
-                        <div className="p-[.75em] font-bold">Name and relationship to secondary contact</div>
-                        <div className="p-[.75em] font-bold">Speaks/understands English?</div>
-                        <div className="p-[.75em] font-bold">Number of adults in the family</div>
-                        <div className="p-[.75em] font-bold">Number of kids in the family</div>
-                        <div className="p-[.75em] font-bold">Veteran Status</div>
-                        <div className="p-[.75em] font-bold">Pick up items at the warehouse?</div>
-                        <div className="p-[.75em] font-bold">Chronic before housing?</div>
-                        <div className="p-[.75em] font-bold">Moved in?</div>
-                        <div className="border-r border-gray-400 p-[.75em] font-bold">Moved in date</div>
-                    </div>
-                    <div className="w-3/4 divide-y divide-gray-400 bg-white">
-                        <div className="p-[.75em]">{client.client.firstName} {client.client.lastName}</div>
-                        <div className="p-[.75em]">{client.client.email} </div>
-                        <div className="p-[.75em]">{client.client.hmis}</div>
-                        <div className="p-[.75em]"> {client.client.phoneNumber}</div>
-                        <div className="p-[.75em]">{client.client.secondaryContact.phone}</div>
-                        <div className="p-[.75em]">{client.client.secondaryContact.name} - {client.client.secondaryContact.relationship}</div>
-                        <div className="p-[.75em]">{client.client.questions.clientSpeaksEnglish ? "Yes" : "No"}</div>
-                        <div className="p-[.75em]">{client.client.questions.adultsInFamily}</div>
-                        <div className="p-[.75em]">{client.client.questions.childrenInFamily}</div>
-                        <div className="p-[.75em]">{client.client.questions.isVeteran ? "Yes" : "No"}</div>
-                        <div className="p-[.75em]">{client.client.questions.canPickUp ? "Yes" : "No"}</div>
-                        <div className="p-[.75em]">{client.client.questions.wasChronic ? "Yes" : "No"}</div>
-                        <div className="p-[.75em]">{client.client.questions.hasMovedIn ? "Yes" : "No"}</div>
-                        <div className="p-[.75em]">{client.client.questions.moveInDate? client.client.questions.moveInDate.toDate().toLocaleDateString(): "N/A"}</div>
+                        <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Email</div>
+                        <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{caseManager?.email ?? "Loading..."}</div>
+                        <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Phone Number</div>
+                        <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{caseManager?.phone ?? "—"}</div>
+                        <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Program</div>
+                        <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{client.client.programName || "—"}</div>
                     </div>
                 </div>
-            </div>
-            <div className="divide-y divide-gray-400" >
-                <div className="border-b border-gray-400 text-[#02AFC7] font-bold p-2 bg-[#FAFAFB]">Client&apos;s New Home</div>
-                <div className="flex flex-row">
-                    <div className="w-1/2 divide-y divide-x divide-gray-400 bg-[#FAFAFB]"> 
-                        <div className="p-[.75em] font-bold">Address</div>
-                        <div className="p-[.75em] font-bold">Apt, unit, etc.</div>
-                        <div className="border-r border-gray-400 p-2 font-bold">Working elevator?</div>
-                    </div> 
-                    <div className="w-3/4 divide-y divide-gray-400 bg-white">
-                        <div className="p-[.75em]">{client.client.address.streetAddress} {client.client.address.city} {client.client.address.state} {client.client.address.zipCode}</div>
-                        <div className="p-[.75em]">—</div>
-                        <div className="p-[.75em]">{client.client.questions.hasElevator ? "Yes" : "No"}</div>
-                    </div>
-                 </div>
+            )}
 
-    
-            </div>
             <div>
-                <div className="border-b border-gray-400 text-[#02AFC7] font-bold p-1 bg-[#FAFAFB]">Furniture Requests</div>
-                <div className="flex flex-col flex-wrap max-h-48 overflow-y-auto w-full bg-white">
+                <div className="relative font-bold text-primary py-3 pl-4 bg-[#FAFAFB] border-t border-b border-light-border before:content-[''] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-3.5 before:w-px before:bg-light-border after:content-[''] after:absolute after:right-0 after:top-1/2 after:-translate-y-1/2 after:h-3.5 after:w-px after:bg-light-border">
+                    Client
+                </div>
+                <div className="grid grid-cols-2">
+                    <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">HMIS number</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{client.client.hmis}</div>
+                    <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Client phone number</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{client.client.phoneNumber}</div>
+                    <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Client email</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{client.client.email || "—"}</div>
+                    <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Secondary contact number</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{secondaryContact.phone}</div>
+                    <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Name and relationship to secondary contact</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{secondaryContact.name} - {secondaryContact.relationship}</div>
+                    <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Speaks/understands English?</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.clientSpeaksEnglish ? "Yes" : "No"}</div>
+                    <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Number of adults in the family</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.adultsInFamily ?? "—"}</div>
+                    <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Number of kids in the family</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.childrenInFamily ?? "—"}</div>
+                    <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Veteran status</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.isVeteran ?? "—"}</div>
+                    <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Pick up items at the warehouse?</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.canPickUp ? "Yes" : "No"}</div>
+                    <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Chronic before housing?</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.wasChronic ?? "—"}</div>
+                    <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Moved in status</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.hasMovedIn ? "Yes" : "No"}</div>
+                    <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Moved in date</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">
+                        {questions.moveInDate ? questions.moveInDate.toDate().toLocaleDateString() : "N/A"}
+                    </div>
+                    <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Notes</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.notes || "—"}</div>
+                </div>
+            </div>
+
+            <div>
+                <div className="relative font-bold text-primary py-3 pl-4 bg-[#FAFAFB] border-t border-b border-light-border before:content-[''] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-3.5 before:w-px before:bg-light-border after:content-[''] after:absolute after:right-0 after:top-1/2 after:-translate-y-1/2 after:h-3.5 after:w-px after:bg-light-border">
+                    Client&apos;s New Home
+                </div>
+                <div className="grid grid-cols-2">
+                    <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Address</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">
+                        {address.streetAddress}, {address.city}, {address.state} {address.zipCode}
+                    </div>
+                    <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Apt, unit, etc.</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{address.apt ?? "—"}</div>
+                    <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Working elevator?</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.hasElevator ? "Yes" : "No"}</div>
+                </div>
+            </div>
+
+            <div>
+                <div className="relative font-bold text-primary py-3 pl-4 bg-[#FAFAFB] border-t border-b border-light-border before:content-[''] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-3.5 before:w-px before:bg-light-border after:content-[''] after:absolute after:right-0 after:top-1/2 after:-translate-y-1/2 after:h-3.5 after:w-px after:bg-light-border">
+                    Furniture Requests
+                </div>
+                <div className="grid grid-cols-[repeat(auto-fit,minmax(11rem,1fr))] gap-x-40 gap-y-2 px-10 py-5 border-b border-light-border">
                     {client.items.map((item) => (
-                        <div key={item.name} className="w-1/3 flex flex-row border-gray-300 p-1">
-                            <div className="w-3/4 font-bold">{item.name}</div>
-                            <div>{item.quantity}</div>
+                        <div key={item.name} className="flex justify-between">
+                            <span className="font-semibold">{item.name}</span>
+                            <span>{item.quantity}</span>
                         </div>
                     ))}
                 </div>
             </div>
         </div>
-    )
+    );
 }

@@ -9,7 +9,6 @@ import { SortOption } from "@/components/inventory/SortOption";
 import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
 import { CaseMCRTable } from "@/components/client-requests/CaseMCRTable";
 import { useAuth } from "@/contexts/AuthContext";
-import Link from "next/link";
 import { ReviewStatus } from "@/types/general";
 
 export default function ClientRequestsCaseManagerPage() {
@@ -31,19 +30,17 @@ export default function ClientRequestsCaseManagerPage() {
         <ProtectedRoute allow={["Case Manager"]}>
             <div className="flex flex-col flex-1 min-h-0">
                 {selectedCR ? (
-                    <div>
-                        <div className="flex items-center justify-between mb-4">
-                            <span className="text-lg font-semibold text-text-1">
-                                {selectedCR.client.firstName} {selectedCR.client.lastName}
-                            </span>
-                            <button
-                                className="w-16 h-8 text-white bg-primary rounded-xs text-sm mb-4"
-                                onClick={() => setSelectedCRId(null)}
-                            >
-                                Back
-                            </button>
-                        </div>
-                        <div className="h-90 overflow-auto overflow-x-hidden">
+                    <div className="flex flex-col flex-1 min-h-0">
+                        <button
+                            className="w-16 h-8 text-white bg-primary rounded-xs text-sm self-start mb-[1.125rem]"
+                            onClick={() => setSelectedCRId(null)}
+                        >
+                            Back
+                        </button>
+                        <span className="text-lg font-semibold text-text-1 mb-3">
+                            {selectedCR.client.firstName} {selectedCR.client.lastName}
+                        </span>
+                        <div className="flex-1 overflow-auto min-h-0">
                             <RequestDetailsPage
                                 client={selectedCR}
                                 userRole="CaseManager"
@@ -105,14 +102,6 @@ export default function ClientRequestsCaseManagerPage() {
                         />
                     </>
                 )}
-                <div className="mt-4">
-                    <Link
-                        href="/client-request-form"
-                        className="bg-primary text-white text-sm px-4 py-2 rounded-xs"
-                    >
-                        Create Request
-                    </Link>
-                </div>
             </div>
         </ProtectedRoute>
     );
