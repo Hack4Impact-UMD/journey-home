@@ -3,8 +3,8 @@
 import { createDonationRequest } from "@/lib/services/donations";
 import { setInventoryCategory, uploadImage } from "@/lib/services/inventory";
 import { DonationItem, DonationRequest } from "@/types/donations";
-import { InventoryCategory, InventoryPhoto } from "@/types/inventory";
-import { Timestamp } from "@firebase/firestore";
+import { InventoryCategory, InventoryChange, InventoryPhoto } from "@/types/inventory";
+import { query, Timestamp, where } from "@firebase/firestore";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { LocationContact } from "@/types/general";
@@ -14,6 +14,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { TimeBlock } from "@/types/schedule";
 import { collection, getDocs } from "firebase/firestore";
 import { toast, Toaster } from "sonner";
+
 
 const CASEREQUEST = "client-requests";
 const TIMEBLOCK = "timeblocks";
@@ -749,6 +750,59 @@ const DEFAULT_INVENTORY_CATEGORIES: Omit<InventoryCategory, "quantity">[] = [
     { id: crypto.randomUUID(), name: "End Tables",        lowThreshold: 5,  highThreshold: 10 },
 ];
 
+async function generateInventoryChanges(count: number): Promise<InventoryChange[]> {
+  const users = await getDocs(
+    query(collection(db, "users"), where("role", "in", ["Volunteer", "Admin"]))
+  );
+  const userIds = users.docs.map((doc) => doc.id);
+
+  if (userIds.length === 0) throw new Error("no volunteers");
+
+  const runningQty = Object.fromEntries(
+    DEFAULT_INVENTORY_CATEGORIES.map((cat) => [
+      cat.id,
+      Math.floor(Math.random() * (cat.highThreshold - cat.lowThreshold + 1)) + cat.lowThreshold,
+    ])
+  );
+
+  const now = Date.now();
+  const twoMonthsMs = 60 * 86_400_000;
+
+  // Generate and sort timestamps first
+  const timestamps = Array.from({ length: count }, () =>
+    now - Math.floor(Math.random() * twoMonthsMs)
+  ).sort((a, b) => a - b); // oldest first
+
+  return timestamps.map((ts): InventoryChange => {
+    const cat = DEFAULT_INVENTORY_CATEGORIES[Math.floor(Math.random() * DEFAULT_INVENTORY_CATEGORIES.length)];
+
+    const oldQuantity = runningQty[cat.id];
+    const delta = Math.floor(Math.random() * 9) - 3;
+    const newQuantity = Math.max(0, oldQuantity + delta);
+    const reverted = Math.random() < 0.2;
+    runningQty[cat.id] = reverted ? oldQuantity : newQuantity;
+
+    return {
+      id: crypto.randomUUID(),
+      userId: userIds[Math.floor(Math.random() * userIds.length)],
+      timestamp: Timestamp.fromMillis(ts),
+      change: { category: cat.name, oldQuantity, newQuantity },
+      reverted,
+    };
+  });
+}
+
+async function seedInventoryChanges(count: number) {
+  const changes = await generateInventoryChanges(count);
+
+  const writes = changes.map((change) =>
+    setDoc(doc(db, "warehouseHistory", change.id), change)
+  );
+
+  await Promise.all(writes);
+  console.log(`Seeded ${count} inventory changes`);
+}
+
 const desc = [
     "New: This item is brand new and has never been used. It comes in its original packaging and is ready for immediate use.",
     "Like New: The item is in excellent condition, almost indistinguishable from new. Only minor handling marks may be present.",
@@ -1219,6 +1273,7 @@ async function addCaseManagerRequests(count: number) {
                 ...baseClient,
 
                 hmis: randomHMIS(),
+                programName: "Seed Data Program",
 
                 secondaryContact: {
                     name: randomFrom(SEED_DONORS).firstName +
@@ -1237,9 +1292,9 @@ async function addCaseManagerRequests(count: number) {
                     clientSpeaksEnglish: Math.random() > 0.3,
                     adultsInFamily: Math.floor(Math.random() * 3) + 1,
                     childrenInFamily: Math.floor(Math.random() * 4),
-                    isVeteran: Math.random() > 0.8,
+                    isVeteran: randomFrom(["Yes", "No", "Unsure"] as const),
                     canPickUp: Math.random() > 0.5,
-                    wasChronic: Math.random() > 0.7,
+                    wasChronic: randomFrom(["Yes", "No", "Unsure"] as const),
                     hasMovedIn: Math.random() > 0.5,
                     moveInDate: Timestamp.fromDate(new Date()),
                     hasElevator: Math.random() > 0.5,
@@ -1328,6 +1383,7 @@ export default function page() {
                         for (let i = 0; i < 5; i++) await addDonationRequests(true);
                         for (let i = 0; i < 20; i++) await addDonationRequests(false);
                         await addCaseManagerRequests(7);
+                        await seedInventoryChanges(50);
                     })();
                     toast.promise(promise, {
                         loading: "Seeding all test data...",
@@ -1371,6 +1427,9 @@ export default function page() {
                 </button>
                 <button className={btnClass} onClick={() => addCaseManagerRequests(7)}>
                     Add client requests
+                </button>
+                <button className={btnClass} onClick={() => seedInventoryChanges(50)}>
+                    Add Warehouse Logs
                 </button>
             </div>
         </div>

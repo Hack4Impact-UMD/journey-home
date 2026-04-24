@@ -1,22 +1,28 @@
 "use client";
 
 import { ProtectedRoute } from "@/components/general/ProtectedRoute";
-import SideNavbar from "@/components/general/SideNav";
+import { useAuth } from "@/contexts/AuthContext";
+import AdminHomePage from "@/components/homepage/AdminHomePage";
+import VolunteerHomePage from "@/components/homepage/VolunteerHomePage";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function HomePage() {
+    const { state: authState } = useAuth();
+    const role = authState.userData?.role;
+    const router = useRouter();
+
+    useEffect(() => {
+        if (authState.loading || !authState.userData) return;
+        if (authState.userData.role === "Case Manager") {
+            router.replace("/client-requests");
+        }
+    }, [authState, router]);
 
     return (
         <ProtectedRoute allow={["Admin", "Case Manager", "Volunteer"]}>
-            <div className="h-full w-full flex flex-col font-family-roboto">
-                <div className="flex flex-1">
-                    <SideNavbar />
-                    <div className="flex-1  bg-[#F7F7F7] pt-8 pb-4 px-6 flex flex-col">
-                        <span className="text-2xl text-primary font-extrabold block">
-                            Journeying to the Home Page!
-                        </span>
-                    </div>
-                </div>
-            </div>
+            {role === "Admin" && <AdminHomePage />}
+            {role === "Volunteer" && <VolunteerHomePage />}
         </ProtectedRoute>
     );
 }

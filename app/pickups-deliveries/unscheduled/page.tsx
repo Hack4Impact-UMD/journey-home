@@ -29,7 +29,7 @@ export default function UnscheduledTasksPage() {
 
     const deliveryItems = useMemo(
         () => clientRequests.filter(
-            (cr) => cr.associatedTimeBlockID === null
+            (cr) => cr.associatedTimeBlockID === null && cr.status === "Approved"
         ),
         [clientRequests]
     );

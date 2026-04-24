@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Timestamp } from "firebase/firestore";
 import { TimeBlock } from "@/types/schedule";
-import ConfirmModal from "@/components/general/ConfirmModal";
+// import ConfirmModal from "@/components/general/ConfirmModal";
 import Button from "@/components/form/Button";
 import { useTimeBlocks } from "@/lib/queries/timeblocks";
 
@@ -276,13 +276,13 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
             </div>
 
             {/* confirm sign up */}
-            {selectedTB && action === "signup" && (
+            {/* {selectedTB && action === "signup" && (
                 <ConfirmModal
                     confirmLabel="Sign up"
                     onCancel={() => {
                         setSelectedTB(null);
                         setAction(null);
-                        setSelectedGroup(null); 
+                        setSelectedGroup(null);
                     }}
                     onConfirm={() => {
                         if (!selectedTB || !selectedGroup) return;
@@ -290,9 +290,9 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                         const targetGroup = selectedTB.volunteerGroups.find(
                             (group) => group.name === selectedGroup
                         );
-                        
+
                         if (!targetGroup) return;
-                        
+
                         // doesn't allow add if full
                         if (targetGroup.volunterIDs.length >= targetGroup.maxNum) return;
 
@@ -322,7 +322,7 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
 
                         setSelectedTB(null);
                         setAction(null);
-                        setSelectedGroup(null); 
+                        setSelectedGroup(null);
                     }}
                 >
                     <div className="mt-2 flex flex-col gap-4">
@@ -360,10 +360,10 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                         </p>
                     </div>
                 </ConfirmModal>
-            )}
+            )} */}
 
             {/* drop modal */}
-            {selectedTB && action === "drop" && (
+            {/* {selectedTB && action === "drop" && (
                 <ConfirmModal
                     confirmLabel="Drop shift"
                     onCancel={() => {
@@ -392,7 +392,7 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                 >
                     <p>Are you sure you want to drop this shift?</p>
                 </ConfirmModal>
-            )}
+            )} */}
         </div>
     );
 }
