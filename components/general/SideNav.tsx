@@ -100,7 +100,7 @@ export default function SideNavbar({ pageTitle }: { pageTitle?: string }) {
     return (
         <>
             {/* Desktop sidebar */}
-            <div className="h-full w-[13em] flex flex-col font-family-roboto max-md:hidden">
+            <div className="h-full w-[13em] shrink-0 flex flex-col font-family-roboto max-md:hidden">
                 <Link href="/">
                     <div className="border border-[#EFF3F5] px-4 py-3">
                         <span className="text-primary font-family-raleway font-semibold text-xl">
