@@ -262,6 +262,19 @@ export default function Step1ClientInfo() {
                             )}
 
                             <FormInput
+                                label="Secondary Contact Name"
+                                value={
+                                    formState.clientInfoAndNewHome
+                                        .secondaryContact?.name ?? ""
+                                }
+                                onChange={(e) =>
+                                    updateSecondaryContact({
+                                        name: e.target.value,
+                                    })
+                                }
+                            />
+
+                            <FormInput
                                 id="secondaryContactPhone"
                                 label="Secondary Contact Phone Number"
                                 type="tel"
@@ -292,19 +305,6 @@ export default function Step1ClientInfo() {
                                     {errors.secondaryContactPhone}
                                 </p>
                             )}
-
-                            <FormInput
-                                label="Secondary Contact Name"
-                                value={
-                                    formState.clientInfoAndNewHome
-                                        .secondaryContact?.name ?? ""
-                                }
-                                onChange={(e) =>
-                                    updateSecondaryContact({
-                                        name: e.target.value,
-                                    })
-                                }
-                            />
 
                             <FormInput
                                 label="Secondary Contact Relationship to Client"
