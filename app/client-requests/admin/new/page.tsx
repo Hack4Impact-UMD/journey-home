@@ -5,12 +5,17 @@ import { SearchBox } from "@/components/inventory/SearchBox";
 import { SortOption } from "@/components/inventory/SortOption";
 import { AdminCRTable } from "@/components/client-requests/AdminCRTable";
 import { RequestDetailsPage } from "@/components/client-requests/RequestDetails";
+import { ConfirmModal } from "@/components/general/ConfirmModal";
+import { DebounceTextbox } from "@/components/general/DebounceTextbox";
 import { useClientRequests } from "@/lib/queries/client-requests";
+import { useAllActiveAccounts } from "@/lib/queries/users";
 import { useState } from "react";
 import { ReviewStatus } from "@/types/general";
 
 export default function ClientRequestsAdminPage() {
-    const { clientRequests, refetch: refetchClientRequests, setClientRequestToast } = useClientRequests();
+    const { clientRequests, refetch: refetchClientRequests, setClientRequest, setClientRequestToast } = useClientRequests();
+    const { allAccounts } = useAllActiveAccounts();
+    const userById = new Map(allAccounts.map((u) => [u.uid, u]));
 
     const [selectedCRId, setSelectedCRId] = useState<string | null>(null);
     const selectedCR = clientRequests.find((cr) => cr.id === selectedCRId) ?? null;
@@ -18,12 +23,15 @@ export default function ClientRequestsAdminPage() {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [sortBy, setSortBy] = useState<"asc" | "desc" | "none">("desc");
 
-    const handleUpdateStatus = async (status: ReviewStatus) => {
-        if (!selectedCR) return;
-        await setClientRequestToast({
-            ...selectedCR,
-            status: status,
-        });
+    const [editSinceLabel, setEditSinceLabel] = useState<string | null>("Saved");
+    const [pendingAction, setPendingAction] = useState<{ status: "Approved" | "Denied" } | null>(null);
+    const pendingCaseManager = selectedCR ? (userById.get(selectedCR.caseManagerID) ?? null) : null;
+
+    const handleConfirm = async () => {
+        if (!pendingAction || !selectedCR) return;
+        await setClientRequestToast({ ...selectedCR, status: pendingAction.status });
+        setPendingAction(null);
+        setSelectedCRId(null);
     };
 
     return (
@@ -45,20 +53,42 @@ export default function ClientRequestsAdminPage() {
                             userRole="Admin"
                         />
                     </div>
-                    <div className="flex gap-2 mt-8 justify-end">
+                    <div className="mt-6">
+                        <span className="font-bold text-text-1">Admin Notes</span>
+                        <div className="h-20 w-full mt-2">
+                            <DebounceTextbox
+                                key={selectedCR.id}
+                                initialValue={selectedCR.notes}
+                                debounceMs={1500}
+                                onUpdate={(value) => setClientRequest({ ...selectedCR, notes: value })}
+                                setEditSince={setEditSinceLabel}
+                                placeholder="Add notes..."
+                            />
+                        </div>
+                        <span className="text-xs text-[#7D7D7D] mt-2 block h-3.5">{editSinceLabel}</span>
+                    </div>
+                    <div className="flex gap-2 justify-end">
                         <button
                             className="text-sm bg-primary rounded-xs h-8 px-4 text-white"
-                            onClick={() => handleUpdateStatus("Approved")}
+                            onClick={() => setPendingAction({ status: "Approved" })}
                         >
                             Approve
                         </button>
                         <button
                             className="text-sm rounded-xs h-8 px-4 border border-light-border"
-                            onClick={() => handleUpdateStatus("Denied")}
+                            onClick={() => setPendingAction({ status: "Denied" })}
                         >
                             Deny
                         </button>
                     </div>
+                    {pendingAction && (
+                        <ConfirmModal
+                            title={pendingAction.status === "Approved" ? "Approve request?" : "Deny request?"}
+                            message={`${pendingAction.status === "Approved" ? "Approve" : "Deny"} ${selectedCR.client.firstName} ${selectedCR.client.lastName}'s request submitted by ${pendingCaseManager ? `${pendingCaseManager.firstName} ${pendingCaseManager.lastName}` : "this case manager"}?`}
+                            onConfirm={handleConfirm}
+                            onCancel={() => setPendingAction(null)}
+                        />
+                    )}
                 </div>
             ) : (
                 <div>
@@ -80,9 +110,17 @@ export default function ClientRequestsAdminPage() {
                         clientRequests={clientRequests
                             .filter((request) => {
                                 if (request.status !== "Not Reviewed") return false;
-                                const clientFullName =
-                                    `${request.client.firstName} ${request.client.lastName}`.toLowerCase();
-                                return clientFullName.includes(searchQuery.toLowerCase());
+                                const norm = (s: string) => s.toLowerCase().replace(/\s/g, "");
+                                const q = norm(searchQuery);
+                                if (!q) return true;
+                                const cm = userById.get(request.caseManagerID);
+                                return [
+                                    `${request.client.firstName}${request.client.lastName}`,
+                                    request.client.email,
+                                    request.client.phoneNumber,
+                                    cm ? `${cm.firstName}${cm.lastName}` : "",
+                                    cm?.email ?? "",
+                                ].some((field) => norm(field).includes(q));
                             })
                             .sort((req1, req2) => {
                                 let diff;

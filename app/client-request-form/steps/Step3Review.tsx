@@ -100,7 +100,7 @@ export default function Step3Review() {
                 id: crypto.randomUUID(),
                 client,
                 caseManagerID: uid,
-                notes: client.questions.notes ?? "",
+                notes: "",
                 status: "Not Reviewed",
                 associatedTimeBlockID: null,
                 date: Timestamp.now(),
