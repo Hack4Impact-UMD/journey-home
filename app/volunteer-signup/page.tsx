@@ -5,6 +5,7 @@ import ShiftListView from "@/components/schedule/ShiftListView";
 import { useTimeBlocks } from "@/lib/queries/timeblocks";
 import { useAuth } from "@/contexts/AuthContext";
 import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
+import { SearchBox } from "@/components/inventory/SearchBox";
 import { Spinner } from "@/components/ui/spinner";
 
 export default function VolunteerSignupPage() {
@@ -18,6 +19,7 @@ export default function VolunteerSignupPage() {
     const { state } = useAuth();
     const user = state.currentUser;
 
+
     const [selectedTypes, setSelectedTypes] = useState<string[]>([
         "Warehouse",
         "Pickups / Deliveries",
@@ -27,6 +29,8 @@ export default function VolunteerSignupPage() {
         "Available",
         "Full",
     ]);
+
+    const [searchQuery, setSearchQuery] = useState("");
 
     const filteredTimeBlocks = timeBlocks.filter((tb) => {
         const type =
@@ -40,9 +44,18 @@ export default function VolunteerSignupPage() {
 
         const availability = isAvailable ? "Available" : "Full";
 
+        const q = searchQuery.toLowerCase();
+        const matchesSearch =
+            !q ||
+            tb.name.toLowerCase().includes(q) ||
+            tb.volunteerGroups.some((group) =>
+                group.name.toLowerCase().includes(q)
+            );
+
         return (
             selectedTypes.includes(type) &&
-            selectedAvailability.includes(availability)
+            selectedAvailability.includes(availability) &&
+            matchesSearch
         );
     });
 
@@ -62,17 +75,23 @@ export default function VolunteerSignupPage() {
 
     return (
         <>
-            <div className="flex flex-col">
-                <div className="flex gap-3 mt-2 mb-5 ml-4">
+            <div className="flex flex-col mb-6 px-6">
+                <div className="flex flex-wrap gap-3">
+                    <SearchBox
+                        value={searchQuery}
+                        onChange={setSearchQuery}
+                        onSubmit={() => {}}
+                    />
+
                     <DropdownMultiselect
-                        label="Shift type"
+                        label="Type"
                         options={["Warehouse", "Pickups / Deliveries"]}
                         selected={selectedTypes}
                         setSelected={setSelectedTypes}
                     />
 
                     <DropdownMultiselect
-                        label="Spots available"
+                        label="Availability"
                         options={["Available", "Full"]}
                         selected={selectedAvailability}
                         setSelected={setSelectedAvailability}
@@ -84,11 +103,8 @@ export default function VolunteerSignupPage() {
                         </div>
                     )}
                 </div>
-
-                <div className="border-b border-gray-200 w-full" />
             </div>
 
-            {/* content */}
             <div className="flex-1 overflow-auto min-h-0">
                 <ShiftListView
                     timeBlocks={filteredTimeBlocks}

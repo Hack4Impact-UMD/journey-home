@@ -9,7 +9,7 @@ type SearchBoxProps = {
 export function SearchBox({ value, onChange, onSubmit }: SearchBoxProps) {
     return (
         <>
-            <div className="border border-light-border rounded-xs flex shrink-0">
+            <div className="h-8 border border-light-border rounded-xs flex shrink-0">
                 <form
                     className="flex"
                     onSubmit={(e) => {
