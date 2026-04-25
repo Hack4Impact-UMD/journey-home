@@ -20,7 +20,7 @@ const formatTime = (d: Date) => { const h = d.getHours(); return `${h % 12 || 12
 
 export default function VolunteerTasks() {
     const { state: { currentUser } } = useAuth();
-    const { allTB, setTimeblock } = useTimeBlocks();
+    const { allTB } = useTimeBlocks();
 
     const [screen, setScreen] = useState<"signup" | "shiftoverview" | "modify" | "summary">("signup");
     const [selectedShift, setSelectedShift] = useState<TimeBlock | null>(null);
@@ -83,9 +83,11 @@ export default function VolunteerTasks() {
             {screen === "signup" && (
                 <div className="flex flex-col gap-4 pt-4 flex-1 min-h-0 overflow-y-auto">
                     {userTimeBlocks.map((tb) => {
-                        const isActive = tb.startTime.toMillis() <= now && now <= tb.endTime.toMillis();
-                        const totalFilled = tb.volunteerGroups.reduce((sum, g) => sum + g.volunterIDs.length, 0);
-                        const totalMax = tb.volunteerGroups.reduce((sum, g) => sum + g.maxNum, 0);
+                        const shiftDate = tb.startTime.toDate();
+                        const dayStart = new Date(shiftDate.getFullYear(), shiftDate.getMonth(), shiftDate.getDate()).getTime();
+                        const dayEnd = dayStart + 24 * 60 * 60 * 1000;
+                        const isActive = dayStart <= now && now < dayEnd;
+                        const userGroup = tb.volunteerGroups.find((g) => g.volunterIDs.includes(currentUser!.uid));
                         const start = tb.startTime.toDate();
                         const timeRange = `${formatTime(tb.startTime.toDate())}-${formatTime(tb.endTime.toDate())}`;
                         const dateLabel = `${start.toLocaleDateString("en-US", { month: "short" }).toUpperCase()}, ${start.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase()}`;
@@ -103,7 +105,7 @@ export default function VolunteerTasks() {
                                             </div>
                                             <div className="pl-10">
                                                 <p className="text-sm font-family-roboto">{tb.type === "Pickup/Delivery" ? "Pickups / deliveries" : "Warehouse"}</p>
-                                                <p className="text-sm font-family-roboto text-primary">{totalFilled}/{totalMax} volunteers</p>
+                                                <p className="text-sm font-family-roboto text-primary">Group: {userGroup?.name}</p>
                                             </div>
                                         </div>
                                         <div className="flex flex-col items-end justify-between">
@@ -125,28 +127,7 @@ export default function VolunteerTasks() {
                                             )}
                                         </div>
                                     </div>
-                                    {!isActive && (
-                                        <button
-                                            onClick={async () => {
-                                                const p = setTimeblock({
-                                                    ...tb,
-                                                    volunteerGroups: tb.volunteerGroups.map((g) => ({
-                                                        ...g,
-                                                        volunterIDs: g.volunterIDs.filter((id) => id !== currentUser!.uid),
-                                                    })),
-                                                });
-                                                toast.promise(p, {
-                                                    loading: "Dropping shift...",
-                                                    success: "Shift dropped",
-                                                    error: "Error: Couldn't drop shift",
-                                                });
-                                                await p;
-                                            }}
-                                            className="mt-3 mb-6 w-full h-8 bg-primary text-white rounded text-sm"
-                                        >
-                                            Drop shift
-                                        </button>
-                                    )}
+
                                 </div>
                                 <div className="border-b border-gray-200" />
                             </div>
@@ -277,7 +258,7 @@ export default function VolunteerTasks() {
                                     className="flex justify-between font-bold"
                                 >
                                     <span>{name}</span>
-                                    <span className="text-primary font-semibold">
+                                    <span className="text-text-1 font-semibold">
                                         {qty}
                                     </span>
                                 </div>
