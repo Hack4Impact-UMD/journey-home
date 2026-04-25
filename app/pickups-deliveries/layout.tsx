@@ -14,7 +14,7 @@ export default function PickupsDeliveriesLayout({ children }: { children: ReactN
             <div className="h-full w-full flex flex-col font-family-roboto overflow-hidden">
                 <div className="flex flex-1 min-h-0 max-md:flex-col">
                     <Navbar pageTitle="Pickups & Deliveries" />
-                    <div className="flex-1 min-h-0 bg-[#F7F7F7] pt-8 max-md:pt-1 pb-4 px-6 flex flex-col">
+                    <div className="flex-1 min-h-0 bg-[#F7F7F7] pt-8 max-md:pt-1 pb-4 px-6 flex flex-col max-md:bg-transparent max-md:p-0">
                         <span className="text-2xl text-primary font-extrabold block max-md:hidden">
                             Pickups and Deliveries
                         </span>
@@ -44,7 +44,7 @@ export default function PickupsDeliveriesLayout({ children }: { children: ReactN
                                 Scheduled
                             </Link>
                         </div>
-                        <div className="bg-background rounded-xl my-2 flex-1 py-4 px-6 min-h-0 overflow-hidden flex flex-col">
+                        <div className="bg-background rounded-xl my-2 flex-1 py-4 px-6 min-h-0 overflow-hidden flex flex-col max-md:bg-transparent max-md:m-0 max-md:rounded-none">
                             { children }
                         </div>
                     </div>
