@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+
 :root {
 
   --background: #ffffff;
@@ -60,6 +61,13 @@
   --font-family-opensans: var(--font-opensans);
   --font-family-raleway: var(--font-raleway);
   --font-family-roboto: var(--font-roboto);
+
+  --animate-slide-up: slide-up 0.15s ease-out;
+
+  @keyframes slide-up {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
   
   /* shadcn theme variables */
   --color-foreground: var(--foreground);

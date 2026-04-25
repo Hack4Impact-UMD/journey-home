@@ -12,11 +12,13 @@ import { UserManagementIcon } from "../icons/UserManagementIcon";
 import { ControlPanelIcon } from "../icons/ControlPanelIcon";
 import { ViewIcon } from "../icons/ViewIcon";
 import { Menu } from "lucide-react";
-import { HandHeartIcon, HouseIcon, CalendarCheckIcon } from "@phosphor-icons/react";
+import { HandHeartIcon, HouseIcon, CalendarCheckIcon, PackageIcon } from "@phosphor-icons/react";
 
 const CreateRequestIcon = () => <HandHeartIcon className="w-5 h-5" />;
+const ShiftTasksIcon = () => <PackageIcon className="w-5 h-5" />;
 const HomeIcon = () => <HouseIcon className="w-5 h-5" />;
 const ShiftSignUpIcon = () => <CalendarCheckIcon className="w-5 h-5" />;
+
 
 export default function Navbar({ pageTitle }: { pageTitle?: string }) {
     const auth = useAuth();
@@ -92,6 +94,14 @@ export default function Navbar({ pageTitle }: { pageTitle?: string }) {
                 icon={ShiftSignUpIcon}
                 name="Shift Sign-Up"
                 path="/volunteer-signup"
+                roles={["Volunteer"]}
+                isMobile={isMobile}
+                onClick={() => setDrawerOpen(false)}
+            />
+            <NavbarLink
+                icon={ShiftTasksIcon}
+                name="Shift Tasks"
+                path="/volunteer-tasks"
                 roles={["Volunteer"]}
                 isMobile={isMobile}
                 onClick={() => setDrawerOpen(false)}
