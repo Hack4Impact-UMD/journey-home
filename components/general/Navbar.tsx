@@ -12,10 +12,11 @@ import { UserManagementIcon } from "../icons/UserManagementIcon";
 import { ControlPanelIcon } from "../icons/ControlPanelIcon";
 import { ViewIcon } from "../icons/ViewIcon";
 import { Menu } from "lucide-react";
-import { HandHeartIcon, HouseIcon } from "@phosphor-icons/react";
+import { HandHeartIcon, HouseIcon, CalendarCheckIcon } from "@phosphor-icons/react";
 
 const CreateRequestIcon = () => <HandHeartIcon className="w-5 h-5" />;
 const HomeIcon = () => <HouseIcon className="w-5 h-5" />;
+const ShiftSignUpIcon = () => <CalendarCheckIcon className="w-5 h-5" />;
 
 export default function Navbar({ pageTitle }: { pageTitle?: string }) {
     const auth = useAuth();
@@ -84,6 +85,14 @@ export default function Navbar({ pageTitle }: { pageTitle?: string }) {
                 name="Create Request"
                 path="/client-request-form"
                 roles={["Case Manager"]}
+                isMobile={isMobile}
+                onClick={() => setDrawerOpen(false)}
+            />
+            <NavbarLink
+                icon={ShiftSignUpIcon}
+                name="Shift Sign-Up"
+                path="/volunteer-signup"
+                roles={["Volunteer"]}
                 isMobile={isMobile}
                 onClick={() => setDrawerOpen(false)}
             />
