@@ -53,14 +53,14 @@ export default function VolunteerTasks() {
         }));
         setOpen(false);
     };
-    const handleConfirm = async () => {
-        if (!currentUser) return;
+    const handleConfirm = async (): Promise<boolean> => {
+        if (!currentUser) return false;
         if (summaryMode === "remove") {
             for (const [name, qty] of Object.entries(items)) {
                 const category = inventoryCategories.find((c) => c.name === name);
                 if (category && qty > category.quantity) {
                     toast.error(`Not enough ${name} in inventory (${category.quantity} available)`);
-                    return;
+                    return false;
                 }
             }
         }
@@ -75,6 +75,7 @@ export default function VolunteerTasks() {
                 highThreshold: category!.highThreshold,
             }, currentUser.uid));
         await Promise.all(writes);
+        return true;
     };
 
     return (
@@ -294,7 +295,7 @@ export default function VolunteerTasks() {
 
                         {Object.keys(items).length > 0 && (
                             <button
-                                onClick={async () => { await handleConfirm(); setItems({}); setScreen("shiftoverview"); }}
+                                onClick={async () => { if (await handleConfirm()) { setItems({}); setScreen("shiftoverview"); } }}
                                 className="mt-6 w-full bg-primary text-white rounded-md"
                             >
                                 Confirm
