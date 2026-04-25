@@ -17,7 +17,7 @@ type Props = {
 export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
     const [selectedTB, setSelectedTB] = useState<TimeBlock | null>(null);
     const [action, setAction] = useState<"signup" | "drop" | null>(null);
-    const { setTimeblockToast } = useTimeBlocks();
+    const { setTimeblockToast, signUpToast } = useTimeBlocks();
     const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
 
     const formatTime = (timestamp: Timestamp) => {
@@ -37,12 +37,20 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
     const formatTimeRange = (start: Timestamp, end: Timestamp) =>
         `${formatTime(start)}–${formatTime(end)}`;
 
-    const groupedByDate = timeBlocks.reduce((acc, tb) => {
+    const sortedBlocks = [...timeBlocks].sort(
+        (a, b) => a.startTime.toMillis() - b.startTime.toMillis()
+    );
+
+    const groupedByDate = sortedBlocks.reduce((acc, tb) => {
         const dateKey = tb.startTime.toDate().toDateString();
         if (!acc[dateKey]) acc[dateKey] = [];
         acc[dateKey].push(tb);
         return acc;
     }, {} as Record<string, TimeBlock[]>);
+
+    const sortedDateEntries = Object.entries(groupedByDate).sort(
+        ([a], [b]) => new Date(a).getTime() - new Date(b).getTime()
+    );
 
     return (
         <div className="w-full">
@@ -54,7 +62,7 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
             <>
             {/* mobile view */}
             <div className="block md:hidden border-t border-gray-200">
-                {Object.entries(groupedByDate).map(([dateKey, blocks]) => {
+                {sortedDateEntries.map(([dateKey, blocks]) => {
                     const date = new Date(dateKey);
 
                     return (
@@ -169,7 +177,7 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
             </div>
 
             <div className="hidden md:block w-full border-t border-gray-200">
-                {Object.entries(groupedByDate).map(([dateKey, blocks]) => {
+                {sortedDateEntries.map(([dateKey, blocks]) => {
                     const date = new Date(dateKey);
 
                     return (
@@ -293,29 +301,7 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                     onConfirm={() => {
                         if (!selectedTB || !selectedGroup) return;
 
-                        const targetGroup = selectedTB.volunteerGroups.find(
-                            (group) => group.name === selectedGroup
-                        );
-
-                        if (!targetGroup) return;
-                        if (targetGroup.volunterIDs.length >= targetGroup.maxNum) return;
-
-                        const updatedTB = {
-                            ...selectedTB,
-                            volunteerGroups: selectedTB.volunteerGroups.map((group) => {
-                                if (group.name === selectedGroup) {
-                                    return {
-                                        ...group,
-                                        volunterIDs: group.volunterIDs.includes(currentUserID)
-                                            ? group.volunterIDs
-                                            : [...group.volunterIDs, currentUserID],
-                                    };
-                                }
-                                return group;
-                            }),
-                        };
-
-                        setTimeblockToast(updatedTB);
+                        signUpToast(selectedTB.id, selectedGroup, currentUserID);
 
                         setSelectedTB(null);
                         setAction(null);

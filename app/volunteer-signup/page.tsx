@@ -14,6 +14,7 @@ export default function VolunteerSignupPage() {
         isLoading,
         isError,
         error,
+        refetch,
     } = useTimeBlocks();
 
     const { state } = useAuth();
@@ -32,7 +33,12 @@ export default function VolunteerSignupPage() {
 
     const [searchQuery, setSearchQuery] = useState("");
 
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
     const filteredTimeBlocks = timeBlocks.filter((tb) => {
+        if (tb.startTime.toDate() < todayStart) return false;
+
         const type =
             tb.type === "Pickup/Delivery"
                 ? "Pickups / Deliveries"
@@ -80,7 +86,7 @@ export default function VolunteerSignupPage() {
                     <SearchBox
                         value={searchQuery}
                         onChange={setSearchQuery}
-                        onSubmit={() => {}}
+                        onSubmit={() => refetch()}
                     />
 
                     <DropdownMultiselect
