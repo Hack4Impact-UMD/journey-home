@@ -1,29 +1,51 @@
 "use client";
 
-import { useState} from "react";
-import CheckInOutFlow from "@/components/volunteer-tasks/CheckInOutFlow";
-import AddButton from "@/components/volunteer-tasks/AddButton";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
+
+import ItemSearch from "@/components/volunteer-tasks/ItemSearch";
 
 import { useInventoryCategories } from "@/lib/queries/inventory";
-import { CheckOutInventory } from "@/components/icons/CheckOutInventory";
+import { useTimeBlocks } from "@/lib/queries/timeblocks";
+import { toast } from "sonner";
+import { ManageInventory1 } from "@/components/icons/ManageInventory1";
+import { ManageInventory2 } from "@/components/icons/ManageInventory2";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { TimeBlock } from "@/types/schedule";
 
 type ItemMap = Record<string, number>;
 
+const formatTime = (d: Date) => { const h = d.getHours(); return `${h % 12 || 12}${h >= 12 ? "pm" : "am"}`; };
+
 export default function VolunteerTasks() {
     const { state: { currentUser } } = useAuth();
-    const [view] = useState<"Screen3">("Screen3");
-    const [screen, setScreen] = useState<"checkout" | "summary">("checkout");
+    const { allTB, setTimeblock } = useTimeBlocks();
+
+    const [screen, setScreen] = useState<"signup" | "shiftoverview" | "modify" | "summary">("signup");
+    const [selectedShift, setSelectedShift] = useState<TimeBlock | null>(null);
 
     const [items, setItems] = useState<ItemMap>({});
+    const [summaryMode, setSummaryMode] = useState<"add" | "remove">("remove");
     const [open, setOpen] = useState(false);
+    const [notesOpen, setNotesOpen] = useState(true);
+
+    useEffect(() => {
+        document.body.style.overflow = open ? "hidden" : "";
+        return () => { document.body.style.overflow = ""; };
+    }, [open]);
 
     const {
         inventoryCategories,
+        isLoading,
+        isError,
         setInventoryCategoryWithToast,
     } = useInventoryCategories();
 
-
+    const now = Date.now();
+    const userTimeBlocks = allTB
+        .filter((tb) => tb.volunteerGroups.some((g) => g.volunterIDs.includes(currentUser!.uid)))
+        .sort((a, b) => a.startTime.toMillis() - b.startTime.toMillis());
     const handleAddItem = (item: { name: string; qty: number }) => {
         setItems((prev) => ({
             ...prev,
@@ -33,132 +55,253 @@ export default function VolunteerTasks() {
     };
     const handleConfirm = async () => {
         if (!currentUser) return;
-        for (const [name, qty] of Object.entries(items)) {
-            const category = inventoryCategories.find((c) => c.name === name);
-            if (!category) continue;
-            await setInventoryCategoryWithToast({
-                id: category.id,
-                name: category.name,
-                quantity: category.quantity - qty,
-                lowThreshold: category.lowThreshold,
-                highThreshold: category.highThreshold,
-            }, currentUser.uid);
+        if (summaryMode === "remove") {
+            for (const [name, qty] of Object.entries(items)) {
+                const category = inventoryCategories.find((c) => c.name === name);
+                if (category && qty > category.quantity) {
+                    toast.error(`Not enough ${name} in inventory (${category.quantity} available)`);
+                    return;
+                }
+            }
         }
+        const writes = Object.entries(items)
+            .map(([name, qty]) => ({ category: inventoryCategories.find((c) => c.name === name), qty }))
+            .filter(({ category }) => category != null)
+            .map(({ category, qty }) => setInventoryCategoryWithToast({
+                id: category!.id,
+                name: category!.name,
+                quantity: summaryMode === "remove" ? category!.quantity - qty : category!.quantity + qty,
+                lowThreshold: category!.lowThreshold,
+                highThreshold: category!.highThreshold,
+            }, currentUser.uid));
+        await Promise.all(writes);
     };
+
     return (
-        <div>
-            {view === "Screen3" && (
-                <div>
-                    {screen === "checkout" && (
-                        <>
-                            <div className="flex justify-center">
-                                <div className="flex flex-col items-center">
-                                    <h1 className="text-[#02AFC7] mb-[1em] font-bold">
-                                        Check out of warehouse
-                                    </h1>
-                                    <CheckOutInventory/>
-                                </div>
-                            </div>
-                            <p className="text-[#02AFC7] font-bold mt-4">Shift notes</p>
-                            <p>INSERT TIME BLOCK TEXT HERE!!!!</p>
-                            <p  className="text-[#02AFC7] font-bold mt-4">Check out of inventory</p>
+        <div className="h-full flex flex-col">
+            {screen === "signup" && (
+                <div className="flex flex-col gap-4 pt-4 flex-1 min-h-0 overflow-y-auto">
+                    {userTimeBlocks.map((tb) => {
+                        const isActive = tb.startTime.toMillis() <= now && now <= tb.endTime.toMillis();
+                        const totalFilled = tb.volunteerGroups.reduce((sum, g) => sum + g.volunterIDs.length, 0);
+                        const totalMax = tb.volunteerGroups.reduce((sum, g) => sum + g.maxNum, 0);
+                        const start = tb.startTime.toDate();
+                        const timeRange = `${formatTime(tb.startTime.toDate())}-${formatTime(tb.endTime.toDate())}`;
+                        const dateLabel = `${start.toLocaleDateString("en-US", { month: "short" }).toUpperCase()}, ${start.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase()}`;
 
-                             {Object.keys(items).length > 0 && (
-                                <div className="mt-4 space-y-2">
-                                    {Object.entries(items).map(([name, qty]) => (
-                                        <div
-                                            key={name}
-                                            className="flex justify-between "
-                                        >
-                                            <span className="font-bold">{name}</span>
-                                            <span>
-                                                {qty}
-                                            </span>
+                        return (
+                            <div key={tb.id} className="w-full">
+                                <div className="pb-4">
+                                    <div className="flex justify-between items-stretch">
+                                        <div className="flex flex-col gap-2">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center font-family-roboto font-semibold text-sm shrink-0">
+                                                    {start.getDate()}
+                                                </div>
+                                                <p className="font-family-roboto font-semibold text-sm text-[#6B7A99]">{dateLabel}</p>
+                                            </div>
+                                            <div className="pl-10">
+                                                <p className="text-sm font-family-roboto">{tb.type === "Pickup/Delivery" ? "Pickups / deliveries" : "Warehouse"}</p>
+                                                <p className="text-sm font-family-roboto text-primary">{totalFilled}/{totalMax} volunteers</p>
+                                            </div>
                                         </div>
-                                    ))}
+                                        <div className="flex flex-col items-end justify-between">
+                                            <div className="flex items-center gap-2 h-7">
+                                                <div className={`w-3 h-3 rounded-full ${tb.type === "Warehouse" ? "bg-yellow-400" : "bg-primary"}`} />
+                                                <span className="text-sm">{timeRange}</span>
+                                            </div>
+                                            {isActive ? (
+                                                <button
+                                                    onClick={() => { setSelectedShift(tb); setScreen("shiftoverview"); }}
+                                                    className="bg-primary text-white w-22.5 h-8 rounded text-sm"
+                                                >
+                                                    Open
+                                                </button>
+                                            ) : (
+                                                <button className="border border-primary text-primary w-22.5 h-8 rounded text-sm">
+                                                    Upcoming
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                    {!isActive && (
+                                        <button
+                                            onClick={async () => {
+                                                const p = setTimeblock({
+                                                    ...tb,
+                                                    volunteerGroups: tb.volunteerGroups.map((g) => ({
+                                                        ...g,
+                                                        volunterIDs: g.volunterIDs.filter((id) => id !== currentUser!.uid),
+                                                    })),
+                                                });
+                                                toast.promise(p, {
+                                                    loading: "Dropping shift...",
+                                                    success: "Shift dropped",
+                                                    error: "Error: Couldn't drop shift",
+                                                });
+                                                await p;
+                                            }}
+                                            className="mt-3 mb-6 w-full h-8 bg-primary text-white rounded text-sm"
+                                        >
+                                            Drop shift
+                                        </button>
+                                    )}
                                 </div>
-                            )}
-                            <AddButton onClick={() => setOpen(true)} />
-                            
-                            <div className="flex flex-row gap-[1em] h-[4em] justify-center mt-auto ">
-                                <button className="mt-6 w-full border border-gray">
-                                    Back
-                                </button>
-
-                                {Object.keys(items).length > 0 && (
-                                    <button
-                                        onClick={() => setScreen("summary")}
-                                        className="mt-6 w-full bg-[#02AFC7] text-white"
-                                    >
-                                        Next
-                                    </button>
-                                )}
+                                <div className="border-b border-gray-200" />
                             </div>
-                            {open && (
-                           
-                            <div className="fixed top-0 left-0 w-screen h-screen flex items-center justify-center">
-                                <div className="w-full max-w-md mx-auto">
-                                    <CheckInOutFlow
-                                        onClose={() => setOpen(false)}
-                                        onAddItem={handleAddItem}
-                                    />
-                                </div>
-                            </div>
-                        )}
-                        </>
+                        );
+                    })}
+                </div>
+            )}
+            {screen === "shiftoverview" && (
+                <div className="pt-8 flex flex-col h-full">
+                    <p className="font-family-roboto font-medium text-2xl text-primary text-center">Shift Notes</p>
+                    <div className="mt-4 flex flex-col gap-4">
+                        <button
+                            onClick={() => { setItems({}); setSummaryMode("add"); setScreen("modify"); }}
+                            className="w-full h-10 bg-primary text-white font-family-roboto rounded"
+                        >
+                            Add to inventory
+                        </button>
+                        <button
+                            onClick={() => { setItems({}); setSummaryMode("remove"); setScreen("modify"); }}
+                            className="w-full h-10 border border-gray-300 font-family-roboto rounded"
+                        >
+                            Remove from inventory
+                        </button>
+                    </div>
+                    {selectedShift?.notes && (
+                        <p className="mt-8 text-sm font-family-roboto">{selectedShift.notes}</p>
                     )}
+                    <div className="flex flex-row gap-4 h-16 justify-center mt-auto">
+                        <button
+                            onClick={() => setScreen("signup")}
+                            className="mt-6 w-full border border-gray rounded-md"
+                        >
+                            Back
+                        </button>
+                    </div>
+                </div>
+            )}
+            {screen === "modify" && (
+                <div className="flex flex-col flex-1 min-h-0 overflow-y-auto">
+                    <div className="flex justify-center pt-8">
+                        <div className="flex flex-col items-center">
+                            <h1 className="text-primary mb-4 font-bold text-2xl">
+                                {summaryMode === "remove" ? "Remove from inventory" : "Add to inventory"}
+                            </h1>
+                            <ManageInventory1 />
+                        </div>
+                    </div>
 
-                    {screen === "summary" && (
-                        <>
-                             <div className="flex justify-center">
-                                <div className="flex flex-col items-center">
-                                    <h1 className="text-[#02AFC7] mb-[1em] font-bold">
-                                        Summary
-                                    </h1>
-                                    <CheckOutInventory/>
-                                </div>
-                            </div>
+                    <button
+                        onClick={() => setNotesOpen((o) => !o)}
+                        className="flex items-center justify-between w-full mt-4"
+                    >
+                        <p className="text-primary font-bold">Shift notes</p>
+                        {notesOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    </button>
+                    {notesOpen && <p className="mt-3">{selectedShift?.notes}</p>}
+                    <p className="text-primary font-bold mt-4">{summaryMode === "remove" ? "Remove from inventory" : "Add to inventory"}</p>
 
-                            {Object.keys(items).length === 0 ? (
-                                <p className="text-gray-400">
-                                    No items selected
-                                </p>
-                            ) : (
-                                <div className="space-y-3">
-                                    {Object.entries(items).map(([name, qty]) => (
-                                        <div
-                                            key={name}
-                                            className="flex justify-between font-bold"
-                                        >
-                                            <span>{name}</span>
-                                            <span className="text-[#02AFC7] font-semibold">
-                                                {qty}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-
-                            <div className="flex flex-row gap-[1em] h-[4em] justify-center mt-auto ">
-                                <button 
-                                    onClick={() => setScreen("checkout")}
-                                    className="mt-6 w-full border border-gray"
+                    {Object.keys(items).length > 0 && (
+                        <div className="mt-4 space-y-2">
+                            {Object.entries(items).map(([name, qty]) => (
+                                <div
+                                    key={name}
+                                    className="flex justify-between "
                                 >
-                                    Back
-                                </button>
+                                    <span className="font-bold">{name}</span>
+                                    <span>
+                                        {qty}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    <button onClick={() => setOpen(true)} className="mt-4 bg-primary text-white w-24 h-8 rounded-md">
+                        Add
+                    </button>
 
-                                {Object.keys(items).length > 0 && (
-                                    <button
-                                        onClick={handleConfirm}
-                                        className="mt-6 w-full bg-[#02AFC7] text-white"
-                                    >
-                                        Confirm
-                                    </button>
-                                )}
-                            </div>
-                        </>
+                    <div className="flex flex-row gap-4 h-16 justify-center mt-auto ">
+                        <button
+                            onClick={() => setScreen("shiftoverview")}
+                            className="mt-6 w-full border border-gray rounded-md"
+                        >
+                            Back
+                        </button>
+
+                        {Object.keys(items).length > 0 && (
+                            <button
+                                onClick={() => setScreen("summary")}
+                                className="mt-6 w-full bg-primary text-white rounded-md"
+                            >
+                                Next
+                            </button>
+                        )}
+                    </div>
+                    {open && createPortal(
+                        <ItemSearch
+                            categories={inventoryCategories}
+                            isLoading={isLoading}
+                            isError={isError}
+                            onAdd={handleAddItem}
+                            onClose={() => setOpen(false)}
+                            mode={summaryMode}
+                        />,
+                        document.body
                     )}
                 </div>
+            )}
+
+            {screen === "summary" && (
+                <>
+                    <h1 className="text-primary mb-4 font-bold text-2xl text-center pt-8">Summary</h1>
+
+                    <div className="flex justify-center pb-4">
+                        <ManageInventory2 />
+                    </div>
+
+                    <p className="font-family-roboto font-medium text-base text-primary">{summaryMode === "remove" ? "Remove from inventory" : "Add to inventory"}</p>
+
+                    {Object.keys(items).length === 0 ? (
+                        <p className="text-gray-400 mt-4">
+                            No items selected
+                        </p>
+                    ) : (
+                        <div className="space-y-3 mt-4">
+                            {Object.entries(items).map(([name, qty]) => (
+                                <div
+                                    key={name}
+                                    className="flex justify-between font-bold"
+                                >
+                                    <span>{name}</span>
+                                    <span className="text-primary font-semibold">
+                                        {qty}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    <div className="flex flex-row gap-4 h-16 justify-center mt-auto ">
+                        <button
+                            onClick={() => setScreen("modify")}
+                            className="mt-6 w-full border border-gray rounded-md"
+                        >
+                            Back
+                        </button>
+
+                        {Object.keys(items).length > 0 && (
+                            <button
+                                onClick={async () => { await handleConfirm(); setItems({}); setScreen("shiftoverview"); }}
+                                className="mt-6 w-full bg-primary text-white rounded-md"
+                            >
+                                Confirm
+                            </button>
+                        )}
+                    </div>
+                </>
             )}
         </div>
     );
