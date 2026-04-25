@@ -3,7 +3,8 @@ import { DonationRequest } from "@/types/donations";
 function SectionHeader({ title }: { title: string }) {
     return (
         <div className="h-10 bg-[#FAFAFB] border-light-border border flex items-center font-bold text-sm text-primary shrink-0">
-            <span className="border-l-2 border-primary px-4">{title}</span>
+            <div className="w-0.5 h-3.5 bg-[#181D1F26]" />
+            <span className="px-4">{title}</span>
         </div>
     );
 }
@@ -19,7 +20,7 @@ function DetailRow({ label, value }: { label: string; value: string }) {
 
 export function DRDetails({ dr }: { dr: DonationRequest }) {
     return (
-        <div className="w-full min-w-4xl mt-6">
+        <div className="w-full min-w-4xl">
             <SectionHeader title="Contact" />
             <DetailRow
                 label="Name"

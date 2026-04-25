@@ -16,7 +16,7 @@ import { useState } from "react";
 function ListIcon({ active }: { active: boolean }) {
     return (
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
-            className={active ? "text-primary" : "text-gray-400"}>
+            className={active ? "text-primary" : "text-gray-300"}>
             <rect x="1" y="3" width="16" height="2" rx="1" fill="currentColor" />
             <rect x="1" y="8" width="16" height="2" rx="1" fill="currentColor" />
             <rect x="1" y="13" width="16" height="2" rx="1" fill="currentColor" />
@@ -27,7 +27,7 @@ function ListIcon({ active }: { active: boolean }) {
 function GridIcon({ active }: { active: boolean }) {
     return (
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
-            className={active ? "text-primary" : "text-gray-400"}>
+            className={active ? "text-primary" : "text-gray-300"}>
             <rect x="1" y="1" width="7" height="7" rx="1" fill="currentColor" />
             <rect x="10" y="1" width="7" height="7" rx="1" fill="currentColor" />
             <rect x="1" y="10" width="7" height="7" rx="1" fill="currentColor" />
@@ -131,7 +131,7 @@ export default function NewRequestsPage() {
                         }
                     }}
                 >
-                    <span className={itemSortBy === "Quantity" ? "font-semibold" : ""}>Qnt</span>
+                    <span>Qnt</span>
                     <SortIcon status={itemSortBy === "Quantity" ? (itemAscending ? "asc" : "desc") : "none"} />
                 </button>
                 <button
@@ -145,16 +145,15 @@ export default function NewRequestsPage() {
                         }
                     }}
                 >
-                    <span className={itemSortBy === "Date" ? "font-semibold" : ""}>Date</span>
+                    <span>Date</span>
                     <SortIcon status={itemSortBy === "Date" ? (itemAscending ? "asc" : "desc") : "none"} />
                 </button>
-
                 <div className="relative">
                     <button
                         className="border border-light-border rounded-xs flex justify-center items-center px-4 gap-1.5 h-8 text-sm"
                         onClick={() => setStatusDropdownOpen((o) => !o)}
                     >
-                        <span className={itemStatusFilter ? "font-semibold" : ""}>{itemStatusFilter ?? "Status"}</span>
+                        <span>{itemStatusFilter ?? "Status"}</span>
                         <ChevronDown />
                     </button>
                     {statusDropdownOpen && (
@@ -183,16 +182,15 @@ export default function NewRequestsPage() {
                         </div>
                     )}
                 </div>
-
                 <div className="ml-auto flex items-center gap-1">
                     <button
-                        className={`w-8 h-8 flex items-center justify-center border border-light-border ${viewMode === "list" ? "bg-[#FAFAFB] text-primary" : "bg-white text-gray-400"}`}
+                        className="w-8 h-8 flex items-center justify-center"
                         onClick={() => setViewMode("list")}
                     >
                         <ListIcon active={viewMode === "list"} />
                     </button>
                     <button
-                        className={`w-8 h-8 flex items-center justify-center border border-light-border ${viewMode === "gallery" ? "bg-[#FAFAFB] text-primary" : "bg-white text-gray-400"}`}
+                        className="w-8 h-8 flex items-center justify-center"
                         onClick={() => setViewMode("gallery")}
                     >
                         <GridIcon active={viewMode === "gallery"} />
@@ -200,19 +198,23 @@ export default function NewRequestsPage() {
                 </div>
             </div>
 
-            <div className="flex-1 overflow-auto min-h-0 mt-2">
-                {viewMode === "list" ? (
-                    <DRContentsTable
-                        request={{ ...selectedDR, items: filteredItems }}
-                        openItem={setSelectedItem}
-                    />
-                ) : (
-                    <DRContentsGallery
-                        request={{ ...selectedDR, items: filteredItems }}
-                        openItem={setSelectedItem}
-                    />
-                )}
-                <DRDetails dr={selectedDR} />
+            <div className="flex-1 overflow-auto min-h-0">
+                <div className="mt-[23px]">
+                    {viewMode === "list" ? (
+                        <DRContentsTable
+                            request={{ ...selectedDR, items: filteredItems }}
+                            openItem={setSelectedItem}
+                        />
+                    ) : (
+                        <DRContentsGallery
+                            request={{ ...selectedDR, items: filteredItems }}
+                            openItem={setSelectedItem}
+                        />
+                    )}
+                </div>
+                <div className="mt-[37px]">
+                    <DRDetails dr={selectedDR} />
+                </div>
             </div>
         </>
     ) : (

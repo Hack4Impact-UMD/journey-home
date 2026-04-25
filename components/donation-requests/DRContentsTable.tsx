@@ -11,31 +11,31 @@ export function DRContentsTable({
     openItem: (item: DonationItem) => void;
 }) {
     return (
-        <div className="w-full min-w-4xl h-full flex flex-col">
+        <div className="w-full min-w-4xl flex flex-col">
             <div className="h-12 bg-[#FAFAFB] border-light-border border flex items-center font-family-roboto font-bold text-sm text-text-1 shrink-0">
-                <span className="w-[25%] border-l-2 border-light-border px-4">
-                    Name
+                <span className="w-[25%] px-4 flex items-center gap-2.5">
+                    <div className="w-0.5 h-3.5 bg-[#181D1F26] shrink-0" />Name
                 </span>
-                <span className="w-[15%] border-l-2 border-light-border px-4">
-                    Category
+                <span className="w-[15%] px-4 flex items-center gap-2.5">
+                    <div className="w-0.5 h-3.5 bg-[#181D1F26] shrink-0" />Category
                 </span>
-                <span className="w-[10%] border-l-2 border-light-border px-4">
-                    Size
+                <span className="w-[10%] px-4 flex items-center gap-2.5">
+                    <div className="w-0.5 h-3.5 bg-[#181D1F26] shrink-0" />Size
                 </span>
-                <span className="w-[10%] border-l-2 border-light-border px-4">
-                    Quantity
+                <span className="w-[10%] px-4 flex items-center gap-2.5">
+                    <div className="w-0.5 h-3.5 bg-[#181D1F26] shrink-0" />Quantity
                 </span>
-                <span className="w-[10%] border-l-2 border-light-border px-4">
-                    Date
+                <span className="w-[10%] px-4 flex items-center gap-2.5">
+                    <div className="w-0.5 h-3.5 bg-[#181D1F26] shrink-0" />Date
                 </span>
-                <span className="w-[15%] border-l-2 border-light-border px-4">
-                    Status
+                <span className="w-[15%] px-4 flex items-center gap-2.5">
+                    <div className="w-0.5 h-3.5 bg-[#181D1F26] shrink-0" />Status
                 </span>
-                <span className="w-[10%] border-l-2 border-light-border px-4">
-                    Actions
+                <span className="w-[10%] px-4 flex items-center gap-2.5">
+                    <div className="w-0.5 h-3.5 bg-[#181D1F26] shrink-0" />Actions
                 </span>
             </div>
-            <div className="flex-1 overflow-auto min-h-0">
+            <div className="overflow-auto">
                 {request.items.map((item) => (
                     <DRContentsTableRow item={item} key={item.item.id+request.id} onOpen={() => openItem(item)}/>
                 ))}

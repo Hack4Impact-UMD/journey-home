@@ -48,7 +48,7 @@ function DRGalleryCard({
             </div>
 
             <div className="flex flex-col gap-1">
-                <span className="text-sm font-bold text-text-1 truncate">
+                <span className="text-sm font-semibold text-text-1 truncate">
                     {item.item.name}
                 </span>
 
