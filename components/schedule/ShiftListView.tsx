@@ -46,6 +46,12 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
 
     return (
         <div className="w-full">
+            {timeBlocks.length === 0 ? (
+                <div className="flex items-center justify-center py-12 text-sm text-gray-400">
+                    No shifts found
+                </div>
+            ) : (
+            <>
             {/* mobile view */}
             <div className="block md:hidden border-t border-gray-200">
                 {Object.entries(groupedByDate).map(([dateKey, blocks]) => {
@@ -65,10 +71,6 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                                 currentUserID
                                             )
                                     );
-                                    const isFull = tb.volunteerGroups.every(
-                                        (group) => group.volunterIDs.length >= group.maxNum
-                                    );
-
                                     const type = tb.type;
                                     const isFirst = index === 0;
 
@@ -104,7 +106,6 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                         <Button
                                             className="text-sm w-22 h-8 py-0 flex items-center justify-center shrink-0 rounded-xs"
                                             onClick={() => {
-                                                if (isFull) return;
                                                 setSelectedTB(tb);
                                                 setAction("signup");
                                                 setSelectedGroup(null);
@@ -203,12 +204,6 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                             )
                                     );
 
-                                    const isFull = tb.volunteerGroups.every(
-                                        (group) =>
-                                            group.volunterIDs.length >=
-                                            group.maxNum
-                                    );
-
                                     const type = tb.type;
 
                                     return (
@@ -263,7 +258,6 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                                     <Button
                                                         className="text-sm font-roboto h-8 py-0 px-4 rounded-xs flex items-center"
                                                         onClick={() => {
-                                                            if (isFull) return;
                                                             setSelectedTB(tb);
                                                             setAction("signup");
                                                             setSelectedGroup(null);
@@ -282,6 +276,8 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                     );
                 })}
             </div>
+            </>
+            )}
 
             {/* confirm sign up */}
             {selectedTB && action === "signup" && (

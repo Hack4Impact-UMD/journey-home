@@ -1,6 +1,7 @@
 "use client";
 
 import { createPortal } from "react-dom";
+import { useEffect } from "react";
 import { TimeBlock } from "@/types/schedule";
 import Button from "@/components/form/Button";
 import { Timestamp } from "firebase/firestore";
@@ -40,17 +41,24 @@ export default function ShiftSignUpConfirm({
     const timeRange = `${formatTime(timeBlock.startTime)}–${formatTime(timeBlock.endTime)}`;
     const dateStr = formatDate(timeBlock.startTime);
 
+    useEffect(() => {
+        document.body.style.overflow = "hidden";
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, []);
+
     return createPortal(
         <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
             onClick={onClose}
         >
             <div
-                className="w-75 px-6 py-8 bg-white rounded-[0.625rem] shadow-lg flex flex-col gap-4"
+                className="w-80 px-6 py-8 bg-white rounded-[0.625rem] shadow-lg flex flex-col gap-4"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="flex items-center justify-between">
-                    <p className="text-base font-medium" style={{ color: "#565656" }}>
+                    <p className="text-base font-medium text-[#565656]">
                         Confirm Sign Up
                     </p>
                     <button onClick={onClose} className="text-text-1 hover:opacity-60 transition-opacity">
