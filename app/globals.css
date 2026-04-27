@@ -125,3 +125,10 @@ button:hover {
     @apply bg-background text-foreground;
   }
 }
+
+/* Prevent iOS zoom on focused inputs (requires >= 16px font size) */
+@media (max-width: 767px) {
+  input, textarea, select {
+    font-size: 1rem !important;
+  }
+}
