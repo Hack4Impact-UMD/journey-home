@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchAllTB, setTB } from "../services/timeblocks";
+import { fetchAllTB, setTB, signUpForShift } from "../services/timeblocks";
 import { TimeBlock } from "@/types/schedule";
 import { toast } from "sonner";
 
@@ -49,11 +49,25 @@ export function useTimeBlocks() {
         await promise;
     };
 
+    const signUpToast = async (tbId: string, groupName: string, userId: string) => {
+        const toastId = toast.loading("Signing up...");
+        try {
+            const updatedTB = await signUpForShift(tbId, groupName, userId);
+            toast.success("Signed up successfully!", { id: toastId });
+            queryClient.setQueryData(["timeblocks"], (old: TimeBlock[] | undefined) =>
+                old ? old.map((tb) => tb.id === updatedTB.id ? updatedTB : tb) : [updatedTB]
+            );
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Couldn't sign up for shift", { id: toastId });
+        }
+    };
+
     return {
         allTB: query.data ?? [],
 
         setTimeblockToast: setTimeblockToast,
         setTimeblock: setMutation.mutateAsync,
+        signUpToast,
 
         isLoading: query.isLoading,
         isError: query.isError,
