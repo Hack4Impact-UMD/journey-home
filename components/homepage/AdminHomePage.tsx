@@ -1,7 +1,7 @@
 "use client";
 
 import { ProtectedRoute } from "@/components/general/ProtectedRoute";
-import SideNavbar from "@/components/general/SideNav";
+import Navbar from "@/components/general/Navbar";
 import AdminCalendarSummary from "./AdminCalendarSummary";
 import WarehouseHistorySummary from "./WarehouseHistorySummary";
 import { PickupsDeliveriesSummary } from "./PickupsDeliveriesSummary";
@@ -17,7 +17,7 @@ export default function AdminHomePage() {
         <ProtectedRoute allow={["Admin"]}>
             <div className="h-full w-full flex flex-col font-family-roboto">
                 <div className="flex flex-1 min-h-0">
-                    <SideNavbar />
+                    <Navbar />
                     <div className="flex-1 flex flex-col overflow-auto pt-8 pb-15 px-10 gap-6 bg-linear-to-r from-[#F8FDFE] to-[#DAF2F5]">
                         <h1 className="text-5xl text-primary font-extrabold">
                             Welcome, {userData?.firstName ?? ""}!
