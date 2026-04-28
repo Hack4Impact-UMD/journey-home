@@ -4,7 +4,7 @@ import {
 } from "@/types/donations";
 
 import { db } from "../firebase";
-import { collection, doc, getDoc, setDoc, getDocs, deleteDoc, Timestamp } from "firebase/firestore";
+import { collection, doc, getDoc, setDoc, getDocs, deleteDoc, updateDoc, Timestamp } from "firebase/firestore";
 import { LocationContact, ReviewStatus } from "@/types/general";
 
 const DONATIONS_COLLECTION = "donation-requests";
@@ -136,6 +136,11 @@ export const fetchAllDonors = async (): Promise<LocationContact[]> => {
   });
   return donors;
 };
+
+export async function clearDonationRequestTimeBlockRef(id: string): Promise<void> {
+  const docRef = doc(db, DONATIONS_COLLECTION, id);
+  await updateDoc(docRef, { associatedTimeBlockID: null });
+}
 
 export async function getDonor(email: string): Promise<LocationContact | null> {
   const donorRef = doc(db, DONORS_COLLECTION, email);

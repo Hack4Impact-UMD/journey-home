@@ -30,7 +30,7 @@ Next.js 16 (App Router, standalone) + Firebase (Auth, Firestore, Storage, Functi
 ## Pages
 - **Public:** `/login`, `/signup`, `/donate` (4-step `DonorFormContext`), `/status/*`
 - **All roles:** `/`, `/inventory/warehouse`, `/profile`
-- **Admin:** `/donation-requests/{new,reviewed}`, `/user-management/{all-accounts,account-requests,past-donors}`, `/pickups-deliveries/{unscheduled,scheduled}`, `/control-panel/warehouse-history`, `/client-requests/admin`
+- **Admin:** `/donation-requests/{new,reviewed}`, `/user-management/{all-accounts,account-requests,past-donors}`, `/pickups-deliveries/{unscheduled,scheduled}`, `/control-panel/warehouse-history`, `/client-requests/admin`, `/schedule/calendar`
 - **Case Manager:** `/client-requests/case-manager`, `/client-request-form` (full-screen, no nav). `/` redirects Case Managers to `/client-requests` via `useRouter().replace`.
 - **Admin + Case Manager:** `/client-requests` → redirects by role
 - Shortcut `permanentRedirect`s: `/inventory`, `/donation-requests`, `/user-management`, `/pickups-deliveries`, `/control-panel` → each default sub-page.
@@ -42,7 +42,8 @@ Copy `.env.example` → `.env`. Emulator vars pre-configured; `NEXT_PUBLIC_FIREB
 - **Parallel writes:** `Promise.all` for independent Firestore writes.
 - **Errors:** `toast.promise(p)` then `await p`. Never empty `catch` — only catch known error codes, always rethrow unexpected.
 - **Loading/error states:** Inline with ternary inside the existing layout — never early-return duplicating `ProtectedRoute` + `Navbar`.
-- **Modals:** `createPortal(..., document.body)` + `overflow: hidden` on body. Structure: sticky header / `flex-1 overflow-y-auto` body / sticky footer. Both bars shadow inward: `shadow-[0_±2px_6px_rgba(0,0,0,0.08)]`.
+- **Modals:** `createPortal(..., document.body)` + `overflow: hidden` on body. Structure: sticky header / `flex-1 overflow-y-auto` body / sticky footer. Both bars shadow inward: `shadow-[0_±2px_6px_rgba(0,0,0,0.08)]`. Use existing `ConfirmModal` at `components/general/ConfirmModal.tsx` for all confirmation dialogs — props: `title`, `message`, `onConfirm`, `onCancel`.
+- **shadcn/ui:** Prefer shadcn primitives over custom implementations (e.g. `Switch`, not a hand-rolled toggle). Install new components with `npx shadcn@latest add <component>`.
 - **Components:** Don't extract single-use components — inline them.
 - **Nav links:** `NavbarLink` in `components/general/Navbar.tsx` — props: `name`, `path`, `roles` (empty = all), optional `icon`, `isMobile`, `onClick`. Active state uses exact match for `/`, `startsWith` otherwise. Icons from `@phosphor-icons/react` use `className="w-5 h-5"` (not the `size` prop); wrap in a local `() =>` component to satisfy `React.FC` type.
 - **Filter/sort bars:** Wrap controls in `flex flex-wrap gap-3`. All three control components (`SearchBox`, `DropdownMultiselect`, `SortOption`) have `shrink-0` and explicit `h-8` so they hold size when wrapping to a new line.
