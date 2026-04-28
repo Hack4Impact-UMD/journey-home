@@ -1,24 +1,19 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import { View } from "react-big-calendar";
 import { TimeBlock } from "../../../types/schedule";
-import { fetchAllTB } from "../../../lib/services/timeblocks";
+import { useTimeBlocks } from "../../../lib/queries/timeblocks";
 import { MasterCalendar } from "../../../components/schedule/MasterCalendar";
 import { AddShiftOverlay } from "../../../components/schedule/AddShiftOverlay";
 import { ShiftDetailOverlay } from "../../../components/schedule/ShiftDetailOverlay";
+import '@/styles/globals.scss';
 
 export default function CalendarPage() {
-    const [timeblocks, setTimeblocks] = useState<TimeBlock[]>([]);
+    const { allTB: timeblocks, refetch } = useTimeBlocks();
     const [view, setView] = useState<View>("week");
     const [date, setDate] = useState(new Date());
     const [selectedTimeBlock, setSelectedTimeBlock] = useState<TimeBlock | null>(null);
     const [showAddOverlay, setShowAddOverlay] = useState(false);
-
-    const loadTimeblocks = useCallback(async () => {
-        setTimeblocks(await fetchAllTB());
-    }, []);
-
-    useEffect(() => { loadTimeblocks(); }, [loadTimeblocks]);
 
     const now = new Date();
     const todayHighlight =
@@ -85,7 +80,7 @@ export default function CalendarPage() {
                     <AddShiftOverlay
                         isOpen={showAddOverlay}
                         onClose={() => setShowAddOverlay(false)}
-                        onShiftCreated={loadTimeblocks}
+                        onShiftCreated={refetch}
                     />
                 </div>
             </div>
@@ -102,7 +97,7 @@ export default function CalendarPage() {
             <ShiftDetailOverlay
                 timeBlock={selectedTimeBlock}
                 onClose={() => setSelectedTimeBlock(null)}
-                onSaved={() => { loadTimeblocks(); setSelectedTimeBlock(null); }}
+                onSaved={() => { refetch(); setSelectedTimeBlock(null); }}
             />
         </>
     );
