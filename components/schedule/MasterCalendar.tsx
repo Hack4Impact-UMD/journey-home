@@ -3,7 +3,7 @@ import { Calendar, momentLocalizer, EventProps, View } from "react-big-calendar"
 import moment from "moment";
 import { TimeBlock } from "../../types/schedule";
 import { cn } from "@/lib/utils";
-import { BadgeCheck, BadgeCheckIcon, BanIcon } from "lucide-react";
+import { SteeringWheelIcon, UsersThreeIcon } from "@phosphor-icons/react";
 
 type CalendarEvent = TimeBlock & { title: string; start: Date; end: Date };
 
@@ -21,25 +21,55 @@ const formats = {
 };
 
 function ShiftBlock({ event, isMonthView }: EventProps<CalendarEvent> & { isMonthView: boolean }) {
+    const isPickup = event.type === "Pickup/Delivery";
+    const borderBg = !event.published
+        ? "border-[#BBBDBE] bg-[#F6F6F6]"
+        : isPickup
+        ? "border-primary bg-[#F5FAFA]"
+        : "border-[#FBCF0B] bg-[#FFFCED]";
 
+    if (isMonthView) return (
+        <div className={cn(borderBg, "px-1 py-0.5 rounded-sm border-l-2 overflow-hidden truncate text-xs text-[#193347] flex items-center gap-1")}>
+            <span className="shrink-0">{shortenTime(formats.timeGutterFormat(event.start))}</span>
+            <span className="text-[#BBBDBE]">|</span>
+            <span className="truncate font-medium">{event.name || "Unnamed Shift"}</span>
+        </div>
+    );
 
-    const totalVols = event.volunteerGroups?.reduce((s, g) => s + g.volunterIDs.length, 0) ?? 0;
-    const maxVols   = event.volunteerGroups?.reduce((s, g) => s + g.maxNum, 0) ?? 0;
+    const leadDriver = event.volunteerGroups?.find(g => g.name === "Lead Driver" && g.maxNum >= 1);
+    const otherGroups = (event.volunteerGroups ?? []).filter(g => g !== leadDriver);
+    const otherSigned = otherGroups.reduce((s, g) => s + g.volunterIDs.length, 0);
+    const otherMax = otherGroups.reduce((s, g) => s + g.maxNum, 0);
 
-    if (isMonthView) return <span className="text-xs">{event.title}</span>;
+    const infoColor = !event.published ? "#252525" : isPickup ? "#02AFC7" : "#BE8200";
 
     return (
-        <div className={cn(event.type == "Pickup/Delivery" ? "bg-[#F5FAFA] border-primary text-primary" : "bg-[#FFFCED] border-[#FBCF0B] text-[#BE8200]", " p-1.5 h-full flex flex-col rounded-sm cursor-pointer ml-2 border-2 overflow-hidden")}>
-            <span className="font-bold text-sm">{event.name}</span>
+        <div className={cn(borderBg, "p-1.5 h-full flex flex-col rounded-sm cursor-pointer ml-2 border-2 overflow-hidden")}>
+            <span className="font-bold text-xs text-[#193347]">{event.name || "Unnamed Shift"}</span>
             <span className="text-text-1 text-xs">{shortenTime(formats.timeGutterFormat(event.start))}-{shortenTime(formats.timeGutterFormat(event.end))}</span>
 
-            {
-                (event.published) ?
-                <span className="text-xs mt-1 flex text-center items-center"><BadgeCheckIcon className="h-2.5 w-2.5 mx-1"/> Published</span> :
-                <span className="text-xs mt-1 flex text-center items-center text-gray-500"><BanIcon className="h-2.5 w-2.5 mx-1"/> Hidden</span>
-            }
+            <div className="flex-1" />
+
+            <div className="text-[0.625em]" style={{ color: infoColor }}>
+                <span className="font-bold block">{event.type}</span>
+                <span className="block">{event.published ? "Published" : "Not Published"}</span>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                    {leadDriver && (
+                        <span className="flex items-center gap-0.5">
+                            <SteeringWheelIcon className="w-3 h-3" />
+                            {leadDriver.volunterIDs.length}/{leadDriver.maxNum}
+                        </span>
+                    )}
+                    {otherMax > 0 && (
+                        <span className="flex items-center gap-0.5">
+                            <UsersThreeIcon className="w-3 h-3" />
+                            {otherSigned}/{otherMax}
+                        </span>
+                    )}
+                </div>
+            </div>
         </div>
-    );  
+    );
 }
 
 interface MasterCalendarProps {
@@ -54,7 +84,7 @@ interface MasterCalendarProps {
 export function MasterCalendar({ timeblocks, view, date, onView, onNavigate, onSelectEvent }: MasterCalendarProps) {
     const events: CalendarEvent[] = timeblocks.map((tb) => ({
         ...tb,
-        title: tb.name,
+        title: tb.name || "Unnamed Shift",
         start: tb.startTime.toDate(),
         end: tb.endTime.toDate(),
     }));
