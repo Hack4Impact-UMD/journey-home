@@ -1,7 +1,7 @@
 "use client";
 
 import { ProtectedRoute } from "@/components/general/ProtectedRoute";
-import SideNavbar from "@/components/general/SideNav";
+import Navbar from "@/components/general/Navbar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
@@ -12,13 +12,20 @@ export default function ControlPanelLayout({ children }: { children: ReactNode }
     return (
         <ProtectedRoute allow={["Admin"]}>
             <div className="h-full w-full flex flex-col font-family-roboto overflow-hidden">
-                <div className="flex flex-1 min-h-0">
-                    <SideNavbar />
-                    <div className="flex-1 min-h-0 bg-[#F7F7F7] pt-8 pb-4 px-6 flex flex-col">
-                        <span className="text-2xl text-primary font-extrabold block font-family-roboto">
+                <div className="flex flex-1 min-h-0 max-md:flex-col">
+                    <Navbar pageTitle="Control Panel" />
+                    <div className="flex-1 min-h-0 bg-[#F7F7F7] pt-8 max-md:pt-1 pb-4 px-6 flex flex-col max-md:bg-transparent max-md:p-0">
+                        <span className="text-2xl text-primary font-extrabold block font-family-roboto max-md:hidden">
                             Control Panel
                         </span>
                         <div className="flex gap-8 text-sm">
+                            <Link
+                                className={`py-4 font-family-roboto text-sm${pathname.startsWith("/control-panel/categories") ? " border-b-2 border-primary text-primary" : ""}`}
+                                href="/control-panel/categories"
+                                aria-current={pathname.startsWith("/control-panel/categories") ? "page" : undefined}
+                            >
+                                Categories
+                            </Link>
                             <Link
                                 className={`py-4 font-family-roboto text-sm${pathname.startsWith("/control-panel/warehouse-history") ? " border-b-2 border-primary text-primary" : ""}`}
                                 href="/control-panel/warehouse-history"
@@ -27,7 +34,7 @@ export default function ControlPanelLayout({ children }: { children: ReactNode }
                                 Warehouse History
                             </Link>
                         </div>
-                        <div className="bg-background rounded-xl my-2 flex-1 py-4 px-6 min-h-0 overflow-hidden flex flex-col">
+                        <div className="bg-background rounded-xl my-2 flex-1 py-4 px-6 min-h-0 overflow-hidden flex flex-col max-md:bg-transparent max-md:m-0 max-md:rounded-none">
                             {children}
                         </div>
                     </div>

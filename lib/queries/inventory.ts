@@ -31,18 +31,20 @@ export function useInventoryCategories() {
 
             batch.set(doc(db, WAREHOUSE_COLLECTION, category.id), category);
 
-            const newChange: InventoryChange = {
-                id: crypto.randomUUID(),
-                userId,
-                timestamp: Timestamp.now(),
-                change: {
-                    category: category.name,
-                    oldQuantity,
-                    newQuantity: category.quantity,
-                },
-                reverted: false,
-            };
-            batch.set(doc(db, WAREHOUSE_HISTORY_COLLECTION, newChange.id), newChange);
+            if (category.quantity !== oldQuantity) {
+                const newChange: InventoryChange = {
+                    id: crypto.randomUUID(),
+                    userId,
+                    timestamp: Timestamp.now(),
+                    change: {
+                        category: category.name,
+                        oldQuantity,
+                        newQuantity: category.quantity,
+                    },
+                    reverted: false,
+                };
+                batch.set(doc(db, WAREHOUSE_HISTORY_COLLECTION, newChange.id), newChange);
+            }
 
             if (revertedChange) {
                 batch.update(doc(db, WAREHOUSE_HISTORY_COLLECTION, revertedChange.id), { reverted: true });

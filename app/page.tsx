@@ -3,17 +3,25 @@
 import { ProtectedRoute } from "@/components/general/ProtectedRoute";
 import { useAuth } from "@/contexts/AuthContext";
 import AdminHomePage from "@/components/homepage/AdminHomePage";
-import CaseManagerHomePage from "@/components/homepage/CaseManagerHomePage";
 import VolunteerHomePage from "@/components/homepage/VolunteerHomePage";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function HomePage() {
-    const { state: { userData } } = useAuth();
-    const role = userData?.role;
+    const { state: authState } = useAuth();
+    const role = authState.userData?.role;
+    const router = useRouter();
+
+    useEffect(() => {
+        if (authState.loading || !authState.userData) return;
+        if (authState.userData.role === "Case Manager") {
+            router.replace("/client-requests");
+        }
+    }, [authState, router]);
 
     return (
         <ProtectedRoute allow={["Admin", "Case Manager", "Volunteer"]}>
             {role === "Admin" && <AdminHomePage />}
-            {role === "Case Manager" && <CaseManagerHomePage />}
             {role === "Volunteer" && <VolunteerHomePage />}
         </ProtectedRoute>
     );

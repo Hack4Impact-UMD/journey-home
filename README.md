@@ -20,7 +20,7 @@ Meet our wonderful team comprised of Product Managers, Designers, Tech Leads, En
   <tr>
     <td align="center" width="150">
       <a href="https://umd.hack4impact.org/">
-        <img src="public/team-photos/pending-image.jpg" height="100" width="100" style="border-radius:50%;object-fit:cover;" alt="pending"/><br/>
+        <img src="public/team-photos/kalpana_iyer.jpeg" height="100" width="100" style="border-radius:50%;object-fit:cover;" alt="Kalpana Iyer"/><br/>
         <b>Kalpana Iyer</b><br/><br/>
         <img src="https://img.shields.io/badge/👩‍💼_product_manager-007ACC?style=flat-square" alt="Product Manager"/>
       </a>
@@ -153,8 +153,8 @@ Meet our wonderful team comprised of Product Managers, Designers, Tech Leads, En
   <tr>
     <td align="center" width="150">
         <a href="https://umd.hack4impact.org/">
-        <img src="public/team-photos/pending-image.jpg" height="100" width="100" style="border-radius:50%;object-fit:cover;" alt="Mentor"/><br/>
-        <b>Microsoft Mentor</b><br/><br/>
+        <img src="public/team-photos/manit_rana.jpeg" height="100" width="100" style="border-radius:50%;object-fit:cover;" alt="Manit Rana"/><br/>
+        <b>Manit Rana</b><br/><br/>
         <img src="https://img.shields.io/badge/🧑‍🏫_mentor-95A5A6?style=flat-square" alt="Mentor"/>
       </a>
     </td>

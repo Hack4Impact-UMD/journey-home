@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function ControlPanelPage() {
-    redirect("/control-panel/warehouse-history");
+    redirect("/control-panel/categories");
 }
