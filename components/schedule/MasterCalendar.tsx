@@ -3,7 +3,7 @@ import { Calendar, momentLocalizer, EventProps, View } from "react-big-calendar"
 import moment from "moment";
 import { TimeBlock } from "../../types/schedule";
 import { cn } from "@/lib/utils";
-import { SteeringWheelIcon, UsersThreeIcon } from "@phosphor-icons/react";
+import { SteeringWheelIcon, UsersThreeIcon, ProhibitIcon, SealCheckIcon } from "@phosphor-icons/react";
 
 type CalendarEvent = TimeBlock & { title: string; start: Date; end: Date };
 
@@ -45,15 +45,18 @@ function ShiftBlock({ event, isMonthView }: EventProps<CalendarEvent> & { isMont
 
     return (
         <div className={cn(borderBg, "p-1.5 h-full flex flex-col rounded-sm cursor-pointer ml-2 border-2 overflow-hidden")}>
-            <span className="font-bold text-xs text-[#193347]">{event.name || "Unnamed Shift"}</span>
+            <span className="font-bold text-xs text-[#193347] truncate">{event.name || "Unnamed Shift"}</span>
             <span className="text-text-1 text-xs">{shortenTime(formats.timeGutterFormat(event.start))}-{shortenTime(formats.timeGutterFormat(event.end))}</span>
 
             <div className="flex-1" />
 
             <div className="text-[0.625em]" style={{ color: infoColor }}>
                 <span className="font-bold block">{event.type}</span>
-                <span className="block">{event.published ? "Published" : "Not Published"}</span>
                 <div className="flex items-center gap-1.5 mt-0.5">
+                    {event.published
+                        ? <SealCheckIcon className="w-3 h-3 mr-1" />
+                        : <ProhibitIcon className="w-3 h-3 mr-1" />
+                    }
                     {leadDriver && (
                         <span className="flex items-center gap-0.5">
                             <SteeringWheelIcon className="w-3 h-3" />

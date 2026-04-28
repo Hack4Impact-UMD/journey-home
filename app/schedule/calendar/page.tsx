@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { PlusIcon } from "@phosphor-icons/react";
 import { View } from "react-big-calendar";
 import { TimeBlock } from "../../../types/schedule";
 import { useTimeBlocks } from "../../../lib/queries/timeblocks";
@@ -74,9 +75,10 @@ export default function CalendarPage() {
                 <div className="flex justify-end relative">
                     <button
                         onClick={() => setShowAddOverlay(v => !v)}
-                        className="px-4 py-1.5 rounded-full cursor-pointer text-white text-sm bg-[#02AFC7]"
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-sm cursor-pointer text-white text-sm bg-[#02AFC7]"
                     >
-                        + Add Shift
+                        <PlusIcon className="w-4 h-4" />
+                        Add Shift
                     </button>
                     <AddShiftOverlay
                         isOpen={showAddOverlay}

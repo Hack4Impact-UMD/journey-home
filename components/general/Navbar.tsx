@@ -12,8 +12,9 @@ import { UserManagementIcon } from "../icons/UserManagementIcon";
 import { ControlPanelIcon } from "../icons/ControlPanelIcon";
 import { ViewIcon } from "../icons/ViewIcon";
 import { Menu } from "lucide-react";
-import { HandHeartIcon, HouseIcon, CalendarCheckIcon, PackageIcon } from "@phosphor-icons/react";
+import { HandHeartIcon, HouseIcon, CalendarCheckIcon, PackageIcon, CalendarDotsIcon } from "@phosphor-icons/react";
 
+const ScheduleIcon = () => <CalendarDotsIcon className="w-5 h-5" />;
 const CreateRequestIcon = () => <HandHeartIcon className="w-5 h-5" />;
 const ShiftTasksIcon = () => <PackageIcon className="w-5 h-5" />;
 const HomeIcon = () => <HouseIcon className="w-5 h-5" />;
@@ -62,6 +63,14 @@ export default function Navbar({ pageTitle }: { pageTitle?: string }) {
                 icon={PickupDeliveryIcon}
                 name="Pickups & Deliveries"
                 path="/pickups-deliveries"
+                roles={["Admin"]}
+                isMobile={isMobile}
+                onClick={() => setDrawerOpen(false)}
+            />
+            <NavbarLink
+                icon={ScheduleIcon}
+                name="Schedule"
+                path="/schedule/calendar"
                 roles={["Admin"]}
                 isMobile={isMobile}
                 onClick={() => setDrawerOpen(false)}
