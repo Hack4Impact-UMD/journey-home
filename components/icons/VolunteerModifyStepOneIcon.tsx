@@ -1,5 +1,5 @@
 "use client";
-export function ManageInventory1() {
+export function VolunteerModifyStepOneIcon() {
     return (
         <svg width="96" height="20" viewBox="0 0 96 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <g clipPath="url(#clip0_5314_28677)">

@@ -8,9 +8,10 @@ import ItemSearch from "@/components/volunteer-tasks/ItemSearch";
 import { useInventoryCategories } from "@/lib/queries/inventory";
 import { useTimeBlocks } from "@/lib/queries/timeblocks";
 import { toast } from "sonner";
-import { ManageInventory1 } from "@/components/icons/ManageInventory1";
-import { ManageInventory2 } from "@/components/icons/ManageInventory2";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { VolunteerModifyStepOneIcon } from "@/components/icons/VolunteerModifyStepOneIcon";
+import { VolunteerModifyStepTwoIcon } from "@/components/icons/VolunteerModifyStepTwoIcon";
+import { JourneyTheDogIcon } from "@/components/icons/JourneyTheDogIcon";
+import { ChevronDown, ChevronUp, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { TimeBlock } from "@/types/schedule";
 
@@ -22,7 +23,7 @@ export default function VolunteerTasks() {
     const { state: { currentUser } } = useAuth();
     const { allTB } = useTimeBlocks();
 
-    const [screen, setScreen] = useState<"signup" | "shiftoverview" | "modify" | "summary">("signup");
+    const [screen, setScreen] = useState<"shiftlist" | "shiftoverview" | "modify" | "summary">("shiftlist");
     const [selectedShift, setSelectedShift] = useState<TimeBlock | null>(null);
 
     const [items, setItems] = useState<ItemMap>({});
@@ -44,12 +45,15 @@ export default function VolunteerTasks() {
 
     const now = Date.now();
     const userTimeBlocks = allTB
-        .filter((tb) => tb.volunteerGroups.some((g) => g.volunterIDs.includes(currentUser!.uid)))
+        .filter((tb) =>
+            tb.endTime.toMillis() >= now &&
+            tb.volunteerGroups.some((g) => g.volunterIDs.includes(currentUser!.uid))
+        )
         .sort((a, b) => a.startTime.toMillis() - b.startTime.toMillis());
     const handleAddItem = (item: { name: string; qty: number }) => {
         setItems((prev) => ({
             ...prev,
-            [item.name]: (prev[item.name] || 0) + item.qty,
+            [item.name]: item.qty,
         }));
         setOpen(false);
     };
@@ -80,8 +84,14 @@ export default function VolunteerTasks() {
 
     return (
         <div className="h-full flex flex-col">
-            {screen === "signup" && (
+            {screen === "shiftlist" && (
                 <div className="flex flex-col gap-4 pt-4 flex-1 min-h-0 overflow-y-auto">
+                    {userTimeBlocks.length === 0 && (
+                        <div className="flex flex-1 flex-col items-center justify-center gap-9">
+                            <div className="grayscale opacity-40"><JourneyTheDogIcon /></div>
+                            <p className="font-family-roboto text-xl text-center text-gray-400">You are not signed up for any shifts!</p>
+                        </div>
+                    )}
                     {userTimeBlocks.map((tb) => {
                         const shiftDate = tb.startTime.toDate();
                         const dayStart = new Date(shiftDate.getFullYear(), shiftDate.getMonth(), shiftDate.getDate()).getTime();
@@ -104,7 +114,7 @@ export default function VolunteerTasks() {
                                                 <p className="font-family-roboto font-semibold text-sm text-[#6B7A99]">{dateLabel}</p>
                                             </div>
                                             <div className="pl-10">
-                                                <p className="text-sm font-family-roboto">{tb.type === "Pickup/Delivery" ? "Pickups / deliveries" : "Warehouse"}</p>
+                                                <p className="text-sm font-family-roboto">{tb.type === "Pickup/Delivery" ? "Pickups / Deliveries" : "Warehouse"}</p>
                                                 <p className="text-sm font-family-roboto text-primary">Group: {userGroup?.name}</p>
                                             </div>
                                         </div>
@@ -116,12 +126,12 @@ export default function VolunteerTasks() {
                                             {isActive ? (
                                                 <button
                                                     onClick={() => { setSelectedShift(tb); setScreen("shiftoverview"); }}
-                                                    className="bg-primary text-white w-22.5 h-8 rounded text-sm"
+                                                    className="bg-primary text-white w-22.5 h-8 rounded-sm text-sm"
                                                 >
                                                     Open
                                                 </button>
                                             ) : (
-                                                <button className="border border-primary text-primary w-22.5 h-8 rounded text-sm">
+                                                <button className="border border-gray-300-300 text-primary w-22.5 h-8 rounded-sm text-sm">
                                                     Upcoming
                                                 </button>
                                             )}
@@ -141,15 +151,15 @@ export default function VolunteerTasks() {
                     <div className="mt-4 flex flex-col gap-4">
                         <button
                             onClick={() => { setItems({}); setSummaryMode("add"); setScreen("modify"); }}
-                            className="w-full h-10 bg-primary text-white font-family-roboto rounded"
+                            className="w-full h-10 bg-primary text-white font-family-roboto rounded-sm"
                         >
-                            Add to inventory
+                            Add to Inventory
                         </button>
                         <button
                             onClick={() => { setItems({}); setSummaryMode("remove"); setScreen("modify"); }}
-                            className="w-full h-10 border border-gray-300 font-family-roboto rounded"
+                            className="w-full h-10 border border-gray-300 font-family-roboto rounded-sm"
                         >
-                            Remove from inventory
+                            Remove from Inventory
                         </button>
                     </div>
                     {selectedShift?.notes && (
@@ -157,8 +167,8 @@ export default function VolunteerTasks() {
                     )}
                     <div className="flex flex-row gap-4 h-16 justify-center mt-auto">
                         <button
-                            onClick={() => setScreen("signup")}
-                            className="mt-6 w-full border border-gray rounded-md"
+                            onClick={() => setScreen("shiftlist")}
+                            className="mt-6 w-full border border-gray-300 rounded-sm"
                         >
                             Back
                         </button>
@@ -170,9 +180,9 @@ export default function VolunteerTasks() {
                     <div className="flex justify-center pt-8">
                         <div className="flex flex-col items-center">
                             <h1 className="text-primary mb-4 font-bold text-2xl">
-                                {summaryMode === "remove" ? "Remove from inventory" : "Add to inventory"}
+                                {summaryMode === "remove" ? "Remove from Inventory" : "Add to Inventory"}
                             </h1>
-                            <ManageInventory1 />
+                            <VolunteerModifyStepOneIcon />
                         </div>
                     </div>
 
@@ -180,35 +190,41 @@ export default function VolunteerTasks() {
                         onClick={() => setNotesOpen((o) => !o)}
                         className="flex items-center justify-between w-full mt-4"
                     >
-                        <p className="text-primary font-bold">Shift notes</p>
+                        <p className="text-primary font-bold">Shift Notes</p>
                         {notesOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                     </button>
                     {notesOpen && <p className="mt-3">{selectedShift?.notes}</p>}
-                    <p className="text-primary font-bold mt-4">{summaryMode === "remove" ? "Remove from inventory" : "Add to inventory"}</p>
+                    <p className="text-primary font-bold mt-4">{summaryMode === "remove" ? "Remove from Inventory" : "Add to Inventory"}</p>
 
                     {Object.keys(items).length > 0 && (
                         <div className="mt-4 space-y-2">
                             {Object.entries(items).map(([name, qty]) => (
-                                <div
-                                    key={name}
-                                    className="flex justify-between "
-                                >
+                                <div key={name} className="flex justify-between items-center">
                                     <span className="font-bold">{name}</span>
-                                    <span>
-                                        {qty}
-                                    </span>
+                                    <div className="flex items-center gap-2">
+                                        <span className="font-bold">{qty}</span>
+                                        <button
+                                            onClick={() => setItems((prev) => {
+                                                const next = { ...prev };
+                                                delete next[name];
+                                                return next;
+                                            })}
+                                        >
+                                            <X className="w-4 h-4 text-gray-400" />
+                                        </button>
+                                    </div>
                                 </div>
                             ))}
                         </div>
                     )}
-                    <button onClick={() => setOpen(true)} className="mt-4 bg-primary text-white w-24 h-8 rounded-md">
-                        Add
+                    <button onClick={() => setOpen(true)} className="mt-4 bg-primary text-white w-24 h-8 rounded-sm">
+                        Modify
                     </button>
 
                     <div className="flex flex-row gap-4 h-16 justify-center mt-auto ">
                         <button
                             onClick={() => setScreen("shiftoverview")}
-                            className="mt-6 w-full border border-gray rounded-md"
+                            className="mt-6 w-full border border-gray-300 rounded-sm"
                         >
                             Back
                         </button>
@@ -216,7 +232,7 @@ export default function VolunteerTasks() {
                         {Object.keys(items).length > 0 && (
                             <button
                                 onClick={() => setScreen("summary")}
-                                className="mt-6 w-full bg-primary text-white rounded-md"
+                                className="mt-6 w-full bg-primary text-white rounded-sm"
                             >
                                 Next
                             </button>
@@ -241,10 +257,10 @@ export default function VolunteerTasks() {
                     <h1 className="text-primary mb-4 font-bold text-2xl text-center pt-8">Summary</h1>
 
                     <div className="flex justify-center pb-4">
-                        <ManageInventory2 />
+                        <VolunteerModifyStepTwoIcon />
                     </div>
 
-                    <p className="font-family-roboto font-medium text-base text-primary">{summaryMode === "remove" ? "Remove from inventory" : "Add to inventory"}</p>
+                    <p className="font-family-roboto font-medium text-base text-primary">{summaryMode === "remove" ? "Remove from Inventory" : "Add to Inventory"}</p>
 
                     {Object.keys(items).length === 0 ? (
                         <p className="text-gray-400 mt-4">
@@ -258,7 +274,7 @@ export default function VolunteerTasks() {
                                     className="flex justify-between font-bold"
                                 >
                                     <span>{name}</span>
-                                    <span className="text-text-1 font-semibold">
+                                    <span className="text-text-1 font-bold">
                                         {qty}
                                     </span>
                                 </div>
@@ -269,7 +285,7 @@ export default function VolunteerTasks() {
                     <div className="flex flex-row gap-4 h-16 justify-center mt-auto ">
                         <button
                             onClick={() => setScreen("modify")}
-                            className="mt-6 w-full border border-gray rounded-md"
+                            className="mt-6 w-full border border-gray-300 rounded-sm"
                         >
                             Back
                         </button>
@@ -277,7 +293,7 @@ export default function VolunteerTasks() {
                         {Object.keys(items).length > 0 && (
                             <button
                                 onClick={async () => { if (await handleConfirm()) { setItems({}); setScreen("shiftoverview"); } }}
-                                className="mt-6 w-full bg-primary text-white rounded-md"
+                                className="mt-6 w-full bg-primary text-white rounded-sm"
                             >
                                 Confirm
                             </button>
