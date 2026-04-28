@@ -131,7 +131,7 @@ export default function VolunteerTasks() {
                                                     Open
                                                 </button>
                                             ) : (
-                                                <button className="border border-gray-300-300 text-primary w-22.5 h-8 rounded-sm text-sm">
+                                                <button className="border border-gray-300 text-primary w-22.5 h-8 rounded-sm text-sm">
                                                     Upcoming
                                                 </button>
                                             )}
