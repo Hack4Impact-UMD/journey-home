@@ -70,7 +70,7 @@ export default function Navbar({ pageTitle }: { pageTitle?: string }) {
             <NavbarLink
                 icon={ScheduleIcon}
                 name="Schedule"
-                path="/schedule/calendar"
+                path="/schedule"
                 roles={["Admin"]}
                 isMobile={isMobile}
                 onClick={() => setDrawerOpen(false)}

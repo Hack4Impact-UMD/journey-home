@@ -108,7 +108,7 @@ export function ShiftEditModal({ timeBlock, onClose, onSaved }: Props) {
         const prev = document.body.style.overflow;
         document.body.style.overflow = "hidden";
         return () => { document.body.style.overflow = prev; };
-    }, [!!timeBlock]);
+    }, [timeBlock]);
 
     useEffect(() => {
         if (!timeBlock) return;

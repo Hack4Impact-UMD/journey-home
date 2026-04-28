@@ -11,7 +11,7 @@ import { ShiftDetailOverlay } from "../../../components/schedule/ShiftDetailOver
 import '@/styles/globals.scss';
 
 export default function CalendarPage() {
-    const { allTB: timeblocks, refetch } = useTimeBlocks();
+    const { allTB: timeblocks } = useTimeBlocks();
     const [view, setView] = useState<View>("week");
     const [date, setDate] = useState(new Date());
     const [selectedTimeBlock, setSelectedTimeBlock] = useState<TimeBlock | null>(null);
@@ -52,7 +52,7 @@ export default function CalendarPage() {
                 <div className="flex items-center justify-center gap-4">
                     <button onClick={() => {
                         const d = new Date(date);
-                        view === "week" ? d.setDate(d.getDate() - 7) : d.setMonth(d.getMonth() - 1);
+                        if (view === "week") d.setDate(d.getDate() - 7); else d.setMonth(d.getMonth() - 1);
                         setDate(d);
                     }} className="flex items-center justify-center w-7 h-7 rounded-full border border-light-border bg-white shadow-[0_1px_3px_rgba(38,51,77,0.06)]">
                         <ChevronLeft className="w-4 h-4 text-[#6B7A99]" />
@@ -73,7 +73,7 @@ export default function CalendarPage() {
                     </span>
                     <button onClick={() => {
                         const d = new Date(date);
-                        view === "week" ? d.setDate(d.getDate() + 7) : d.setMonth(d.getMonth() + 1);
+                        if (view === "week") d.setDate(d.getDate() + 7); else d.setMonth(d.getMonth() + 1);
                         setDate(d);
                     }} className="flex items-center justify-center w-7 h-7 rounded-full border border-light-border bg-white shadow-[0_1px_3px_rgba(38,51,77,0.06)]">
                         <ChevronRight className="w-4 h-4 text-[#6B7A99]" />
@@ -104,13 +104,12 @@ export default function CalendarPage() {
             <ShiftDetailOverlay
                 timeBlock={selectedTimeBlock}
                 onClose={() => setSelectedTimeBlock(null)}
-                onSaved={() => { refetch(); setSelectedTimeBlock(null); }}
             />
 
             <ShiftEditModal
                 timeBlock={editingTB}
                 onClose={() => setEditingTB(null)}
-                onSaved={() => { refetch(); setEditingTB(null); }}
+                onSaved={() => setEditingTB(null)}
             />
         </>
     );

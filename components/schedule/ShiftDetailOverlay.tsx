@@ -45,10 +45,9 @@ function formatAddress(addr: { streetAddress: string; apt?: string; city: string
 interface Props {
   timeBlock: TimeBlock | null;
   onClose: () => void;
-  onSaved?: () => void;
 }
 
-export function ShiftDetailOverlay({ timeBlock, onClose, onSaved }: Props) {
+export function ShiftDetailOverlay({ timeBlock, onClose }: Props) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const { allTB, setTimeblockToast, deleteTimeblockToast } = useTimeBlocks();
   const { allAccounts, isLoading: accountsLoading } = useAllActiveAccounts();
