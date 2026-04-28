@@ -20,7 +20,15 @@ export default function CalendarPage() {
     const now = new Date();
     const todayHighlight =
         view === "week"
-            ? (() => { const end = new Date(date); end.setDate(end.getDate() + 6); return now >= date && now <= end; })()
+            ? (() => {
+                const weekStart = new Date(date);
+                weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+                weekStart.setHours(0, 0, 0, 0);
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekEnd.getDate() + 6);
+                weekEnd.setHours(23, 59, 59, 999);
+                return now >= weekStart && now <= weekEnd;
+              })()
             : date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
 
     return (

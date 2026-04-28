@@ -26,7 +26,7 @@ export function makeDefaultTimeBlock(slotStart?: Date): TimeBlock {
         const today = new Date().toLocaleDateString("en-CA");
         const [year, month, day] = today.split("-").map(Number);
         startDate = new Date(year, month - 1, day, 9, 0, 0);
-        endDate = new Date(year, month - 1, day, 17, 0, 0);
+        endDate = new Date(year, month - 1, day, 12, 0, 0);
     }
 
     return {
@@ -102,6 +102,13 @@ export function ShiftEditModal({ timeBlock, onClose, onSaved }: Props) {
         setNotes(timeBlock.notes);
         setPublished(timeBlock.published);
     }, [timeBlock]);
+
+    useEffect(() => {
+        if (!timeBlock) return;
+        const prev = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
+        return () => { document.body.style.overflow = prev; };
+    }, [!!timeBlock]);
 
     useEffect(() => {
         if (!timeBlock) return;

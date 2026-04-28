@@ -73,6 +73,12 @@ export function ShiftDetailOverlay({ timeBlock, onClose, onSaved }: Props) {
   }, [timeBlock]);
 
   useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && !confirmDelete && !removeTarget) onClose();
     };

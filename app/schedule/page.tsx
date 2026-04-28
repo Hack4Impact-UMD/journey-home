@@ -1,8 +1,5 @@
-"use client";
+import { permanentRedirect } from "next/navigation";
 
-import { ProtectedRoute } from "@/components/general/ProtectedRoute";
-import { redirect } from "next/navigation";
-
-export default function CalendarView() {
-    redirect("/schedule/calendar");
+export default function SchedulePage() {
+    permanentRedirect("/schedule/calendar");
 }
