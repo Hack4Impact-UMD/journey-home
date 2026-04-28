@@ -36,10 +36,14 @@ function ShiftBlock({ event, isMonthView }: EventProps<CalendarEvent> & { isMont
         </div>
     );
 
-    const leadDriver = event.volunteerGroups?.find(g => g.name === "Lead Driver" && g.maxNum >= 1);
-    const otherGroups = (event.volunteerGroups ?? []).filter(g => g !== leadDriver);
+    const driverGroups = (event.volunteerGroups ?? []).filter(g => g.name.toLowerCase().includes("drive") && g.maxNum >= 1);
+    const otherGroups = (event.volunteerGroups ?? []).filter(g => !g.name.toLowerCase().includes("drive"));
+    const driverSigned = driverGroups.reduce((s, g) => s + g.volunterIDs.length, 0);
+    const driverMax = driverGroups.reduce((s, g) => s + g.maxNum, 0);
     const otherSigned = otherGroups.reduce((s, g) => s + g.volunterIDs.length, 0);
     const otherMax = otherGroups.reduce((s, g) => s + g.maxNum, 0);
+    const driverRed = driverMax > 0 && driverSigned < driverMax;
+    const otherRed = otherMax > 0 && (otherSigned === 0 || otherSigned < otherMax / 2);
 
     const infoColor = !event.published ? "#252525" : isPickup ? "#02AFC7" : "#BE8200";
 
@@ -57,14 +61,14 @@ function ShiftBlock({ event, isMonthView }: EventProps<CalendarEvent> & { isMont
                         ? <SealCheckIcon className="w-3 h-3 mr-1" />
                         : <ProhibitIcon className="w-3 h-3 mr-1" />
                     }
-                    {leadDriver && (
-                        <span className="flex items-center gap-0.5">
+                    {driverMax > 0 && (
+                        <span className="flex items-center gap-0.5" style={{ color: driverRed ? "#D43D3D" : infoColor }}>
                             <SteeringWheelIcon className="w-3 h-3" />
-                            {leadDriver.volunterIDs.length}/{leadDriver.maxNum}
+                            {driverSigned}/{driverMax}
                         </span>
                     )}
                     {otherMax > 0 && (
-                        <span className="flex items-center gap-0.5">
+                        <span className="flex items-center gap-0.5" style={{ color: otherRed ? "#D43D3D" : infoColor }}>
                             <UsersThreeIcon className="w-3 h-3" />
                             {otherSigned}/{otherMax}
                         </span>
@@ -82,9 +86,10 @@ interface MasterCalendarProps {
     onView: (v: View) => void;
     onNavigate: (d: Date) => void;
     onSelectEvent: (tb: TimeBlock) => void;
+    onSelectSlot: (start: Date) => void;
 }
 
-export function MasterCalendar({ timeblocks, view, date, onView, onNavigate, onSelectEvent }: MasterCalendarProps) {
+export function MasterCalendar({ timeblocks, view, date, onView, onNavigate, onSelectEvent, onSelectSlot }: MasterCalendarProps) {
     const events: CalendarEvent[] = timeblocks.map((tb) => ({
         ...tb,
         title: tb.name || "Unnamed Shift",
@@ -105,6 +110,8 @@ export function MasterCalendar({ timeblocks, view, date, onView, onNavigate, onS
                 date={date}
                 onNavigate={onNavigate}
                 onSelectEvent={onSelectEvent}
+                selectable
+                onSelectSlot={(slot) => onSelectSlot(slot.start)}
                 min={minTime}
                 max={maxTime}
                 formats={formats}

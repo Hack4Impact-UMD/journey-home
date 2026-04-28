@@ -6,7 +6,7 @@ import { View } from "react-big-calendar";
 import { TimeBlock } from "../../../types/schedule";
 import { useTimeBlocks } from "../../../lib/queries/timeblocks";
 import { MasterCalendar } from "../../../components/schedule/MasterCalendar";
-import { AddShiftOverlay } from "../../../components/schedule/AddShiftOverlay";
+import { ShiftEditModal, makeDefaultTimeBlock } from "../../../components/schedule/ShiftEditModal";
 import { ShiftDetailOverlay } from "../../../components/schedule/ShiftDetailOverlay";
 import '@/styles/globals.scss';
 
@@ -15,7 +15,7 @@ export default function CalendarPage() {
     const [view, setView] = useState<View>("week");
     const [date, setDate] = useState(new Date());
     const [selectedTimeBlock, setSelectedTimeBlock] = useState<TimeBlock | null>(null);
-    const [showAddOverlay, setShowAddOverlay] = useState(false);
+    const [editingTB, setEditingTB] = useState<TimeBlock | null>(null);
 
     const now = new Date();
     const todayHighlight =
@@ -72,19 +72,14 @@ export default function CalendarPage() {
                     </button>
                 </div>
 
-                <div className="flex justify-end relative">
+                <div className="flex justify-end">
                     <button
-                        onClick={() => setShowAddOverlay(v => !v)}
+                        onClick={() => setEditingTB(makeDefaultTimeBlock())}
                         className="flex items-center gap-1.5 px-3 py-2 rounded-sm cursor-pointer text-white text-sm bg-[#02AFC7]"
                     >
                         <PlusIcon className="w-4 h-4" />
                         Add Shift
                     </button>
-                    <AddShiftOverlay
-                        isOpen={showAddOverlay}
-                        onClose={() => setShowAddOverlay(false)}
-                        onShiftCreated={refetch}
-                    />
                 </div>
             </div>
 
@@ -95,12 +90,19 @@ export default function CalendarPage() {
                 onView={setView}
                 onNavigate={setDate}
                 onSelectEvent={setSelectedTimeBlock}
+                onSelectSlot={(start) => setEditingTB(makeDefaultTimeBlock(start))}
             />
 
             <ShiftDetailOverlay
                 timeBlock={selectedTimeBlock}
                 onClose={() => setSelectedTimeBlock(null)}
                 onSaved={() => { refetch(); setSelectedTimeBlock(null); }}
+            />
+
+            <ShiftEditModal
+                timeBlock={editingTB}
+                onClose={() => setEditingTB(null)}
+                onSaved={() => { refetch(); setEditingTB(null); }}
             />
         </>
     );

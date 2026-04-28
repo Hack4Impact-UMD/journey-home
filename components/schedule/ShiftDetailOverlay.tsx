@@ -10,6 +10,8 @@ import {
   UserIcon,
   MapPinIcon,
   CubeIcon,
+  SteeringWheelIcon,
+  UsersThreeIcon,
 } from "@phosphor-icons/react";
 import { TimeBlock, Task } from "../../types/schedule";
 import { DonationRequest } from "../../types/donations";
@@ -17,7 +19,7 @@ import { ClientRequest } from "../../types/client-requests";
 import { useAllActiveAccounts } from "../../lib/queries/users";
 import { useTimeBlocks } from "../../lib/queries/timeblocks";
 import { ConfirmModal } from "../general/ConfirmModal";
-import { EditShiftOverlay } from "./EditShiftOverlay";
+import { ShiftEditModal } from "./ShiftEditModal";
 import { Switch } from "../ui/switch";
 
 function isPickup(task: Task): task is DonationRequest { return "donor" in task; }
@@ -43,7 +45,7 @@ function formatAddress(addr: { streetAddress: string; apt?: string; city: string
 interface Props {
   timeBlock: TimeBlock | null;
   onClose: () => void;
-  onSaved: () => void;
+  onSaved?: () => void;
 }
 
 export function ShiftDetailOverlay({ timeBlock, onClose, onSaved }: Props) {
@@ -82,11 +84,10 @@ export function ShiftDetailOverlay({ timeBlock, onClose, onSaved }: Props) {
 
   if (showEdit) {
     return (
-      <EditShiftOverlay
-        isOpen={true}
+      <ShiftEditModal
         timeBlock={liveTimeBlock}
-        onClose={onClose}
-        onSaved={onSaved}
+        onClose={() => setShowEdit(false)}
+        onSaved={() => setShowEdit(false)}
       />
     );
   }
@@ -198,9 +199,12 @@ export function ShiftDetailOverlay({ timeBlock, onClose, onSaved }: Props) {
                     const groupVolunteers = accountsLoading
                       ? []
                       : allAccounts.filter(u => group.volunterIDs.includes(u.uid));
+                    const isDriver = group.name.toLowerCase().includes("drive");
+                    const GroupIcon = isDriver ? SteeringWheelIcon : UsersThreeIcon;
                     return (
                       <div key={group.name}>
-                        <p className="text-sm font-medium text-[#565656]">
+                        <p className="text-sm font-medium flex items-center gap-1.5 text-[#565656]">
+                          <GroupIcon className="w-4 h-4 shrink-0" />
                           {group.name}&nbsp;|&nbsp;{group.volunterIDs.length}/{group.maxNum}
                         </p>
                         {groupVolunteers.length === 0 ? (
@@ -315,7 +319,7 @@ export function ShiftDetailOverlay({ timeBlock, onClose, onSaved }: Props) {
               {/* Shift Notes */}
               <div className="mt-4">
                 <p className="text-sm font-medium text-[#565656]">Shift Notes</p>
-                <p className="text-sm text-gray-500 mt-3">
+                <p className="text-sm text-gray-500 mt-3 whitespace-pre-wrap">
                   {liveTimeBlock.notes || <span className="italic text-gray-400">No notes</span>}
                 </p>
               </div>
