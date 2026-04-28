@@ -38,6 +38,7 @@ export default function VolunteerSignupPage() {
 
     const filteredTimeBlocks = timeBlocks.filter((tb) => {
         if (tb.startTime.toDate() < todayStart) return false;
+        if (!tb.published) return false;
 
         const type =
             tb.type === "Pickup/Delivery"

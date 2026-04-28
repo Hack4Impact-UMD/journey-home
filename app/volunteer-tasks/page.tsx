@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { createPortal } from "react-dom";
 
 import ItemSearch from "@/components/volunteer-tasks/ItemSearch";
@@ -21,6 +22,8 @@ const formatTime = (d: Date) => { const h = d.getHours(); return `${h % 12 || 12
 export default function VolunteerTasks() {
     const { state: { currentUser } } = useAuth();
     const { allTB } = useTimeBlocks();
+    const searchParams = useSearchParams();
+    const tbId = searchParams.get("id");
 
     const [screen, setScreen] = useState<"signup" | "shiftoverview" | "modify" | "summary">("signup");
     const [selectedShift, setSelectedShift] = useState<TimeBlock | null>(null);
@@ -34,6 +37,12 @@ export default function VolunteerTasks() {
         document.body.style.overflow = open ? "hidden" : "";
         return () => { document.body.style.overflow = ""; };
     }, [open]);
+
+    useEffect(() => {
+        if (!tbId || !allTB.length) return;
+        const tb = allTB.find((t) => t.id === tbId);
+        if (tb) { setSelectedShift(tb); setScreen("shiftoverview"); }
+    }, [tbId, allTB]);
 
     const {
         inventoryCategories,
