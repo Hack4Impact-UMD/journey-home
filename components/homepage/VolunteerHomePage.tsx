@@ -19,8 +19,7 @@ export default function VolunteerHomePage() {
                 <div className="flex flex-1 min-h-0 max-md:flex-col">
                     <Navbar />
                     <div className="flex-1 overflow-y-auto bg-white pt-8 max-md:pt-4 pb-4 px-6 flex flex-col gap-6">
-                        <span className="text-[36px] font-semibold text-primary 
-  leading-none block">
+                        <span className="text-4xl font-semibold text-primary leading-none block">
                             Welcome, {name}!
                         </span>
 

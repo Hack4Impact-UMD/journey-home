@@ -48,7 +48,7 @@ export default function ShiftTaskSummary() {
         <div>
             <Link href="/volunteer-tasks">
                 <div className="flex items-center mb-4 cursor-pointer gap-2">
-                    <h2 className="text-[20px] font-semibold text-gray-800 leading-none">
+                    <h2 className="text-xl font-semibold text-gray-800 leading-none">
                         Shift Tasks
                     </h2>
                     <ChevronRightIcon />

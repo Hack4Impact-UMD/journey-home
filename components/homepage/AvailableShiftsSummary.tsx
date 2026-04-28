@@ -57,7 +57,7 @@ export default function AvailableShiftsSummary() {
         <div>
             <Link href="/volunteer-signup">
                 <div className="flex items-center mb-4 cursor-pointer gap-2">
-                    <h2 className="text-[20px] font-semibold text-gray-800 leading-none">
+                    <h2 className="text-xl font-semibold text-gray-800 leading-none">
                         Sign-Up
                     </h2>
                     <ChevronRightIcon />
