@@ -44,9 +44,11 @@ export default function VolunteerTasks() {
     } = useInventoryCategories();
 
     const now = Date.now();
+    const todayMidnight = new Date(now);
+    todayMidnight.setHours(0, 0, 0, 0);
     const userTimeBlocks = allTB
         .filter((tb) =>
-            tb.endTime.toMillis() >= now &&
+            tb.endTime.toMillis() >= todayMidnight.getTime() &&
             tb.volunteerGroups.some((g) => g.volunterIDs.includes(currentUser!.uid))
         )
         .sort((a, b) => a.startTime.toMillis() - b.startTime.toMillis());

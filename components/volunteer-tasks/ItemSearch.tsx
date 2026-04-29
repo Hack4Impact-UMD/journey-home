@@ -102,13 +102,12 @@ export default function ItemSearch({
                         <div className="flex items-center gap-3 px-4 py-3 border-b">
                             <BoxIcon />
                             <input
-                                type="number"
+                                type="text"
+                                inputMode="numeric"
                                 value={quantity}
-                                onChange={(e) => setQuantity(e.target.value)}
+                                onChange={(e) => { if (/^\d*$/.test(e.target.value)) setQuantity(e.target.value); }}
                                 placeholder="Quantity"
                                 className="w-full outline-none"
-                                min={1}
-                                step={1}
                             />
                         </div>
 
