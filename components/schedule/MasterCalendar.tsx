@@ -42,8 +42,8 @@ function ShiftBlock({ event, isMonthView }: EventProps<CalendarEvent> & { isMont
     const driverMax = driverGroups.reduce((s, g) => s + g.maxNum, 0);
     const otherSigned = otherGroups.reduce((s, g) => s + g.volunterIDs.length, 0);
     const otherMax = otherGroups.reduce((s, g) => s + g.maxNum, 0);
-    const driverRed = driverMax > 0 && driverSigned < driverMax;
-    const otherRed = otherMax > 0 && (otherSigned === 0 || otherSigned < otherMax / 2);
+    const driverRed = event.published && driverMax > 0 && driverSigned < driverMax;
+    const otherRed = event.published && otherMax > 0 && (otherSigned === 0 || otherSigned < otherMax / 2);
 
     const infoColor = !event.published ? "#252525" : isPickup ? "#02AFC7" : "#BE8200";
 
