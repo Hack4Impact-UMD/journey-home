@@ -68,7 +68,7 @@ export default function CategoriesPage() {
                     onClick={() => { setSelectedCategory(category); setShowModal(true); }}
                   >
                     <div className="w-[58%] px-4 flex items-center gap-4">
-                      <PresetIcon icon={category.icon} size={28} className="text-text-1 shrink-0" />
+                      <PresetIcon icon={category.icon} className="w-7 h-7 text-text-1 shrink-0" />
                       {category.name}
                     </div>
                     <div className="w-[34%] px-4 flex gap-2">

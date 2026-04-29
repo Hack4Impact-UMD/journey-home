@@ -83,7 +83,7 @@ export function CategoryModal({
             <div className="flex items-center justify-between">
               <span className="font-semibold text-base">Select an icon</span>
               <button
-                onClick={() => setShowIconPicker(false)}
+                onClick={() => { setShowIconPicker(false); setIconSearch(""); }}
                 className="text-gray-400 hover:text-gray-600"
               >
                 <CloseIcon />
@@ -91,7 +91,7 @@ export function CategoryModal({
             </div>
 
             <div className="flex items-center gap-2 border border-[#D9D9D9] rounded-xs px-3 py-1.5">
-              <MagnifyingGlassIcon size={16} className="text-gray-400 shrink-0" />
+              <MagnifyingGlassIcon className="w-4 h-4 text-gray-400 shrink-0" />
               <input
                 className="flex-1 text-sm outline-none bg-transparent"
                 placeholder="Search icons"
@@ -112,7 +112,7 @@ export function CategoryModal({
                   <button
                     key={key}
                     title={key}
-                    onClick={() => { setIcon(key); setShowIconPicker(false); }}
+                    onClick={() => { setIcon(key); setShowIconPicker(false); setIconSearch(""); }}
                     className={[
                       "flex items-center justify-center w-full aspect-square rounded-xs border transition-colors",
                       icon === key
@@ -120,7 +120,7 @@ export function CategoryModal({
                         : "border-[#D9D9D9] hover:border-primary hover:bg-blue-50",
                     ].join(" ")}
                   >
-                    <PresetIcon icon={key} size={24} />
+                    <PresetIcon icon={key} className="w-6 h-6" />
                   </button>
                 ))
               }
@@ -166,7 +166,7 @@ export function CategoryModal({
                 : "border-[#D9D9D9] hover:border-primary hover:bg-blue-50",
             ].join(" ")}
           >
-            <PresetIcon icon={icon} size={24} />
+            <PresetIcon icon={icon} className="w-6 h-6" />
           </button>
 
           <div className="flex gap-8 mb-6">

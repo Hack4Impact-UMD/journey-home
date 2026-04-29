@@ -83,7 +83,7 @@ export function ItemDial({ category, onClick }: ItemDialProps) {
             <div className="relative flex items-center justify-center">
                 <DialArc quantity={quantity} low={lowThreshold} high={highThreshold} />
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
-                    <PresetIcon icon={icon} size={40} />
+                    <PresetIcon icon={icon} className="w-10 h-10" />
                     <span className="text-base font-semibold leading-none" style={{ color }}>
                         {quantity}
                     </span>

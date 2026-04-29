@@ -73,9 +73,7 @@ import {
 } from "@phosphor-icons/react";
 
 export type IconComponent = React.ComponentType<{
-  size?: number;
   className?: string;
-  strokeWidth?: number;
 }>;
 
 export const DEFAULT_ICON_KEY = "box";
