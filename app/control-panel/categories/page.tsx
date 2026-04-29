@@ -20,7 +20,7 @@ function isValidIcon(val: unknown): val is React.ComponentType<{ size?: number; 
 
 export default function CategoriesPage() {
   const { state: { userData } } = useAuth();
-  const { inventoryCategories, isLoading, setInventoryCategoryWithToast } =
+  const { inventoryCategories, isLoading, setInventoryCategoryWithToast, refetch } =
     useInventoryCategories();
 
   const [search, setSearch] = useState("");
@@ -36,8 +36,12 @@ export default function CategoriesPage() {
 
   return (
     <>
-      <div className="flex mb-6 gap-3">
-        <SearchBox value={search} onChange={setSearch} onSubmit={() => {}} />
+      <div className="flex flex-wrap mb-6 gap-3">
+        <SearchBox
+          value={search}
+          onChange={setSearch}
+          onSubmit={() => refetch}
+        />
         <button
           className="flex items-center gap-1 px-3 py-2 h-8 text-sm rounded-xs bg-primary text-white cursor-pointer"
           onClick={() => { setSelectedCategory(null); setShowModal(true); }}

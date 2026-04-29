@@ -1,0 +1,81 @@
+"use client";
+
+import { useMemo } from "react";
+import Link from "next/link";
+import { useWarehouseHistory } from "@/lib/queries/warehouse-history";
+
+function PlusIcon() {
+    return (
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 0C8.02219 0 6.08879 0.58649 4.4443 1.6853C2.79981 2.78412 1.51809 4.3459 0.761209 6.17316C0.0043328 8.00042 -0.1937 10.0111 0.192152 11.9509C0.578004 13.8907 1.53041 15.6725 2.92894 17.0711C4.32746 18.4696 6.10929 19.422 8.0491 19.8078C9.98891 20.1937 11.9996 19.9957 13.8268 19.2388C15.6541 18.4819 17.2159 17.2002 18.3147 15.5557C19.4135 13.9112 20 11.9778 20 10C19.9972 7.34869 18.9427 4.80678 17.068 2.93202C15.1932 1.05727 12.6513 0.00279983 10 0ZM10 18.4615C8.32647 18.4615 6.69052 17.9653 5.29902 17.0355C3.90753 16.1057 2.823 14.7842 2.18256 13.2381C1.54213 11.6919 1.37456 9.99061 1.70105 8.34923C2.02754 6.70786 2.83343 5.20016 4.01679 4.01679C5.20016 2.83342 6.70786 2.02754 8.34924 1.70105C9.99062 1.37456 11.6919 1.54212 13.2381 2.18256C14.7842 2.82299 16.1057 3.90753 17.0355 5.29902C17.9653 6.69051 18.4615 8.32646 18.4615 10C18.459 12.2434 17.5667 14.3941 15.9804 15.9804C14.3941 17.5667 12.2434 18.459 10 18.4615ZM14.6154 10C14.6154 10.204 14.5343 10.3997 14.3901 10.5439C14.2458 10.6882 14.0502 10.7692 13.8462 10.7692H10.7692V13.8462C10.7692 14.0502 10.6882 14.2458 10.5439 14.3901C10.3997 14.5343 10.204 14.6154 10 14.6154C9.79599 14.6154 9.60033 14.5343 9.45607 14.3901C9.31182 14.2458 9.23077 14.0502 9.23077 13.8462V10.7692H6.15385C5.94984 10.7692 5.75418 10.6882 5.60992 10.5439C5.46566 10.3997 5.38462 10.204 5.38462 10C5.38462 9.79599 5.46566 9.60033 5.60992 9.45607C5.75418 9.31181 5.94984 9.23077 6.15385 9.23077H9.23077V6.15384C9.23077 5.94983 9.31182 5.75418 9.45607 5.60992C9.60033 5.46566 9.79599 5.38461 10 5.38461C10.204 5.38461 10.3997 5.46566 10.5439 5.60992C10.6882 5.75418 10.7692 5.94983 10.7692 6.15384V9.23077H13.8462C14.0502 9.23077 14.2458 9.31181 14.3901 9.45607C14.5343 9.60033 14.6154 9.79599 14.6154 10Z" fill="#69C22E" />
+        </svg>
+    );
+}
+
+function MinusIcon() {
+    return (
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14.6154 10C14.6154 10.204 14.5343 10.3997 14.3901 10.5439C14.2458 10.6882 14.0502 10.7692 13.8462 10.7692H6.15385C5.94984 10.7692 5.75418 10.6882 5.60992 10.5439C5.46566 10.3997 5.38462 10.204 5.38462 10C5.38462 9.79599 5.46566 9.60033 5.60992 9.45607C5.75418 9.31181 5.94984 9.23077 6.15385 9.23077H13.8462C14.0502 9.23077 14.2458 9.31181 14.3901 9.45607C14.5343 9.60033 14.6154 9.79599 14.6154 10ZM20 10C20 11.9778 19.4135 13.9112 18.3147 15.5557C17.2159 17.2002 15.6541 18.4819 13.8268 19.2388C11.9996 19.9957 9.98891 20.1937 8.0491 19.8078C6.10929 19.422 4.32746 18.4696 2.92894 17.0711C1.53041 15.6725 0.578004 13.8907 0.192152 11.9509C-0.1937 10.0111 0.0043328 8.00042 0.761209 6.17316C1.51809 4.3459 2.79981 2.78412 4.4443 1.6853C6.08879 0.58649 8.02219 0 10 0C12.6513 0.00279983 15.1932 1.05727 17.068 2.93202C18.9427 4.80678 19.9972 7.34869 20 10ZM18.4615 10C18.4615 8.32646 17.9653 6.69051 17.0355 5.29902C16.1057 3.90753 14.7842 2.82299 13.2381 2.18256C11.6919 1.54212 9.99062 1.37456 8.34924 1.70105C6.70786 2.02754 5.20016 2.83342 4.01679 4.01679C2.83343 5.20016 2.02754 6.70786 1.70105 8.34923C1.37456 9.99061 1.54213 11.6919 2.18256 13.2381C2.823 14.7842 3.90753 16.1057 5.29902 17.0355C6.69052 17.9653 8.32647 18.4615 10 18.4615C12.2434 18.459 14.3941 17.5667 15.9804 15.9804C17.5667 14.3941 18.459 12.2434 18.4615 10Z" fill="#E16060" />
+        </svg>
+    );
+}
+
+export default function WarehouseHistorySummary() {
+    const { changes: warehouseChanges = [], isLoading } = useWarehouseHistory();
+
+    const sortedChanges = useMemo(() =>
+        [...warehouseChanges]
+            .filter((c) => c.change.newQuantity !== c.change.oldQuantity)
+            .sort((a, b) => b.timestamp.toDate().getTime() - a.timestamp.toDate().getTime()),
+        [warehouseChanges]
+    );
+
+    const recentCount = useMemo(() =>
+        sortedChanges.filter(
+            (c) => Date.now() - c.timestamp.toDate().getTime() <= 48 * 60 * 60 * 1000,
+        ).length,
+        [sortedChanges]
+    );
+
+    const mostRecent = useMemo(() => sortedChanges.slice(0, 5), [sortedChanges]);
+
+    return (
+        <div className="w-full h-full rounded-2xl border border-[#E7E7E7] shadow-sm py-6 px-5 flex flex-col gap-3 bg-white/70">
+            <div className="flex flex-row place-content-between items-center">
+                <Link href="/control-panel/warehouse-history" className="font-semibold text-text-1 hover:underline">
+                    Latest inventory updates
+                </Link>
+                <span className="text-sm text-[#383838]">
+                    <span className="font-semibold text-text-1">{recentCount}</span> new changes
+                </span>
+            </div>
+            {isLoading ? (
+                <p className="text-sm text-gray-400">Loading...</p>
+            ) : mostRecent.length === 0 ? (
+                <p className="text-sm text-gray-400">No inventory changes were made</p>
+            ) : (
+                <div className="flex flex-col gap-2">
+                    {mostRecent.map((c) => {
+                        const diff = c.change.newQuantity - c.change.oldQuantity;
+                        const isPositive = diff > 0;
+                        return (
+                            <Link key={c.id} href="/control-panel/warehouse-history" className="flex items-center gap-3 bg-white/70 border border-[#DCDDDD] rounded-xl px-3 py-2">
+                                <span className="shrink-0">
+                                    {isPositive ? <PlusIcon /> : <MinusIcon />}
+                                </span>
+                                <span className="text-xs text-gray-400 shrink-0">
+                                    {c.timestamp.toDate().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).replaceAll(",", "").replace(" AM", "am").replace(" PM", "pm")}
+                                </span>
+                                <span className="border-l border-gray-200 self-stretch" />
+                                <span className="text-sm text-gray-700">
+                                    {isPositive ? "added " : "removed "}
+                                    {Math.abs(diff)} {c.change.category} ({c.change.oldQuantity} → {c.change.newQuantity})
+                                </span>
+                            </Link>
+                        );
+                    })}
+                </div>
+            )}
+        </div>
+    );
+}

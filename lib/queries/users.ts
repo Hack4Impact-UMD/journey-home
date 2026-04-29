@@ -44,6 +44,9 @@ function useAllAccounts(onlyActive: boolean) {
                 queryClient.setQueryData(["users"], context.prevData);
             }
         },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["users"] });
+        },
     });
 
     const updateAccount = async (newUserData: UserData) => {

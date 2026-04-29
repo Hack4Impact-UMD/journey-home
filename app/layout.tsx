@@ -32,7 +32,8 @@ export default function RootLayout({
                 className={`${openSans.variable} ${raleway.variable} ${roboto.variable} w-full h-full overscroll-none`}
             >
                 <body className="w-full h-full font-family-roboto">
-                    <Toaster />
+                    <div className="md:hidden"><Toaster position="top-center" /></div>
+                    <div className="max-md:hidden"><Toaster /></div>
                     {children}
                 </body>
             </html>
