@@ -1,5 +1,5 @@
 "use client"
-import Request, { getTotalItems } from "@/components/pickups-deliveries/Request";
+import PickupDeliveryCard, { getTotalItems } from "@/components/pickups-deliveries/Request";
 import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { SortOption } from "@/components/inventory/SortOption";
@@ -32,7 +32,7 @@ export default function ScheduledTasksPage() {
 
     const deliveryItems = useMemo(
         () => clientRequests.filter(
-            (cr) => cr.associatedTimeBlockID !== null
+            (cr) => cr.associatedTimeBlockID !== null && cr.status === "Approved"
         ),
         [clientRequests]
     );
@@ -117,7 +117,7 @@ export default function ScheduledTasksPage() {
                     const totalB = getTotalItems(b);
                     return sortAsc ? totalA - totalB : totalB - totalA;
                 }).map(item => (
-                    <Request donation={item} key={item.id} />
+                    <PickupDeliveryCard donation={item} key={item.id} />
                 ))
             }
             </div>
