@@ -15,10 +15,9 @@ import { JourneyTheDogIcon } from "@/components/icons/JourneyTheDogIcon";
 import { ChevronDown, ChevronUp, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { TimeBlock } from "@/types/schedule";
+import { formatTime } from "@/lib/utils";
 
 type ItemMap = Record<string, number>;
-
-const formatTime = (d: Date) => { const h = d.getHours(); return `${h % 12 || 12}${h >= 12 ? "pm" : "am"}`; };
 
 export default function VolunteerTasks() {
     const { state: { currentUser } } = useAuth();

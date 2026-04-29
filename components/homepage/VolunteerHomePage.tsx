@@ -7,7 +7,6 @@ import AvailableShiftsSummary from "./AvailableShiftsSummary";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function VolunteerHomePage() {
-    // display the name of the user 
     const { state } = useAuth();
     const user = state.userData;
 

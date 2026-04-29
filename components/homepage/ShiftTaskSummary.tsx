@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { CaretRight as CaretRightIcon } from "@phosphor-icons/react";
 import { useTimeBlocks } from "@/lib/queries/timeblocks";
 import { useAuth } from "@/contexts/AuthContext";
-import { ChevronRightIcon } from "@/components/icons/ChevronRightIcon";
+import { formatTime } from "@/lib/utils";
 import { TimeBlock } from "@/types/schedule";
 
 export default function ShiftTaskSummary() {
@@ -12,26 +13,20 @@ export default function ShiftTaskSummary() {
     const userId = state.currentUser?.uid;
 
     const now = new Date();
+    const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     const myShifts = timeblocks
         .filter((tb) => {
             if (!userId) return false;
             const startTime = tb.startTime.toDate();
-            const endTime = tb.endTime?.toDate();
-            if (endTime ? endTime <= now : startTime < now) return false;
+            const shiftDay = new Date(startTime.getFullYear(), startTime.getMonth(), startTime.getDate());
+            if (shiftDay < todayMidnight) return false;
             return tb.volunteerGroups?.some((group) =>
                 group.volunterIDs?.includes(userId)
             );
         })
         .sort((a, b) => a.startTime.toDate().getTime() - b.startTime.toDate().getTime())
         .slice(0, 2);
-
-    const formatTime = (date: Date) => {
-        const hours = date.getHours();
-        const hour12 = hours % 12 || 12;
-        const suffix = hours >= 12 ? "pm" : "am";
-        return `${hour12}${suffix}`;
-    };
 
     const groupedByDate = myShifts.reduce((acc, tb) => {
         const dateKey = tb.startTime.toDate().toDateString();
@@ -51,14 +46,14 @@ export default function ShiftTaskSummary() {
                     <h2 className="text-xl font-semibold text-gray-800 leading-none">
                         Shift Tasks
                     </h2>
-                    <ChevronRightIcon />
+                    <CaretRightIcon className="w-5 h-5" />
                 </div>
             </Link>
 
             <div className="border bg-white overflow-hidden">
                 {isLoading ? (
                     <div className="h-64" />
-                ) :myShifts.length === 0 ? (
+                ) : myShifts.length === 0 ? (
                     <div className="h-64 flex items-center justify-center text-sm text-gray-400">
                         No shifts
                     </div>
@@ -74,7 +69,8 @@ export default function ShiftTaskSummary() {
                                             {blocks.map((tb, index) => {
                                                 const start = tb.startTime.toDate();
                                                 const end = tb.endTime?.toDate();
-                                                const isOngoing = start <= now && end && now <= end;
+                                                const shiftDayStart = new Date(start.getFullYear(), start.getMonth(), start.getDate()).getTime();
+                                                const isOngoing = shiftDayStart <= now.getTime() && now.getTime() < shiftDayStart + 86400000;
                                                 const timeRange = end
                                                     ? `${formatTime(start)}-${formatTime(end)}`
                                                     : formatTime(start);
@@ -120,9 +116,9 @@ export default function ShiftTaskSummary() {
                                                             <div className="flex flex-col gap-1">
                                                                 <div className="text-sm text-text-1">{tb.name}</div>
                                                                 <div className="flex flex-col gap-1 text-sm text-primary">
-                                                                    {tb.volunteerGroups.map((group) => (
+                                                                    {tb.volunteerGroups?.map((group) => (
                                                                         <div key={group.name}>
-                                                                            {group.volunterIDs.length}/{group.maxNum}{" "}
+                                                                            {group.volunterIDs?.length ?? 0}/{group.maxNum ?? 0}{" "}
                                                                             {group.name}
                                                                         </div>
                                                                     ))}
@@ -162,7 +158,8 @@ export default function ShiftTaskSummary() {
                                                 {blocks.map((tb) => {
                                                     const start = tb.startTime.toDate();
                                                     const end = tb.endTime?.toDate();
-                                                    const isOngoing = start <= now && end && now <= end;
+                                                    const shiftDayStart = new Date(start.getFullYear(), start.getMonth(), start.getDate()).getTime();
+                                                    const isOngoing = shiftDayStart <= now.getTime() && now.getTime() < shiftDayStart + 86400000;
                                                     const timeRange = end
                                                         ? `${formatTime(start)}-${formatTime(end)}`
                                                         : formatTime(start);
@@ -173,15 +170,15 @@ export default function ShiftTaskSummary() {
                                                             <div className="w-24 shrink-0 text-sm text-text-1">{timeRange}</div>
                                                             <div className="w-40 shrink-0 text-sm text-text-1">{tb.name}</div>
                                                             <div className="flex flex-col gap-1 text-primary text-sm">
-                                                                {tb.volunteerGroups.map((group) => (
+                                                                {tb.volunteerGroups?.map((group) => (
                                                                     <span key={group.name}>
-                                                                        {group.volunterIDs.length}/{group.maxNum} {group.name}
+                                                                        {group.volunterIDs?.length ?? 0}/{group.maxNum ?? 0} {group.name}
                                                                     </span>
                                                                 ))}
                                                             </div>
                                                             <div className="ml-auto shrink-0">
                                                                 {isOngoing ? (
-                                                                    <Link href="/volunteer-tasks" className="text-sm h-8 w-24 flex items-center justify-center rounded-xs bg-primary text-white">
+                                                                    <Link href={`/volunteer-tasks?id=${tb.id}`} className="text-sm h-8 w-24 flex items-center justify-center rounded-xs bg-primary text-white">
                                                                         Open
                                                                     </Link>
                                                                 ) : (

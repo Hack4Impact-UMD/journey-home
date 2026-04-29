@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { CaretRightIcon } from "@phosphor-icons/react";
 import { useTimeBlocks } from "@/lib/queries/timeblocks";
 import { useAuth } from "@/contexts/AuthContext";
-import { ChevronRightIcon } from "@/components/icons/ChevronRightIcon";
+import { formatTime } from "@/lib/utils";
 import { TimeBlock } from "@/types/schedule";
 
 export default function AvailableShiftsSummary() {
@@ -35,13 +36,6 @@ export default function AvailableShiftsSummary() {
         .sort((a, b) => a.startTime.toDate().getTime() - b.startTime.toDate().getTime())
         .slice(0, 2);
 
-    const formatTime = (date: Date) => {
-        const hours = date.getHours();
-        const hour12 = hours % 12 || 12;
-        const suffix = hours >= 12 ? "pm" : "am";
-        return `${hour12}${suffix}`;
-    };
-
     const groupedByDate = availableShifts.reduce((acc, tb) => {
         const dateKey = tb.startTime.toDate().toDateString();
         if (!acc[dateKey]) acc[dateKey] = [];
@@ -60,14 +54,14 @@ export default function AvailableShiftsSummary() {
                     <h2 className="text-xl font-semibold text-gray-800 leading-none">
                         Sign-Up
                     </h2>
-                    <ChevronRightIcon />
+                    <CaretRightIcon className="w-5 h-5" />
                 </div>
             </Link>
 
             <div className="border bg-white overflow-hidden">
                 {isLoading ? (
                     <div className="h-64" />
-                ) :availableShifts.length === 0 ? (
+                ) : availableShifts.length === 0 ? (
                     <div className="h-64 flex items-center justify-center text-sm text-gray-400">
                         No shifts
                     </div>
@@ -83,7 +77,6 @@ export default function AvailableShiftsSummary() {
                                             {blocks.map((tb, index) => {
                                                 const start = tb.startTime.toDate();
                                                 const end = tb.endTime?.toDate();
-                                                const isFull = !tb.volunteerGroups?.some((g) => (g.volunterIDs?.length ?? 0) < (g.maxNum ?? 0));
                                                 const timeRange = end
                                                     ? `${formatTime(start)}-${formatTime(end)}`
                                                     : formatTime(start);
@@ -98,16 +91,6 @@ export default function AvailableShiftsSummary() {
                                                         {typeDot}
                                                         {timeRange}
                                                     </div>
-                                                );
-
-                                                const button = isFull ? (
-                                                    <div className="text-sm h-8 w-24 flex items-center justify-center shrink-0 rounded-xs bg-white text-gray-400 border border-gray-300">
-                                                        Full
-                                                    </div>
-                                                ) : (
-                                                    <Link href="/volunteer-signup" className="text-sm h-8 w-24 flex items-center justify-center shrink-0 rounded-xs bg-primary text-white">
-                                                        Sign up
-                                                    </Link>
                                                 );
 
                                                 return (
@@ -139,7 +122,9 @@ export default function AvailableShiftsSummary() {
                                                             </div>
                                                             <div className="flex flex-col items-end gap-1 shrink-0">
                                                                 {!isFirst && timeEl}
-                                                                {button}
+                                                                <Link href="/volunteer-signup" className="text-sm h-8 w-24 flex items-center justify-center shrink-0 rounded-xs bg-primary text-white">
+                                                                    Sign up
+                                                                </Link>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -171,7 +156,6 @@ export default function AvailableShiftsSummary() {
                                                 {blocks.map((tb) => {
                                                     const start = tb.startTime.toDate();
                                                     const end = tb.endTime?.toDate();
-                                                    const isFull = !tb.volunteerGroups?.some((g) => (g.volunterIDs?.length ?? 0) < (g.maxNum ?? 0));
                                                     const timeRange = end
                                                         ? `${formatTime(start)}-${formatTime(end)}`
                                                         : formatTime(start);
@@ -189,15 +173,9 @@ export default function AvailableShiftsSummary() {
                                                                 ))}
                                                             </div>
                                                             <div className="ml-auto shrink-0">
-                                                                {isFull ? (
-                                                                    <div className="text-sm h-8 w-24 flex items-center justify-center rounded-xs bg-white text-gray-400 border border-gray-300">
-                                                                        Full
-                                                                    </div>
-                                                                ) : (
-                                                                    <Link href="/volunteer-signup" className="text-sm h-8 w-24 flex items-center justify-center rounded-xs bg-primary text-white">
-                                                                        Sign up
-                                                                    </Link>
-                                                                )}
+                                                                <Link href="/volunteer-signup" className="text-sm h-8 w-24 flex items-center justify-center rounded-xs bg-primary text-white">
+                                                                    Sign up
+                                                                </Link>
                                                             </div>
                                                         </div>
                                                     );
