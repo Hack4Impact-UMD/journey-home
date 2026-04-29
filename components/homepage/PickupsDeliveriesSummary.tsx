@@ -49,11 +49,9 @@ export function PickupsDeliveriesSummary() {
         });
     });
 
-    const displayRows = rows.slice(0,4);
-
     return (
         <div className="h-full w-full bg-white/70 rounded-2xl border border-light-border p-5 flex flex-col gap-3 shadow-sm">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between shrink-0">
                 <Link href="/pickups-deliveries/scheduled" className="text-base font-semibold text-text-1 hover:underline">Upcoming pickups/deliveries</Link>
                 <span className="text-sm text-[#383838]">
                     {isLoading ? "..." : <><span className="font-semibold text-text-1">{rows.length}</span> today</>}
@@ -66,8 +64,8 @@ export function PickupsDeliveriesSummary() {
             ) : rows.length === 0 ? (
                 <span className="text-sm text-gray-400">No pickups or deliveries today</span>
             ) : (
-                <div className="flex flex-col gap-2">
-                    {displayRows.map((row) => (
+                <div className="flex flex-col gap-2 overflow-y-auto flex-1 min-h-0">
+                    {rows.map((row) => (
                         <Link key={row.key} href="/pickups-deliveries/scheduled" className="flex items-center gap-4 border border-light-border px-4 py-3 rounded-sm">
                             <span className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-semibold shrink-0 ${row.type === "P" ? "bg-[#D6E8F0] text-[#4A8FA8]" : "bg-[#F5E0E0] text-[#A87070]"}`}>{row.type}</span>
                             <span className="w-24 shrink-0 text-sm">{row.timeRange}</span>
