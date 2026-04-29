@@ -11,7 +11,7 @@ import { CloseIcon } from "@/components/icons/CloseIcon";
 import { toast } from "sonner";
 import { PlusIcon } from "lucide-react";
 import Image from "next/image";
-import { useCategories } from "@/lib/queries/categories";
+import { useInventoryCategories } from "@/lib/queries/inventory";
 
 
 export default function Step2AddDonations() {
@@ -39,12 +39,18 @@ export default function Step2AddDonations() {
         setCurrentStep(3);
     };
 
-    const {allCategories: categoryOptions} = useCategories();
+    const { inventoryCategories } = useInventoryCategories();
+    const categoryOptions = inventoryCategories.map((c) => c.name);
 
     const fileInputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
 
     const sizeOptions = ["Small", "Medium", "Large"];
 
+    const steps = [
+    { number: 1, label: "Personal Information" },
+    { number: 2, label: "Donations" },
+    { number: 3, label: "Review" },
+    ];
     return (
         <div className="space-y-6">
             <div className="flex justify-center mb-8">
@@ -57,7 +63,7 @@ export default function Step2AddDonations() {
                />
             </div>
 
-            <StepIndicator currentStep={2} />
+            <StepIndicator currentStep={2} steps={steps}/>
 
             <div className="mb-6">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">

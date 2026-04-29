@@ -81,6 +81,7 @@ export default function Step3Review() {
             canDropOff: formState.canDropOff ?? false,
             notes: formState.notes ?? "",
             date: Timestamp.now(),
+            responded: false,
             items,
             associatedTimeBlockID: null // Placeholder for now, need to replace to create a Time Block
         };
@@ -105,6 +106,11 @@ export default function Step3Review() {
         setCurrentStep(4);
     };
 
+    const steps = [
+    { number: 1, label: "Personal Information" },
+    { number: 2, label: "Donations" },
+    { number: 3, label: "Review" },
+    ];
     return (
         <div className="space-y-6">
             <div className="flex justify-center mb-8">
@@ -117,7 +123,7 @@ export default function Step3Review() {
                 />
             </div>
 
-            <StepIndicator currentStep={3} />
+            <StepIndicator currentStep={3} steps={steps}/>
 
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
                 Personal Information

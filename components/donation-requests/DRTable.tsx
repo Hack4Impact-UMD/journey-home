@@ -1,7 +1,5 @@
 import { DonationRequest } from "@/types/donations";
 import { Badge } from "../inventory/Badge";
-import { ViewIcon } from "../icons/ViewIcon";
-import { TrashIcon } from "../icons/TrashIcon";
 
 export function DRTable({
     donationRequests,
@@ -13,7 +11,7 @@ export function DRTable({
     return (
         <div className="w-full min-w-3xl h-full flex flex-col">
             <div className="h-12 bg-[#FAFAFB] border-light-border border flex items-center font-family-roboto font-bold text-sm text-text-1 shrink-0">
-                <span className="w-[30%] border-l-2 border-light-border px-4">
+                <span className="w-[35%] border-l-2 border-light-border px-4">
                     Name
                 </span>
                 <span className="w-[10%] border-l-2 border-light-border px-4">
@@ -22,14 +20,11 @@ export function DRTable({
                 <span className="w-[15%] border-l-2 border-light-border px-4">
                     Date
                 </span>
-                <span className="w-[20%] border-l-2 border-light-border px-4">
+                <span className="w-[25%] border-l-2 border-light-border px-4">
                     Status
                 </span>
                 <span className="w-[15%] border-l-2 border-light-border px-4">
                     Responded
-                </span>
-                <span className="w-[10%] border-l-2 border-light-border px-4">
-                    Actions
                 </span>
             </div>
             <div className="flex-1 overflow-auto min-h-0">
@@ -62,11 +57,7 @@ function DRTableRow({ request, onOpen }: { request: DonationRequest, onOpen: () 
             className="h-10 border-light-border border-b border-x flex items-center font-family-roboto text-sm text-text-1 hover:bg-blue-50 cursor-pointer"
             onClick={onOpen}
         >
-            <div className="w-[30%] px-4 flex items-center">
-                <input
-                    type="checkbox"
-                    className="w-4 h-4 mr-4 rounded-xs cursor-pointer border-white"
-                ></input>
+            <div className="w-[35%] px-4 flex items-center">
                 <span>
                     {request.donor.firstName} {request.donor.lastName}
                 </span>
@@ -84,14 +75,10 @@ function DRTableRow({ request, onOpen }: { request: DonationRequest, onOpen: () 
                     year: "2-digit",
                 })}
             </span>
-            <span className="w-[20%] px-4 text-xs">
+            <span className="w-[25%] px-4 text-xs">
                 <Badge text={statusText} color={statusColor} />
             </span>
             <span className="w-[15%] px-4">TBD</span>
-            <div className="w-[10%] px-4 flex align-center">
-                <ViewIcon />
-                <TrashIcon />
-            </div>
         </div>
     );
 }

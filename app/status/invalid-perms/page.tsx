@@ -1,29 +1,29 @@
 "use client";
 
+import { StatusPage } from "@/components/general/StatusPage";
+import { usePageTitle } from "@/lib/usePageTitle";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 
 export default function InvalidPerms() {
-    const router = useRouter();
+    usePageTitle("Insufficient Permissions | Journey Home");
     const auth = useAuth();
+    const router = useRouter();
+
+    const handleLogout = async () => {
+        try {
+            await auth.logout();
+            router.push("/login");
+        } catch (error) {
+            console.error("Logout failed", error);
+        }
+    };
 
     return (
-        <>
-            <div className="w-full h-full flex items-center align-center flex-col p-10 gap-2">
-                <h1>You don&apos;t have permissions to view this page</h1>
-                <button
-                    className="border border-light-border px-8 rounded-xs font-family-roboto"
-                    onClick={() => router.push("/")}
-                >
-                    Home
-                </button>
-                <button
-                    className="border border-light-border px-8 rounded-xs font-family-roboto"
-                    onClick={() => auth.logout().then(() => router.push("/login"))}
-                >
-                    Logout
-                </button>
-            </div>
-        </>
+        <StatusPage
+            title="Insufficient Permissions"
+            message="You don't have permissions to view this page"
+            onLogout={handleLogout}
+        />
     );
 }
