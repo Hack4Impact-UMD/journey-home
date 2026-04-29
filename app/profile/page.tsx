@@ -91,21 +91,21 @@ export default function ProfilePage() {
             <div className="h-full w-full flex flex-col font-family-roboto overflow-hidden">
                 <div className="flex flex-1 min-h-0 max-md:flex-col">
                     <Navbar pageTitle="Profile" />
-                    <div className="flex-1 min-h-0 bg-[#F7F7F7] pt-8 max-md:pt-1 pb-4 px-6 flex flex-col items-center justify-center">
+                    <div className="flex-1 min-h-0 bg-[#F7F7F7] pt-8 max-md:pt-0 pb-4 max-md:pb-0 px-6 max-md:px-0 flex flex-col items-center justify-center max-md:justify-start">
                         {isLoading ? (
                             <p>Loading...</p>
                         ) : !account ? (
                             <p className="text-red-600">User not found</p>
                         ) : (
-                            <div className="w-full max-w-3xl bg-white rounded-[0.625rem] border border-gray-300">
-                                <div className="border-b border-light-border py-4 px-7">
+                            <div className="w-full max-w-3xl bg-white rounded-[0.625rem] border border-gray-300 max-md:rounded-none max-md:border-0 max-md:flex-1 max-md:overflow-y-auto">
+                                <div className="border-b border-light-border py-4 px-7 max-md:px-6 max-md:hidden">
                                     <h1 className="text-2xl text-primary font-bold mb-1">
                                         Account Info
                                     </h1>
                                     <p className="text-[#666666]">{account.role}</p>
                                 </div>
 
-                                <div className="px-20 pt-6 pb-8">
+                                <div className="px-20 pt-6 pb-8 max-md:px-6">
                                 {showPasswordReset ? (
                                     <PasswordResetSection onBack={() => setShowPasswordReset(false)} />
                                 ) : (
@@ -115,7 +115,7 @@ export default function ProfilePage() {
                                         Personal
                                     </h2>
                                     <div className="space-y-4 mb-8">
-                                        <div className="flex gap-4">
+                                        <div className="flex gap-4 max-md:flex-col">
                                             <div className="flex-1">
                                                 <label className="block mb-1 text-sm text-text-1">First Name</label>
                                                 <input
@@ -135,7 +135,7 @@ export default function ProfilePage() {
                                                 />
                                             </div>
                                         </div>
-                                        <div className="flex gap-4">
+                                        <div className="flex gap-4 max-md:flex-col">
                                             <div className="flex-1">
                                                 <label className="block mb-1 text-sm text-text-1">Date of Birth</label>
                                                 <input
@@ -161,7 +161,7 @@ export default function ProfilePage() {
                                     <h2 className="text-xl font-semibold mb-4">
                                         Login
                                     </h2>
-                                    <div className="flex gap-4 mb-16">
+                                    <div className="flex gap-4 mb-16 max-md:flex-col">
                                         <div className="flex-1">
                                             <label className="block mb-1 text-sm text-text-1">Email</label>
                                             <input
