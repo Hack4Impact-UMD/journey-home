@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchAllTB, setTB, signUpForShift } from "../services/timeblocks";
+import { deleteTB, fetchAllTB, setTB, signUpForShift } from "../services/timeblocks";
+import { clearDonationRequestTimeBlockRef } from "../services/donations";
+import { clearClientRequestTimeBlockRef } from "../services/client-request";
 import { TimeBlock } from "@/types/schedule";
 import { toast } from "sonner";
 
@@ -31,7 +33,7 @@ export function useTimeBlocks() {
 
             return { prevData };
         },
-        onError: (error, newTB, context) => {
+        onError: (_error, _newTB, context) => {
             if (context?.prevData) {
                 queryClient.setQueryData(["timeblocks"], context.prevData);
             }
@@ -46,6 +48,46 @@ export function useTimeBlocks() {
             error: "Error: Couldn't update timeblock",
         });
         
+        await promise;
+    };
+
+    const deleteMutation = useMutation({
+        mutationFn: async (tb: TimeBlock) => {
+            await Promise.all(
+                tb.tasks.map(task =>
+                    "donor" in task
+                        ? clearDonationRequestTimeBlockRef(task.id)
+                        : clearClientRequestTimeBlockRef(task.id)
+                )
+            );
+            await deleteTB(tb.id);
+        },
+        onMutate: async (tb: TimeBlock) => {
+            await queryClient.cancelQueries({ queryKey: ["timeblocks"] });
+            const prevData = queryClient.getQueryData<TimeBlock[]>(["timeblocks"]);
+            queryClient.setQueryData(["timeblocks"], (old: TimeBlock[] | undefined) =>
+                old ? old.filter(t => t.id !== tb.id) : []
+            );
+            return { prevData };
+        },
+        onError: (_err, _tb, context) => {
+            if (context?.prevData) {
+                queryClient.setQueryData(["timeblocks"], context.prevData);
+            }
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["donationRequests"] });
+            queryClient.invalidateQueries({ queryKey: ["clientRequests"] });
+        },
+    });
+
+    const deleteTimeblockToast = async (tb: TimeBlock) => {
+        const promise = deleteMutation.mutateAsync(tb);
+        toast.promise(promise, {
+            loading: "Deleting shift...",
+            success: "Shift deleted!",
+            error: "Couldn't delete shift",
+        });
         await promise;
     };
 
@@ -67,6 +109,7 @@ export function useTimeBlocks() {
 
         setTimeblockToast: setTimeblockToast,
         setTimeblock: setMutation.mutateAsync,
+        deleteTimeblockToast,
         signUpToast,
 
         isLoading: query.isLoading,
