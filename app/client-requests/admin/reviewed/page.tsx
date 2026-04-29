@@ -28,7 +28,7 @@ export default function ClientRequestsAdminPage() {
     const [selectedStatus, setStatus] = useState<ReviewStatus[]>(statusOpts);
 
     const [editSinceLabel, setEditSinceLabel] = useState<string | null>("Saved");
-    const [pendingAction, setPendingAction] = useState<{ status: "Approved" | "Denied" } | null>(null);
+    const [pendingAction, setPendingAction] = useState<{ status: "Approved" | "Denied" | "Not Reviewed" } | null>(null);
     const pendingCaseManager = selectedCR ? (userById.get(selectedCR.caseManagerID) ?? null) : null;
 
     const handleConfirm = async () => {
@@ -84,11 +84,19 @@ export default function ClientRequestsAdminPage() {
                         >
                             Deny
                         </button>
+                        {(selectedCR.status === "Approved" || selectedCR.status === "Denied") && (
+                            <button
+                                className="text-sm rounded-xs h-8 px-4 border border-light-border"
+                                onClick={() => setPendingAction({ status: "Not Reviewed" })}
+                            >
+                                Mark Pending
+                            </button>
+                        )}
                     </div>
                     {pendingAction && (
                         <ConfirmModal
-                            title={pendingAction.status === "Approved" ? "Approve request?" : "Deny request?"}
-                            message={`${pendingAction.status === "Approved" ? "Approve" : "Deny"} ${selectedCR.client.firstName} ${selectedCR.client.lastName}'s request submitted by ${pendingCaseManager ? `${pendingCaseManager.firstName} ${pendingCaseManager.lastName}` : "this case manager"}?`}
+                            title={pendingAction.status === "Not Reviewed" ? "Mark request pending?" : pendingAction.status === "Approved" ? "Approve request?" : "Deny request?"}
+                            message={`${pendingAction.status === "Not Reviewed" ? "Mark pending" : pendingAction.status === "Approved" ? "Approve" : "Deny"} ${selectedCR.client.firstName} ${selectedCR.client.lastName}'s request submitted by ${pendingCaseManager ? `${pendingCaseManager.firstName} ${pendingCaseManager.lastName}` : "this case manager"}?`}
                             onConfirm={handleConfirm}
                             onCancel={() => setPendingAction(null)}
                         />
