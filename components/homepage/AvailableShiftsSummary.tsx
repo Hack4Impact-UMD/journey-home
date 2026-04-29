@@ -13,13 +13,15 @@ export default function AvailableShiftsSummary() {
     const userId = state.currentUser?.uid;
 
     const now = new Date();
+    const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     const availableShifts = timeblocks
         .filter((tb) => {
             if (!userId) return false;
 
             const startTime = tb.startTime.toDate();
-            if (!(tb.published === true && startTime > now)) return false;
+            const shiftDay = new Date(startTime.getFullYear(), startTime.getMonth(), startTime.getDate());
+            if (!(tb.published === true && shiftDay >= todayMidnight)) return false;
 
             const isSignedUp = tb.volunteerGroups?.some((group) =>
                 group.volunterIDs?.includes(userId)
