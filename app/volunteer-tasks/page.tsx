@@ -82,11 +82,8 @@ export default function VolunteerTasks() {
             .map(([name, qty]) => ({ category: inventoryCategories.find((c) => c.name === name), qty }))
             .filter(({ category }) => category != null)
             .map(({ category, qty }) => setInventoryCategoryWithToast({
-                id: category!.id,
-                name: category!.name,
+                ...category!,
                 quantity: summaryMode === "remove" ? category!.quantity - qty : category!.quantity + qty,
-                lowThreshold: category!.lowThreshold,
-                highThreshold: category!.highThreshold,
             }, currentUser.uid));
         await Promise.all(writes);
         return true;
