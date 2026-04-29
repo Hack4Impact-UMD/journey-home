@@ -169,17 +169,21 @@ export default function ScheduleModal({
                         const { weekday, day, month } = getDateInfo(tb.startTime);
                         const timeSlot = getTimeSlot(tb.startTime, tb.endTime);
                         const sortedTasks = sortTasks(tb);
-                        const currentTime = Timestamp.now();
-                        const notCurrent = currentTime > tb.startTime
+                        const startOfToday = new Date();
+                        startOfToday.setHours(0, 0, 0, 0);
+                        const isPast = tb.startTime.toDate() < startOfToday;
 
                         const isAlreadyAssigned = scheduleRequest.associatedTimeBlockID === tb.id;
 
-                        if (notCurrent) return null;
+                        if (isPast) return null;
 
                         return(
                             <div key={tb.id} className="border-b pb-4 mb-4 flex-col items-center pt-2">
+                                <h1 className="text-sm text-[#565656] font-semibold mb-2">
+                                    {tb.name}
+                                </h1>
                                 <div className="flex gap-1 items-baseline">
-                                    <h1 className= "text-sm text-[#565656] font-medium">
+                                    <h1 className= "text-sm text-[#565656]">
                                         {weekday}
                                     </h1>
                                     <h1 className= "text-xs text-[#7D7D7D]">
