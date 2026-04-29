@@ -9,6 +9,7 @@ import { EditIcon } from "@/components/icons/EditIcon";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { Badge } from "@/components/inventory/Badge";
 import { CategoryModal } from "@/components/control-panel/CategoryModal";
+import { PresetIcon } from "@/components/icons/PresetIcon";
 
 export default function CategoriesPage() {
   const { state: { userData } } = useAuth();
@@ -66,7 +67,10 @@ export default function CategoriesPage() {
                     className="h-10 border-light-border border-b border-x flex items-center font-family-roboto text-sm text-text-1 hover:bg-blue-50 cursor-pointer"
                     onClick={() => { setSelectedCategory(category); setShowModal(true); }}
                   >
-                    <div className="w-[58%] px-4">{category.name}</div>
+                    <div className="w-[58%] px-4 flex items-center gap-4">
+                      <PresetIcon icon={category.icon} size={28} className="text-text-1 shrink-0" />
+                      {category.name}
+                    </div>
                     <div className="w-[34%] px-4 flex gap-2">
                       <Badge text={`Very low: ${category.lowThreshold}`} color="red" />
                       <Badge text={`Low: ${category.highThreshold}`} color="yellow" />

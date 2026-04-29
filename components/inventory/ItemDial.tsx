@@ -1,7 +1,7 @@
 "use client";
 
 import { InventoryCategory } from "@/types/inventory";
-import { BoxIcon } from "lucide-react";
+import { PresetIcon } from "@/components/icons/PresetIcon";
 
 function getStockColor(quantity: number, low: number, high: number): string {
     if (quantity <= low) return "#E16060";
@@ -70,7 +70,7 @@ interface ItemDialProps {
 }
 
 export function ItemDial({ category, onClick }: ItemDialProps) {
-    const { name, quantity, lowThreshold, highThreshold } = category;
+    const { name, quantity, lowThreshold, highThreshold, icon } = category;
     const color = getStockColor(quantity, lowThreshold, highThreshold);
     const bg = getStockBg(quantity, lowThreshold, highThreshold);
 
@@ -83,7 +83,7 @@ export function ItemDial({ category, onClick }: ItemDialProps) {
             <div className="relative flex items-center justify-center">
                 <DialArc quantity={quantity} low={lowThreshold} high={highThreshold} />
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
-                    <BoxIcon className="w-10 h-10 text-[#333]" strokeWidth={1.5} />
+                    <PresetIcon icon={icon} size={40} />
                     <span className="text-base font-semibold leading-none" style={{ color }}>
                         {quantity}
                     </span>
