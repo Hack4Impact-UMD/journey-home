@@ -46,11 +46,6 @@ function UserTableRow({ user, onSelect }: { user: UserData, onSelect: () => void
             onClick={onSelect}
         >
             <div className="w-[20%] px-4 flex items-center">
-                {/* Checkboxes */}
-                {/* <input
-                    type="checkbox"
-                    className="w-4 h-4 mr-4 rounded-xs cursor-pointer border-white"
-                ></input> */}
                 <span>
                     {user.firstName} {user.lastName}
                 </span>

@@ -51,10 +51,6 @@ function DRContentsTableRow({ item, onOpen }: { item: DonationItem, onOpen: () =
             onClick={onOpen}
         >
             <div className="w-[25%] px-4 flex items-center">
-                <input
-                    type="checkbox"
-                    className="w-4 h-4 mr-3 rounded-xs cursor-pointer border-white"
-                ></input>
                 <div className="w-7 h-7 flex items-center mr-3 justify-center">
                     {(item.item.photos.length > 0) ? <img className="max-w-7 max-h-7" src={item.item.photos[0].url} alt={item.item.name}/> : null}
                 </div>
