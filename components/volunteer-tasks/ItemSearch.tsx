@@ -27,12 +27,13 @@ export default function ItemSearch({
     const [selectedItem, setSelectedItem] = useState<string | null>(null);
     const [quantity, setQuantity] = useState("");
 
-    const filteredItems =
-        searchQuery.trim() && !selectedItem
+    const filteredItems = !selectedItem
+        ? searchQuery.trim()
             ? categories.filter((item) =>
                   item.name.toLowerCase().includes(searchQuery.toLowerCase())
               )
-            : [];
+            : categories
+        : [];
 
     const handleAdd = () => {
         if (!selectedItem || !quantity) return;
@@ -53,7 +54,7 @@ export default function ItemSearch({
 
                 {!selectedItem && (
                     <>
-                        <div className="flex items-center border-b pt-4 pb-3 gap-2">
+                        <div className="flex items-center border-b pt-4 pb-3 gap-2 shrink-0">
                             <SearchIcon />
                             <input
                                 value={searchQuery}
@@ -63,29 +64,31 @@ export default function ItemSearch({
                             />
                         </div>
 
-                        {isLoading && <p className="px-4 py-2">Loading...</p>}
-                        {isError && <p className="px-4 py-2 text-red-500">Error</p>}
+                        <div className="flex-1 min-h-0 overflow-y-auto">
+                            {isLoading && <p className="px-4 py-2">Loading...</p>}
+                            {isError && <p className="px-4 py-2 text-red-500">Error</p>}
 
-                        {filteredItems.map((item) => {
-                            const lowerName = item.name.toLowerCase();
-                            const lowerQuery = searchQuery.toLowerCase();
-                            const idx = lowerName.indexOf(lowerQuery);
-                            return (
-                                <div
-                                    key={item.id}
-                                    onClick={() => setSelectedItem(item.name)}
-                                    className="px-4 py-3 border-b cursor-pointer hover:bg-gray-50 text-sm font-normal"
-                                >
-                                    {idx === -1 ? item.name : (
-                                        <>
-                                            {item.name.slice(0, idx)}
-                                            <strong>{item.name.slice(idx, idx + searchQuery.length)}</strong>
-                                            {item.name.slice(idx + searchQuery.length)}
-                                        </>
-                                    )}
-                                </div>
-                            );
-                        })}
+                            {filteredItems.map((item) => {
+                                const lowerName = item.name.toLowerCase();
+                                const lowerQuery = searchQuery.toLowerCase();
+                                const idx = lowerName.indexOf(lowerQuery);
+                                return (
+                                    <div
+                                        key={item.id}
+                                        onClick={() => setSelectedItem(item.name)}
+                                        className="px-4 py-3 border-b cursor-pointer hover:bg-gray-50 text-sm font-normal"
+                                    >
+                                        {idx === -1 ? item.name : (
+                                            <>
+                                                {item.name.slice(0, idx)}
+                                                <strong>{item.name.slice(idx, idx + searchQuery.length)}</strong>
+                                                {item.name.slice(idx + searchQuery.length)}
+                                            </>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </>
                 )}
 
@@ -99,13 +102,12 @@ export default function ItemSearch({
                         <div className="flex items-center gap-3 px-4 py-3 border-b">
                             <BoxIcon />
                             <input
-                                type="number"
+                                type="text"
+                                inputMode="numeric"
                                 value={quantity}
-                                onChange={(e) => setQuantity(e.target.value)}
+                                onChange={(e) => { if (/^\d*$/.test(e.target.value)) setQuantity(e.target.value); }}
                                 placeholder="Quantity"
                                 className="w-full outline-none"
-                                min={1}
-                                step={1}
                             />
                         </div>
 
@@ -113,9 +115,9 @@ export default function ItemSearch({
                             <div className="px-4 pt-4">
                                 <button
                                     onClick={handleAdd}
-                                    className="w-full h-8 bg-primary text-white"
+                                    className="w-full h-8 bg-primary text-white rounded-sm"
                                 >
-                                    Add Item
+                                    {mode === "add" ? "Add to Inventory" : "Remove from Inventory"}
                                 </button>
                             </div>
                         )}

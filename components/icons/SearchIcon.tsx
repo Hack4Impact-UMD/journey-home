@@ -3,8 +3,8 @@
 export function SearchIcon() {
     return (
         <svg
-            width="18"
-            height="18"
+            width="0.875em"
+            height="0.875em"
             viewBox="0 0 15 15"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
