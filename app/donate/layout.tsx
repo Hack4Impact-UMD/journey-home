@@ -1,12 +1,14 @@
 "use client";
 
 import { DonorFormProvider } from "./DonorFormContext";
+import { usePageTitle } from "@/lib/usePageTitle";
 
 export default function DonorFormLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  usePageTitle("Donate | Journey Home");
   return (
     <DonorFormProvider>
       <div className="min-h-screen py-8 bg-[#D8E3E5]">

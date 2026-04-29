@@ -34,12 +34,12 @@ type StatCardProps = {
 
 function StatCard({ label, count, newCount, icon, iconClassName, href }: StatCardProps) {
     return (
-        <Link href={href} className="bg-white/70 shadow-sm rounded-2xl border border-light-border p-4 flex flex-col gap-3 relative overflow-hidden h-full">
+        <Link href={href} className="bg-white/70 shadow-sm rounded-2xl border border-light-border p-4 flex flex-col gap-2 relative overflow-hidden h-full">
             <div className="flex items-center justify-between">
                 <span className="text-base font-semibold text-text-1">{label}</span>
                 <span className="text-text-1"><ArrowDiagonalIcon /></span>
             </div>
-            <span className="text-5xl font-normal text-text-1 mt-1">{count}</span>
+            <span className="text-[2.5rem] leading-none font-normal text-text-1 mt-1">{count}</span>
             <span className="text-base text-[#919393] mt-auto">
                 {newCount !== undefined ? `${newCount} new today` : ""}
             </span>
@@ -90,7 +90,9 @@ export function QuickStatsSummary() {
         <div className={`grid grid-cols-2 grid-rows-2 gap-3 h-full w-full${isLoading ? " animate-pulse" : ""}`}>
             {isLoading ? (
                 [...Array(4)].map((_, i) => (
-                    <div key={i} className="bg-white/70 rounded-2xl border border-light-border" />
+                    <div key={i} className="bg-white/70 rounded-2xl border border-light-border flex items-center justify-center">
+                        <div className="w-5 h-5 border-2 border-gray-200 border-t-primary rounded-full animate-spin" />
+                    </div>
                 ))
             ) : isError ? (
                 <div className="col-span-2 row-span-2 bg-white/70 rounded-2xl border border-light-border p-4 flex items-center justify-center">

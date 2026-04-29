@@ -54,7 +54,7 @@ export default function AdminCalendarSummary() {
         return [...allTB]
             .filter((tb) => tb.startTime.toDate() >= today)
             .sort((a, b) => a.startTime.toDate().getTime() - b.startTime.toDate().getTime())
-            .slice(0, 4);
+;
     }, [allTB]);
 
     const groupedEvents = useMemo(() => {
@@ -73,20 +73,22 @@ export default function AdminCalendarSummary() {
     }, [upcomingEvents]);
 
     return (
-        <div className="w-full h-full rounded-xl border border-[#E7E7E7] shadow-sm px-5 pb-5 flex flex-col gap-3 bg-white/70 overflow-hidden">
-            <div className="flex flex-row pt-6 justify-between">
+        <div className="w-full h-full rounded-xl border border-[#E7E7E7] shadow-sm px-5 pb-5 flex flex-col gap-3 bg-white/70">
+            <div className="flex flex-row pt-6 justify-between shrink-0">
                 <Link href="/schedule/calendar" className="font-semibold text-base hover:underline">
                     Calendar
                 </Link>
             </div>
             {isLoading ? (
-                <p className="flex justify-center">Loading...</p>
+                <div className="flex items-center justify-center flex-1">
+                    <div className="w-5 h-5 border-2 border-gray-200 border-t-primary rounded-full animate-spin" />
+                </div>
             ) : isError ? (
                 <p className="flex justify-center text-sm text-gray-400">Unable to load calendar</p>
             ) : groupedEvents.length === 0 ? (
                 <p className="flex justify-center">No upcoming shifts!</p>
             ) : (
-                <div className="flex flex-col gap-2 overflow-auto">
+                <div className="flex flex-col gap-2 overflow-y-auto flex-1 min-h-0">
                     {groupedEvents.map(({ dateKey, date, events }) => {
                         const dayNumber = date.getDate();
                         const weekday = date.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase();

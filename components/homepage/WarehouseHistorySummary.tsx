@@ -37,11 +37,11 @@ export default function WarehouseHistorySummary() {
         [sortedChanges]
     );
 
-    const mostRecent = useMemo(() => sortedChanges.slice(0, 5), [sortedChanges]);
+    const mostRecent = sortedChanges;
 
     return (
-        <div className="w-full h-full rounded-2xl border border-[#E7E7E7] shadow-sm py-6 px-5 flex flex-col gap-3 bg-white/70">
-            <div className="flex flex-row place-content-between items-center">
+        <div className="w-full h-full rounded-2xl border border-[#E7E7E7] shadow-sm py-6 px-5 flex flex-col gap-3 bg-white/70 min-h-0">
+            <div className="flex flex-row place-content-between items-center shrink-0">
                 <Link href="/control-panel/warehouse-history" className="font-semibold text-text-1 hover:underline">
                     Latest inventory updates
                 </Link>
@@ -50,11 +50,13 @@ export default function WarehouseHistorySummary() {
                 </span>
             </div>
             {isLoading ? (
-                <p className="text-sm text-gray-400">Loading...</p>
+                <div className="flex items-center justify-center flex-1">
+                    <div className="w-5 h-5 border-2 border-gray-200 border-t-primary rounded-full animate-spin" />
+                </div>
             ) : mostRecent.length === 0 ? (
                 <p className="text-sm text-gray-400">No inventory changes were made</p>
             ) : (
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 overflow-y-auto flex-1 min-h-0">
                     {mostRecent.map((c) => {
                         const diff = c.change.newQuantity - c.change.oldQuantity;
                         const isPositive = diff > 0;

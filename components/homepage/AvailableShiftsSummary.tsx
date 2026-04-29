@@ -62,7 +62,9 @@ export default function AvailableShiftsSummary() {
 
             <div className="border bg-white overflow-hidden">
                 {isLoading ? (
-                    <div className="h-64" />
+                    <div className="h-64 flex items-center justify-center">
+                        <div className="w-5 h-5 border-2 border-gray-200 border-t-primary rounded-full animate-spin" />
+                    </div>
                 ) : availableShifts.length === 0 ? (
                     <div className="h-64 flex items-center justify-center text-sm text-gray-400">
                         No shifts
