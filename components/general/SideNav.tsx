@@ -4,14 +4,13 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserRole } from "@/types/user";
 import Link from "next/link";
-import { InventoryIcon } from "@/components/icons/InventoryIcon";
-import { DonorRequestsIcon } from "@/components/icons/DonorRequestsIcon";
-import { ClientRequestIcon } from "@/components/icons/ClientRequestIcon";
-import { PickupDeliveryIcon } from "@/components/icons/PickupDeliveryIcon";
-import { UserManagementIcon } from "@/components/icons/UserManagementIcon";
-import { ControlPanelIcon } from "@/components/icons/ControlPanelIcon";
-import { DogPeekingIcon } from "../icons/DogPeekingIcon";
-import { HomeIcon } from "../icons/HomeIcon";
+import { InventoryIcon } from "../icons/InventoryIcon";
+import { DonorRequestsIcon } from "../icons/DonorRequestsIcon";
+import { ClientRequestIcon } from "../icons/ClientRequestIcon";
+import { PickupDeliveryIcon } from "../icons/PickupDeliveryIcon";
+import { UserManagementIcon } from "../icons/UserManagementIcon";
+import { ControlPanelIcon } from "../icons/ControlPanelIcon";
+import { ViewIcon } from "../icons/ViewIcon";
 
 export default function SideNavbar() {
     const auth = useAuth();
@@ -29,14 +28,6 @@ export default function SideNavbar() {
                 </div>
             </Link>
             <div className="px-4 h-full w-full flex flex-col">
-
-                <SideNavbarLink 
-                    icon = {HomeIcon}
-                    name = "Home"
-                    path = "/"
-                    roles = {["Admin", "Case Manager"]}
-                />
-
                 <SideNavbarLink
                     icon={InventoryIcon}
                     name="Inventory"
@@ -87,8 +78,8 @@ export default function SideNavbar() {
 
                 <div className="mt-auto w-full mb-4">
                     <Link href="/profile">
-                        <div className="relative pt-2 pl-4 pr-2 border border-light-border rounded-lg w-full flex items-center justify-between">
-                            <div className = "pb-2">
+                        <div className="pt-2 pb-2 pl-4 pr-2 border border-light-border rounded-lg w-full flex items-center justify-between">
+                            <div>
                                 <div className="text-text-1 text-sm font-family-opensans">
                                     {auth.state.userData && (
                                         <>
@@ -101,9 +92,7 @@ export default function SideNavbar() {
                                     {auth.state.userData?.role ?? "Loading..."}
                                 </div>
                             </div>
-                            <div className = "absolute bottom-0 right-2 translate-y-1/16">
-                                <DogPeekingIcon/>
-                            </div>
+                            <ViewIcon />
                         </div>
                     </Link>
                 </div>
@@ -133,21 +122,15 @@ function SideNavbarLink({
         return <></>;
     }
 
-    const isActive =
-    path === "/" ? pathname === "/" :
-    pathname?.startsWith(path);
-
     return (
         <Link
             href={path}
-            className = "gap-2"
+            className={`hover:text-primary pb-4 text-sm flex items-center gap-2 ${
+                pathname?.startsWith(path) ? "text-primary font-semibold" : ""
+            }`}
         >
-            <div className = {`flex items-center gap-[0.5rem] px-[0.75rem] py-[0.75rem] text-sm rounded-md transition-all ${
-                isActive ? "bg-[#F2FBFD] text-[#125C6D]" : "hover:text-primary"
-            }`}>
             <Icon />
             {name}
-            </div>
         </Link>
     );
 }
