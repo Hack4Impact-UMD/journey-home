@@ -50,7 +50,9 @@ export default function WarehouseHistorySummary() {
                 </span>
             </div>
             {isLoading ? (
-                <p className="text-sm text-gray-400">Loading...</p>
+                <div className="flex items-center justify-center flex-1">
+                    <div className="w-5 h-5 border-2 border-gray-200 border-t-primary rounded-full animate-spin" />
+                </div>
             ) : mostRecent.length === 0 ? (
                 <p className="text-sm text-gray-400">No inventory changes were made</p>
             ) : (

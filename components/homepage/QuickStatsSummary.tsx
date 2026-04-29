@@ -90,7 +90,9 @@ export function QuickStatsSummary() {
         <div className={`grid grid-cols-2 grid-rows-2 gap-3 h-full w-full${isLoading ? " animate-pulse" : ""}`}>
             {isLoading ? (
                 [...Array(4)].map((_, i) => (
-                    <div key={i} className="bg-white/70 rounded-2xl border border-light-border" />
+                    <div key={i} className="bg-white/70 rounded-2xl border border-light-border flex items-center justify-center">
+                        <div className="w-5 h-5 border-2 border-gray-200 border-t-primary rounded-full animate-spin" />
+                    </div>
                 ))
             ) : isError ? (
                 <div className="col-span-2 row-span-2 bg-white/70 rounded-2xl border border-light-border p-4 flex items-center justify-center">

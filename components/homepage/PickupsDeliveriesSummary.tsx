@@ -58,7 +58,9 @@ export function PickupsDeliveriesSummary() {
                 </span>
             </div>
             {isLoading ? (
-                <span className="text-sm text-gray-400">Loading...</span>
+                <div className="flex items-center justify-center flex-1">
+                    <div className="w-5 h-5 border-2 border-gray-200 border-t-primary rounded-full animate-spin" />
+                </div>
             ) : isError ? (
                 <span className="text-sm text-gray-400">Unable to load pickups or deliveries</span>
             ) : rows.length === 0 ? (
