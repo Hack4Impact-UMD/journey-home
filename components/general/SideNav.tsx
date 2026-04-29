@@ -10,7 +10,7 @@ import { ClientRequestIcon } from "../icons/ClientRequestIcon";
 import { PickupDeliveryIcon } from "../icons/PickupDeliveryIcon";
 import { UserManagementIcon } from "../icons/UserManagementIcon";
 import { ControlPanelIcon } from "../icons/ControlPanelIcon";
-import { ViewIcon } from "../icons/ViewIcon";
+import { DogPeekingIcon } from "../icons/DogPeekingIcon";
 
 export default function SideNavbar() {
     const auth = useAuth();
@@ -78,7 +78,10 @@ export default function SideNavbar() {
 
                 <div className="mt-auto w-full mb-4">
                     <Link href="/profile">
-                        <div className="pt-2 pb-2 pl-4 pr-2 border border-light-border rounded-lg w-full flex items-center justify-between">
+                        <div className="group relative pt-2 pb-2 pl-4 pr-2 border border-light-border rounded-lg w-full flex items-center overflow-hidden transition-all duration-200 hover:border-primary hover:shadow-sm hover:bg-[#F2FBFD]">
+                            <div className="absolute -bottom-[0.5em] left-[80%] -translate-x-1/2 transition-transform duration-200 group-hover:-translate-y-[0.375em]">
+                                <DogPeekingIcon />
+                            </div>
                             <div>
                                 <div className="text-text-1 text-sm font-family-opensans">
                                     {auth.state.userData && (
@@ -92,7 +95,6 @@ export default function SideNavbar() {
                                     {auth.state.userData?.role ?? "Loading..."}
                                 </div>
                             </div>
-                            <ViewIcon />
                         </div>
                     </Link>
                 </div>
