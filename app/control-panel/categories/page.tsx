@@ -5,12 +5,10 @@ import { useInventoryCategories } from "@/lib/queries/inventory";
 import { useAuth } from "@/contexts/AuthContext";
 import { InventoryCategory } from "@/types/inventory";
 import { Plus } from "lucide-react";
-import * as PhosphorIcons from "@phosphor-icons/react";
 import { EditIcon } from "@/components/icons/EditIcon";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { Badge } from "@/components/inventory/Badge";
-import { CategoryModal, DEFAULT_ICONS } from "@/components/control-panel/CategoryModal";
-import { isValidIcon } from "@/lib/icons";
+import { CategoryModal } from "@/components/control-panel/CategoryModal";
 
 export default function CategoriesPage() {
   const { state: { userData } } = useAuth();
@@ -62,23 +60,13 @@ export default function CategoriesPage() {
                 No categories found.
               </div>
             ) : (
-              filteredCategories.map((category) => {
-                const iconRecord = PhosphorIcons as Record<string, unknown>;
-                const iconVal = category.icon ? iconRecord[category.icon] : null;
-                const IconComp = isValidIcon(iconVal)
-                  ? (iconVal as React.ComponentType<{ size?: number; strokeWidth?: number }>)
-                  : (DEFAULT_ICONS.find((d) => d.key === category.icon)?.Component ?? PhosphorIcons.Package);
-
-                return (
+              filteredCategories.map((category) => (
                   <div
                     key={category.id}
                     className="h-10 border-light-border border-b border-x flex items-center font-family-roboto text-sm text-text-1 hover:bg-blue-50 cursor-pointer"
                     onClick={() => { setSelectedCategory(category); setShowModal(true); }}
                   >
-                    <div className="w-[58%] px-4 flex items-center gap-2">
-                      <IconComp size={18} strokeWidth={1.5} className="text-gray-500 shrink-0" />
-                      {category.name}
-                    </div>
+                    <div className="w-[58%] px-4">{category.name}</div>
                     <div className="w-[34%] px-4 flex gap-2">
                       <Badge text={`Very low: ${category.lowThreshold}`} color="red" />
                       <Badge text={`Low: ${category.highThreshold}`} color="yellow" />
@@ -95,8 +83,7 @@ export default function CategoriesPage() {
                       </button>
                     </div>
                   </div>
-                );
-              })
+              ))
             )}
           </div>
         </div>

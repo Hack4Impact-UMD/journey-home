@@ -2,32 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import * as PhosphorIcons from "@phosphor-icons/react";
 import { InventoryCategory } from "@/types/inventory";
 import { CloseIcon } from "@/components/icons/CloseIcon";
-import { isValidIcon, resolveIconComponent, PhosphorIconComponent } from "@/lib/icons";
-
-type IconEntry = { key: string; Component: PhosphorIconComponent };
-
-export const DEFAULT_ICONS: IconEntry[] = [
-  { key: "Rug", Component: resolveIconComponent("Rug") ?? PhosphorIcons.Package },
-  { key: "Armchair", Component: resolveIconComponent("Armchair") ?? PhosphorIcons.Package },
-  { key: "Coffee", Component: resolveIconComponent("Coffee") ?? PhosphorIcons.Package },
-  { key: "BedSingle", Component: resolveIconComponent("Bed") ?? PhosphorIcons.Package },
-  { key: "BedDouble", Component: resolveIconComponent("BedDouble") ?? PhosphorIcons.Package },
-  { key: "PaintBrushHousehold", Component: resolveIconComponent("PaintBrushHousehold") ?? PhosphorIcons.Package },
-  { key: "Chair", Component: resolveIconComponent("Chair") ?? PhosphorIcons.Package },
-  { key: "SprayBottle", Component: resolveIconComponent("SprayBottle") ?? PhosphorIcons.Package },
-  { key: "Desk", Component: resolveIconComponent("Desk") ?? PhosphorIcons.Package },
-  { key: "Basket", Component: resolveIconComponent("Basket") ?? PhosphorIcons.Package },
-  { key: "CookingPot", Component: resolveIconComponent("CookingPot") ?? PhosphorIcons.Package },
-  { key: "ForkKnife", Component: resolveIconComponent("ForkKnife") ?? PhosphorIcons.Package },
-  { key: "Shelves", Component: resolveIconComponent("Bookcase") ?? PhosphorIcons.Package },
-  { key: "Microwave", Component: resolveIconComponent("Oven") ?? PhosphorIcons.Package },
-  { key: "ToiletPaper", Component: resolveIconComponent("ToiletPaper") ?? PhosphorIcons.Package },
-  { key: "Dresser", Component: resolveIconComponent("Dresser") ?? PhosphorIcons.Package },
-  { key: "Television", Component: resolveIconComponent("Television") ?? PhosphorIcons.Package },
-];
 
 interface Props {
   category: InventoryCategory | null;
@@ -94,11 +70,6 @@ export function CategoryModal({
     onClose();
   };
 
-  const iconRecord = PhosphorIcons as Record<string, unknown>;
-  const IconComponent = isValidIcon(iconRecord[icon])
-    ? iconRecord[icon] as PhosphorIconComponent
-    : (DEFAULT_ICONS.find((d) => d.key === icon)?.Component ?? PhosphorIcons.Package);
-
   return createPortal(
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
       <div className="flex items-stretch gap-4">
@@ -115,23 +86,7 @@ export function CategoryModal({
               </button>
             </div>
 
-            <div className="grid grid-cols-5 gap-2">
-              {DEFAULT_ICONS.map(({ key, Component }) => (
-                <button
-                  key={key}
-                  onClick={() => { setIcon(key); setShowIconPicker(false); }}
-                  className={[
-                    "flex items-center justify-center w-full aspect-square rounded-xs border transition-colors",
-                    icon === key
-                      ? "border-primary bg-primary/10"
-                      : "border-[#D9D9D9] hover:border-primary hover:bg-blue-50",
-                  ].join(" ")}
-                  title={key}
-                >
-                  <Component size={24} strokeWidth={1.5} />
-                </button>
-              ))}
-            </div>
+            {/* icon grid goes here */}
           </div>
         )}
 
@@ -172,9 +127,7 @@ export function CategoryModal({
                 ? "border-primary bg-primary/10"
                 : "border-[#D9D9D9] hover:border-primary hover:bg-blue-50",
             ].join(" ")}
-          >
-            <IconComponent size={24} strokeWidth={1.5} />
-          </button>
+          />
 
           <div className="flex gap-8 mb-6">
 
