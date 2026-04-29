@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import Link from "next/link";
 import { useWarehouseHistory } from "@/lib/queries/warehouse-history";
 
 function PlusIcon() {
@@ -41,9 +42,9 @@ export default function WarehouseHistorySummary() {
     return (
         <div className="w-full h-full rounded-2xl border border-[#E7E7E7] shadow-sm py-6 px-5 flex flex-col gap-3 bg-white/70">
             <div className="flex flex-row place-content-between items-center">
-                <span className="font-semibold text-text-1">
+                <Link href="/control-panel/warehouse-history" className="font-semibold text-text-1 hover:underline">
                     Latest inventory updates
-                </span>
+                </Link>
                 <span className="text-sm text-[#383838]">
                     <span className="font-semibold text-text-1">{recentCount}</span> new changes
                 </span>
@@ -58,7 +59,7 @@ export default function WarehouseHistorySummary() {
                         const diff = c.change.newQuantity - c.change.oldQuantity;
                         const isPositive = diff > 0;
                         return (
-                            <div key={c.id} className="flex items-center gap-3 bg-white/70 border border-[#DCDDDD] rounded-xl px-3 py-2">
+                            <Link key={c.id} href="/control-panel/warehouse-history" className="flex items-center gap-3 bg-white/70 border border-[#DCDDDD] rounded-xl px-3 py-2">
                                 <span className="shrink-0">
                                     {isPositive ? <PlusIcon /> : <MinusIcon />}
                                 </span>
@@ -70,7 +71,7 @@ export default function WarehouseHistorySummary() {
                                     {isPositive ? "added " : "removed "}
                                     {Math.abs(diff)} {c.change.category} ({c.change.oldQuantity} → {c.change.newQuantity})
                                 </span>
-                            </div>
+                            </Link>
                         );
                     })}
                 </div>

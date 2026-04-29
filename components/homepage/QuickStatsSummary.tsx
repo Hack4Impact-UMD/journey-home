@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useInventoryCategories } from "@/lib/queries/inventory";
 import { useAllAccountRequests } from "@/lib/queries/users";
 import { useClientRequests } from "@/lib/queries/client-requests";
@@ -28,11 +29,12 @@ type StatCardProps = {
     newCount?: number;
     icon: React.ReactNode;
     iconClassName?: string;
+    href: string;
 };
 
-function StatCard({ label, count, newCount, icon, iconClassName }: StatCardProps) {
+function StatCard({ label, count, newCount, icon, iconClassName, href }: StatCardProps) {
     return (
-        <div className="bg-white/70 shadow-sm rounded-2xl border border-light-border p-4 flex flex-col gap-3 relative overflow-hidden h-full">
+        <Link href={href} className="bg-white/70 shadow-sm rounded-2xl border border-light-border p-4 flex flex-col gap-3 relative overflow-hidden h-full">
             <div className="flex items-center justify-between">
                 <span className="text-base font-semibold text-text-1">{label}</span>
                 <span className="text-text-1"><ArrowDiagonalIcon /></span>
@@ -44,16 +46,16 @@ function StatCard({ label, count, newCount, icon, iconClassName }: StatCardProps
             <div className={`absolute text-[#CBDFE2] text-[5rem] ${iconClassName ?? "bottom-[-1.25rem] right-[-1.25rem]"}`}>
                 {icon}
             </div>
-        </div>
+        </Link>
     );
 }
 
 export function QuickStatsSummary() {
-    const { inventoryCategories, isLoading: invLoading, isError: invError} = useInventoryCategories();
-    const { allAccounts: accountRequests, isLoading: usersLoading, isError: usersError} = useAllAccountRequests();
-    const { clientRequests, isLoading: crLoading, isError: crError} = useClientRequests();
+    const { inventoryCategories, isLoading: invLoading, isError: invError } = useInventoryCategories();
+    const { allAccounts: accountRequests, isLoading: usersLoading, isError: usersError } = useAllAccountRequests();
+    const { clientRequests, isLoading: crLoading, isError: crError } = useClientRequests();
     const { donationRequests, isLoading: drLoading, isError: drError } = useDonationRequests();
-    const { changes: warehouseHistory, isLoading: whLoading, isError: whError} = useWarehouseHistory();
+    const { changes: warehouseHistory, isLoading: whLoading, isError: whError } = useWarehouseHistory();
 
     const isLoading = invLoading || usersLoading || crLoading || drLoading || whLoading;
     const isError = invError || usersError || crError || drError || whError;
@@ -75,43 +77,33 @@ export function QuickStatsSummary() {
         );
         const categoriesGoneLow = new Set(
             recentChanges
-            .filter((entry) => {
-                const cat = inventoryCategories.find((c) => c.name == entry.change.category);
-                return cat && entry.change.newQuantity <= cat.lowThreshold && entry.change.oldQuantity > cat.lowThreshold;
-
-            }).map((entry) => entry.change.category)
+                .filter((entry) => {
+                    const cat = inventoryCategories.find((c) => c.name === entry.change.category);
+                    return cat && entry.change.newQuantity <= cat.lowThreshold && entry.change.oldQuantity > cat.lowThreshold;
+                })
+                .map((entry) => entry.change.category)
         );
         return categoriesGoneLow.size;
     }, [warehouseHistory, inventoryCategories]);
 
-
-    if (isLoading) {
-        return (
-            <div className="grid grid-cols-2 gap-3 animate-pulse h-full w-full">
-                {[...Array(4)].map((_, i) => (
-                    <div key={i} className="bg-white/70 rounded-2xl border border-light-border h-40" />
-                ))}
-            </div>
-        );
-    }
-
-    if (isError) {
-        return (
-            <div className="grid grid-cols-2 gap-3">
-                <div className="col-span-2 bg-white/70 rounded-2xl border border-light-border p-4 flex items-center justify-center h-40">
+    return (
+        <div className={`grid grid-cols-2 grid-rows-2 gap-3 h-full w-full${isLoading ? " animate-pulse" : ""}`}>
+            {isLoading ? (
+                [...Array(4)].map((_, i) => (
+                    <div key={i} className="bg-white/70 rounded-2xl border border-light-border" />
+                ))
+            ) : isError ? (
+                <div className="col-span-2 row-span-2 bg-white/70 rounded-2xl border border-light-border p-4 flex items-center justify-center">
                     <span className="text-sm text-gray-400">Unable to load stats</span>
                 </div>
-            </div>
-        );
-    }
-
-
-    return (
-        <div className="grid grid-cols-2 grid-rows-2 gap-3 h-full w-full">
-            <StatCard label="Low stock items" count={lowStockCount} newCount={newLowStock} icon={<InventoryIcon />} iconClassName="bottom-[-1.25rem] right-[-1.25rem]" />
-            <StatCard label="Donation requests" count={notReviewedDR.length} newCount={newDR} icon={<DonorRequestsIcon />} iconClassName="bottom-[-0.5rem] right-[-1rem]" />
-            <StatCard label="Account requests" count={accountRequests.length} icon={<UserManagementIcon />} iconClassName="bottom-[-0.25rem] right-[-1rem]" />
-            <StatCard label="Client requests" count={notReviewedCR.length} newCount={newCR} icon={<ClientRequestIcon />} iconClassName="bottom-[-0.75rem] right-[0rem]" />
+            ) : (
+                <>
+                    <StatCard label="Low stock items" count={lowStockCount} newCount={newLowStock} icon={<InventoryIcon />} iconClassName="bottom-[-1.25rem] right-[-1.25rem]" href="/inventory" />
+                    <StatCard label="Donation requests" count={notReviewedDR.length} newCount={newDR} icon={<DonorRequestsIcon />} iconClassName="bottom-[-0.5rem] right-[-1rem]" href="/donation-requests" />
+                    <StatCard label="Account requests" count={accountRequests.length} icon={<UserManagementIcon />} iconClassName="bottom-[-0.25rem] right-[-1rem]" href="/user-management/account-requests" />
+                    <StatCard label="Client requests" count={notReviewedCR.length} newCount={newCR} icon={<ClientRequestIcon />} iconClassName="bottom-[-0.75rem] right-[0rem]" href="/client-requests" />
+                </>
+            )}
         </div>
     );
 }

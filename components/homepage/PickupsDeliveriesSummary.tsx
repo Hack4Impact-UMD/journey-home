@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useTimeBlocks } from "@/lib/queries/timeblocks";
 import { ClientRequest } from "@/types/client-requests";
 import { DonationRequest } from "@/types/donations";
@@ -53,7 +54,7 @@ export function PickupsDeliveriesSummary() {
     return (
         <div className="h-full w-full bg-white/70 rounded-2xl border border-light-border p-5 flex flex-col gap-3 shadow-sm">
             <div className="flex items-center justify-between">
-                <span className="text-base font-semibold text-text-1">Upcoming pickups/deliveries</span>
+                <Link href="/pickups-deliveries/scheduled" className="text-base font-semibold text-text-1 hover:underline">Upcoming pickups/deliveries</Link>
                 <span className="text-sm text-[#383838]">
                     {isLoading ? "..." : <><span className="font-semibold text-text-1">{rows.length}</span> today</>}
                 </span>
@@ -67,12 +68,12 @@ export function PickupsDeliveriesSummary() {
             ) : (
                 <div className="flex flex-col gap-2">
                     {displayRows.map((row) => (
-                        <div key={row.key} className="flex items-center gap-4 border border-light-border px-4 py-3 rounded-sm">
+                        <Link key={row.key} href="/pickups-deliveries/scheduled" className="flex items-center gap-4 border border-light-border px-4 py-3 rounded-sm">
                             <span className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-semibold shrink-0 ${row.type === "P" ? "bg-[#D6E8F0] text-[#4A8FA8]" : "bg-[#F5E0E0] text-[#A87070]"}`}>{row.type}</span>
                             <span className="w-24 shrink-0 text-sm">{row.timeRange}</span>
-                            <span className="flex items-center gap-1 flex-1 text-sm"><PersonIcon />{row.name}</span>
-                            <span className="flex items-center gap-1 text-sm "><LocationIcon />{row.location}</span>
-                        </div>
+                            <span className="flex items-center gap-1 text-sm"><PersonIcon />{row.name}</span>
+                            <span className="flex items-center gap-1 text-sm"><LocationIcon />{row.location}</span>
+                        </Link>
                     ))}
                 </div>
             )}
