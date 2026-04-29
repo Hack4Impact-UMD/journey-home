@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { createPortal } from "react-dom";
 
 import ItemSearch from "@/components/volunteer-tasks/ItemSearch";
@@ -14,14 +15,15 @@ import { JourneyTheDogIcon } from "@/components/icons/JourneyTheDogIcon";
 import { ChevronDown, ChevronUp, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { TimeBlock } from "@/types/schedule";
+import { formatTime } from "@/lib/utils";
 
 type ItemMap = Record<string, number>;
-
-const formatTime = (d: Date) => { const h = d.getHours(); return `${h % 12 || 12}${h >= 12 ? "pm" : "am"}`; };
 
 export default function VolunteerTasks() {
     const { state: { currentUser } } = useAuth();
     const { allTB } = useTimeBlocks();
+    const searchParams = useSearchParams();
+    const tbId = searchParams.get("id");
 
     const [screen, setScreen] = useState<"shiftlist" | "shiftoverview" | "modify" | "summary">("shiftlist");
     const [selectedShift, setSelectedShift] = useState<TimeBlock | null>(null);
@@ -35,6 +37,12 @@ export default function VolunteerTasks() {
         document.body.style.overflow = open ? "hidden" : "";
         return () => { document.body.style.overflow = ""; };
     }, [open]);
+
+    useEffect(() => {
+        if (!tbId || !allTB.length) return;
+        const tb = allTB.find((t) => t.id === tbId);
+        if (tb) { setSelectedShift(tb); setScreen("shiftoverview"); }
+    }, [tbId, allTB]);
 
     const {
         inventoryCategories,

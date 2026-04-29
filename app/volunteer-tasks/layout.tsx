@@ -2,7 +2,7 @@
 
 import { ProtectedRoute } from "@/components/general/ProtectedRoute";
 import Navbar from "@/components/general/Navbar";
-import { ReactNode } from "react";
+import { ReactNode, Suspense } from "react";
 
 export default function VolunteerLayout({ children }: { children: ReactNode }) {
     return (
@@ -15,7 +15,7 @@ export default function VolunteerLayout({ children }: { children: ReactNode }) {
                             Shift Tasks
                         </span>
                         <div className="bg-background max-md:bg-white rounded-xl max-md:rounded-none my-2 max-md:my-0 flex-1 py-4 max-md:py-0 px-6 min-h-0 overflow-hidden flex flex-col">
-                            {children}
+                            <Suspense fallback={null}>{children}</Suspense>
                         </div>
                     </div>
                 </div>
