@@ -76,8 +76,8 @@ export function useTimeBlocks() {
             }
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["donation-requests"] });
-            queryClient.invalidateQueries({ queryKey: ["client-requests"] });
+            queryClient.invalidateQueries({ queryKey: ["donationRequests"] });
+            queryClient.invalidateQueries({ queryKey: ["clientRequests"] });
         },
     });
 
