@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { usePageTitle } from "@/lib/usePageTitle";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserRole } from "@/types/user";
@@ -24,6 +25,8 @@ const ShiftSignUpIcon = () => <CalendarCheckIcon className="w-5 h-5" />;
 export default function Navbar({ pageTitle }: { pageTitle?: string }) {
     const auth = useAuth();
     const [drawerOpen, setDrawerOpen] = useState(false);
+
+    usePageTitle(pageTitle ? `${pageTitle} | Journey Home` : "Journey Home");
 
     const navLinks = (isMobile: boolean) => (
         <>

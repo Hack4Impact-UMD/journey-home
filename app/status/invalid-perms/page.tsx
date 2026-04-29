@@ -1,10 +1,12 @@
 "use client";
 
 import { StatusPage } from "@/components/general/StatusPage";
+import { usePageTitle } from "@/lib/usePageTitle";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 
 export default function InvalidPerms() {
+    usePageTitle("Insufficient Permissions | Journey Home");
     const auth = useAuth();
     const router = useRouter();
 

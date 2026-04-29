@@ -1,10 +1,12 @@
 "use client";
 
 import { StatusPage } from "@/components/general/StatusPage";
+import { usePageTitle } from "@/lib/usePageTitle";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 
 export default function MissingUserData() {
+    usePageTitle("User Not Found | Journey Home");
     const router = useRouter();
     const auth = useAuth();
 

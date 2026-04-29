@@ -1,6 +1,7 @@
 "use client";
 
 import { CaseFormProvider } from "./caseContext";
+import { usePageTitle } from "@/lib/usePageTitle";
 import { ProtectedRoute } from "@/components/general/ProtectedRoute";
 import Link from "next/link";
 
@@ -9,6 +10,7 @@ export default function CaseFormLayout({
 }: {
   children: React.ReactNode;
 }) {
+  usePageTitle("Client Request Form | Journey Home");
   return (
     <ProtectedRoute allow={["Case Manager"]}>
       <CaseFormProvider>
