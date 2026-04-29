@@ -1,7 +1,5 @@
 import { DonationItem, DonationRequest } from "@/types/donations";
 import { Badge } from "../inventory/Badge";
-import { ViewIcon } from "../icons/ViewIcon";
-import { TrashIcon } from "../icons/TrashIcon";
 
 export function DRContentsTable({
     request,
@@ -13,7 +11,7 @@ export function DRContentsTable({
     return (
         <div className="w-full min-w-4xl h-full flex flex-col">
             <div className="h-12 bg-[#FAFAFB] border-light-border border flex items-center font-family-roboto font-bold text-sm text-text-1 shrink-0">
-                <span className="w-[25%] border-l-2 border-light-border px-4">
+                <span className="w-[30%] border-l-2 border-light-border px-4">
                     Name
                 </span>
                 <span className="w-[15%] border-l-2 border-light-border px-4">
@@ -28,11 +26,8 @@ export function DRContentsTable({
                 <span className="w-[10%] border-l-2 border-light-border px-4">
                     Date
                 </span>
-                <span className="w-[15%] border-l-2 border-light-border px-4">
+                <span className="w-[25%] border-l-2 border-light-border px-4">
                     Status
-                </span>
-                <span className="w-[10%] border-l-2 border-light-border px-4">
-                    Actions
                 </span>
             </div>
             <div className="flex-1 overflow-auto min-h-0">
@@ -50,7 +45,7 @@ function DRContentsTableRow({ item, onOpen }: { item: DonationItem, onOpen: () =
             className="h-10 border-light-border border-b border-x flex items-center font-family-roboto text-sm text-text-1 hover:bg-blue-50 cursor-pointer"
             onClick={onOpen}
         >
-            <div className="w-[25%] px-4 flex items-center">
+            <div className="w-[30%] px-4 flex items-center">
                 <div className="w-7 h-7 flex items-center mr-3 justify-center">
                     {(item.item.photos.length > 0) ? <img className="max-w-7 max-h-7" src={item.item.photos[0].url} alt={item.item.name}/> : null}
                 </div>
@@ -81,17 +76,13 @@ function DRContentsTableRow({ item, onOpen }: { item: DonationItem, onOpen: () =
                     year: "2-digit",
                 })}
             </span>
-            <span className="w-[15%] px-4 text-xs">
+            <span className="w-[25%] px-4 text-xs">
                 <Badge text={item.status} color={
                     (item.status == "Approved") ? "green" :
                     (item.status == "Denied") ? "red" :
                     "gray"
                 }/>
             </span>
-            <div className="w-[10%] px-4 flex align-center">
-                <ViewIcon />
-                <TrashIcon />
-            </div>
         </div>
     );
 }
