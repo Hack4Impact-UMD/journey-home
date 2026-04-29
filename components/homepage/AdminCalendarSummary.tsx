@@ -7,8 +7,8 @@ import { AdminCalendarPeople } from "@/components/icons/AdminCalendarPeople";
 import { AdminCalendarDriver } from "@/components/icons/AdminCalendarDriver";
 
 const type_dot_color: Record<TimeBlock["type"], string> = {
-    "Pickup/Delivery": "bg-[#FBCF0B]",
-    "Warehouse": "bg-[#02AFC7]",
+    "Pickup/Delivery": "bg-[#02AFC7]",
+    "Warehouse": "bg-[#FBCF0B]",
 };
 
 function formatTime(ts: { toDate: () => Date }) {
@@ -48,21 +48,11 @@ export default function AdminCalendarSummary() {
         return groups;
     }, [upcomingEvents]);
 
-    const unfilledCount = useMemo(() => {
-        return upcomingEvents.filter((tb) => {
-            const driveGroup = tb.volunteerGroups.find((g) => g.name === "Lead Drivers ONLY");
-            const volGroup = tb.volunteerGroups.find((g)=> g.name === "Volunteers");
-            const lowDrive = driveGroup ? (driveGroup.volunterIDs?.length ?? 0) < (driveGroup.maxNum ?? 0) : false;
-            const lowVol = volGroup ? (volGroup.volunterIDs?.length ?? 0) <= ((volGroup.maxNum ?? 0) /2) : false;
-            return lowDrive || lowVol;
-        }).length
-    },[upcomingEvents]);
 
     return (
-        <div className="w-full h-full rounded-xl border border-[#E7E7E7] shadow-sm px-4 pb-4 flex flex-col gap-3 bg-white/70 overflow-hidden">
+        <div className="w-full h-full rounded-xl border border-[#E7E7E7] shadow-sm px-5 pb-5 flex flex-col gap-3 bg-white/70 overflow-hidden">
             <div className = "flex flex-row pt-6 justify-between ">
                 <div className = "font-semibold text-base"> Calendar </div>
-                <div className = "text-sm text-[#383838] "> {unfilledCount}/{upcomingEvents.length} shifts unfilled</div>
             </div>
             {isLoading ? (
                 <p className = "flex justify-center"> Loading... </p>
@@ -75,43 +65,43 @@ export default function AdminCalendarSummary() {
                         const weekday = date.toLocaleDateString("en-US", {weekday: "short"}).toUpperCase();
                         
                         return (
-                            <div key = {dateKey} className = "flex flex-row border border-[#E3E3E3] rounded-sm bg-white">
+                            <div key = {dateKey} className = "flex flex-row border border-light-border rounded-sm">
                                 <div className = "flex flex-col items-center justify-center text-center w-14 shrink-0 py-2">
                                     <span className = "font-semibold text-base text-[#6B7A99]">{dayNumber}</span>
                                     <span className = "text-xs text-[#6B7A99]">{weekday}</span>
                                 </div>
-                                <span className="w-px bg-[#E3E3E3] my-4 " />
-                                <div className = "flex flex-col px-3 ">
+                                <div className="border-l border-dotted border-[#E3E3E3] my-4" />
+                                <div className = "flex flex-col pl-3 pr-4 flex-1 min-w-0">
                                     {events.map((tb, i) => {{
 
                                     const volGroup = tb.volunteerGroups.find(group => group.name === "Volunteers")
                                     const volCount = volGroup?.volunterIDs?.length ?? 0; 
                                     const lowVol = volCount <= (volGroup?.maxNum ?? 0)/2
-                                    const driveGroup = tb.volunteerGroups.find(group => group.name === "Lead Drivers ONLY")
+                                    const driveGroup = tb.volunteerGroups.find(group => group.name.toLowerCase().includes("drive"))
                                     const driveCount = driveGroup?.volunterIDs?.length ?? 0;
                                     const lowDrive = (driveGroup?.volunterIDs.length ?? 0) !== driveGroup?.maxNum
 
                                     return(
-                                        <>
+                                        <div key={tb.id}>
                                         {i > 0 && <div className = "border-t border-dotted border-[#E3E3E3]"/>}
-                                        <div key = {tb.id} className = "grid grid-cols-[2rem_5rem_9rem_2rem_2rem] items-center gap-2 py-5">
-                                            <span className = {`h-[0.875rem] w-[0.875rem] rounded-full ${type_dot_color[tb.type]}`}/>
-                                            <span className = "text-sm"> {formatTime(tb.startTime)}-{formatTime(tb.endTime)}</span>
-                                            <span className = "text-sm"> {tb.type}</span>
-                                            <span className={`flex text-sm items-center justify-end gap-[0.25rem] ${lowVol ? "text-[#E16060]" : "text-[#000000]"}`}>
-                                                <AdminCalendarPeople fill={lowVol ? "#E16060" : "#000000"}/>
-                                                {volCount}
-                                            </span>
-                                            {lowDrive ? (
-                                            <span className={`flex text-sm items-center justify-end gap-[0.25rem] ${lowDrive ? "text-[#E16060]" : "text-[#000000]"}`}>
-                                                <AdminCalendarDriver fill={lowDrive ? "#E16060" : "#000000"}/>
-                                                {driveCount}
-                                            </span>): 
-                                            (
-                                                <div/>
-                                            )}
+                                        <div className = "flex items-center gap-2 py-5">
+                                            <span className = {`h-3.5 w-3.5 rounded-full shrink-0 ${type_dot_color[tb.type]}`}/>
+                                            <span className = "w-24 shrink-0 text-sm">{formatTime(tb.startTime)}-{formatTime(tb.endTime)}</span>
+                                            <span className = "flex-1 text-sm">{tb.type}</span>
+                                            <div className="flex items-center gap-2">
+                                                <span className={`flex text-sm items-center gap-[0.25rem] ${lowVol ? "text-[#E16060]" : "text-[#000000]"}`}>
+                                                    <AdminCalendarPeople fill={lowVol ? "#E16060" : "#000000"}/>
+                                                    {volCount}
+                                                </span>
+                                                {lowDrive && (
+                                                    <span className={`flex text-sm items-center gap-[0.25rem] text-[#E16060]`}>
+                                                        <AdminCalendarDriver fill="#E16060"/>
+                                                        {driveCount}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
-                                        </>
+                                        </div>
                                     );
                                     }})}
                                 </div>

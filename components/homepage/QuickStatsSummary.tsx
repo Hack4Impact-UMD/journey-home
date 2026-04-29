@@ -32,7 +32,7 @@ type StatCardProps = {
 
 function StatCard({ label, count, newCount, icon, iconClassName }: StatCardProps) {
     return (
-        <div className="bg-white/70 shadow-sm rounded-2xl border border-light-border p-4 flex flex-col gap-3 relative overflow-hidden h-40">
+        <div className="bg-white/70 shadow-sm rounded-2xl border border-light-border p-4 flex flex-col gap-3 relative overflow-hidden h-full">
             <div className="flex items-center justify-between">
                 <span className="text-base font-semibold text-text-1">{label}</span>
                 <span className="text-text-1"><ArrowDiagonalIcon /></span>
@@ -70,9 +70,8 @@ export function QuickStatsSummary() {
     const newDR = notReviewedDR.filter((dr) => isFromToday(dr.date.seconds)).length;
 
     const newLowStock = useMemo(() => {
-        const oneDayAgo = Date.now() - 25*60*60*1000; 
         const recentChanges = warehouseHistory.filter(
-            (entry) => entry.timestamp.toDate().getTime() >= oneDayAgo
+            (entry) => isFromToday(entry.timestamp.toDate().getTime() / 1000)
         );
         const categoriesGoneLow = new Set(
             recentChanges
@@ -106,16 +105,9 @@ export function QuickStatsSummary() {
         );
     }
 
-    if(isError){
-        return (
-            <div className = "h-full w-full flex itmes-center justify-center rounded-xl border border-light-border bg-white/70">
-                <p className = "text-sm  text-[#919393]"> Failed to load stats</p>
-            </div>
-        )
-    }
 
     return (
-        <div className="grid grid-cols-2 gap-3 h-full w-full">
+        <div className="grid grid-cols-2 grid-rows-2 gap-3 h-full w-full">
             <StatCard label="Low stock items" count={lowStockCount} newCount={newLowStock} icon={<InventoryIcon />} iconClassName="bottom-[-1.25rem] right-[-1.25rem]" />
             <StatCard label="Donation requests" count={notReviewedDR.length} newCount={newDR} icon={<DonorRequestsIcon />} iconClassName="bottom-[-0.5rem] right-[-1rem]" />
             <StatCard label="Account requests" count={accountRequests.length} icon={<UserManagementIcon />} iconClassName="bottom-[-0.25rem] right-[-1rem]" />

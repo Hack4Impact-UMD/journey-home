@@ -16,7 +16,7 @@ export default function AdminHomePage() {
     return (
         <ProtectedRoute allow={["Admin"]}>
             <div className="h-full w-full flex flex-col font-family-roboto">
-                <div className="flex flex-1 min-h-0">
+                <div className="flex flex-1 min-h-0 max-md:flex-col">
                     <Navbar />
                     <div className="flex-1 flex flex-col overflow-auto pt-8 pb-15 px-10 gap-6 bg-linear-to-r from-[#F8FDFE] to-[#DAF2F5]">
                         <h1 className="text-5xl text-primary font-extrabold">
