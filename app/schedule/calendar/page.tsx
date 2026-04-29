@@ -34,7 +34,7 @@ export default function CalendarPage() {
     return (
         <>
             {/* Toolbar */}
-            <div className="grid grid-cols-3 items-center mb-4">
+            <div className="grid grid-cols-3 items-center mb-4 px-6">
                 <div className="flex items-center gap-3">
                     <button onClick={() => setDate(new Date())} className="px-4 py-1 rounded-full border border-light-border text-sm bg-white shadow-[0_1px_3px_rgba(38,51,77,0.06)]">
                         <span className={todayHighlight ? "text-[#02AFC7]" : "text-[#6B7A99]"}>Today</span>
