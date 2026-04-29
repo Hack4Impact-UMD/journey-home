@@ -6,12 +6,10 @@ import Link from "next/link";
 export function StatusPage({
     title,
     message,
-    homePath = "/",
     onLogout,
 }: {
     title: string;
     message: string;
-    homePath?: string;
     onLogout?: () => void;
 }) {
     return (
@@ -22,7 +20,7 @@ export function StatusPage({
                 <p className="text-text-2">{message}</p>
                 <div className="flex flex-row gap-4">
                     <Link
-                        href={homePath}
+                        href="/"
                         className="border border-light-border px-3 py-1 rounded-lg font-family-roboto mt-4 bg-background text-text-2"
                     >
                         Back to Home
