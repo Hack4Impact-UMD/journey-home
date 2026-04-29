@@ -3,13 +3,7 @@
 import { InventoryCategory } from "@/types/inventory";
 import * as PhosphorIcons from "@phosphor-icons/react";
 import { DEFAULT_ICONS } from "@/components/control-panel/CategoryModal";
-
-function isValidIcon(val: unknown): val is React.ComponentType<{ size?: number; strokeWidth?: number }> {
-  if (!val) return false;
-  if (typeof val === "function") return true;
-  if (typeof val === "object" && val !== null && "render" in val) return true;
-  return false;
-}
+import { isValidIcon } from "@/lib/icons";
 
 function getStockColor(quantity: number, low: number, high: number): string {
     if (quantity <= low) return "#E16060";

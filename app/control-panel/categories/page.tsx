@@ -10,13 +10,7 @@ import { EditIcon } from "@/components/icons/EditIcon";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { Badge } from "@/components/inventory/Badge";
 import { CategoryModal, DEFAULT_ICONS } from "@/components/control-panel/CategoryModal";
-
-function isValidIcon(val: unknown): val is React.ComponentType<{ size?: number; strokeWidth?: number }> {
-  if (!val) return false;
-  if (typeof val === "function") return true;
-  if (typeof val === "object" && val !== null && "render" in val) return true;
-  return false;
-}
+import { isValidIcon } from "@/lib/icons";
 
 export default function CategoriesPage() {
   const { state: { userData } } = useAuth();
@@ -40,7 +34,7 @@ export default function CategoriesPage() {
         <SearchBox
           value={search}
           onChange={setSearch}
-          onSubmit={() => refetch}
+          onSubmit={refetch}
         />
         <button
           className="flex items-center gap-1 px-3 py-2 h-8 text-sm rounded-xs bg-primary text-white cursor-pointer"

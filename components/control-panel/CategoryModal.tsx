@@ -1,43 +1,20 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { X, MagnifyingGlass } from "@phosphor-icons/react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import * as PhosphorIcons from "@phosphor-icons/react";
-import { BedSingle, BedDouble, ShelvingUnit, Microwave } from "lucide-react";
 import { InventoryCategory } from "@/types/inventory";
+import { CloseIcon } from "@/components/icons/CloseIcon";
+import { isValidIcon, resolveIconComponent, PhosphorIconComponent } from "@/lib/icons";
 
-const WEIGHT_SUFFIXES = ["", "Light", "Thin", "Regular", "Bold", "Fill", "Duotone"];
-
-function isValidIcon(val: unknown): val is React.ComponentType<{ size?: number; strokeWidth?: number }> {
-  if (!val) return false;
-  if (typeof val === "function") return true;
-  if (typeof val === "object" && val !== null && "render" in val) return true;
-  return false;
-}
-
-function resolveIconName(base: string): string | null {
-  for (const suffix of WEIGHT_SUFFIXES) {
-    const key = base + suffix;
-    if (isValidIcon((PhosphorIcons as Record<string, unknown>)[key])) return key;
-  }
-  return null;
-}
-
-function resolveIconComponent(base: string): React.ComponentType<{ size?: number; strokeWidth?: number }> | null {
-  const resolved = resolveIconName(base);
-  if (!resolved) return null;
-  const val = (PhosphorIcons as Record<string, unknown>)[resolved];
-  return isValidIcon(val) ? val : null;
-}
-
-type IconEntry = { key: string; Component: React.ComponentType<{ size?: number; strokeWidth?: number }> };
+type IconEntry = { key: string; Component: PhosphorIconComponent };
 
 export const DEFAULT_ICONS: IconEntry[] = [
   { key: "Rug", Component: resolveIconComponent("Rug") ?? PhosphorIcons.Package },
   { key: "Armchair", Component: resolveIconComponent("Armchair") ?? PhosphorIcons.Package },
   { key: "Coffee", Component: resolveIconComponent("Coffee") ?? PhosphorIcons.Package },
-  { key: "BedSingle", Component: BedSingle },
-  { key: "BedDouble", Component: BedDouble },
+  { key: "BedSingle", Component: resolveIconComponent("Bed") ?? PhosphorIcons.Package },
+  { key: "BedDouble", Component: resolveIconComponent("BedDouble") ?? PhosphorIcons.Package },
   { key: "PaintBrushHousehold", Component: resolveIconComponent("PaintBrushHousehold") ?? PhosphorIcons.Package },
   { key: "Chair", Component: resolveIconComponent("Chair") ?? PhosphorIcons.Package },
   { key: "SprayBottle", Component: resolveIconComponent("SprayBottle") ?? PhosphorIcons.Package },
@@ -45,267 +22,236 @@ export const DEFAULT_ICONS: IconEntry[] = [
   { key: "Basket", Component: resolveIconComponent("Basket") ?? PhosphorIcons.Package },
   { key: "CookingPot", Component: resolveIconComponent("CookingPot") ?? PhosphorIcons.Package },
   { key: "ForkKnife", Component: resolveIconComponent("ForkKnife") ?? PhosphorIcons.Package },
-  { key: "Shelves", Component: ShelvingUnit },
-  { key: "Microwave", Component: Microwave },
+  { key: "Shelves", Component: resolveIconComponent("Bookcase") ?? PhosphorIcons.Package },
+  { key: "Microwave", Component: resolveIconComponent("Oven") ?? PhosphorIcons.Package },
   { key: "ToiletPaper", Component: resolveIconComponent("ToiletPaper") ?? PhosphorIcons.Package },
   { key: "Dresser", Component: resolveIconComponent("Dresser") ?? PhosphorIcons.Package },
   { key: "Television", Component: resolveIconComponent("Television") ?? PhosphorIcons.Package },
 ];
 
-interface CategoryModalProps {
+interface Props {
   category: InventoryCategory | null;
   categories: InventoryCategory[];
-  onSave: (cat: InventoryCategory) => Promise<void>;
+  onSave: (category: InventoryCategory) => Promise<void>;
   onClose: () => void;
 }
 
-export function CategoryModal({ category, categories, onSave, onClose }: CategoryModalProps) {
-  const [name, setName] = useState(category?.name ?? "");
-  const [icon, setIcon] = useState<string>(
-    category?.icon ?? DEFAULT_ICONS[0].key
-  );
-  const [lowThreshold, setLowThreshold] = useState(category?.lowThreshold ?? 0);
-  const [highThreshold, setHighThreshold] = useState(category?.highThreshold ?? 0);
-  const [showIconPicker, setShowIconPicker] = useState(false);
-  const [iconSearch, setIconSearch] = useState("");
-  const [saving, setSaving] = useState(false);
+export function CategoryModal({
+  category,
+  categories,
+  onSave,
+  onClose,
+}: Props) {
+  const isEdit = category !== null;
 
-  const sliderMax = 50;
+  const [name, setName] = useState("");
+  const [icon, setIcon] = useState<string>("Package");
+  const [min, setMin] = useState(0);
+  const [mid, setMid] = useState(0);
+  const [error, setError] = useState("");
+  const [showIconPicker, setShowIconPicker] = useState(false);
+
+  useEffect(() => {
+    if (category) {
+      setName(category.name);
+      setIcon(category.icon || "Package");
+      setMin(category.lowThreshold ?? 0);
+      setMid(category.highThreshold ?? 0);
+    }
+  }, [category]);
+
+  const validate = () => {
+    if (!name.trim()) {
+      setError("Category name cannot be empty");
+      return false;
+    }
+
+    if (min >= mid) {
+      setError("Very Low Threshold must be less than Low Threshold");
+      return false;
+    }
+
+    const duplicate = categories.some(
+      (c) => c.name === name && c.id !== category?.id
+    );
+    if (duplicate) {
+      setError("Category name already exists");
+      return false;
+    }
+
+    setError("");
+    return true;
+  };
+
+  const save = async () => {
+    if (!validate()) return;
+
+    const updated: InventoryCategory = isEdit
+      ? { ...category!, name, icon, lowThreshold: min, highThreshold: mid }
+      : { id: crypto.randomUUID(), name, icon, quantity: 0, lowThreshold: min, highThreshold: mid };
+
+    await onSave(updated);
+    onClose();
+  };
 
   const iconRecord = PhosphorIcons as Record<string, unknown>;
-  const IconComponent =
-    isValidIcon(iconRecord[icon])
-      ? iconRecord[icon] as React.ComponentType<{ size?: number; strokeWidth?: number }>
-      : (DEFAULT_ICONS.find((d) => d.key === icon)?.Component ?? PhosphorIcons.Package);
+  const IconComponent = isValidIcon(iconRecord[icon])
+    ? iconRecord[icon] as PhosphorIconComponent
+    : (DEFAULT_ICONS.find((d) => d.key === icon)?.Component ?? PhosphorIcons.Package);
 
-  const allIconNames = useMemo(() => {
-    const map = new Map<string, string>();
-    for (const key of Object.keys(PhosphorIcons)) {
-      const val = (PhosphorIcons as Record<string, unknown>)[key];
-      if (!isValidIcon(val) || key === "createIcon" || key === "IconContext") continue;
-      const base = key
-        .replace(/(Thin|Light|Regular|Bold|Fill|Duotone)$/, "")
-        .replace(/Icon$/, "");
-      if (!map.has(base) || key === base || key.replace(/Icon$/, "") === base) {
-        map.set(base, key);
-      }
-    }
-    return Array.from(map.values());
-  }, []);
-
-  const displayedIcons = useMemo(() => {
-    if (!iconSearch.trim()) return [];
-    const q = iconSearch.toLowerCase();
-    return allIconNames
-      .filter((key) => {
-        const base = key
-          .replace(/(Thin|Light|Regular|Bold|Fill|Duotone)$/, "")
-          .replace(/Icon$/, "");
-        return base.toLowerCase().includes(q);
-      })
-      .slice(0, 40);
-  }, [iconSearch, allIconNames]);
-
-  async function handleSave() {
-    if (!name.trim()) return;
-    setSaving(true);
-    await onSave({
-      id: category?.id || crypto.randomUUID(),
-      name: name.trim(),
-      icon,
-      quantity: category?.quantity ?? 0,
-      lowThreshold,
-      highThreshold,
-    });
-    setSaving(false);
-    onClose();
-  }
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/30" onClick={onClose} />
-
-      <div className="relative flex items-stretch gap-4">
+  return createPortal(
+    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+      <div className="flex items-stretch gap-4">
 
         {showIconPicker && (
-          <div className="bg-white rounded-xl shadow-xl w-[340px] p-5 flex flex-col">
+          <div className="bg-white rounded-xl shadow-lg w-[340px] p-5 flex flex-col">
             <div className="flex items-center justify-between mb-3">
               <span className="font-semibold text-base">Select an icon</span>
               <button
                 onClick={() => setShowIconPicker(false)}
                 className="text-gray-400 hover:text-gray-600"
               >
-                <X size={18} />
+                <CloseIcon />
               </button>
             </div>
 
-            <div className="flex items-center gap-2 border border-light-border rounded-md px-3 py-1.5 mb-4">
-              <MagnifyingGlass size={16} className="text-gray-400" />
-              <input
-                className="flex-1 text-sm outline-none bg-transparent"
-                placeholder="Search"
-                value={iconSearch}
-                onChange={(e) => setIconSearch(e.target.value)}
-                autoFocus
-              />
-            </div>
-
-            <div className="grid grid-cols-5 gap-2 overflow-y-auto flex-1 content-start">
-              {!iconSearch.trim() ? (
-                DEFAULT_ICONS.map(({ key, Component }) => (
-                  <button
-                    key={key}
-                    onClick={() => { setIcon(key); setShowIconPicker(false); }}
-                    className={[
-                      "flex items-center justify-center w-full aspect-square rounded-md border transition-colors",
-                      icon === key
-                        ? "border-primary bg-primary/10"
-                        : "border-light-border hover:border-primary hover:bg-blue-50",
-                    ].join(" ")}
-                    title={key}
-                  >
-                    <Component size={24} strokeWidth={1.5} />
-                  </button>
-                ))
-              ) : displayedIcons.length > 0 ? (
-                displayedIcons.map((iconName) => {
-                  const val = (PhosphorIcons as Record<string, unknown>)[iconName];
-                  if (!isValidIcon(val)) return null;
-                  const Icon = val;
-                  return (
-                    <button
-                      key={iconName}
-                      onClick={() => { setIcon(iconName); setShowIconPicker(false); }}
-                      className={[
-                        "flex items-center justify-center w-full aspect-square rounded-md border transition-colors",
-                        icon === iconName
-                          ? "border-primary bg-primary/10"
-                          : "border-light-border hover:border-primary hover:bg-blue-50",
-                      ].join(" ")}
-                      title={iconName
-                        .replace(/(Thin|Light|Regular|Bold|Fill|Duotone)$/, "")
-                        .replace(/Icon$/, "")}
-                    >
-                      <Icon size={24} />
-                    </button>
-                  );
-                })
-              ) : (
-                <div className="col-span-5 text-center text-sm text-gray-400 py-6">
-                  No icons found.
-                </div>
-              )}
+            <div className="grid grid-cols-5 gap-2">
+              {DEFAULT_ICONS.map(({ key, Component }) => (
+                <button
+                  key={key}
+                  onClick={() => { setIcon(key); setShowIconPicker(false); }}
+                  className={[
+                    "flex items-center justify-center w-full aspect-square rounded-xs border transition-colors",
+                    icon === key
+                      ? "border-primary bg-primary/10"
+                      : "border-[#D9D9D9] hover:border-primary hover:bg-blue-50",
+                  ].join(" ")}
+                  title={key}
+                >
+                  <Component size={24} strokeWidth={1.5} />
+                </button>
+              ))}
             </div>
           </div>
         )}
 
-        <div className="bg-white rounded-xl shadow-xl w-[480px] p-8 relative">
+        <div className="bg-white rounded-xl w-140 p-8 shadow-lg relative font-family-roboto">
+
           <button
+            aria-label="Close modal"
+            className="absolute top-5 right-5 text-gray-400 hover:text-gray-600"
             onClick={onClose}
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
           >
-            <X size={18} />
+            <CloseIcon />
           </button>
 
-          <h2 className="text-xl font-bold text-text-1 mb-6">
-            {category ? "Edit item category" : "New item category"}
+          <h2 className="text-[24px] font-semibold mb-6">
+            {isEdit ? "Edit category" : "New category"}
           </h2>
 
-          <label className="block text-sm font-medium text-text-1 mb-1">Item name</label>
+          <label className="text-gray-600 text-sm block mb-2">
+            Inventory item
+          </label>
+
           <input
-            className="w-full border border-light-border rounded-md px-3 py-2 text-sm mb-5 outline-none focus:border-primary"
+            className="border border-[#D9D9D9] w-full px-3 py-2.5 mb-4 rounded-xs text-sm"
             placeholder="Add"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
 
-          <label className="block text-sm font-medium text-text-1 mb-2">Icon</label>
+          <label className="text-gray-600 text-sm block mb-2">
+            Icon
+          </label>
+
           <button
             onClick={() => setShowIconPicker((v) => !v)}
             className={[
-              "w-14 h-14 flex items-center justify-center border rounded-md transition-colors mb-5",
+              "w-12 h-12 flex items-center justify-center border rounded-xs transition-colors mb-6",
               showIconPicker
                 ? "border-primary bg-primary/10"
-                : "border-light-border hover:border-primary hover:bg-blue-50",
+                : "border-[#D9D9D9] hover:border-primary hover:bg-blue-50",
             ].join(" ")}
           >
-            <IconComponent size={28} strokeWidth={1.5} />
+            <IconComponent size={24} strokeWidth={1.5} />
           </button>
 
-          <div className="flex gap-4 mb-4">
+          <div className="flex gap-8 mb-6">
+
             <div>
-              <label className="block text-sm font-medium text-text-1 mb-1">Very low</label>
+              <label className="text-gray-600 text-sm block mb-1">
+                Very Low
+              </label>
+
               <input
                 type="number"
-                className="w-28 border border-red-300 rounded-md px-3 py-2 text-sm outline-none focus:border-red-400"
+                min="0"
                 placeholder="< Amt"
-                value={lowThreshold || ""}
-                onChange={(e) => setLowThreshold(Number(e.target.value))}
+                className="border border-red-400 px-3 py-2.5 w-25 rounded-xs text-sm"
+                value={min === 0 ? "" : min}
+                onChange={(e) => setMin(Number(e.target.value) || 0)}
               />
             </div>
+
             <div>
-              <label className="block text-sm font-medium text-text-1 mb-1">low</label>
+              <label className="text-gray-600 text-sm block mb-1">
+                Low
+              </label>
+
               <input
                 type="number"
-                className="w-28 border border-yellow-300 rounded-md px-3 py-2 text-sm outline-none focus:border-yellow-400"
+                min="0"
                 placeholder="< Amt"
-                value={highThreshold || ""}
-                onChange={(e) => setHighThreshold(Number(e.target.value))}
+                className="border border-yellow-400 px-3 py-2.5 w-25 rounded-xs text-sm"
+                value={mid === 0 ? "" : mid}
+                onChange={(e) => setMid(Number(e.target.value) || 0)}
               />
             </div>
+
           </div>
 
-          <div className="relative mb-6">
-            <div className="relative w-full h-5 mb-1">
-              <span
-                className="absolute -translate-x-1/2 bg-gray-700 text-white text-xs rounded-full px-1.5 py-0.5"
-                style={{ left: `${Math.min((lowThreshold / sliderMax) * 100, 100)}%` }}
-              >
-                {lowThreshold}
-              </span>
-              {highThreshold > 0 && (
-                <span
-                  className="absolute -translate-x-1/2 bg-gray-700 text-white text-xs rounded-full px-1.5 py-0.5"
-                  style={{ left: `${Math.min((highThreshold / sliderMax) * 100, 100)}%` }}
-                >
-                  {highThreshold}
-                </span>
-              )}
+          {/* threshold bar */}
+
+          <div className="relative mb-8 pt-7">
+
+            <div className="absolute top-0 left-1/3 -translate-x-1/2 bg-[#505050] text-white text-xs px-2 h-5 flex items-center rounded-full">
+              {min || 0}
             </div>
-            <div className="relative h-2 rounded-full overflow-hidden bg-gray-100">
-              <div
-                className="absolute inset-y-0 left-0 bg-red-400"
-                style={{ width: `${Math.min((lowThreshold / sliderMax) * 100, 100)}%` }}
-              />
-              <div
-                className="absolute inset-y-0 bg-yellow-400"
-                style={{
-                  left: `${Math.min((lowThreshold / sliderMax) * 100, 100)}%`,
-                  width: `${Math.min(((highThreshold - lowThreshold) / sliderMax) * 100, 100)}%`,
-                }}
-              />
-              <div
-                className="absolute inset-y-0 right-0 bg-green-400"
-                style={{ left: `${Math.min((highThreshold / sliderMax) * 100, 100)}%` }}
-              />
+
+            <div className="absolute top-0 left-2/3 -translate-x-1/2 bg-[#505050] text-white text-xs px-2 h-5 flex items-center rounded-full">
+              {mid || 0}
             </div>
-            <div className="flex justify-between text-xs text-gray-400 mt-1">
-              <span>Very low</span>
-              <span>Low</span>
-              <span>Good</span>
+
+            <div className="flex h-1.5 rounded overflow-hidden">
+              <div className="w-1/3 bg-red-400" />
+              <div className="w-1/3 bg-yellow-400" />
+              <div className="w-1/3 bg-green-500" />
             </div>
+
+            <div className="flex mt-2 text-xs text-[#BFBFBF]">
+              <span className="w-1/3 text-center">Very low</span>
+              <span className="w-1/3 text-center">Low</span>
+              <span className="w-1/3 text-center">Good</span>
+            </div>
+
           </div>
 
-          <button
-            onClick={handleSave}
-            disabled={saving || !name.trim()}
-            className="bg-primary text-white text-sm px-5 py-2 rounded-md disabled:opacity-50 cursor-pointer hover:bg-primary/90"
-          >
-            {saving ? "Saving..." : "Save"}
-          </button>
+          {error && (
+            <p className="text-red-500 text-sm mb-4">{error}</p>
+          )}
+
+          <div className="mt-6">
+            <button
+              className="bg-primary text-white text-sm px-6 py-2 rounded-xs cursor-pointer"
+              onClick={save}
+            >
+              Save
+            </button>
+          </div>
+
         </div>
-
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
