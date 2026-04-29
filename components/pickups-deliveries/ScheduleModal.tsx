@@ -52,7 +52,7 @@ export function getTimeSlot(
   const formattedStart = startDate.toLocaleTimeString("en-US", options);
   const formattedEnd = endDate.toLocaleTimeString("en-US", options);
 
-  return `${formattedStart} to ${formattedEnd}`;
+  return `${formattedStart} - ${formattedEnd}`;
 }
 
 //NEED A WAY TO DIFFRENTIATE BETWEEN DONOR AND CLIENT
@@ -167,7 +167,7 @@ export default function ScheduleModal({
 
                     {sortedTBs.map((tb) => {
                         const { weekday, day, month } = getDateInfo(tb.startTime);
-                        const timeSlot = getTimeSlot(tb.startTime, tb.endTime);
+                        const timeSlot = getTimeSlot(tb.startTime, tb.endTime).replaceAll(":00", "");
                         const sortedTasks = sortTasks(tb);
                         const startOfToday = new Date();
                         startOfToday.setHours(0, 0, 0, 0);
@@ -175,64 +175,58 @@ export default function ScheduleModal({
 
                         const isAlreadyAssigned = scheduleRequest.associatedTimeBlockID === tb.id;
 
-                        if (isPast) return null;
+                        if (isPast || tb.type !== "Pickup/Delivery") return null;
 
                         return(
                             <div key={tb.id} className="border-b pb-4 mb-4 flex-col items-center pt-2">
-                                <h1 className="text-sm text-[#565656] font-semibold mb-2">
-                                    {tb.name}
-                                </h1>
-                                <div className="flex gap-1 items-baseline">
-                                    <h1 className= "text-sm text-[#565656]">
-                                        {weekday}
-                                    </h1>
-                                    <h1 className= "text-xs text-[#7D7D7D]">
-                                        {day} {month}
-                                    </h1>
-                                </div>
-
-                                <div className="flex justify-between items-baseline">
-                                    <p className="cursor-pointer text-sm px-2 py-1 mr-auto font-family-roboto rounded-sm border-primary border text-[#565656] bg-[#F5FAFA]">
-                                        {timeSlot}
-                                    </p>
-                                   
-                                    <button 
-                                    onClick= {isAlreadyAssigned ? undefined : () => addShift(tb)}
-                                    disabled= {isAlreadyAssigned}
-                                    className={`text-xs rounded-sm px-3 py-2 flex items-center gap-1.5
-                                        ${isAlreadyAssigned
-                                            ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                                            : "bg-primary text-white"}`
-                                        }>
-                                        {isAlreadyAssigned ? <></> : <Plus className="h-3 w-3" />}
-                                        <span className="">
-                                            {isAlreadyAssigned ? "Assigned" :  "Add To Shift"}
+                                <div className="flex flex-row">
+                                    <div className="flex flex-col">
+                                        <span className="text-primary font-bold mb-1">
+                                            {tb.name}
                                         </span>
-                                    </button>
+                                        <span className= "text-sm text-[#565656] font-medium">
+                                            {weekday}, {month} {day}
+                                        </span>
+                                        <span className="text-xs text-[#7D7D7D]">
+                                            {timeSlot}
+                                        </span>
+                                    </div>
+                                    <div className="ml-auto">
+                                        <button 
+                                            onClick= {isAlreadyAssigned ? undefined : () => addShift(tb)}
+                                            disabled= {isAlreadyAssigned}
+                                            className={`text-sm rounded-sm px-3 py-2 flex items-center gap-1.5
+                                            ${isAlreadyAssigned
+                                                ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                                                : "bg-primary text-white"}`
+                                            }
+                                        >
+                                            {isAlreadyAssigned ? "Selected" : <><Plus className="h-4 w-4"/>Select</>}
+                                        </button> 
+                                    </div>
+                                     
                                 </div>
                                 
-                                <div className= "flex-col pt-2">
+                                <div className="flex gap-2 mt-2 flex-wrap">
                                     {/*need to map through each task*/}
 
                                     {sortedTasks.map((task) => {
                                         const { city, zipCode } = getLocoInfo(task);
                                         
                                         return(
-                                            <div key={task.id} className="flex gap-1 pt-2 items-baseline">
-                                                <h1 className= "text-sm text-[#565656] font-medium">
+                                            <div key={task.id} className="bg-[#EEEEEE] rounded-sm flex gap-1 text-[#565656] items-center px-2 h-[1.625em]">
+                                                <span className= "text-xs font-medium">
                                                     {city}
-                                                </h1>
-                                                <h1 className= "text-xs text-[#7D7D7D]">
+                                                </span>
+                                                <span className= "text-xs">
                                                     {zipCode}
-                                                </h1>
-                                                <h1 className= "bg-[#E6E6E6] text-[#383838] px-2.5 py-1 rounded-sm text-xs">
+                                                </span>
+                                                <span className= "bg-[#F5FAFA] rounded-sm border border-[#E6E6E6] text-xs px-2">
                                                     {getTotalItems(task)}
-                                                </h1>
+                                                </span>
                                             </div>
                                         );
                                     })}
-
-                                    {/*then submit with the add shift, and also the list of shifts by zip code and stuff*/}
                                 </div>
                             </div>
                         );   

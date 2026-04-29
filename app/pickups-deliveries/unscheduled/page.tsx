@@ -2,7 +2,7 @@
 import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { SortOption } from "@/components/inventory/SortOption";
-import Request, { getTotalItems } from "@/components/pickups-deliveries/Request";
+import PickupDeliveryCard, { getTotalItems } from "@/components/pickups-deliveries/Request";
 import { useDonationRequests } from "@/lib/queries/donation-requests";
 import { useClientRequests } from "@/lib/queries/client-requests";
 import { useState, useMemo } from "react";
@@ -91,7 +91,7 @@ export default function UnscheduledTasksPage() {
                     const totalB = getTotalItems(b);
                     return sortAsc ? totalA - totalB : totalB - totalA;
                 }).map(item => (
-                    <Request donation={item} key={item.id} />
+                    <PickupDeliveryCard donation={item} key={item.id} />
                 ))
             }
             </div>
