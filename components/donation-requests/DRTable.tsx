@@ -112,7 +112,7 @@ function DRTableRow({
             <span className="w-[10%] px-4" onClick={(e) => e.stopPropagation()}>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild className="outline-0">
-                        <button className={`border rounded-xs flex items-center justify-between px-2 w-[3.62rem] h-[1.375rem] ${colorClass}`}>
+                        <button className={`border rounded-xs flex items-center justify-between px-2 w-[3.62rem] h-5.5 ${colorClass}`}>
                             <span className="text-xs">{responded ? "Yes" : "No"}</span>
                             <DropdownIcon />
                         </button>
