@@ -123,11 +123,11 @@ function DRTableRow({
                                 key={option}
                                 className="text-xs cursor-pointer"
                                 checked={(option === "Yes") === responded}
-                                onCheckedChange={(checked) => {
+                                onCheckedChange={async (checked) => {
                                     if (!checked) return;
                                     const value = option === "Yes";
                                     setResponded(value);
-                                    setDonationRequestToast({ ...request, responded: value });
+                                    await setDonationRequestToast({ ...request, responded: value });
                                 }}
                             >
                                 {option}
