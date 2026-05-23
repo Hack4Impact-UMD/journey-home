@@ -9,10 +9,11 @@ import { EditIcon } from "@/components/icons/EditIcon";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { Badge } from "@/components/inventory/Badge";
 import { CategoryModal } from "@/components/control-panel/CategoryModal";
+import { PresetIcon } from "@/components/icons/PresetIcon";
 
 export default function CategoriesPage() {
   const { state: { userData } } = useAuth();
-  const { inventoryCategories, isLoading, setInventoryCategoryWithToast } =
+  const { inventoryCategories, isLoading, setInventoryCategoryWithToast, refetch } =
     useInventoryCategories();
 
   const [search, setSearch] = useState("");
@@ -21,7 +22,9 @@ export default function CategoriesPage() {
     useState<InventoryCategory | null>(null);
 
   const filteredCategories = inventoryCategories.filter((category) =>
-    category.name.replace(/\s/g, "").toLowerCase().includes(search.trim().toLowerCase().replace(/\s/g, ""))
+    category.name.replace(/\s/g, "").toLowerCase().includes(
+      search.trim().toLowerCase().replace(/\s/g, "")
+    )
   );
 
   return (
@@ -30,14 +33,11 @@ export default function CategoriesPage() {
         <SearchBox
           value={search}
           onChange={setSearch}
-          onSubmit={() => {}}
+          onSubmit={refetch}
         />
         <button
           className="flex items-center gap-1 px-3 py-2 h-8 text-sm rounded-xs bg-primary text-white cursor-pointer"
-          onClick={() => {
-            setSelectedCategory(null);
-            setShowModal(true);
-          }}
+          onClick={() => { setSelectedCategory(null); setShowModal(true); }}
         >
           <Plus className="w-4 h-4" /> Add
         </button>
@@ -49,7 +49,6 @@ export default function CategoriesPage() {
         </div>
       ) : (
         <div className="flex-1 min-h-0 flex flex-col">
-
           <div className="h-12 bg-[#FAFAFB] border-light-border border flex items-center font-family-roboto font-bold text-sm text-text-1 shrink-0">
             <span className="w-[58%] border-l-2 border-light-border px-4">Items</span>
             <span className="w-[34%] border-l-2 border-light-border px-4">Stock Thresholds</span>
@@ -63,31 +62,34 @@ export default function CategoriesPage() {
               </div>
             ) : (
               filteredCategories.map((category) => (
-                <div
-                  key={category.id}
-                  className="h-10 border-light-border border-b border-x flex items-center font-family-roboto text-sm text-text-1 hover:bg-blue-50 cursor-pointer"
-                  onClick={() => { setSelectedCategory(category); setShowModal(true); }}
-                >
-                  <div className="w-[58%] px-4">{category.name}</div>
-                  <div className="w-[34%] px-4 flex gap-2">
-                    <Badge text={`Very low: ${category.lowThreshold}`} color="red" />
-                    <Badge text={`Low: ${category.highThreshold}`} color="yellow" />
+                  <div
+                    key={category.id}
+                    className="h-10 border-light-border border-b border-x flex items-center font-family-roboto text-sm text-text-1 hover:bg-blue-50 cursor-pointer"
+                    onClick={() => { setSelectedCategory(category); setShowModal(true); }}
+                  >
+                    <div className="w-[58%] px-4 flex items-center gap-4">
+                      <PresetIcon icon={category.icon} className="w-7 h-7 text-text-1 shrink-0" />
+                      {category.name}
+                    </div>
+                    <div className="w-[34%] px-4 flex gap-2">
+                      <Badge text={`Very low: ${category.lowThreshold}`} color="red" />
+                      <Badge text={`Low: ${category.highThreshold}`} color="yellow" />
+                    </div>
+                    <div className="w-[8%] px-4 flex gap-3 text-gray-400">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedCategory(category);
+                          setShowModal(true);
+                        }}
+                      >
+                        <EditIcon />
+                      </button>
+                    </div>
                   </div>
-                  <div className="w-[8%] px-4 flex gap-3 text-gray-400">
-                    <button
-                      onClick={() => {
-                        setSelectedCategory(category);
-                        setShowModal(true);
-                      }}
-                    >
-                      <EditIcon />
-                    </button>
-                  </div>
-                </div>
               ))
             )}
           </div>
-
         </div>
       )}
 

@@ -235,6 +235,14 @@ export function ItemReviewModal({
                             >
                                 Deny
                             </button>
+                            {(item.status === "Approved" || item.status === "Denied") && (
+                                <button
+                                    className="text-sm rounded-xs h-8 px-4 border border-light-border"
+                                    onClick={() => setStatus("Not Reviewed")}
+                                >
+                                    Mark Unfinished
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
