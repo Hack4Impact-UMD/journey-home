@@ -47,7 +47,7 @@ function DRGalleryCard({
                 )}
             </div>
             <div className="w-full px-4 mt-1 flex flex-col">
-                <span className="font-semibold text-sm">{item.item.name}</span>
+                <span className="font-semibold text-sm truncate w-full">{item.item.name}</span>
                 <div className="text-xs flex flex-wrap gap-1 mt-1">
                     <Badge text={item.item.category} color="blue" />
                     <Badge
