@@ -11,30 +11,8 @@ import { SortOption } from "@/components/inventory/SortOption";
 import { useDonationRequests } from "@/lib/queries/donation-requests";
 import { ReviewStatus } from "@/types/general";
 import { DonationItem, DonationSearchParams } from "@/types/donations";
+import { ListIcon, SquaresFourIcon } from "@phosphor-icons/react";
 import { useState } from "react";
-
-function ListIcon({ active }: { active: boolean }) {
-    return (
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
-            className={active ? "text-primary" : "text-gray-300"}>
-            <rect x="1" y="3" width="16" height="2" rx="1" fill="currentColor" />
-            <rect x="1" y="8" width="16" height="2" rx="1" fill="currentColor" />
-            <rect x="1" y="13" width="16" height="2" rx="1" fill="currentColor" />
-        </svg>
-    );
-}
-
-function GridIcon({ active }: { active: boolean }) {
-    return (
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
-            className={active ? "text-primary" : "text-gray-300"}>
-            <rect x="1" y="1" width="7" height="7" rx="1" fill="currentColor" />
-            <rect x="10" y="1" width="7" height="7" rx="1" fill="currentColor" />
-            <rect x="1" y="10" width="7" height="7" rx="1" fill="currentColor" />
-            <rect x="10" y="10" width="7" height="7" rx="1" fill="currentColor" />
-        </svg>
-    );
-}
 
 function ChevronDown() {
     return (
@@ -182,24 +160,24 @@ export default function NewRequestsPage() {
                         </div>
                     )}
                 </div>
-                <div className="ml-auto flex items-center gap-1">
+                <div className="ml-auto flex items-center gap-2">
                     <button
                         className="w-8 h-8 flex items-center justify-center"
                         onClick={() => setViewMode("list")}
                     >
-                        <ListIcon active={viewMode === "list"} />
+                        <ListIcon size={24} className={viewMode === "list" ? "text-[#505050]" : "text-gray-300"} />
                     </button>
                     <button
                         className="w-8 h-8 flex items-center justify-center"
                         onClick={() => setViewMode("gallery")}
                     >
-                        <GridIcon active={viewMode === "gallery"} />
+                        <SquaresFourIcon size={24} className={viewMode === "gallery" ? "text-[#505050]" : "text-gray-300"} />
                     </button>
                 </div>
             </div>
 
             <div className="flex-1 overflow-auto min-h-0">
-                <div className="mt-[23px]">
+                <div className="mt-5.75">
                     {viewMode === "list" ? (
                         <DRContentsTable
                             request={{ ...selectedDR, items: filteredItems }}
@@ -212,7 +190,7 @@ export default function NewRequestsPage() {
                         />
                     )}
                 </div>
-                <div className="mt-[37px]">
+                <div className="mt-9.25">
                     <DRDetails dr={selectedDR} />
                 </div>
             </div>

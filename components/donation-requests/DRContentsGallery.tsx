@@ -9,16 +9,14 @@ export function DRContentsGallery({
     openItem: (item: DonationItem) => void;
 }) {
     return (
-        <div className="w-full">
-            <div className="grid grid-cols-4 gap-[10px] pt-2 pb-4">
-                {request.items.map((item) => (
-                    <DRGalleryCard
-                        key={item.item.id + request.id}
-                        item={item}
-                        onOpen={() => openItem(item)}
-                    />
-                ))}
-            </div>
+        <div className="w-full h-full flex flex-wrap gap-x-3 gap-y-6 content-start">
+            {request.items.map((item) => (
+                <DRGalleryCard
+                    key={item.item.id + request.id}
+                    item={item}
+                    onOpen={() => openItem(item)}
+                />
+            ))}
         </div>
     );
 }
@@ -32,27 +30,25 @@ function DRGalleryCard({
 }) {
     return (
         <div
-            className="border border-[#E1E1E1] rounded-[4px] bg-white hover:bg-blue-50 cursor-pointer flex flex-col px-2.5 pt-2.5 pb-3 gap-[10px]"
+            className="w-[17.59em] rounded-sm border border-light-border h-[22.8em] shadow-md hover:shadow-lg cursor-pointer flex flex-col"
             onClick={onOpen}
         >
-            <div className="w-full aspect-square bg-[#FAFAFB] rounded-[4px] overflow-hidden flex items-center justify-center">
+            <div className="px-3 pt-3">
                 {item.item.photos.length > 0 ? (
                     <img
                         src={item.item.photos[0].url}
                         alt={item.item.name}
-                        className="w-full h-full object-cover rounded-[4px]"
+                        className="w-full aspect-square object-cover rounded-sm"
                     />
                 ) : (
-                    <span className="text-xs text-gray-400">No image</span>
+                    <div className="w-full aspect-square flex items-center justify-center bg-light-border rounded-sm">
+                        No Image
+                    </div>
                 )}
             </div>
-
-            <div className="flex flex-col gap-1">
-                <span className="text-sm font-semibold text-text-1 truncate">
-                    {item.item.name}
-                </span>
-
-                <div className="flex gap-1 items-center text-xs">
+            <div className="w-full px-4 mt-1 flex flex-col">
+                <span className="font-semibold text-sm">{item.item.name}</span>
+                <div className="text-xs flex flex-wrap gap-1 mt-1">
                     <Badge text={item.item.category} color="blue" />
                     <Badge
                         text={item.item.size}
@@ -66,8 +62,7 @@ function DRGalleryCard({
                     />
                     <Badge text={item.item.quantity.toString()} color="orange" />
                 </div>
-
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-[#818181] mt-2">
                     {item.item.dateAdded.toDate().toLocaleDateString("en-US", {
                         month: "numeric",
                         day: "numeric",
