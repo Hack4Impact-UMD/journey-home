@@ -101,6 +101,11 @@ export default function Step1PersonalInfo() {
     "Windsor Locks",
   ];
 
+  const steps = [
+    { number: 1, label: "Personal Information" },
+    { number: 2, label: "Donations" },
+    { number: 3, label: "Review" },
+  ];
   return (
     <div className="space-y-6">
       <div className="flex justify-center mb-8">
@@ -113,7 +118,7 @@ export default function Step1PersonalInfo() {
         />
       </div>
 
-      <StepIndicator currentStep={1} />
+      <StepIndicator currentStep={1} steps={steps}/>
 
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Contact</h2>
 

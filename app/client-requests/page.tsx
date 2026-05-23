@@ -14,9 +14,9 @@ export default function ClientRequestsPage() {
         if (authState.loading || !authState.userData) return;
 
         if (authState.userData.role === "Admin") {
-            router.replace("/client-requests/admin");
+            router.replace("/client-requests/admin/new");
         } else if (authState.userData.role === "Case Manager") {
-            router.replace("/client-requests/case-manager");
+            router.replace("/client-requests/case-manager/new");
         }
     }, [authState, router]);
 

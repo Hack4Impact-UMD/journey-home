@@ -1,8 +1,14 @@
 export type Address = {
     streetAddress: string,
+    apt?: string,
     city: string,
     state: string,
     zipCode: string
+}
+
+export type Name = {
+    firstName: string,
+    lastName: string
 }
 
 // General contacts that don't need an Address

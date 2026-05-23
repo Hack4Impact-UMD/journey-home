@@ -46,6 +46,11 @@ export default function Step2AddDonations() {
 
     const sizeOptions = ["Small", "Medium", "Large"];
 
+    const steps = [
+    { number: 1, label: "Personal Information" },
+    { number: 2, label: "Donations" },
+    { number: 3, label: "Review" },
+    ];
     return (
         <div className="space-y-6">
             <div className="flex justify-center mb-8">
@@ -58,7 +63,7 @@ export default function Step2AddDonations() {
                />
             </div>
 
-            <StepIndicator currentStep={2} />
+            <StepIndicator currentStep={2} steps={steps}/>
 
             <div className="mb-6">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">

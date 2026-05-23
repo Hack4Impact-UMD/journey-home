@@ -11,7 +11,7 @@ export function SortOption({label, onChange, status}: SortOptionProps) {
 
     return <>
         <button 
-            className="border border-light-border rounded-xs flex justify-center items-center px-4 gap-1.5"
+            className="h-8 shrink-0 border border-light-border rounded-xs flex justify-center items-center px-4 gap-1.5"
             onClick={() => {
                 if(status == "desc") {
                     onChange("asc");

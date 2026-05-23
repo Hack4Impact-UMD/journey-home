@@ -732,22 +732,22 @@ const DEFAULT_CATEGORIES: string[] = [
 ];
 
 const DEFAULT_INVENTORY_CATEGORIES: Omit<InventoryCategory, "quantity">[] = [
-    { id: crypto.randomUUID(), name: "Mattresses",        lowThreshold: 5,  highThreshold: 10 },
-    { id: crypto.randomUUID(), name: "Box Springs",       lowThreshold: 5,  highThreshold: 10 },
-    { id: crypto.randomUUID(), name: "Sofas",             lowThreshold: 3,  highThreshold: 7  },
-    { id: crypto.randomUUID(), name: "Loveseats",         lowThreshold: 3,  highThreshold: 6  },
-    { id: crypto.randomUUID(), name: "Kitchen Tables",    lowThreshold: 4,  highThreshold: 8  },
-    { id: crypto.randomUUID(), name: "Kitchen Chairs",    lowThreshold: 8,  highThreshold: 15 },
-    { id: crypto.randomUUID(), name: "Armchairs",         lowThreshold: 4,  highThreshold: 8  },
-    { id: crypto.randomUUID(), name: "Coffee Tables",     lowThreshold: 4,  highThreshold: 8  },
-    { id: crypto.randomUUID(), name: "Dressers",          lowThreshold: 5,  highThreshold: 10 },
-    { id: crypto.randomUUID(), name: "Nightstands",       lowThreshold: 6,  highThreshold: 12 },
-    { id: crypto.randomUUID(), name: "TVs",               lowThreshold: 3,  highThreshold: 6  },
-    { id: crypto.randomUUID(), name: "TV Stands",         lowThreshold: 3,  highThreshold: 6  },
-    { id: crypto.randomUUID(), name: "Microwave Stands",  lowThreshold: 4,  highThreshold: 8  },
-    { id: crypto.randomUUID(), name: "Small Bookshelves", lowThreshold: 4,  highThreshold: 8  },
-    { id: crypto.randomUUID(), name: "Area Rugs",         lowThreshold: 5,  highThreshold: 10 },
-    { id: crypto.randomUUID(), name: "End Tables",        lowThreshold: 5,  highThreshold: 10 },
+    { id: crypto.randomUUID(), name: "Mattresses",        icon: "box", lowThreshold: 5,  highThreshold: 10 },
+    { id: crypto.randomUUID(), name: "Box Springs",       icon: "box", lowThreshold: 5,  highThreshold: 10 },
+    { id: crypto.randomUUID(), name: "Sofas",             icon: "box", lowThreshold: 3,  highThreshold: 7  },
+    { id: crypto.randomUUID(), name: "Loveseats",         icon: "box", lowThreshold: 3,  highThreshold: 6  },
+    { id: crypto.randomUUID(), name: "Kitchen Tables",    icon: "box", lowThreshold: 4,  highThreshold: 8  },
+    { id: crypto.randomUUID(), name: "Kitchen Chairs",    icon: "box", lowThreshold: 8,  highThreshold: 15 },
+    { id: crypto.randomUUID(), name: "Armchairs",         icon: "box", lowThreshold: 4,  highThreshold: 8  },
+    { id: crypto.randomUUID(), name: "Coffee Tables",     icon: "box", lowThreshold: 4,  highThreshold: 8  },
+    { id: crypto.randomUUID(), name: "Dressers",          icon: "box", lowThreshold: 5,  highThreshold: 10 },
+    { id: crypto.randomUUID(), name: "Nightstands",       icon: "box", lowThreshold: 6,  highThreshold: 12 },
+    { id: crypto.randomUUID(), name: "TVs",               icon: "box", lowThreshold: 3,  highThreshold: 6  },
+    { id: crypto.randomUUID(), name: "TV Stands",         icon: "box", lowThreshold: 3,  highThreshold: 6  },
+    { id: crypto.randomUUID(), name: "Microwave Stands",  icon: "box", lowThreshold: 4,  highThreshold: 8  },
+    { id: crypto.randomUUID(), name: "Small Bookshelves", icon: "box", lowThreshold: 4,  highThreshold: 8  },
+    { id: crypto.randomUUID(), name: "Area Rugs",         icon: "box", lowThreshold: 5,  highThreshold: 10 },
+    { id: crypto.randomUUID(), name: "End Tables",        icon: "box", lowThreshold: 5,  highThreshold: 10 },
 ];
 
 async function generateInventoryChanges(count: number): Promise<InventoryChange[]> {
@@ -1273,6 +1273,7 @@ async function addCaseManagerRequests(count: number) {
                 ...baseClient,
 
                 hmis: randomHMIS(),
+                programName: "Seed Data Program",
 
                 secondaryContact: {
                     name: randomFrom(SEED_DONORS).firstName +
@@ -1291,9 +1292,9 @@ async function addCaseManagerRequests(count: number) {
                     clientSpeaksEnglish: Math.random() > 0.3,
                     adultsInFamily: Math.floor(Math.random() * 3) + 1,
                     childrenInFamily: Math.floor(Math.random() * 4),
-                    isVeteran: Math.random() > 0.8,
+                    isVeteran: randomFrom(["Yes", "No", "Unsure"] as const),
                     canPickUp: Math.random() > 0.5,
-                    wasChronic: Math.random() > 0.7,
+                    wasChronic: randomFrom(["Yes", "No", "Unsure"] as const),
                     hasMovedIn: Math.random() > 0.5,
                     moveInDate: Timestamp.fromDate(new Date()),
                     hasElevator: Math.random() > 0.5,

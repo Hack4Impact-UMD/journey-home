@@ -1,0 +1,37 @@
+"use client";
+
+import Button from "../../../components/form/Button";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+
+export default function Step4Confirmation() {
+  const router = useRouter();
+  return (
+    <div className="space-y-6 text-center py-12">
+      <div className="flex justify-center mb-8">
+        <Image
+          src="/journey-home-logo.png"
+          alt="Journey Home Logo"
+          height={96}
+          width={350}
+          className="h-24 w-auto"
+        />
+      </div>
+
+      <div className="max-w-2xl mx-auto">
+        <p className="text-gray-900 leading-relaxed">
+          We have received your request! You can expect to hear back from us within X business days. Thank you so much for your help!
+        </p>
+
+        <div className="mt-12">
+          <Button
+            onClick={() => router.push("/")}
+            variant="primary"
+          >
+            Return to Home
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}

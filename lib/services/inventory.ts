@@ -21,7 +21,7 @@ export async function setInventoryCategory(category: InventoryCategory): Promise
 }
 
 export async function uploadImage(file: File): Promise<string> {
-    const storageRef = ref(storage, "images/"+crypto.randomUUID()+"-"+file.name);
+    const storageRef = ref(storage, "images/" + crypto.randomUUID() + "-" + file.name);
     const snapshot = await uploadBytes(storageRef, file);
     const url = await getDownloadURL(snapshot.ref);
     return url;
