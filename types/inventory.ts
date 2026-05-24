@@ -27,6 +27,7 @@ export type InventoryCategory = {
   quantity: number,
   lowThreshold: number,
   highThreshold: number,
+  icon: string;
 }
 
 export type CategoryQuantityChange = {

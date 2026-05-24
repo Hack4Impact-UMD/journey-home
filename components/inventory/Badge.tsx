@@ -14,6 +14,9 @@ const colorPairs: {[key: string]: {bg: string, text: string}} = {
     "gray": {bg: "#F2F2F2", text: "#383838"},
     "purple": {bg: "#E2D8E8", text: "#412454"},
     "pink": {bg: "#F8DFEB", text: "#4C2337"},
+    "indigo": {bg: "#D2D9EE", text: "#001248"},
+    "light-green": {bg: "#D4F0ED", text: "#003530"},
+    "light-pink": {bg: "#DDD3E7", text: "#320067"}
 }
 
 export function Badge(props: BadgeProps) {

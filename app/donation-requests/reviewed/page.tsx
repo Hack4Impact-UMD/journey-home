@@ -43,7 +43,7 @@ export default function ReviewedRequestsPage() {
                 />
             )}
             <div className="flex flex-col">
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
                     <button
                         className="w-16 h-8 text-white bg-primary rounded-xs text-sm"
                         onClick={() => setSelectedDRId(null)}
@@ -74,7 +74,7 @@ export default function ReviewedRequestsPage() {
     ) : (
         <>
             <div className="flex flex-col mb-6">
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
                     <SearchBox
                         value={searchQuery}
                         onChange={setSearchQuery}

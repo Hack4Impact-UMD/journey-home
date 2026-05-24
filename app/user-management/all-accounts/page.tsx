@@ -83,16 +83,25 @@ export default function AllAccountsPage() {
                     editAccount={editAccount}
                 />
             )}
-
-            <div className="flex gap-3 mb-6">
-                <SearchBox value={searchQuery} onChange={setSearchQuery} onSubmit={refetch} />
-                <DropdownMultiselect
-                    label="User Type"
-                    options={roleOptions}
-                    selected={selectedRoles}
-                    setSelected={setSelectedRoles}
-                />
-                {isLoading && <Spinner className="size-5 text-primary" />}
+            <div className="flex flex-col mb-6">
+                <div className="flex flex-wrap gap-3">
+                    <SearchBox
+                        value={searchQuery}
+                        onChange={setSearchQuery}
+                        onSubmit={refetch}
+                    />
+                    <DropdownMultiselect
+                        label="User Type"
+                        options={roleOptions}
+                        selected={selectedRoles}
+                        setSelected={setSelectedRoles}
+                    />
+                    {isLoading && (
+                        <div className="flex items-center">
+                            <Spinner className="size-5 text-primary" />
+                        </div>
+                    )}
+                </div>
             </div>
 
             <div className="flex-1 overflow-auto min-h-0">

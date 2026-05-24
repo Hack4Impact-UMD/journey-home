@@ -1,11 +1,14 @@
 "use client";
 
+import { StatusPage } from "@/components/general/StatusPage";
+import { usePageTitle } from "@/lib/usePageTitle";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 
 export default function MissingUserData() {
-    const auth = useAuth();
+    usePageTitle("User Not Found | Journey Home");
     const router = useRouter();
+    const auth = useAuth();
 
     const handleLogout = async () => {
         try {
@@ -17,23 +20,10 @@ export default function MissingUserData() {
     };
 
     return (
-        <>
-            <div className="w-full h-full flex items-center justify-center flex-col gap-4 bg-[#ECFBFE]">
-                <h1 className="text-3xl text-text-2">Error</h1>
-
-                <div className="flex items-center justify-center flex-col pt-8">
-                    <p className="text-text-2">
-                        Could not find data for this user
-                    </p>
-
-                    <button
-                        className="border border-light-border px-3 py-1 rounded-lg font-family-roboto mt-4 bg-background text-text-2"
-                        onClick={handleLogout}
-                    >
-                        Logout
-                    </button>
-                </div>
-            </div>
-        </>
+        <StatusPage
+            title="User not found"
+            message="Could not find data for this user"
+            onLogout={handleLogout}
+        />
     );
 }

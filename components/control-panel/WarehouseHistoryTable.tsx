@@ -1,6 +1,7 @@
 "use client";
 
 import { InventoryChange, InventoryCategory } from "@/types/inventory";
+import { Badge } from "@/components/inventory/Badge";
 import { UserData } from "@/types/user";
 import { useState } from "react";
 import { ConfirmModal } from "@/components/general/ConfirmModal";
@@ -55,11 +56,13 @@ export function WarehouseHistoryTable({ changes, userById, inventoryCategories, 
                     const displayName = user
                         ? `${user.firstName} ${user.lastName}`
                         : change.userId;
+                    const roleColor = user?.role === "Admin" ? "light-pink" : user?.role === "Case Manager" ? "indigo" : "light-green";
                     return (
                         <WarehouseHistoryRow
                             key={change.id}
                             change={change}
                             displayName={displayName}
+                            roleColor={roleColor}
                             onRevert={() => setPendingRevert(change)}
                             isReverting={isReverting}
                         />
@@ -84,11 +87,13 @@ function buildDescription(change: InventoryChange): string {
 function WarehouseHistoryRow({
     change,
     displayName,
+    roleColor,
     onRevert,
     isReverting,
 }: {
     change: InventoryChange;
     displayName: string;
+    roleColor: string;
     onRevert: () => void;
     isReverting: boolean;
 }) {
@@ -126,8 +131,8 @@ function WarehouseHistoryRow({
 
             <div className="w-px h-5 bg-[#D9D9D9] shrink-0" />
 
-            <span className="shrink-0 bg-[#D4F0ED] text-[#003530] text-xs font-medium px-2.5 py-1 rounded-sm">
-                {displayName}
+            <span className="shrink-0 text-xs font-medium">
+                <Badge text={displayName} color={roleColor} />
             </span>
 
             <span className="flex-1 text-sm text-text-1 truncate">

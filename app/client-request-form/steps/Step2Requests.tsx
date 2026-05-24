@@ -49,6 +49,10 @@ export default function Step2Requests() {
 
                 <StepIndicator currentStep={2} steps={steps} />
 
+                <p className="text-sm text-gray-600 bg-amber-50 border border-amber-200 rounded-md px-6 py-3 max-w-2xl mx-auto">
+                    All items are gently used. We are unable to provide new items. We will do our best to provide as many of the requested items as possible based on our inventory, however we are unable to provide every item a client requests.
+                </p>
+
                 <CategoryBox<Bedding>
                     categoryName="Bedding"
                     onChange={updateBedding}

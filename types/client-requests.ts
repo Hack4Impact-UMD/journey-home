@@ -1,6 +1,7 @@
 import { Timestamp } from "firebase/firestore";
 import { LocationContact, ReviewStatus } from "./general";
 
+export type YesNoUnsure = "Yes" | "No" | "Unsure";
 
 export type ClientRequest = {
     id: string,
@@ -30,9 +31,9 @@ export type ClientQuestions = {
     clientSpeaksEnglish?: boolean,
     adultsInFamily?: number,
     childrenInFamily?: number,
-    isVeteran?: boolean,
+    isVeteran?: YesNoUnsure,
     canPickUp?: boolean,
-    wasChronic?: boolean,
+    wasChronic?: YesNoUnsure,
     hasMovedIn?: boolean,
     moveInDate: Timestamp | null,
     hasElevator?: boolean,

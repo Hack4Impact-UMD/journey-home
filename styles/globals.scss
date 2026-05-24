@@ -1,0 +1,61 @@
+@import 'react-big-calendar/lib/css/react-big-calendar.css';
+
+.rbc-event-content {
+    overflow: hidden;
+}
+
+.rbc-allday-cell {
+    display: none;
+}
+
+.rbc-time-header-content > .rbc-row:last-child {
+    border-bottom: none;
+}
+
+.rbc-current-time-indicator {
+    background-color: #FF6633;
+}
+
+.rbc-event:focus {
+    outline: none;
+}
+
+.rbc-event-label {
+    display: none;
+}
+
+.rbc-day-slot .rbc-event {
+    right: 0;
+}
+
+.rbc-header {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: none;
+}
+
+.rbc-time-header {
+    border-bottom: none;
+}
+
+.rbc-time-content {
+    border-top: 1px solid #DDE1E7;
+}
+
+.rbc-time-gutter .rbc-time-slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rbc-time-gutter .rbc-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.rbc-time-gutter,
+.rbc-time-header-gutter {
+    width: 2.75rem !important;
+    min-width: 2.75rem !important;
+    max-width: 2.75rem !important;
+}

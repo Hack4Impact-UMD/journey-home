@@ -57,7 +57,7 @@ export default function InventoryPage() {
 
     return (
         <>
-            <div className="flex items-center gap-3 mb-8 mt-2">
+            <div className="flex flex-wrap items-center gap-3 mb-8 mt-2">
                 <SearchBox
                     value={searchQuery}
                     onChange={setSearchQuery}
