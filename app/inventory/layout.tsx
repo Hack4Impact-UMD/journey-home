@@ -2,38 +2,10 @@
 
 import { ProtectedRoute } from "@/components/general/ProtectedRoute";
 import Navbar from "@/components/general/Navbar";
-import { ReactNode, useState } from "react";
-import { getAllInventoryCategories } from "@/lib/services/inventory";
-import { InventoryCategory } from "@/types/inventory";
+import { ReactNode } from "react";
 import { StockSidebar } from "@/components/inventory/StockSidebar";
 
 export default function InventoryLayout({ children }: { children: ReactNode }) {
-    const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
-    const [categories, setCategories] = useState<InventoryCategory[]>([]);
-
-    const handleSidebarOpen = () => {
-        setIsSidebarOpen(true);
-        getAllInventoryCategories().then(setCategories);
-    };
-
-    const categoryStocks = categories.map((cat) => {
-        let color;
-        if (cat.quantity < cat.lowThreshold) {
-            color = "#FF6B4A";
-        } else if (cat.quantity < cat.highThreshold) {
-            color = "#F4DE13";
-        } else {
-            color = "#69C22E";
-        }
-
-        return {
-            category: cat.name,
-            count: cat.quantity,
-            maxCount: cat.highThreshold,
-            color,
-        };
-    });
-
     return (
         <ProtectedRoute allow={["Admin"]}>
             <div className="h-full w-full flex flex-col font-family-roboto overflow-hidden">
@@ -48,12 +20,7 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
                         </div>
                     </div>
                 </div>
-                <StockSidebar
-                    isOpen={isSidebarOpen}
-                    onClose={() => setIsSidebarOpen(false)}
-                    onOpen={handleSidebarOpen}
-                    categoryStocks={categoryStocks}
-                />
+                <StockSidebar />
             </div>
         </ProtectedRoute>
     );
