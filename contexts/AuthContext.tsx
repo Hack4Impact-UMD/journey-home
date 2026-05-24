@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from "react";
 import { User, onAuthStateChanged } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import { UserData, UserRole, AuthContextType } from "../types/user";
@@ -49,40 +49,51 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => unsubscribe();
   }, []);
 
-  async function _signup(
+  const _refreshUser = useCallback(async (): Promise<void> => {
+    const user = auth.currentUser;
+    if (!user) return;
+    const foundUser = await getUserByUID(user.uid);
+    setAuthState({
+      currentUser: user,
+      userData: foundUser,
+      loading: false,
+    });
+  }, []);
+
+  const _signup = useCallback(async (
     email: string,
     password: string,
     firstName: string,
     lastName: string,
     phone: string,
     role: UserRole
-  ): Promise<User> {
+  ): Promise<User> => {
     setAuthState(old => ({...old, loading: true}));
     const user = await signUp(email, password, firstName, lastName, phone, role);
     await _refreshUser();
     return user;
-  }
+  }, [_refreshUser]);
 
-  async function _login(
+  const _login = useCallback(async (
     email: string,
     password: string
-  ): Promise<User> {
+  ): Promise<User> => {
     setAuthState(old => ({...old, loading: true}));
-    return (await login(email, password))
-  }
+    return (await login(email, password));
+  }, []);
 
-  async function _logout(): Promise<void> {
+  const _logout = useCallback(async (): Promise<void> => {
     setAuthState(old => ({...old, loading: true}));
-    return (await logout())
-  }
+    return (await logout());
+  }, []);
 
-  async function _sendVerificationEmail(): Promise<void> {
+  const _sendVerificationEmail = useCallback(async (): Promise<void> => {
     const user = auth.currentUser;
     if (!user) return;
     await sendVerificationEmail(user);
-  }
+  }, []);
 
-  async function _checkVerification(): Promise<{ verified: boolean }> {
+  const _checkVerification = useCallback(async (): Promise<{ verified: boolean }> => {
     const user = auth.currentUser;
     if (!user) return { verified: false };
 
@@ -99,18 +110,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     return { verified: false };
-  }
-
-  async function _refreshUser(): Promise<void> {
-    const user = auth.currentUser;
-    if (!user) return;
-    const foundUser = await getUserByUID(user.uid);
-    setAuthState({
-      currentUser: user,
-      userData: foundUser,
-      loading: false,
-    });
-  }
+  }, [_refreshUser]);
 
   return (
     <AuthContext.Provider value={{ state: authState, signup: _signup, login: _login, logout: _logout, refreshUser: _refreshUser, sendVerificationEmail: _sendVerificationEmail, checkVerification: _checkVerification }}>
