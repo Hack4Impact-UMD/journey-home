@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
     unoptimized: true
   },
   trailingSlash: true,
+  allowedDevOrigins: ['*.local'],
   webpack: (config) => {
     // Ignore Firebase Functions directory during Next.js build
     config.watchOptions = {

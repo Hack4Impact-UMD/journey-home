@@ -9,6 +9,7 @@ import FormTextarea from "../../../components/form/FormTextarea";
 import FormCheckbox from "../../../components/form/FormCheckbox";
 import Button from "../../../components/form/Button";
 import Image from "next/image";
+import { formatPhone } from "@/lib/utils/phone";
 
 export default function Step1PersonalInfo() {
   const { formState, updateDonorInfo, updateAdditionalInfo, updateAcknowledgements, setCurrentStep } = useDonorForm();
@@ -26,6 +27,8 @@ export default function Step1PersonalInfo() {
     }
     if (!formState.donorInfo.phoneNumber) {
       newErrors.phoneNumber = "Phone number is required";
+    } else if (!/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/.test(formState.donorInfo.phoneNumber)) {
+      newErrors.phoneNumber = "Please enter a complete phone number in the format 123-456-7890.";
     }
     if (!formState.donorInfo.email) {
       newErrors.email = "Email is required";
@@ -155,13 +158,13 @@ export default function Step1PersonalInfo() {
             label="Phone Number"
             required
             type="tel"
+            placeholder="XXX-XXX-XXXX"
+            pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+            onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Please enter a complete phone number in the format 123-456-7890.")}
             value={formState.donorInfo.phoneNumber || ""}
             onChange={(e) => {
-              const value = e.target.value.replace(/\D/g, "");
-              const formattedValue = value
-                .replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3")
-                .slice(0, 12);
-              updateDonorInfo({ phoneNumber: formattedValue });
+              e.target.setCustomValidity("");
+              updateDonorInfo({ phoneNumber: formatPhone(e.target.value) });
               if (errors.phoneNumber) setErrors({ ...errors, phoneNumber: "" });
             }}
           />

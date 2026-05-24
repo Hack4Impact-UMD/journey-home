@@ -2,6 +2,7 @@
 
 import { UserRole } from "@/types/user";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function PickRole({
   role,
@@ -12,10 +13,11 @@ export default function PickRole({
   setRole: (r: UserRole) => void;
   onContinue: () => void;
 }) {
+  const router = useRouter();
   return (
     <div className="w-full max-w-[28em] text-center">
       {/* Logo */}
-      <div className="flex justify-center mb-16">
+      <div className="flex justify-center mb-16 cursor-pointer" onClick={() => router.push('/login')}>
         <img src="/journey-home-logo.png" alt="Journey Home" className="hidden md:block h-[6em] w-[22em]" />
         <img src="/house-mobile-logo.png" alt="Journey Home" className="md:hidden w-full h-auto" />
       </div>
