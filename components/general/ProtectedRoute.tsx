@@ -33,6 +33,12 @@ export function ProtectedRoute({children, allow}: ProtectedRouteProps) {
             return
         }
 
+        if (!authState.userData.emailVerified) {
+            setShow(false);
+            router.push("/status/verify-email");
+            return;
+        }
+
         if (authState.userData.pending) {
             setShow(false);
             router.push("/status/account-pending");

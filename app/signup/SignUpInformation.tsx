@@ -3,26 +3,28 @@
 import { useState } from "react";
 import { UserRole } from "@/types/user";
 import { FirebaseError } from "firebase/app";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 
 export default function SignUpInformation({
     selectedRole,
     onBack,
+    onSuccess,
 }: {
     selectedRole: UserRole;
     onBack: () => void;
+    onSuccess: () => void;
 }) {
     const [email, setEmail] = useState("");
     const [first, setFirst] = useState("");
     const [last, setLast] = useState("");
+    const [phone, setPhone] = useState("");
+    const [phoneExtension, setPhoneExtension] = useState("");
     const [dob, setDob] = useState("");
     const [pw, setPw] = useState("");
     const [pw2, setPw2] = useState("");
     const [loading, setLoading] = useState(false);
     const [err, setErr] = useState<string | null>(null);
-    const router = useRouter();
     const auth = useAuth();
 
     async function onSubmit(e: React.FormEvent) {
@@ -37,8 +39,8 @@ export default function SignUpInformation({
         setLoading(true);
         try {
 
-            await auth.signup(email, pw, first, last, dob, selectedRole);
-            router.push("/status/account-created");
+            await auth.signup(email, pw, first, last, phone, phoneExtension, dob, selectedRole);
+            onSuccess();
 
         } catch (e: unknown) {
             console.error("Signup failed:", e);
@@ -51,7 +53,7 @@ export default function SignUpInformation({
     return (
         <div>
             <div className="relative mb-9">
-                <button onClick={onBack} className="absolute left-0 text-2xl">
+                <button onClick={onBack} className="hidden md:block absolute left-0 text-2xl">
                     ←
                 </button>
                 <h1 className="text-center text-2xl font-bold font-family-roboto text-text-1">
@@ -59,7 +61,7 @@ export default function SignUpInformation({
                 </h1>
             </div>
 
-            <form onSubmit={onSubmit} className="w-[28em]">
+            <form onSubmit={onSubmit} className="w-full max-w-[28em]">
                 <div className="flex gap-4">
                     <div>
                         <span className="text-sm">
@@ -83,6 +85,29 @@ export default function SignUpInformation({
                             onChange={(e) => setLast(e.target.value)}
                             className="rounded-xs border-[#D9D9D9] py-1.5 px-3 text-sm border w-full mt-2 mb-6"
                             required
+                        />
+                    </div>
+                </div>
+
+                <div className="flex gap-4">
+                    <div className="flex-1">
+                        <span className="text-sm">Phone Number</span>
+                        <input
+                            type="tel"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            placeholder="XXX-XXX-XXXX"
+                            className="rounded-xs border-[#D9D9D9] py-1.5 px-3 text-sm border w-full mt-2 mb-6"
+                        />
+                    </div>
+                    <div className="flex-1">
+                        <span className="text-sm">Extension</span>
+                        <input
+                            type="text"
+                            value={phoneExtension}
+                            onChange={(e) => setPhoneExtension(e.target.value)}
+                            placeholder="XXX"
+                            className="rounded-xs border-[#D9D9D9] py-1.5 px-3 text-sm border w-full mt-2 mb-6"
                         />
                     </div>
                 </div>

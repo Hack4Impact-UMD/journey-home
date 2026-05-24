@@ -1,54 +1,35 @@
 "use client";
 
 import { ProtectedRoute } from "@/components/general/ProtectedRoute";
-import SideNavbar from "@/components/general/SideNav";
-import TopNavbar from "@/components/general/TopNav";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { ReactNode } from "react";
-import { useState } from "react";
-import {
-    getAllWarehouseInventoryRecords,
-    getCategoryAttributes,
-} from "@/lib/services/inventory";
-import { CategoryAttributes, InventoryRecord } from "@/types/inventory";
+import Navbar from "@/components/general/Navbar";
+import { ReactNode, useState } from "react";
+import { getAllInventoryCategories } from "@/lib/services/inventory";
+import { InventoryCategory } from "@/types/inventory";
 import { StockSidebar } from "@/components/inventory/StockSidebar";
 
 export default function InventoryLayout({ children }: { children: ReactNode }) {
-    const pathname = usePathname();
-
     const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
-    const [allItems, setAllItems] = useState<InventoryRecord[]>([]);
-    const [categoryAttributes, setCategoryAttributes] = useState<
-        CategoryAttributes[]
-    >([]);
+    const [categories, setCategories] = useState<InventoryCategory[]>([]);
 
     const handleSidebarOpen = () => {
         setIsSidebarOpen(true);
-        getAllWarehouseInventoryRecords().then(setAllItems);
-        getCategoryAttributes().then(setCategoryAttributes);
+        getAllInventoryCategories().then(setCategories);
     };
 
-    //Calculating category stocks using CategoryAttributes
-    const categoryStocks = categoryAttributes.map((catAttr) => {
-        const count = allItems
-            .filter((item) => item.category === catAttr.name)
-            .reduce((sum, item) => sum + item.quantity, 0);
-
+    const categoryStocks = categories.map((cat) => {
         let color;
-        if (count < catAttr.lowThreshold) {
+        if (cat.quantity < cat.lowThreshold) {
             color = "#FF6B4A";
-        } else if (count < catAttr.highThreshold) {
+        } else if (cat.quantity < cat.highThreshold) {
             color = "#F4DE13";
         } else {
             color = "#69C22E";
         }
-        const maxCount = catAttr.highThreshold;
 
         return {
-            category: catAttr.name,
-            count: count,
-            maxCount: maxCount,
+            category: cat.name,
+            count: cat.quantity,
+            maxCount: cat.highThreshold,
             color,
         };
     });
@@ -56,54 +37,14 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
     return (
         <ProtectedRoute allow={["Admin"]}>
             <div className="h-full w-full flex flex-col font-family-roboto overflow-hidden">
-                <TopNavbar />
-                <div className="flex flex-1 min-h-0">
-                    <SideNavbar />
-                    <div className="flex-1 min-h-0 bg-[#F7F7F7] py-4 px-6 flex flex-col">
-                        <span className="text-2xl text-primary font-extrabold block">
+                <div className="flex flex-1 min-h-0 max-md:flex-col">
+                    <Navbar pageTitle="Inventory" />
+                    <div className="flex-1 min-h-0 bg-[#F7F7F7] pt-8 max-md:pt-1 pb-4 px-6 flex flex-col max-md:bg-transparent max-md:p-0">
+                        <span className="text-2xl text-primary font-extrabold block max-md:hidden">
                             Inventory
                         </span>
-                        <div className="flex gap-8 text-sm">
-                            <Link
-                                className={`py-4${
-                                    pathname.startsWith("/inventory/warehouse")
-                                        ? " border-b-2 border-primary text-primary"
-                                        : ""
-                                }`}
-                                href="/inventory/warehouse"
-                                suppressHydrationWarning
-                            >
-                                Warehouse
-                            </Link>
-                            <Link
-                                className={`py-4${
-                                    pathname.startsWith(
-                                        "/inventory/donation-requests",
-                                    )
-                                        ? " border-b-2 border-primary text-primary"
-                                        : ""
-                                }`}
-                                href="/inventory/donation-requests"
-                                suppressHydrationWarning
-                            >
-                                Donation Requests
-                            </Link>
-                            <Link
-                                className={`py-4${
-                                    pathname.startsWith(
-                                        "/inventory/reviewed-donations",
-                                    )
-                                        ? " border-b-2 border-primary text-primary"
-                                        : ""
-                                }`}
-                                href="/inventory/reviewed-donations"
-                                suppressHydrationWarning
-                            >
-                                Reviewed Donations
-                            </Link>
-                        </div>
-                        <div className="bg-background rounded-xl my-2 flex-1 py-4 px-6 min-h-0 overflow-hidden flex flex-col">
-                            { children }
+                        <div className="bg-background rounded-xl my-2 flex-1 py-4 px-6 min-h-0 overflow-hidden flex flex-col max-md:bg-transparent max-md:m-0 max-md:rounded-none">
+                            {children}
                         </div>
                     </div>
                 </div>

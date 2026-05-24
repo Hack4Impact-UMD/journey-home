@@ -1,23 +1,29 @@
 "use client";
 
+import { StatusPage } from "@/components/general/StatusPage";
+import { usePageTitle } from "@/lib/usePageTitle";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 
 export default function MissingUserData() {
-
-    const auth = useAuth();
+    usePageTitle("User Not Found | Journey Home");
     const router = useRouter();
+    const auth = useAuth();
 
-    return <>
-        <div className="w-full h-full flex items-center align-center flex-col p-10 gap-2">
-                <h1>Error: Couldn&apos;t find data for this user</h1>
+    const handleLogout = async () => {
+        try {
+            await auth.logout();
+            router.push("/login");
+        } catch (error) {
+            console.error("Logout failed", error);
+        }
+    };
 
-                <button
-                    className="border border-light-border px-8 rounded-xs font-family-roboto"
-                    onClick={() => auth.logout().then(() => router.push("/login"))}
-                >
-                    Logout
-                </button>
-            </div>
-    </>
+    return (
+        <StatusPage
+            title="User not found"
+            message="Could not find data for this user"
+            onLogout={handleLogout}
+        />
+    );
 }

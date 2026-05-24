@@ -13,10 +13,11 @@ export default function PickRole({
   onContinue: () => void;
 }) {
   return (
-    <div className="w-[28em] text-center">
+    <div className="w-full max-w-[28em] text-center">
       {/* Logo */}
       <div className="flex justify-center mb-16">
-        <img src="/journey-home-logo.png" alt="Journey Home" className="h-[6em] w-[22em]" />
+        <img src="/journey-home-logo.png" alt="Journey Home" className="hidden md:block h-[6em] w-[22em]" />
+        <img src="/house-mobile-logo.png" alt="Journey Home" className="md:hidden w-full h-auto" />
       </div>
       <h1 className="text-2xl font-bold font-family-raleway text-text-1 mb-6">Account Type</h1>
 

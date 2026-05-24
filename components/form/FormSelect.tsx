@@ -7,6 +7,7 @@ interface FormSelectProps {
   onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   options: string[];
   className?: string;
+  id?: string;
 }
 
 export default function FormSelect({
@@ -16,9 +17,10 @@ export default function FormSelect({
   onChange,
   options,
   className = "",
+  id,
 }: FormSelectProps) {
   return (
-    <div className={className}>
+    <div id={id} className={className}>
       <label className="block mb-2">
         {required && <span className="text-red-500">* </span>}
         <span className="text-sm text-gray-700">{label}</span>

@@ -38,7 +38,7 @@ export function countItemsInRequest(donation: Task) {
     );
 }
 
-export default function Request({ donation }: RequestProps) {  
+export default function PickupDeliveryCard({ donation }: RequestProps) {  
     let firstName, lastName, email, phoneNumber, streetAddress, city, state, zipCode, title, color, text;
     if ("donor" in donation) { 
         //items = donation.items.filter(dItem => dItem.status === 'Approved').map(dItem => ({ name: dItem.item.name }));

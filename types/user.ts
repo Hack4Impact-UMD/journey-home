@@ -10,6 +10,8 @@ export type UserData = {
     firstName: string;
     lastName: string;
     email: string;
+    phone?: string;
+    phoneExtension?: string;
     dob: Timestamp | null;
     role: UserRole;
     pending: UserRole | null;
@@ -27,9 +29,14 @@ export interface AuthContextType {
         password: string,
         firstName: string,
         lastName: string,
+        phone: string,
+        phoneExtension: string,
         dob: string,
         role: UserRole
     ) => Promise<User>;
     login: (email: string, password: string) => Promise<User>;
     logout: () => Promise<void>;
+    refreshUser: () => Promise<void>;
+    sendVerificationEmail: () => Promise<void>;
+    checkVerification: () => Promise<{ verified: boolean }>;
 }
