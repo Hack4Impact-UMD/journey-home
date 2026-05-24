@@ -8,7 +8,7 @@ export default function DonorFormLayout({
 }: {
   children: React.ReactNode;
 }) {
-  usePageTitle("Donate | Journey Home");
+  usePageTitle("Donate – Journey Home");
   return (
     <DonorFormProvider>
       <div className="min-h-screen py-8 bg-[#D8E3E5]">

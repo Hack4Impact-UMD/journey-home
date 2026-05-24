@@ -9,7 +9,7 @@ import { FirebaseError } from 'firebase/app';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
-  usePageTitle("Login | Journey Home");
+  usePageTitle("Login – Journey Home");
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

@@ -10,7 +10,7 @@ export default function CaseFormLayout({
 }: {
   children: React.ReactNode;
 }) {
-  usePageTitle("Client Request Form | Journey Home");
+  usePageTitle("Client Request Form – Journey Home");
   return (
     <ProtectedRoute allow={["Case Manager"]}>
       <CaseFormProvider>
