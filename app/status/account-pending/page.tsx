@@ -15,7 +15,9 @@ export default function AccountPending() {
         const handleFocus = async () => {
             if (!auth.currentUser) return;
             const userData = await getUserByUID(auth.currentUser.uid);
-            if (!userData?.pending) {
+            if (userData?.disabled) {
+                router.push("/status/account-disabled");
+            } else if (!userData?.pending) {
                 await authContext.refreshUser();
                 router.push("/");
             }

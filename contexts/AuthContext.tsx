@@ -58,7 +58,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     role: UserRole
   ): Promise<User> {
     setAuthState(old => ({...old, loading: true}));
-    return (await signUp(email, password, firstName, lastName, phone, role))
+    const user = await signUp(email, password, firstName, lastName, phone, role);
+    await _refreshUser();
+    return user;
   }
 
   async function _login(

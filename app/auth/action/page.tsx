@@ -91,6 +91,7 @@ function ResetPasswordView({ oobCode }: { oobCode: string }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
     if (password !== confirm) {
       setError('Passwords do not match.');
       return;
@@ -160,6 +161,7 @@ function ResetPasswordView({ oobCode }: { oobCode: string }) {
             <LongButton
               name={loading ? 'Resetting...' : 'Reset Password'}
               type="submit"
+              disabled={loading}
             />
           </div>
         </form>

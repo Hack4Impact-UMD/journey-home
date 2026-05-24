@@ -30,7 +30,13 @@ export default function VerifyEmailPage() {
       const { verified } = await authContext.checkVerification();
       if (verified) {
         const userData = await getUserByUID(auth.currentUser.uid);
-        router.push(userData?.pending ? '/status/account-pending' : '/status/account-created');
+        if (userData?.disabled) {
+          router.push('/status/account-disabled');
+        } else if (userData?.pending) {
+          router.push('/status/account-pending');
+        } else {
+          router.push('/status/account-created');
+        }
       }
     };
     window.addEventListener('focus', handleFocus);

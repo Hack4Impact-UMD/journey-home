@@ -103,6 +103,7 @@ export default function ForgotPasswordPage() {
                 <LongButton
                   name={loading ? 'Sending...' : 'Send Reset Email'}
                   type="submit"
+                  disabled={loading}
                 />
               </div>
 
