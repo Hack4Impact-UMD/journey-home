@@ -96,7 +96,7 @@ export default function VerifyEmailPage() {
         }
       } else {
         setIsError(true);
-        setMessage('Email not verified yet. Please check your inbox and click the verification link.');
+        setMessage('Email not verified yet. Please check your inbox (don\'t forget Spam/Junk!) and click the verification link.');
       }
     } catch (error: unknown) {
       console.error('Error checking verification:', error);
@@ -149,7 +149,8 @@ export default function VerifyEmailPage() {
             </h1>
 
             <p className="text-center font-family-roboto text-text-1 mb-8">
-              We sent a message to your email. Please click the link in the email to verify your account.
+              We sent a verification link to your email. Click the link to verify your account.
+              If you don&apos;t see it, check your Spam or Junk folder.
             </p>
 
             {message && (
