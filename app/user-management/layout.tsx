@@ -12,12 +12,7 @@ function ExportActions() {
     const {onExport} = useExport();
     const pathname = usePathname();
 
-    const isUserManagementPage =
-        pathname.startsWith("/user-management/all-accounts") ||
-        pathname.startsWith("/user-management/account-requests") ||
-        pathname.startsWith("/user-management/past-donors");
-
-    if (!isUserManagementPage || !onExport) return null;
+    if (!onExport) return null;
 
     return (
         <div className="flex items-center gap-2 shrink-0">

@@ -67,11 +67,7 @@ export default function AllAccountsPage() {
         URL.revokeObjectURL(url);
     }, []);
     useEffect(() => {
-
-
-        setOnExport(() => () =>
-            handleExport(filteredUsers)
-        );
+        setOnExport(() => () => handleExport(filteredUsers));
 
         return () => {
             setOnExport(null);
