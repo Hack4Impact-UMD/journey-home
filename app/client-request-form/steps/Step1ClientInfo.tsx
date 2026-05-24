@@ -9,6 +9,7 @@ import { useCaseForm } from "../caseContext";
 import Image from "next/image";
 import { Timestamp } from "firebase/firestore";
 import { YesNoUnsure } from "@/types/client-requests";
+import { formatPhone } from "@/lib/utils/phone";
 
 export default function Step1ClientInfo() {
     const {
@@ -31,7 +32,7 @@ export default function Step1ClientInfo() {
         if (!client.phoneNumber)
             newErrors.phoneNumber = "Client Phone number is required";
         else if (!/^\d{3}-\d{3}-\d{4}$/.test(client.phoneNumber))
-            newErrors.phoneNumber = "Enter a valid 10-digit phone number (e.g. 555-867-5309)";
+            newErrors.phoneNumber = "Please enter a complete phone number in the format 123-456-7890.";
         if (!client.email)
             newErrors.email = "Client email is required";
         else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(client.email))
@@ -64,7 +65,7 @@ export default function Step1ClientInfo() {
             !/^\d{3}-\d{3}-\d{4}$/.test(client.secondaryContact.phone)
         )
             newErrors.secondaryContactPhone =
-                "Enter a valid 10-digit phone number (e.g. 555-867-5309)";
+                "Please enter a complete phone number in the format 123-456-7890.";
 
         if (!client.address?.streetAddress)
             newErrors.streetAddress = "Street address is required";
@@ -236,26 +237,18 @@ export default function Step1ClientInfo() {
                                 label="Client Phone Number"
                                 required
                                 type="tel"
+                                placeholder="XXX-XXX-XXXX"
+                                pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+                                onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Please enter a complete phone number in the format 123-456-7890.")}
                                 value={
                                     formState.clientInfoAndNewHome
                                         .phoneNumber ?? ""
                                 }
                                 onChange={(e) => {
-                                    const value = e.target.value.replace(
-                                        /\D/g,
-                                        "",
-                                    );
-                                    const formatted = value
-                                        .replace(
-                                            /(\d{3})(\d{3})(\d{4})/,
-                                            "$1-$2-$3",
-                                        )
-                                        .slice(0, 12);
-
+                                    e.target.setCustomValidity("");
                                     updateClientInfo({
-                                        phoneNumber: formatted,
+                                        phoneNumber: formatPhone(e.target.value),
                                     });
-
                                     clearError("phoneNumber");
                                 }}
                             />
@@ -301,24 +294,17 @@ export default function Step1ClientInfo() {
                                 id="secondaryContactPhone"
                                 label="Secondary Contact Phone Number"
                                 type="tel"
+                                placeholder="XXX-XXX-XXXX"
+                                pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+                                onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Please enter a complete phone number in the format 123-456-7890.")}
                                 value={
                                     formState.clientInfoAndNewHome
                                         .secondaryContact?.phone ?? ""
                                 }
                                 onChange={(e) => {
-                                    const value = e.target.value.replace(
-                                        /\D/g,
-                                        "",
-                                    );
-                                    const formatted = value
-                                        .replace(
-                                            /(\d{3})(\d{3})(\d{4})/,
-                                            "$1-$2-$3",
-                                        )
-                                        .slice(0, 12);
-
+                                    e.target.setCustomValidity("");
                                     updateSecondaryContact({
-                                        phone: formatted,
+                                        phone: formatPhone(e.target.value),
                                     });
                                     clearError("secondaryContactPhone");
                                 }}

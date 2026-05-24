@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { v4 as uuidv4 } from "uuid";
 import { InventoryCategory, InventoryChange } from "@/types/inventory";
 import { getAllInventoryCategories, WAREHOUSE_COLLECTION } from "../services/inventory";
 import { WAREHOUSE_HISTORY_COLLECTION } from "../services/warehouseHistory";
@@ -33,7 +34,7 @@ export function useInventoryCategories() {
 
             if (category.quantity !== oldQuantity) {
                 const newChange: InventoryChange = {
-                    id: crypto.randomUUID(),
+                    id: uuidv4(),
                     userId,
                     timestamp: Timestamp.now(),
                     change: {

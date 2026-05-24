@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { UserRole } from "@/types/user";
-import { FirebaseError } from "firebase/app";
 import { useAuth } from "@/contexts/AuthContext";
+import { authErrorMessage } from "@/lib/utils/auth-errors";
 import Link from "next/link";
+import { formatPhone } from "@/lib/utils/phone";
 
 export default function SignUpInformation({
     selectedRole,
@@ -19,8 +20,6 @@ export default function SignUpInformation({
     const [first, setFirst] = useState("");
     const [last, setLast] = useState("");
     const [phone, setPhone] = useState("");
-    const [phoneExtension, setPhoneExtension] = useState("");
-    const [dob, setDob] = useState("");
     const [pw, setPw] = useState("");
     const [pw2, setPw2] = useState("");
     const [loading, setLoading] = useState(false);
@@ -38,13 +37,12 @@ export default function SignUpInformation({
 
         setLoading(true);
         try {
-
-            await auth.signup(email, pw, first, last, phone, phoneExtension, dob, selectedRole);
+            await auth.signup(email, pw, first, last, phone, selectedRole);
             onSuccess();
 
         } catch (e: unknown) {
             console.error("Signup failed:", e);
-            setErr((e as FirebaseError).message);
+            setErr(authErrorMessage(e));
         } finally {
             setLoading(false);
         }
@@ -52,7 +50,7 @@ export default function SignUpInformation({
 
     return (
         <div>
-            <div className="relative mb-9">
+            <div className="relative mb-4">
                 <button onClick={onBack} className="hidden md:block absolute left-0 text-2xl">
                     ←
                 </button>
@@ -65,91 +63,78 @@ export default function SignUpInformation({
                 <div className="flex gap-4">
                     <div>
                         <span className="text-sm">
-                            <span className="text-red-500">*</span> First Name
+                            First Name
                         </span>
                         <input
                             type="text"
                             value={first}
                             onChange={(e) => setFirst(e.target.value)}
-                            className="rounded-xs border-[#D9D9D9] py-1.5 px-3 text-sm border w-full mt-2 mb-6"
+                            className="rounded-xs border-[#D9D9D9] py-1.5 px-3 text-sm border w-full mt-2 mb-4"
                             required
                         />
                     </div>
                     <div>
                         <span className="text-sm">
-                            <span className="text-red-500">*</span> Last Name
+                            Last Name
                         </span>
                         <input
                             type="text"
                             value={last}
                             onChange={(e) => setLast(e.target.value)}
-                            className="rounded-xs border-[#D9D9D9] py-1.5 px-3 text-sm border w-full mt-2 mb-6"
+                            className="rounded-xs border-[#D9D9D9] py-1.5 px-3 text-sm border w-full mt-2 mb-4"
                             required
                         />
                     </div>
                 </div>
 
-                <div className="flex gap-4">
-                    <div className="flex-1">
-                        <span className="text-sm">Phone Number</span>
-                        <input
-                            type="tel"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            placeholder="XXX-XXX-XXXX"
-                            className="rounded-xs border-[#D9D9D9] py-1.5 px-3 text-sm border w-full mt-2 mb-6"
-                        />
-                    </div>
-                    <div className="flex-1">
-                        <span className="text-sm">Extension</span>
-                        <input
-                            type="text"
-                            value={phoneExtension}
-                            onChange={(e) => setPhoneExtension(e.target.value)}
-                            placeholder="XXX"
-                            className="rounded-xs border-[#D9D9D9] py-1.5 px-3 text-sm border w-full mt-2 mb-6"
-                        />
-                    </div>
+                <div>
+                    <span className="text-sm">Phone Number</span>
+                    <input
+                        type="tel"
+                        value={phone}
+                        onChange={(e) => { e.target.setCustomValidity(""); setPhone(formatPhone(e.target.value)); }}
+                        onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Please enter a complete phone number in the format 123-456-7890.")}
+                        placeholder="XXX-XXX-XXXX"
+                        pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+                        className="rounded-xs border-[#D9D9D9] py-1.5 px-3 text-sm border w-full mt-2 mb-4"
+                        required
+                    />
                 </div>
 
-                <span className="text-sm">Date of Birth</span>
-                <input
-                    type="date"
-                    value={dob}
-                    onChange={(e) => setDob(e.target.value)}
-                    className="rounded-xs border-[#D9D9D9] py-1.5 px-3 text-sm border w-full mt-2 mb-6"
-                />
-
                 <span className="text-sm">
-                    <span className="text-red-500">*</span> Email
+                    Email
                 </span>
                 <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="rounded-xs border-[#D9D9D9] py-1.5 px-3 text-sm border w-full mt-2 mb-6"
+                    className="rounded-xs border-[#D9D9D9] py-1.5 px-3 text-sm border w-full mt-2 mb-4"
                     required
                 />
 
                 <span className="text-sm">
-                    <span className="text-red-500">*</span> Password
+                    Password
                 </span>
                 <input
                     type="password"
                     value={pw}
-                    onChange={(e) => setPw(e.target.value)}
-                    className="rounded-xs border-[#D9D9D9] py-1.5 px-3 text-sm border w-full mt-2 mb-6"
+                    onChange={(e) => { e.target.setCustomValidity(""); setPw(e.target.value); }}
+                    onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Password must be at least 8 characters.")}
+                    className="rounded-xs border-[#D9D9D9] py-1.5 px-3 text-sm border w-full mt-2 mb-4"
+                    minLength={8}
                     required
                 />
 
                 <span className="text-sm">
-                    <span className="text-red-500">*</span> Confirm Password
+                    Confirm Password
                 </span>
                 <input
                     type="password"
                     value={pw2}
-                    onChange={(e) => setPw2(e.target.value)}
-                    className="rounded-xs border-[#D9D9D9] py-1.5 px-3 text-sm border w-full mt-2 mb-6"
+                    onChange={(e) => { e.target.setCustomValidity(""); setPw2(e.target.value); }}
+                    onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Password must be at least 8 characters.")}
+                    className="rounded-xs border-[#D9D9D9] py-1.5 px-3 text-sm border w-full mt-2 mb-4"
+                    minLength={8}
                     required
                 />
 
