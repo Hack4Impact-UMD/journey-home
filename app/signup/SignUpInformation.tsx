@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { UserRole } from "@/types/user";
-import { FirebaseError } from "firebase/app";
 import { useAuth } from "@/contexts/AuthContext";
+import { authErrorMessage } from "@/lib/utils/auth-errors";
 import Link from "next/link";
 import { formatPhone } from "@/lib/utils/phone";
 
@@ -42,7 +42,7 @@ export default function SignUpInformation({
 
         } catch (e: unknown) {
             console.error("Signup failed:", e);
-            setErr((e as FirebaseError).message);
+            setErr(authErrorMessage(e));
         } finally {
             setLoading(false);
         }

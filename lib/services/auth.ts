@@ -5,6 +5,7 @@ import {
     signOut,
     User,
     sendEmailVerification,
+    sendPasswordResetEmail,
 } from "firebase/auth";
 import { auth } from "../firebase";
 import { Timestamp } from "firebase/firestore";
@@ -62,4 +63,8 @@ export async function logout(): Promise<void> {
 
 export async function sendVerificationEmail(user: User): Promise<void> {
     await sendEmailVerification(user);
+}
+
+export async function resetPassword(email: string): Promise<void> {
+    await sendPasswordResetEmail(auth, email);
 }
