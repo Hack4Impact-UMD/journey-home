@@ -105,7 +105,7 @@ function ResetPasswordView({ oobCode }: { oobCode: string }) {
       await confirmPasswordReset(auth, oobCode, password);
       setStatus('success');
     } catch (err: unknown) {
-      if (err instanceof FirebaseError && err.code === 'auth/expired-action-code') {
+      if (err instanceof FirebaseError && (err.code === 'auth/expired-action-code' || err.code === 'auth/invalid-action-code')) {
         setStatus('invalid');
       } else {
         setError('Failed to reset password. Please try again.');

@@ -144,7 +144,7 @@ export function EditAccountModal({
                             : "Are you sure you want to enable this user? They will be able to log into the platform again."
                     }
                     onConfirm={() => editAccount({ ...account, firstName, lastName, role, disabled }).then(onClose)}
-                    onCancel={() => setShowDisableConfirm(false)}
+                    onCancel={() => { setShowDisableConfirm(false); setDisabled(account.disabled); }}
                 />
             )}
         </>,

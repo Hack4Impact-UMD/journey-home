@@ -37,7 +37,11 @@ export default function ProfilePage() {
             toast.error("Last name is required");
             return;
         }
-        if (phoneNumber && !/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/.test(phoneNumber)) {
+        if (!phoneNumber.trim()) {
+            toast.error("Phone number is required");
+            return;
+        }
+        if (!/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/.test(phoneNumber)) {
             toast.error("Phone number must be in the format 123-456-7890.");
             return;
         }
