@@ -1,15 +1,14 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useDonorForm, FormDonationItem } from "../DonorFormContext";
 import StepIndicator from "../../../components/form/StepIndicator";
 import FormInput from "../../../components/form/FormInput";
 import FormSelect from "../../../components/form/FormSelect";
 import FormTextarea from "../../../components/form/FormTextarea";
 import Button from "../../../components/form/Button";
-import { CloseIcon } from "@/components/icons/CloseIcon";
-import { toast } from "sonner";
-import { PlusIcon, Trash } from "lucide-react";
+import PhotoDropzone from "../../../components/form/PhotoDropzone";
+import { Trash } from "lucide-react";
 import Image from "next/image";
 import { useInventoryCategories } from "@/lib/queries/inventory";
 
@@ -90,8 +89,6 @@ export default function Step2AddDonations() {
 
     const { inventoryCategories } = useInventoryCategories();
     const categoryOptions = inventoryCategories.map((c) => c.name);
-
-    const fileInputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
 
     const steps = [
     { number: 1, label: "Personal Information" },
@@ -318,138 +315,11 @@ export default function Step2AddDonations() {
                                 rows={3}
                             />
 
-                            <div>
-                                <label className="text-sm text-gray-700 mb-2 block">
-                                    <span className="text-red-500">* </span>Photos (1 required, 4 maximum)
-                                </label>
-                                <div className="border-2 border-dashed border-gray-300 rounded p-4 md:p-8 text-center cursor-pointer">
-                                    <div className="flex flex-col items-center justify-center gap-4">
-                                        <svg
-                                            className="w-12 h-12 text-gray-400"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                //svg path for the icon
-                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                                            />
-                                        </svg>
-
-                                        <div className="w-full flex flex-wrap items-center justify-center mb-10 gap-6">
-                                            {item.photos.map((photo, index) => (
-                                                <div
-                                                    className="relative"
-                                                    key={
-                                                        index + " " + photo.name
-                                                    }
-                                                >   
-                                                
-                                                    <img
-                                                        src={URL.createObjectURL(photo)}
-                                                        alt={`Item Photo`}
-                                                        className="max-h-20 max-w-20 md:max-h-32 md:max-w-32 rounded-sm object-contain"
-                                                    />
-                                                    
-                                                    <button
-                                                        onClick={() => {
-                                                            updateDonationInput(
-                                                                item.id,
-                                                                {
-                                                                    photos: item.photos.filter(
-                                                                        (old) =>
-                                                                            old !==
-                                                                            photo
-                                                                    ),
-                                                                }
-                                                            );
-                                                        }}
-                                                        className="absolute top-[-.5em] right-[-.5em] bg-white rounded-full text-white text-lg"
-                                                    >
-                                                        <CloseIcon />
-                                                    </button>
-                                                </div>
-                                            ))}
-                                            <input
-                                                ref={(el) => {
-                                                    if (el) {
-                                                        fileInputRefs.current.set(
-                                                            item.id,
-                                                            el
-                                                        );
-                                                    } else {
-                                                        fileInputRefs.current.delete(
-                                                            item.id
-                                                        );
-                                                    }
-                                                }}
-                                                type="file"
-                                                accept="image/*"
-                                                multiple
-                                                onChange={(e) => {
-                                                    const newPhotos = [
-                                                        ...item.photos,
-                                                        ...Array.from(
-                                                            e.target.files || []
-                                                        ),
-                                                    ];
-
-                                                    if (newPhotos.length > 4) {
-                                                        toast.error(
-                                                            "You can only upload up to 4 photos."
-                                                        );
-                                                    }
-
-                                                    updateDonationInput(
-                                                        item.id,
-                                                        {
-                                                            photos: newPhotos.slice(
-                                                                0,
-                                                                4
-                                                            ),
-                                                        }
-                                                    );
-                                                }}
-                                                className="hidden"
-                                            />
-                                            <div
-                                                onClick={() =>
-                                                    fileInputRefs.current.get(item.id)?.click()
-                                                }
-                                            >
-                                                {item.photos.length > 0 &&
-                                                    item.photos.length < 4 && (
-                                                        <div className="bg-[#E7E7E7] rounded-sm h-20 w-20 md:h-32 md:w-32 flex flex-col items-center justify-center cursor-pointer">
-                                                            <span className="text-sm">
-                                                                Add Photo
-                                                            </span>
-                                                            <PlusIcon className="h-8" />
-                                                        </div>
-                                                    )}
-                                                {item.photos.length == 0 && (
-                                                    <div className="text-center">
-                                                        <p className="text-gray-700 mb-1">
-                                                            Click or drag file
-                                                            to this area to
-                                                            upload
-                                                        </p>
-                                                        <p className="text-sm text-gray-500">
-                                                            Support for a single
-                                                            or bulk upload.
-                                                        </p>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {itemErrors[item.id]?.photos && (
-                                    <p className="form-error text-red-500 text-sm mt-1">{itemErrors[item.id].photos}</p>
-                                )}
-                            </div>
+                            <PhotoDropzone
+                                photos={item.photos}
+                                onChange={(photos) => updateDonationInput(item.id, { photos })}
+                                error={itemErrors[item.id]?.photos}
+                            />
                         </div>
                     </div>
                 );
