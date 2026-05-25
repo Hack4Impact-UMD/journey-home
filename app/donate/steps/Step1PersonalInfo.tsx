@@ -15,6 +15,29 @@ export default function Step1PersonalInfo() {
   const { formState, updateDonorInfo, updateAdditionalInfo, updateAcknowledgements, setCurrentStep } = useDonorForm();
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const predefinedCityOptions = [
+    "Avon", "Bloomfield", "Canton", "East Granby", "East Hartford", "East Windsor",
+    "Farmington", "Glastonbury", "Granby", "Hartford", "Manchester", "Newington",
+    "Rocky Hill", "Simsbury", "South Windsor", "Vernon", "West Hartford",
+    "Wethersfield", "Windsor", "Windsor Locks",
+  ];
+  const [citySelect, setCitySelect] = useState<string>(
+    predefinedCityOptions.includes(formState.donorInfo.address?.city ?? "")
+      ? (formState.donorInfo.address?.city ?? "")
+      : formState.donorInfo.address?.city
+      ? "Other"
+      : ""
+  );
+
+  const predefinedHearOptions = ["Friend", "Social Media", "Website", "Flyer"];
+  const [hearSelect, setHearSelect] = useState<string>(
+    predefinedHearOptions.includes(formState.howDidYouHear)
+      ? formState.howDidYouHear
+      : formState.howDidYouHear
+      ? "Other"
+      : ""
+  );
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
@@ -74,38 +97,11 @@ export default function Step1PersonalInfo() {
 
   const firstTimeDonorOptions = ["Yes", "No"];
 
-  const howDidYouHearOptions = [
-    "Friend",
-    "Social Media",
-    "Website",
-    "Flyer",
-    "Other",
-  ];
+  const howDidYouHearOptions = [...predefinedHearOptions, "Other"];
 
   const canDropOffOptions = ["Yes", "No"];
 
-  const cityOptions = [
-    "Avon",
-    "Bloomfield",
-    "Canton",
-    "East Granby",
-    "East Hartford",
-    "East Windsor",
-    "Farmington",
-    "Glastonbury",
-    "Granby",
-    "Hartford",
-    "Manchester",
-    "Newington",
-    "Rocky Hill",
-    "Simsbury",
-    "South Windsor",
-    "Vernon",
-    "West Hartford",
-    "Wethersfield",
-    "Windsor",
-    "Windsor Locks",
-  ];
+  const cityOptions = [...predefinedCityOptions, "Other"];
 
   const steps = [
     { number: 1, label: "Personal Information" },
@@ -234,21 +230,54 @@ export default function Step1PersonalInfo() {
             <FormSelect
               label="City/Town"
               required
-              value={formState.donorInfo.address?.city || ""}
+              value={citySelect}
               onChange={(e) => {
-                updateDonorInfo({
-                  address: {
-                    streetAddress: formState.donorInfo.address?.streetAddress || "",
-                    apt: formState.donorInfo.address?.apt || "",
-                    city: e.target.value,
-                    state: formState.donorInfo.address?.state || "CT",
-                    zipCode: formState.donorInfo.address?.zipCode || ""
-                  },
-                });
+                const val = e.target.value;
+                setCitySelect(val);
+                if (val !== "Other") {
+                  updateDonorInfo({
+                    address: {
+                      streetAddress: formState.donorInfo.address?.streetAddress || "",
+                      apt: formState.donorInfo.address?.apt || "",
+                      city: val,
+                      state: formState.donorInfo.address?.state || "CT",
+                      zipCode: formState.donorInfo.address?.zipCode || ""
+                    },
+                  });
+                } else {
+                  updateDonorInfo({
+                    address: {
+                      streetAddress: formState.donorInfo.address?.streetAddress || "",
+                      apt: formState.donorInfo.address?.apt || "",
+                      city: "",
+                      state: formState.donorInfo.address?.state || "CT",
+                      zipCode: formState.donorInfo.address?.zipCode || ""
+                    },
+                  });
+                }
                 if (errors.city) setErrors({ ...errors, city: "" });
               }}
               options={cityOptions}
             />
+            {citySelect === "Other" && (
+              <FormInput
+                label="Enter your city/town"
+                required
+                value={formState.donorInfo.address?.city || ""}
+                onChange={(e) => {
+                  updateDonorInfo({
+                    address: {
+                      streetAddress: formState.donorInfo.address?.streetAddress || "",
+                      apt: formState.donorInfo.address?.apt || "",
+                      city: e.target.value,
+                      state: formState.donorInfo.address?.state || "CT",
+                      zipCode: formState.donorInfo.address?.zipCode || ""
+                    },
+                  });
+                  if (errors.city) setErrors({ ...errors, city: "" });
+                }}
+              />
+            )}
             {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city}</p>}
           </div>
           <div>
@@ -280,7 +309,7 @@ export default function Step1PersonalInfo() {
         </div>
 
         <p className="text-sm italic text-gray-700 mt-4">
-          We have listed only the towns we pick up from. If your town is not listed, please contact volunteer@journeyhomect.org to see if a pick up is possible
+          Only towns/cities within our pickup range are listed as an option above. If your town is not listed, you can select it through the Other option. If your town isn't listed, but you need a pickup, please contact volunteer@journeyhomect.org to see if a pickup is possible.
         </p>
 
         <h2 className="text-2xl font-bold text-gray-900 mt-8">Additional Questions</h2>
@@ -309,14 +338,28 @@ export default function Step1PersonalInfo() {
 
         <FormSelect
           label="How did you hear about Journey Home?"
-          value={formState.howDidYouHear}
-          onChange={(e) =>
-            updateAdditionalInfo({
-              howDidYouHear: e.target.value,
-            })
-          }
+          value={hearSelect}
+          onChange={(e) => {
+            const val = e.target.value;
+            setHearSelect(val);
+            if (val !== "Other") {
+              updateAdditionalInfo({ howDidYouHear: val });
+            } else {
+              updateAdditionalInfo({ howDidYouHear: "" });
+            }
+          }}
           options={howDidYouHearOptions}
         />
+
+        {hearSelect === "Other" && (
+          <FormInput
+            label="Please specify"
+            value={formState.howDidYouHear}
+            onChange={(e) =>
+              updateAdditionalInfo({ howDidYouHear: e.target.value })
+            }
+          />
+        )}
 
         <div>
           <FormSelect
