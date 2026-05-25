@@ -14,13 +14,10 @@ export function DRContentsTable({
                 <span className="w-[30%] border-l-2 border-light-border px-4">
                     Name
                 </span>
-                <span className="w-[15%] border-l-2 border-light-border px-4">
+                <span className="w-[20%] border-l-2 border-light-border px-4">
                     Category
                 </span>
-                <span className="w-[10%] border-l-2 border-light-border px-4">
-                    Size
-                </span>
-                <span className="w-[10%] border-l-2 border-light-border px-4">
+                <span className="w-[15%] border-l-2 border-light-border px-4">
                     Quantity
                 </span>
                 <span className="w-[10%] border-l-2 border-light-border px-4">
@@ -53,20 +50,13 @@ function DRContentsTableRow({ item, onOpen }: { item: DonationItem, onOpen: () =
                     {item.item.name}
                 </span>
             </div>
-            <div className="w-[15%] px-4 text-xs">
+            <div className="w-[20%] px-4 text-xs">
                 <Badge
                     text={item.item.category}
                     color="blue"
                 />
             </div>
-            <span className="w-[10%] px-4 text-xs">
-                <Badge text={item.item.size} color={
-                    (item.item.size == "Large") ? "pink" :
-                    (item.item.size == "Medium") ? "purple" :
-                    "yellow"
-                }/>
-            </span>
-            <span className="w-[10%] px-4 text-xs">
+            <span className="w-[15%] px-4 text-xs">
                 <Badge text={item.item.quantity.toString()} color="orange" />
             </span>
             <span className="w-[10%] px-4">

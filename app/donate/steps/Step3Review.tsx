@@ -35,15 +35,8 @@ export default function Step3Review() {
             },
         };
 
-        const validSizes = ["Small", "Medium", "Large"];
         const items: DonationItem[] = await Promise.all(
             formState.donationItems.map(async (donationItem) => {
-                const size =
-                    donationItem.size &&
-                    validSizes.includes(donationItem.size)
-                        ? donationItem.size
-                        : "Medium";
-
                 const photos: InventoryPhoto[] = await Promise.all(
                     (donationItem.photos ?? []).map(async (file) => ({
                         url: await uploadImage(file),
@@ -56,7 +49,6 @@ export default function Step3Review() {
                         id: crypto.randomUUID(),
                         name: donationItem.name ?? "",
                         category: donationItem.category ?? "",
-                        size: size as "Small" | "Medium" | "Large",
                         quantity: donationItem.quantity ?? 1,
                         notes: donationItem.notes ?? "",
                         dateAdded: Timestamp.now(),
@@ -213,13 +205,6 @@ export default function Step3Review() {
                                 </div>
                                 <div className="text-gray-700">
                                     {item.category || "N/A"}
-                                </div>
-
-                                <div className="font-semibold text-gray-900">
-                                    Size
-                                </div>
-                                <div className="text-gray-700">
-                                    {item.size || "N/A"}
                                 </div>
 
                                 <div className="font-semibold text-gray-900">

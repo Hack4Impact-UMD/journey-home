@@ -9,7 +9,7 @@ import FormTextarea from "../../../components/form/FormTextarea";
 import Button from "../../../components/form/Button";
 import { CloseIcon } from "@/components/icons/CloseIcon";
 import { toast } from "sonner";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, Trash } from "lucide-react";
 import Image from "next/image";
 import { useInventoryCategories } from "@/lib/queries/inventory";
 
@@ -43,8 +43,6 @@ export default function Step2AddDonations() {
     const categoryOptions = inventoryCategories.map((c) => c.name);
 
     const fileInputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
-
-    const sizeOptions = ["Small", "Medium", "Large"];
 
     const steps = [
     { number: 1, label: "Personal Information" },
@@ -167,9 +165,9 @@ export default function Step2AddDonations() {
                 return (
                     <div
                         key={item.id}
-                        className="border border-gray-300 rounded p-6 mb-4"
+                        className="border border-gray-300 rounded mb-4 overflow-hidden"
                     >
-                        <div className="flex justify-between items-center mb-4">
+                        <div className="bg-light-border px-6 py-4 flex justify-between items-center">
                             <h3 className="text-lg font-medium">
                                 Item {index + 1}
                             </h3>
@@ -177,27 +175,13 @@ export default function Step2AddDonations() {
                                 <button
                                     type="button"
                                     onClick={() => removeDonationItem(item.id)}
-                                    className="text-red-500 hover:text-red-700"
                                 >
-                                    <svg
-                                        className="w-5 h-5"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            //svg path for the icon
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                        />
-                                    </svg>
+                                    <Trash className="w-4 h-4 text-text-1" />
                                 </button>
                             )}
                         </div>
 
-                        <div className="space-y-4">
+                        <div className="space-y-4 p-6">
                             <FormInput
                                 label="Short description (1-3 words)"
                                 value={item.name ?? ""}
@@ -208,29 +192,17 @@ export default function Step2AddDonations() {
                                 }
                             />
 
-                            <FormSelect
-                                label="Category"
-                                required
-                                value={item.category ?? ""}
-                                onChange={(e) =>
-                                    updateDonationInput(item.id, {
-                                        category: e.target.value,
-                                    })
-                                }
-                                options={categoryOptions}
-                            />
-
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FormSelect
-                                    label="Size"
+                                    label="Category"
                                     required
-                                    value={item.size ?? ""}
+                                    value={item.category ?? ""}
                                     onChange={(e) =>
                                         updateDonationInput(item.id, {
-                                            size: e.target.value,
+                                            category: e.target.value,
                                         })
                                     }
-                                    options={sizeOptions}
+                                    options={categoryOptions}
                                 />
 
                                 <FormInput

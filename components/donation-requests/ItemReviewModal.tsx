@@ -148,16 +148,6 @@ export function ItemReviewModal({
                         <div className="text-xs flex gap-2 my-2">
                             <Badge text={item.item.category} color="blue" />
                             <Badge
-                                text={item.item.size}
-                                color={
-                                    item.item.size == "Large"
-                                        ? "pink"
-                                        : item.item.size == "Medium"
-                                        ? "purple"
-                                        : "yellow"
-                                }
-                            />
-                            <Badge
                                 text={item.item.quantity.toString()}
                                 color="orange"
                             />

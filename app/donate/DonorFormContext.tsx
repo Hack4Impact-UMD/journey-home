@@ -7,7 +7,6 @@ export type FormDonationItem = {
   id: string;
   name: string;
   category: string;
-  size: string;
   quantity: number | null;
   notes: string;
   photos: File[];
@@ -105,7 +104,6 @@ export function DonorFormProvider({ children }: { children: ReactNode }) {
       id: crypto.randomUUID(),
       name: "",
       category: "",
-      size: "",
       quantity: null,
       notes: "",
       photos: [],
