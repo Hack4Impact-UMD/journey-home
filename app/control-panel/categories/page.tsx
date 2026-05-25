@@ -13,7 +13,7 @@ import { PresetIcon } from "@/components/icons/PresetIcon";
 
 export default function CategoriesPage() {
   const { state: { userData } } = useAuth();
-  const { inventoryCategories, isLoading, setInventoryCategoryWithToast, refetch } =
+  const { inventoryCategories, isLoading, setInventoryCategoryWithToast, deleteInventoryCategoryWithToast, refetch } =
     useInventoryCategories();
 
   const [search, setSearch] = useState("");
@@ -48,14 +48,14 @@ export default function CategoriesPage() {
           Loading categories...
         </div>
       ) : (
-        <div className="flex-1 min-h-0 flex flex-col">
-          <div className="h-12 bg-[#FAFAFB] border-light-border border flex items-center font-family-roboto font-bold text-sm text-text-1 shrink-0">
+        <div className="flex-1 min-h-0">
+          <div className="h-full overflow-auto">
+          <div className="sticky top-0 h-12 bg-[#FAFAFB] border-light-border border flex items-center font-family-roboto font-bold text-sm text-text-1">
             <span className="w-[58%] border-l-2 border-light-border px-4">Items</span>
             <span className="w-[34%] border-l-2 border-light-border px-4">Stock Thresholds</span>
             <span className="w-[8%] border-l-2 border-light-border px-4">Actions</span>
           </div>
 
-          <div className="flex-1 overflow-auto min-h-0">
             {filteredCategories.length === 0 ? (
               <div className="flex items-center justify-center h-24 text-sm text-[#A2A2A2]">
                 No categories found.
@@ -75,7 +75,7 @@ export default function CategoriesPage() {
                       <Badge text={`Very low: ${category.lowThreshold}`} color="red" />
                       <Badge text={`Low: ${category.highThreshold}`} color="yellow" />
                     </div>
-                    <div className="w-[8%] px-4 flex gap-3 text-gray-400">
+                    <div className="w-[8%] px-4 text-gray-400">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -98,6 +98,7 @@ export default function CategoriesPage() {
           category={selectedCategory}
           categories={inventoryCategories}
           onSave={async (cat) => { await setInventoryCategoryWithToast(cat, userData!.uid); }}
+          onDelete={async (id) => { await deleteInventoryCategoryWithToast(id); }}
           onClose={() => setShowModal(false)}
         />
       )}

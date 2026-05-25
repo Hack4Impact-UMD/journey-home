@@ -1,11 +1,12 @@
 import { InventoryCategory } from "@/types/inventory";
-
+import { v4 as uuidv4 } from "uuid";
 import { db, storage } from "../firebase";
 import {
     collection,
     doc,
     setDoc,
     getDocs,
+    deleteDoc,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
@@ -20,8 +21,12 @@ export async function setInventoryCategory(category: InventoryCategory): Promise
     await setDoc(doc(db, WAREHOUSE_COLLECTION, category.id), category);
 }
 
+export async function deleteInventoryCategory(categoryId: string): Promise<void> {
+    await deleteDoc(doc(db, WAREHOUSE_COLLECTION, categoryId));
+}
+
 export async function uploadImage(file: File): Promise<string> {
-    const storageRef = ref(storage, "images/" + crypto.randomUUID() + "-" + file.name);
+    const storageRef = ref(storage, "images/" + uuidv4() + "-" + file.name);
     const snapshot = await uploadBytes(storageRef, file);
     const url = await getDownloadURL(snapshot.ref);
     return url;

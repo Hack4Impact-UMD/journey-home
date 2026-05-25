@@ -9,6 +9,8 @@ interface FormInputProps {
   className?: string;
   disabled?: boolean;
   min?: number;
+  step?: number;
+  maxLength?: number;
   id?: string;
   placeholder?: string;
   pattern?: string;
@@ -24,6 +26,8 @@ export default function FormInput({
   className = "",
   disabled = false,
   min,
+  step,
+  maxLength,
   id,
   placeholder,
   pattern,
@@ -38,6 +42,8 @@ export default function FormInput({
       <input
         type={type}
         min={min}
+        step={step}
+        maxLength={maxLength}
         disabled={disabled}
         placeholder={placeholder}
         pattern={pattern}

@@ -15,6 +15,29 @@ export default function Step1PersonalInfo() {
   const { formState, updateDonorInfo, updateAdditionalInfo, updateAcknowledgements, setCurrentStep } = useDonorForm();
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const predefinedCityOptions = [
+    "Avon", "Bloomfield", "Canton", "East Granby", "East Hartford", "East Windsor",
+    "Farmington", "Glastonbury", "Granby", "Hartford", "Manchester", "Newington",
+    "Rocky Hill", "Simsbury", "South Windsor", "Vernon", "West Hartford",
+    "Wethersfield", "Windsor", "Windsor Locks",
+  ];
+  const [citySelect, setCitySelect] = useState<string>(
+    predefinedCityOptions.includes(formState.donorInfo.address?.city ?? "")
+      ? (formState.donorInfo.address?.city ?? "")
+      : formState.donorInfo.address?.city
+      ? "Other"
+      : ""
+  );
+
+  const predefinedHearOptions = ["Friend", "Social Media", "Website", "Flyer"];
+  const [hearSelect, setHearSelect] = useState<string>(
+    predefinedHearOptions.includes(formState.howDidYouHear)
+      ? formState.howDidYouHear
+      : formState.howDidYouHear
+      ? "Other"
+      : ""
+  );
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
@@ -38,8 +61,13 @@ export default function Step1PersonalInfo() {
     if (!formState.donorInfo.address?.streetAddress) {
       newErrors.streetAddress = "Street address is required";
     }
+    if (!formState.donorInfo.address?.city) {
+      newErrors.city = "City/Town is required";
+    }
     if (!formState.donorInfo.address?.zipCode) {
       newErrors.zipCode = "Zip code is required";
+    } else if (!/^\d{5}$/.test(formState.donorInfo.address.zipCode)) {
+      newErrors.zipCode = "Zip code must be 5 digits";
     }
 
     // Required additional questions
@@ -66,43 +94,20 @@ export default function Step1PersonalInfo() {
     e.preventDefault();
     if (validateForm()) {
       setCurrentStep(2);
+    } else {
+      setTimeout(() => {
+        document.querySelector<HTMLElement>(".form-error, .acknowledgement-error, [aria-invalid='true']")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 0);
     }
   };
 
   const firstTimeDonorOptions = ["Yes", "No"];
 
-  const howDidYouHearOptions = [
-    "Friend",
-    "Social Media",
-    "Website",
-    "Flyer",
-    "Other",
-  ];
+  const howDidYouHearOptions = [...predefinedHearOptions, "Other"];
 
   const canDropOffOptions = ["Yes", "No"];
 
-  const cityOptions = [
-    "Avon",
-    "Bloomfield",
-    "Canton",
-    "East Granby",
-    "East Hartford",
-    "East Windsor",
-    "Farmington",
-    "Glastonbury",
-    "Granby",
-    "Hartford",
-    "Manchester",
-    "Newington",
-    "Rocky Hill",
-    "Simsbury",
-    "South Windsor",
-    "Vernon",
-    "West Hartford",
-    "Wethersfield",
-    "Windsor",
-    "Windsor Locks",
-  ];
+  const cityOptions = [...predefinedCityOptions, "Other"];
 
   const steps = [
     { number: 1, label: "Personal Information" },
@@ -117,7 +122,7 @@ export default function Step1PersonalInfo() {
           alt="Journey Home Logo"
           height={96}
           width={350}
-          className="h-24 w-auto"
+          className="h-16 md:h-24 w-auto"
         />
       </div>
 
@@ -137,7 +142,7 @@ export default function Step1PersonalInfo() {
                 if (errors.firstName) setErrors({ ...errors, firstName: "" });
               }}
             />
-            {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
+            {errors.firstName && <p className="form-error text-red-500 text-sm mt-1">{errors.firstName}</p>}
           </div>
           <div>
             <FormInput
@@ -149,7 +154,7 @@ export default function Step1PersonalInfo() {
                 if (errors.lastName) setErrors({ ...errors, lastName: "" });
               }}
             />
-            {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
+            {errors.lastName && <p className="form-error text-red-500 text-sm mt-1">{errors.lastName}</p>}
           </div>
         </div>
 
@@ -168,7 +173,7 @@ export default function Step1PersonalInfo() {
               if (errors.phoneNumber) setErrors({ ...errors, phoneNumber: "" });
             }}
           />
-          {errors.phoneNumber && <p className="text-red-500 text-sm mt-1">{errors.phoneNumber}</p>}
+          {errors.phoneNumber && <p className="form-error text-red-500 text-sm mt-1">{errors.phoneNumber}</p>}
         </div>
 
         <div>
@@ -182,7 +187,7 @@ export default function Step1PersonalInfo() {
               if (errors.email) setErrors({ ...errors, email: "" });
             }}
           />
-          {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+          {errors.email && <p className="form-error text-red-500 text-sm mt-1">{errors.email}</p>}
         </div>
 
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">Address</h2>
@@ -194,8 +199,9 @@ export default function Step1PersonalInfo() {
             value={formState.donorInfo.address?.streetAddress || ""}
             onChange={(e) => {
               updateDonorInfo({
-                address: { 
+                address: {
                   streetAddress: e.target.value,
+                  apt: formState.donorInfo.address?.apt || "",
                   city: formState.donorInfo.address?.city || "",
                   state: formState.donorInfo.address?.state || "CT",
                   zipCode: formState.donorInfo.address?.zipCode || ""
@@ -204,25 +210,84 @@ export default function Step1PersonalInfo() {
               if (errors.streetAddress) setErrors({ ...errors, streetAddress: "" });
             }}
           />
-          {errors.streetAddress && <p className="text-red-500 text-sm mt-1">{errors.streetAddress}</p>}
+          {errors.streetAddress && <p className="form-error text-red-500 text-sm mt-1">{errors.streetAddress}</p>}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <FormSelect
-            label="City/Town"
-            value={formState.donorInfo.address?.city || ""}
+        <div>
+          <FormInput
+            label="Apt / Unit"
+            value={formState.donorInfo.address?.apt || ""}
             onChange={(e) =>
               updateDonorInfo({
-                address: { 
+                address: {
                   streetAddress: formState.donorInfo.address?.streetAddress || "",
-                  city: e.target.value,
+                  apt: e.target.value,
+                  city: formState.donorInfo.address?.city || "",
                   state: formState.donorInfo.address?.state || "CT",
                   zipCode: formState.donorInfo.address?.zipCode || ""
                 },
               })
             }
-            options={cityOptions}
           />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <FormSelect
+              label="City/Town"
+              required
+              value={citySelect}
+              onChange={(e) => {
+                const val = e.target.value;
+                setCitySelect(val);
+                if (val !== "Other") {
+                  updateDonorInfo({
+                    address: {
+                      streetAddress: formState.donorInfo.address?.streetAddress || "",
+                      apt: formState.donorInfo.address?.apt || "",
+                      city: val,
+                      state: formState.donorInfo.address?.state || "CT",
+                      zipCode: formState.donorInfo.address?.zipCode || ""
+                    },
+                  });
+                } else {
+                  updateDonorInfo({
+                    address: {
+                      streetAddress: formState.donorInfo.address?.streetAddress || "",
+                      apt: formState.donorInfo.address?.apt || "",
+                      city: "",
+                      state: formState.donorInfo.address?.state || "CT",
+                      zipCode: formState.donorInfo.address?.zipCode || ""
+                    },
+                  });
+                }
+                if (errors.city) setErrors({ ...errors, city: "" });
+              }}
+              options={cityOptions}
+            />
+            {citySelect === "Other" && (
+              <div className="mt-4">
+              <FormInput
+                label="Enter your city/town"
+                required
+                value={formState.donorInfo.address?.city || ""}
+                onChange={(e) => {
+                  updateDonorInfo({
+                    address: {
+                      streetAddress: formState.donorInfo.address?.streetAddress || "",
+                      apt: formState.donorInfo.address?.apt || "",
+                      city: e.target.value,
+                      state: formState.donorInfo.address?.state || "CT",
+                      zipCode: formState.donorInfo.address?.zipCode || ""
+                    },
+                  });
+                  if (errors.city) setErrors({ ...errors, city: "" });
+                }}
+              />
+              </div>
+            )}
+            {errors.city && <p className="form-error text-red-500 text-sm mt-1">{errors.city}</p>}
+          </div>
           <div>
             <p className="text-sm text-gray-700 pb-2">State</p>
             <div className="border border-gray-300 rounded px-3 py-2 bg-gray-100">
@@ -236,22 +301,23 @@ export default function Step1PersonalInfo() {
               value={formState.donorInfo.address?.zipCode || ""}
               onChange={(e) => {
                 updateDonorInfo({
-                  address: { 
+                  address: {
                     streetAddress: formState.donorInfo.address?.streetAddress || "",
+                    apt: formState.donorInfo.address?.apt || "",
                     city: formState.donorInfo.address?.city || "",
                     state: formState.donorInfo.address?.state || "CT",
-                    zipCode: e.target.value
+                    zipCode: e.target.value.replace(/\D/g, "").slice(0, 5)
                   },
                 });
                 if (errors.zipCode) setErrors({ ...errors, zipCode: "" });
               }}
             />
-            {errors.zipCode && <p className="text-red-500 text-sm mt-1">{errors.zipCode}</p>}
+            {errors.zipCode && <p className="form-error text-red-500 text-sm mt-1">{errors.zipCode}</p>}
           </div>
         </div>
 
         <p className="text-sm italic text-gray-700 mt-4">
-          We have listed only the towns we pick up from. If your town is not listed, please contact volunteer@journeyhomect.org to see if a pick up is possible
+          Only towns/cities within our pickup range are listed as an option above. If your town is not listed, you can select it through the Other option. If your town isn&apos;t listed, but you need a pickup, please contact volunteer@journeyhomect.org to see if a pickup is possible.
         </p>
 
         <h2 className="text-2xl font-bold text-gray-900 mt-8">Additional Questions</h2>
@@ -280,14 +346,28 @@ export default function Step1PersonalInfo() {
 
         <FormSelect
           label="How did you hear about Journey Home?"
-          value={formState.howDidYouHear}
-          onChange={(e) =>
-            updateAdditionalInfo({
-              howDidYouHear: e.target.value,
-            })
-          }
+          value={hearSelect}
+          onChange={(e) => {
+            const val = e.target.value;
+            setHearSelect(val);
+            if (val !== "Other") {
+              updateAdditionalInfo({ howDidYouHear: val });
+            } else {
+              updateAdditionalInfo({ howDidYouHear: "" });
+            }
+          }}
           options={howDidYouHearOptions}
         />
+
+        {hearSelect === "Other" && (
+          <FormInput
+            label="Please specify"
+            value={formState.howDidYouHear}
+            onChange={(e) =>
+              updateAdditionalInfo({ howDidYouHear: e.target.value })
+            }
+          />
+        )}
 
         <div>
           <FormSelect
@@ -313,7 +393,7 @@ export default function Step1PersonalInfo() {
             }}
             options={canDropOffOptions}
           />
-          {errors.canDropOff && <p className="text-red-500 text-sm mt-1">{errors.canDropOff}</p>}
+          {errors.canDropOff && <p className="form-error text-red-500 text-sm mt-1">{errors.canDropOff}</p>}
         </div>
 
         <FormTextarea
@@ -339,7 +419,7 @@ export default function Step1PersonalInfo() {
                 if (errors.acknowledgeSuggestedDonation) setErrors({ ...errors, acknowledgeSuggestedDonation: "" });
               }}
             />
-            {errors.acknowledgeSuggestedDonation && <p className="text-red-500 text-sm mt-1 ml-6">{errors.acknowledgeSuggestedDonation}</p>}
+            {errors.acknowledgeSuggestedDonation && <p className="acknowledgement-error text-red-500 text-sm mt-1 ml-6">{errors.acknowledgeSuggestedDonation}</p>}
           </div>
 
           <div>
@@ -352,7 +432,7 @@ export default function Step1PersonalInfo() {
                 if (errors.acknowledgeRefuseRight) setErrors({ ...errors, acknowledgeRefuseRight: "" });
               }}
             />
-            {errors.acknowledgeRefuseRight && <p className="text-red-500 text-sm mt-1 ml-6">{errors.acknowledgeRefuseRight}</p>}
+            {errors.acknowledgeRefuseRight && <p className="acknowledgement-error text-red-500 text-sm mt-1 ml-6">{errors.acknowledgeRefuseRight}</p>}
           </div>
 
           <div>
@@ -365,7 +445,7 @@ export default function Step1PersonalInfo() {
                 if (errors.acknowledgeItemCondition) setErrors({ ...errors, acknowledgeItemCondition: "" });
               }}
             />
-            {errors.acknowledgeItemCondition && <p className="text-red-500 text-sm mt-1 ml-6">{errors.acknowledgeItemCondition}</p>}
+            {errors.acknowledgeItemCondition && <p className="acknowledgement-error text-red-500 text-sm mt-1 ml-6">{errors.acknowledgeItemCondition}</p>}
           </div>
         </div>
 

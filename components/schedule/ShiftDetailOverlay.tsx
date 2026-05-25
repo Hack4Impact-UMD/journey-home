@@ -37,9 +37,9 @@ function formatHeaderDate(start: Date): string {
   return start.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
 }
 
-function formatAddress(addr: { streetAddress: string; apt?: string; city: string; state: string; zipCode: string }): string {
-  const apt = addr.apt ? ` ${addr.apt}` : "";
-  return `${addr.streetAddress}${apt}, ${addr.city}, ${addr.state} ${addr.zipCode}`;
+function formatAddress(addr: { streetAddress: string; apt: string; city: string; state: string; zipCode: string }): string {
+  const aptSuffix = addr.apt ? ` ${addr.apt}` : "";
+  return `${addr.streetAddress}${aptSuffix}, ${addr.city}, ${addr.state} ${addr.zipCode}`;
 }
 
 interface Props {

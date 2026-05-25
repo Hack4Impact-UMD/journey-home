@@ -48,16 +48,6 @@ function WarehouseGalleryCard({
                 <div className="w-full px-4 flex flex-col">
                     <span className="font-semibold text-sm">{record.name}</span>
                     <div className="text-xs flex flex-wrap gap-1 mt-1">
-                        <Badge
-                            text={record.size}
-                            color={
-                                record.size == "Large"
-                                    ? "pink"
-                                    : record.size == "Medium"
-                                    ? "purple"
-                                    : "yellow"
-                            }
-                        />
                         <Badge text={record.category} color={"blue"} />
                         <Badge
                             text={record.quantity.toString()}

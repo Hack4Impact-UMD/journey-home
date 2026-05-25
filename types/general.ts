@@ -1,6 +1,6 @@
 export type Address = {
     streetAddress: string,
-    apt?: string,
+    apt: string,
     city: string,
     state: string,
     zipCode: string
