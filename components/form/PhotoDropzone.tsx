@@ -32,9 +32,10 @@ export default function PhotoDropzone({ photos, onChange, error }: PhotoDropzone
   }, [photos]);
 
   useEffect(() => {
+    const urlMap = urlMapRef.current;
     return () => {
-      urlMapRef.current.forEach((url) => URL.revokeObjectURL(url));
-      urlMapRef.current.clear();
+      urlMap.forEach((url) => URL.revokeObjectURL(url));
+      urlMap.clear();
     };
   }, []);
 
