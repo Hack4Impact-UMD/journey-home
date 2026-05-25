@@ -46,7 +46,7 @@ export default function Step1ClientInfo() {
             newErrors.childrenInFamily = "Please enter a whole number of 0 or more";
         if (client.questions.clientSpeaksEnglish === undefined)
             newErrors.clientSpeaksEnglish = "Please select English proficiency";
-        if (client.questions.clientSpeaksEnglish === false && !client.questions.preferredLanguage)
+        if (client.questions.clientSpeaksEnglish === false && !client.questions.preferredLanguage?.trim())
             newErrors.preferredLanguage = "Preferred language is required";
         if (client.questions.isVeteran === undefined)
             newErrors.isVeteran = "Please select if client is a veteran";
@@ -69,7 +69,7 @@ export default function Step1ClientInfo() {
 
         if (!client.address?.streetAddress)
             newErrors.streetAddress = "Street address is required";
-        if (!client.address?.apt)
+        if (!client.address?.apt?.trim())
             newErrors.apt = "Apt, Unit, or Floor is required";
         if (!client.address?.city) newErrors.city = "City is required";
         if (!client.address?.zipCode)

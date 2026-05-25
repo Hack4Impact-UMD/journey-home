@@ -96,7 +96,7 @@ export default function Step1PersonalInfo() {
       setCurrentStep(2);
     } else {
       setTimeout(() => {
-        document.querySelector<HTMLElement>(".form-error")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        document.querySelector<HTMLElement>(".form-error, .acknowledgement-error, [aria-invalid='true']")?.scrollIntoView({ behavior: "smooth", block: "center" });
       }, 0);
     }
   };
@@ -317,7 +317,7 @@ export default function Step1PersonalInfo() {
         </div>
 
         <p className="text-sm italic text-gray-700 mt-4">
-          Only towns/cities within our pickup range are listed as an option above. If your town is not listed, you can select it through the Other option. If your town isn't listed, but you need a pickup, please contact volunteer@journeyhomect.org to see if a pickup is possible.
+          Only towns/cities within our pickup range are listed as an option above. If your town is not listed, you can select it through the Other option. If your town isn&apos;t listed, but you need a pickup, please contact volunteer@journeyhomect.org to see if a pickup is possible.
         </p>
 
         <h2 className="text-2xl font-bold text-gray-900 mt-8">Additional Questions</h2>
@@ -419,7 +419,7 @@ export default function Step1PersonalInfo() {
                 if (errors.acknowledgeSuggestedDonation) setErrors({ ...errors, acknowledgeSuggestedDonation: "" });
               }}
             />
-            {errors.acknowledgeSuggestedDonation && <p className="text-red-500 text-sm mt-1 ml-6">{errors.acknowledgeSuggestedDonation}</p>}
+            {errors.acknowledgeSuggestedDonation && <p className="acknowledgement-error text-red-500 text-sm mt-1 ml-6">{errors.acknowledgeSuggestedDonation}</p>}
           </div>
 
           <div>
@@ -432,7 +432,7 @@ export default function Step1PersonalInfo() {
                 if (errors.acknowledgeRefuseRight) setErrors({ ...errors, acknowledgeRefuseRight: "" });
               }}
             />
-            {errors.acknowledgeRefuseRight && <p className="text-red-500 text-sm mt-1 ml-6">{errors.acknowledgeRefuseRight}</p>}
+            {errors.acknowledgeRefuseRight && <p className="acknowledgement-error text-red-500 text-sm mt-1 ml-6">{errors.acknowledgeRefuseRight}</p>}
           </div>
 
           <div>
@@ -445,7 +445,7 @@ export default function Step1PersonalInfo() {
                 if (errors.acknowledgeItemCondition) setErrors({ ...errors, acknowledgeItemCondition: "" });
               }}
             />
-            {errors.acknowledgeItemCondition && <p className="text-red-500 text-sm mt-1 ml-6">{errors.acknowledgeItemCondition}</p>}
+            {errors.acknowledgeItemCondition && <p className="acknowledgement-error text-red-500 text-sm mt-1 ml-6">{errors.acknowledgeItemCondition}</p>}
           </div>
         </div>
 

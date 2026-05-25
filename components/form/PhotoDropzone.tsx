@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import { CloseIcon } from "@/components/icons/CloseIcon";
@@ -13,6 +13,31 @@ interface PhotoDropzoneProps {
 }
 
 export default function PhotoDropzone({ photos, onChange, error }: PhotoDropzoneProps) {
+  const urlMapRef = useRef<Map<File, string>>(new Map());
+
+  const photoUrls = useMemo(() => {
+    const currentSet = new Set(photos);
+    for (const [file, url] of [...urlMapRef.current.entries()]) {
+      if (!currentSet.has(file)) {
+        URL.revokeObjectURL(url);
+        urlMapRef.current.delete(file);
+      }
+    }
+    for (const file of photos) {
+      if (!urlMapRef.current.has(file)) {
+        urlMapRef.current.set(file, URL.createObjectURL(file));
+      }
+    }
+    return photos.map((f) => urlMapRef.current.get(f)!);
+  }, [photos]);
+
+  useEffect(() => {
+    return () => {
+      urlMapRef.current.forEach((url) => URL.revokeObjectURL(url));
+      urlMapRef.current.clear();
+    };
+  }, []);
+
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       const merged = [...photos, ...acceptedFiles];
@@ -26,7 +51,13 @@ export default function PhotoDropzone({ photos, onChange, error }: PhotoDropzone
 
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     onDrop,
-    accept: { "image/*": [] },
+    accept: {
+      "image/jpeg": [".jpg", ".jpeg"],
+      "image/png": [".png"],
+      "image/gif": [".gif"],
+      "image/webp": [".webp"],
+      "image/avif": [".avif"],
+    },
     multiple: true,
     disabled: photos.length >= 4,
     noClick: photos.length > 0,
@@ -64,7 +95,7 @@ export default function PhotoDropzone({ photos, onChange, error }: PhotoDropzone
                 <p className="text-gray-700 mb-1">
                   {isDragActive ? "Drop files here" : "Click or drag file to this area to upload"}
                 </p>
-                <p className="text-sm text-gray-500">Support for a single or bulk upload.</p>
+                <p className="text-sm text-gray-500">JPG, PNG, GIF, WebP, or AVIF. Up to 4 photos.</p>
               </div>
             </>
           ) : (
@@ -72,7 +103,7 @@ export default function PhotoDropzone({ photos, onChange, error }: PhotoDropzone
               {photos.map((photo, index) => (
                 <div className="relative" key={index + " " + photo.name}>
                   <img
-                    src={URL.createObjectURL(photo)}
+                    src={photoUrls[index]}
                     alt="Item Photo"
                     className="max-h-20 max-w-20 md:max-h-32 md:max-w-32 rounded-sm object-contain"
                   />

@@ -11,6 +11,7 @@ import { uploadImage } from "@/lib/services/inventory";
 import { useDonationRequests } from "@/lib/queries/donation-requests";
 import { toast } from "sonner";
 import Image from "next/image";
+import { v4 as uuidv4 } from "uuid";
 
 
 export default function Step3Review() {
@@ -47,7 +48,7 @@ export default function Step3Review() {
 
                 return {
                     item: {
-                        id: crypto.randomUUID(),
+                        id: uuidv4(),
                         name: donationItem.name ?? "",
                         category: donationItem.category ?? "",
                         quantity: donationItem.quantity ?? 1,
@@ -67,7 +68,7 @@ export default function Step3Review() {
                 : formState.firstTimeDonor;
 
         const request: DonationRequest = {
-            id: crypto.randomUUID(),
+            id: uuidv4(),
             donor,
             firstTimeDonor: isFirstTimeDonor,
             howDidYouHear: formState.howDidYouHear ?? "",

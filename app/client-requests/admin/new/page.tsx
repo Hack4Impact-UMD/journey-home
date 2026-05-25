@@ -115,7 +115,7 @@ export default function ClientRequestsAdminPage() {
                                 const cm = userById.get(request.caseManagerID);
                                 return [
                                     `${request.client.firstName}${request.client.lastName}`,
-                                    request.client.email,
+                                    request.client.email ?? "",
                                     request.client.phoneNumber,
                                     cm ? `${cm.firstName}${cm.lastName}` : "",
                                     cm?.email ?? "",
