@@ -112,7 +112,7 @@ export default function Step3Review() {
                     alt="Journey Home Logo"
                     height={96}
                     width={350}
-                    className="h-24 w-auto"
+                    className="h-16 md:h-24 w-auto"
                 />
             </div>
 
@@ -123,7 +123,7 @@ export default function Step3Review() {
             </h2>
 
             <div className="border border-gray-300 rounded">
-                <div className="grid grid-cols-2 gap-y-6 p-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 p-6">
                     <div className="font-semibold text-gray-900">Name</div>
                     <div className="text-gray-700">
                         {formState.donorInfo.firstName || ""}{" "}
@@ -194,7 +194,7 @@ export default function Step3Review() {
                                     Item {index + 1}
                                 </h3>
                             </div>
-                            <div className="grid grid-cols-2 gap-y-6 p-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 p-6">
                                 <div className="font-semibold text-gray-900">
                                     Short Description
                                 </div>

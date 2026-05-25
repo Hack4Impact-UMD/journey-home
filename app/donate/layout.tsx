@@ -11,8 +11,8 @@ export default function DonorFormLayout({
   usePageTitle("Donate – Journey Home");
   return (
     <DonorFormProvider>
-      <div className="min-h-screen py-8 bg-[#D8E3E5]">
-        <div className="max-w-4xl mx-auto bg-white rounded-lg p-8 shadow-md">
+      <div className="min-h-screen bg-white md:bg-[#D8E3E5] md:py-8">
+        <div className="p-5 md:p-8 md:max-w-4xl md:mx-auto md:bg-white md:rounded-lg md:shadow-md">
           {children}
         </div>
       </div>

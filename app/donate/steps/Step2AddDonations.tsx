@@ -106,7 +106,7 @@ export default function Step2AddDonations() {
                    alt="Journey Home Logo"
                    height={96}
                    width={350}
-                   className="h-24 w-auto"
+                   className="h-16 md:h-24 w-auto"
                />
             </div>
 
@@ -322,7 +322,7 @@ export default function Step2AddDonations() {
                                 <label className="text-sm text-gray-700 mb-2 block">
                                     <span className="text-red-500">* </span>Photos (1 required, 4 maximum)
                                 </label>
-                                <div className="border-2 border-dashed border-gray-300 rounded p-8 text-center cursor-pointer">
+                                <div className="border-2 border-dashed border-gray-300 rounded p-4 md:p-8 text-center cursor-pointer">
                                     <div className="flex flex-col items-center justify-center gap-4">
                                         <svg
                                             className="w-12 h-12 text-gray-400"
@@ -339,7 +339,7 @@ export default function Step2AddDonations() {
                                             />
                                         </svg>
 
-                                        <div className="w-full flex items-center justify-center mb-10 gap-6">
+                                        <div className="w-full flex flex-wrap items-center justify-center mb-10 gap-6">
                                             {item.photos.map((photo, index) => (
                                                 <div
                                                     className="relative"
@@ -351,7 +351,7 @@ export default function Step2AddDonations() {
                                                     <img
                                                         src={URL.createObjectURL(photo)}
                                                         alt={`Item Photo`}
-                                                        className="max-h-32 max-w-32 rounded-sm object-contain"
+                                                        className="max-h-20 max-w-20 md:max-h-32 md:max-w-32 rounded-sm object-contain"
                                                     />
                                                     
                                                     <button
@@ -422,7 +422,7 @@ export default function Step2AddDonations() {
                                             >
                                                 {item.photos.length > 0 &&
                                                     item.photos.length < 4 && (
-                                                        <div className="bg-[#E7E7E7] rounded-sm h-32 w-32 flex flex-col items-center justify-center cursor-pointer">
+                                                        <div className="bg-[#E7E7E7] rounded-sm h-20 w-20 md:h-32 md:w-32 flex flex-col items-center justify-center cursor-pointer">
                                                             <span className="text-sm">
                                                                 Add Photo
                                                             </span>
