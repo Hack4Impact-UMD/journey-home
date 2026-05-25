@@ -58,7 +58,7 @@ export function RequestDetailsPage({ client, userRole }: ClientProps) {
                     </div>
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Speaks/understands English?</div>
                     <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.clientSpeaksEnglish == null ? "—" : questions.clientSpeaksEnglish ? "Yes" : "No"}</div>
-                    {!questions.clientSpeaksEnglish && (
+                    {questions.clientSpeaksEnglish === false && (
                         <>
                             <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Preferred language</div>
                             <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.preferredLanguage || "—"}</div>
