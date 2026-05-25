@@ -29,6 +29,7 @@ export default function Step3Review() {
             phoneNumber: formState.donorInfo.phoneNumber ?? "",
             address: formState.donorInfo.address ?? {
                 streetAddress: "",
+                apt: "",
                 city: "",
                 state: "CT",
                 zipCode: "",
@@ -144,6 +145,7 @@ export default function Step3Review() {
                     <div className="font-semibold text-gray-900">Address</div>
                     <div className="text-gray-700">
                         {formState.donorInfo.address?.streetAddress || ""}
+                        {formState.donorInfo.address?.apt && ` ${formState.donorInfo.address.apt}`}
                         {formState.donorInfo.address?.streetAddress &&
                             formState.donorInfo.address?.city &&
                             ", "}

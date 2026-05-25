@@ -38,6 +38,9 @@ export default function Step1PersonalInfo() {
     if (!formState.donorInfo.address?.streetAddress) {
       newErrors.streetAddress = "Street address is required";
     }
+    if (!formState.donorInfo.address?.city) {
+      newErrors.city = "City/Town is required";
+    }
     if (!formState.donorInfo.address?.zipCode) {
       newErrors.zipCode = "Zip code is required";
     }
@@ -194,8 +197,9 @@ export default function Step1PersonalInfo() {
             value={formState.donorInfo.address?.streetAddress || ""}
             onChange={(e) => {
               updateDonorInfo({
-                address: { 
+                address: {
                   streetAddress: e.target.value,
+                  apt: formState.donorInfo.address?.apt || "",
                   city: formState.donorInfo.address?.city || "",
                   state: formState.donorInfo.address?.state || "CT",
                   zipCode: formState.donorInfo.address?.zipCode || ""
@@ -207,22 +211,46 @@ export default function Step1PersonalInfo() {
           {errors.streetAddress && <p className="text-red-500 text-sm mt-1">{errors.streetAddress}</p>}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <FormSelect
-            label="City/Town"
-            value={formState.donorInfo.address?.city || ""}
+        <div>
+          <FormInput
+            label="Apt / Unit"
+            value={formState.donorInfo.address?.apt || ""}
             onChange={(e) =>
               updateDonorInfo({
-                address: { 
+                address: {
                   streetAddress: formState.donorInfo.address?.streetAddress || "",
-                  city: e.target.value,
+                  apt: e.target.value,
+                  city: formState.donorInfo.address?.city || "",
                   state: formState.donorInfo.address?.state || "CT",
                   zipCode: formState.donorInfo.address?.zipCode || ""
                 },
               })
             }
-            options={cityOptions}
           />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <FormSelect
+              label="City/Town"
+              required
+              value={formState.donorInfo.address?.city || ""}
+              onChange={(e) => {
+                updateDonorInfo({
+                  address: {
+                    streetAddress: formState.donorInfo.address?.streetAddress || "",
+                    apt: formState.donorInfo.address?.apt || "",
+                    city: e.target.value,
+                    state: formState.donorInfo.address?.state || "CT",
+                    zipCode: formState.donorInfo.address?.zipCode || ""
+                  },
+                });
+                if (errors.city) setErrors({ ...errors, city: "" });
+              }}
+              options={cityOptions}
+            />
+            {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city}</p>}
+          </div>
           <div>
             <p className="text-sm text-gray-700 pb-2">State</p>
             <div className="border border-gray-300 rounded px-3 py-2 bg-gray-100">
@@ -236,8 +264,9 @@ export default function Step1PersonalInfo() {
               value={formState.donorInfo.address?.zipCode || ""}
               onChange={(e) => {
                 updateDonorInfo({
-                  address: { 
+                  address: {
                     streetAddress: formState.donorInfo.address?.streetAddress || "",
+                    apt: formState.donorInfo.address?.apt || "",
                     city: formState.donorInfo.address?.city || "",
                     state: formState.donorInfo.address?.state || "CT",
                     zipCode: e.target.value
