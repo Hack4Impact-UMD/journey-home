@@ -24,6 +24,7 @@ export default function Step2AddDonations() {
     } = useDonorForm();
     const [showFullList, setShowFullList] = useState(false);
     const [itemErrors, setItemErrors] = useState<Record<string, Record<string, string>>>({});
+    const [noItemsError, setNoItemsError] = useState(false);
 
     const updateDonationInput = (
         id: string,
@@ -47,6 +48,15 @@ export default function Step2AddDonations() {
     };
 
     const handleNext = () => {
+        if (formState.donationItems.length === 0) {
+            setNoItemsError(true);
+            setTimeout(() => {
+                document.querySelector<HTMLElement>(".form-error")?.scrollIntoView({ behavior: "smooth", block: "center" });
+            }, 0);
+            return;
+        }
+        setNoItemsError(false);
+
         const newErrors: Record<string, Record<string, string>> = {};
         let valid = true;
 
@@ -60,7 +70,7 @@ export default function Step2AddDonations() {
                 errs.name = "Description must be 1–3 words";
             }
             if (!item.category) errs.category = "Category is required";
-            if (item.quantity === null || item.quantity === undefined) errs.quantity = "Quantity is required";
+            if (item.quantity === null || item.quantity === undefined || item.quantity < 1) errs.quantity = "Quantity must be at least 1";
             if (item.photos.length === 0) errs.photos = "At least 1 photo is required";
             if (Object.keys(errs).length > 0) {
                 newErrors[item.id] = errs;
@@ -194,9 +204,12 @@ export default function Step2AddDonations() {
                     <p className="text-gray-500 mb-4">
                         No donation items added yet
                     </p>
-                    <Button onClick={addDonationItem} variant="secondary">
+                    <Button onClick={() => { addDonationItem(); setNoItemsError(false); }} variant="secondary">
                         + Add Item
                     </Button>
+                    {noItemsError && (
+                        <p className="form-error text-red-500 text-sm mt-3">Please add at least one item before continuing</p>
+                    )}
                 </div>
             )}
 
@@ -260,7 +273,7 @@ export default function Step2AddDonations() {
                                         label="Quantity"
                                         required
                                         type="number"
-                                        min={0}
+                                        min={1}
                                         value={item.quantity?.toString() ?? ""}
                                         onChange={(e) => {
                                             const rawValue = e.target.value;

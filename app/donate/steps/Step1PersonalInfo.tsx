@@ -266,6 +266,7 @@ export default function Step1PersonalInfo() {
               options={cityOptions}
             />
             {citySelect === "Other" && (
+              <div className="mt-4">
               <FormInput
                 label="Enter your city/town"
                 required
@@ -283,6 +284,7 @@ export default function Step1PersonalInfo() {
                   if (errors.city) setErrors({ ...errors, city: "" });
                 }}
               />
+              </div>
             )}
             {errors.city && <p className="form-error text-red-500 text-sm mt-1">{errors.city}</p>}
           </div>
@@ -304,7 +306,7 @@ export default function Step1PersonalInfo() {
                     apt: formState.donorInfo.address?.apt || "",
                     city: formState.donorInfo.address?.city || "",
                     state: formState.donorInfo.address?.state || "CT",
-                    zipCode: e.target.value
+                    zipCode: e.target.value.replace(/\D/g, "").slice(0, 5)
                   },
                 });
                 if (errors.zipCode) setErrors({ ...errors, zipCode: "" });
