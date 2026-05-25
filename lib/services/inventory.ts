@@ -6,6 +6,7 @@ import {
     doc,
     setDoc,
     getDocs,
+    deleteDoc,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
@@ -18,6 +19,10 @@ export async function getAllInventoryCategories(): Promise<InventoryCategory[]> 
 
 export async function setInventoryCategory(category: InventoryCategory): Promise<void> {
     await setDoc(doc(db, WAREHOUSE_COLLECTION, category.id), category);
+}
+
+export async function deleteInventoryCategory(categoryId: string): Promise<void> {
+    await deleteDoc(doc(db, WAREHOUSE_COLLECTION, categoryId));
 }
 
 export async function uploadImage(file: File): Promise<string> {
