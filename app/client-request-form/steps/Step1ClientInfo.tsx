@@ -33,23 +33,21 @@ export default function Step1ClientInfo() {
             newErrors.phoneNumber = "Client Phone number is required";
         else if (!/^\d{3}-\d{3}-\d{4}$/.test(client.phoneNumber))
             newErrors.phoneNumber = "Please enter a complete phone number in the format 123-456-7890.";
-        if (!client.email)
-            newErrors.email = "Client email is required";
-        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(client.email))
+        if (client.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(client.email))
             newErrors.email = "Enter a valid email address";
 
-        if (
-            client.questions.adultsInFamily === undefined ||
-            client.questions.adultsInFamily < 0
-        )
+        if (client.questions.adultsInFamily === undefined)
             newErrors.adultsInFamily = "Adults in family is required";
-        if (
-            client.questions.childrenInFamily === undefined ||
-            client.questions.childrenInFamily < 0
-        )
+        else if (client.questions.adultsInFamily < 0 || !Number.isInteger(client.questions.adultsInFamily))
+            newErrors.adultsInFamily = "Please enter a whole number of 0 or more";
+        if (client.questions.childrenInFamily === undefined)
             newErrors.childrenInFamily = "Children in family is required";
+        else if (client.questions.childrenInFamily < 0 || !Number.isInteger(client.questions.childrenInFamily))
+            newErrors.childrenInFamily = "Please enter a whole number of 0 or more";
         if (client.questions.clientSpeaksEnglish === undefined)
             newErrors.clientSpeaksEnglish = "Please select English proficiency";
+        if (client.questions.clientSpeaksEnglish === false && !client.questions.preferredLanguage)
+            newErrors.preferredLanguage = "Preferred language is required";
         if (client.questions.isVeteran === undefined)
             newErrors.isVeteran = "Please select if client is a veteran";
         if (client.questions.canPickUp === undefined)
@@ -58,6 +56,8 @@ export default function Step1ClientInfo() {
             newErrors.wasChronic = "Please select chronic homelessness option";
         if (client.questions.hasMovedIn === undefined)
             newErrors.hasMovedIn = "Please select move-in status";
+        else if (client.questions.hasMovedIn === false)
+            newErrors.hasMovedIn = "Client must have moved in and the unit must have passed inspection before submitting a furniture request";
         if (!client.questions.moveInDate)
             newErrors.moveInDate = "Move-in date is required";
         if (
@@ -69,11 +69,13 @@ export default function Step1ClientInfo() {
 
         if (!client.address?.streetAddress)
             newErrors.streetAddress = "Street address is required";
+        if (!client.address?.apt)
+            newErrors.apt = "Apt, Unit, or Floor is required";
         if (!client.address?.city) newErrors.city = "City is required";
         if (!client.address?.zipCode)
             newErrors.zipCode = "Zip code is required";
-        else if (!/^\d{5}(-\d{4})?$/.test(client.address.zipCode))
-            newErrors.zipCode = "Enter a valid zip code (e.g. 06103 or 06103-1234)";
+        else if (!/^\d{5}$/.test(client.address.zipCode))
+            newErrors.zipCode = "Zip code must be 5 digits";
         if (client.questions.hasElevator === undefined)
             newErrors.hasElevator = "Please select elevator option";
 
@@ -91,29 +93,6 @@ export default function Step1ClientInfo() {
         }
         setCurrentStep(2);
     };
-
-    const cityOptions = [
-        "Avon",
-        "Bloomfield",
-        "Canton",
-        "East Granby",
-        "East Hartford",
-        "East Windsor",
-        "Farmington",
-        "Glastonbury",
-        "Granby",
-        "Hartford",
-        "Manchester",
-        "Newington",
-        "Rocky Hill",
-        "Simsbury",
-        "South Windsor",
-        "Vernon",
-        "West Hartford",
-        "Wethersfield",
-        "Windsor",
-        "Windsor Locks",
-    ];
 
     const steps = [
         { number: 1, label: "Client Info" },
@@ -221,16 +200,10 @@ export default function Step1ClientInfo() {
                                 value={
                                     formState.clientInfoAndNewHome.programName ?? ""
                                 }
-                                onChange={(e) => {
-                                    updateClientInfo({ programName: e.target.value });
-                                    clearError("programName");
-                                }}
+                                onChange={(e) =>
+                                    updateClientInfo({ programName: e.target.value })
+                                }
                             />
-                            {errors.programName && (
-                                <p className="text-red-500 text-sm">
-                                    {errors.programName}
-                                </p>
-                            )}
 
                             <FormInput
                                 id="phoneNumber"
@@ -261,7 +234,6 @@ export default function Step1ClientInfo() {
                             <FormInput
                                 id="email"
                                 label="Client Email"
-                                required
                                 type="email"
                                 value={
                                     formState.clientInfoAndNewHome.email ?? ""
@@ -342,15 +314,13 @@ export default function Step1ClientInfo() {
                                           : "No"
                                 }
                                 onChange={(e) => {
+                                    const val = e.target.value === "Yes" ? true : e.target.value === "No" ? false : undefined;
                                     updateClientQuestions({
-                                        clientSpeaksEnglish:
-                                            e.target.value === "Yes"
-                                                ? true
-                                                : e.target.value === "No"
-                                                  ? false
-                                                  : undefined,
+                                        clientSpeaksEnglish: val,
+                                        ...(val !== false && { preferredLanguage: "" }),
                                     });
                                     clearError("clientSpeaksEnglish");
+                                    clearError("preferredLanguage");
                                 }}
                                 options={["Yes", "No"]}
                             />
@@ -360,12 +330,33 @@ export default function Step1ClientInfo() {
                                 </p>
                             )}
 
+                                            {formState.clientInfoAndNewHome.questions.clientSpeaksEnglish === false && (
+                                <div>
+                                    <FormInput
+                                        id="preferredLanguage"
+                                        label="What is the client's preferred language?"
+                                        required
+                                        value={formState.clientInfoAndNewHome.questions.preferredLanguage ?? ""}
+                                        onChange={(e) => {
+                                            updateClientQuestions({ preferredLanguage: e.target.value });
+                                            clearError("preferredLanguage");
+                                        }}
+                                    />
+                                    {errors.preferredLanguage && (
+                                        <p className="text-red-500 text-sm mt-1">
+                                            {errors.preferredLanguage}
+                                        </p>
+                                    )}
+                                </div>
+                            )}
+
                             <FormInput
                                 id="adultsInFamily"
                                 label="How many adults are in the family?"
                                 required
                                 type="number"
                                 min={0}
+                                step={1}
                                 value={
                                     formState.clientInfoAndNewHome.questions
                                         .adultsInFamily ?? ""
@@ -393,6 +384,7 @@ export default function Step1ClientInfo() {
                                 required
                                 type="number"
                                 min={0}
+                                step={1}
                                 value={
                                     formState.clientInfoAndNewHome.questions
                                         .childrenInFamily ?? ""
@@ -434,7 +426,7 @@ export default function Step1ClientInfo() {
 
                             <FormSelect
                                 id="canPickUp"
-                                label="Can the client pick up items at the warehouse in Hartford?"
+                                label="Can the client pick up items at the warehouse in West Hartford? (we are only able to deliver to towns within the GH CAN)"
                                 required
                                 value={
                                     formState.clientInfoAndNewHome.questions
@@ -486,7 +478,7 @@ export default function Step1ClientInfo() {
 
                             <FormSelect
                                 id="hasMovedIn"
-                                label="Has the client moved in yet? Please do not submit a furniture request until a client has moved in AND the unit has passed inspection."
+                                label="Has the client moved in yet?"
                                 required
                                 value={
                                     formState.clientInfoAndNewHome.questions
@@ -511,6 +503,9 @@ export default function Step1ClientInfo() {
                                 }}
                                 options={["Yes", "No"]}
                             />
+                            <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2 mt-2">
+                                Do not submit a furniture request until the client has moved in AND the unit has passed inspection.
+                            </p>
                             {errors.hasMovedIn && (
                                 <p className="text-red-500 text-sm mt-1">
                                     {errors.hasMovedIn}
@@ -612,25 +607,33 @@ export default function Step1ClientInfo() {
                             )}
 
                             <FormInput
-                                label="Apt, unit, etc. (include floor)"
+                                id="apt"
+                                label="Apt, Unit, or Floor"
+                                required
                                 value={
                                     formState.clientInfoAndNewHome.address
                                         .apt ?? ""
                                 }
-                                onChange={(e) =>
+                                onChange={(e) => {
                                     updateClientInfo({
                                         address: {
                                             ...formState.clientInfoAndNewHome
                                                 .address,
                                             apt: e.target.value,
                                         },
-                                    })
-                                }
+                                    });
+                                    clearError("apt");
+                                }}
                             />
+                            {errors.apt && (
+                                <p className="text-red-500 text-sm">
+                                    {errors.apt}
+                                </p>
+                            )}
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div className="flex flex-col">
-                                    <FormSelect
+                                    <FormInput
                                         id="city"
                                         label="City"
                                         required
@@ -638,7 +641,6 @@ export default function Step1ClientInfo() {
                                             formState.clientInfoAndNewHome
                                                 .address.city ?? ""
                                         }
-                                        options={cityOptions}
                                         onChange={(e) => {
                                             updateClientInfo({
                                                 address: {
@@ -665,12 +667,13 @@ export default function Step1ClientInfo() {
                                         id="zipCode"
                                         label="Zip Code"
                                         required
+                                        maxLength={5}
                                         value={
                                             formState.clientInfoAndNewHome
                                                 .address.zipCode ?? ""
                                         }
                                         onChange={(e) => {
-                                            const digits = e.target.value.replace(/[^\d-]/g, "");
+                                            const digits = e.target.value.replace(/\D/g, "").slice(0, 5);
                                             updateClientInfo({
                                                 address: {
                                                     ...formState
