@@ -23,12 +23,23 @@ export default function Step2AddDonations() {
         updateDonationItem,
     } = useDonorForm();
     const [showFullList, setShowFullList] = useState(false);
+    const [itemErrors, setItemErrors] = useState<Record<string, Record<string, string>>>({});
 
     const updateDonationInput = (
         id: string,
         updates: Partial<FormDonationItem>
     ) => {
         updateDonationItem(id, updates);
+        if (itemErrors[id]) {
+            const clearedKeys = Object.keys(updates).reduce<Record<string, string>>(
+                (acc, key) => { acc[key] = ""; return acc; },
+                {}
+            );
+            setItemErrors((prev) => ({
+                ...prev,
+                [id]: { ...prev[id], ...clearedKeys },
+            }));
+        }
     };
 
     const handleBack = () => {
@@ -36,7 +47,29 @@ export default function Step2AddDonations() {
     };
 
     const handleNext = () => {
-        setCurrentStep(3);
+        const newErrors: Record<string, Record<string, string>> = {};
+        let valid = true;
+
+        for (const item of formState.donationItems) {
+            const errs: Record<string, string> = {};
+            const trimmedName = (item.name ?? "").trim();
+            const wordCount = trimmedName ? trimmedName.split(/\s+/).length : 0;
+            if (!trimmedName) {
+                errs.name = "Short description is required";
+            } else if (wordCount > 3) {
+                errs.name = "Description must be 1–3 words";
+            }
+            if (!item.category) errs.category = "Category is required";
+            if (item.quantity === null || item.quantity === undefined) errs.quantity = "Quantity is required";
+            if (item.photos.length === 0) errs.photos = "At least 1 photo is required";
+            if (Object.keys(errs).length > 0) {
+                newErrors[item.id] = errs;
+                valid = false;
+            }
+        }
+
+        setItemErrors(newErrors);
+        if (valid) setCurrentStep(3);
     };
 
     const { inventoryCategories } = useInventoryCategories();
@@ -182,61 +215,77 @@ export default function Step2AddDonations() {
                         </div>
 
                         <div className="space-y-4 p-6">
-                            <FormInput
-                                label="Short description (1-3 words)"
-                                value={item.name ?? ""}
-                                onChange={(e) =>
-                                    updateDonationInput(item.id, {
-                                        name: e.target.value,
-                                    })
-                                }
-                            />
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <FormSelect
-                                    label="Category"
+                            <div>
+                                <FormInput
+                                    label="Short description (1-3 words)"
                                     required
-                                    value={item.category ?? ""}
+                                    value={item.name ?? ""}
                                     onChange={(e) =>
                                         updateDonationInput(item.id, {
-                                            category: e.target.value,
+                                            name: e.target.value,
                                         })
                                     }
-                                    options={categoryOptions}
                                 />
+                                {itemErrors[item.id]?.name && (
+                                    <p className="text-red-500 text-sm mt-1">{itemErrors[item.id].name}</p>
+                                )}
+                            </div>
 
-                                <FormInput
-                                    label="Quantity"
-                                    required
-                                    type="number"
-                                    min={0}
-                                    value={item.quantity?.toString() ?? ""}
-                                    onChange={(e) => {
-                                        const rawValue = e.target.value;
-                                        if (rawValue === "") {
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <FormSelect
+                                        label="Category"
+                                        required
+                                        value={item.category ?? ""}
+                                        onChange={(e) =>
                                             updateDonationInput(item.id, {
-                                                quantity: null,
-                                            });
-                                            return;
+                                                category: e.target.value,
+                                            })
                                         }
-                                        const parsedValue = parseInt(
-                                            rawValue,
-                                            10
-                                        );
-                                        if (
-                                            Number.isNaN(parsedValue) ||
-                                            parsedValue < 0
-                                        ) {
+                                        options={categoryOptions}
+                                    />
+                                    {itemErrors[item.id]?.category && (
+                                        <p className="text-red-500 text-sm mt-1">{itemErrors[item.id].category}</p>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <FormInput
+                                        label="Quantity"
+                                        required
+                                        type="number"
+                                        min={0}
+                                        value={item.quantity?.toString() ?? ""}
+                                        onChange={(e) => {
+                                            const rawValue = e.target.value;
+                                            if (rawValue === "") {
+                                                updateDonationInput(item.id, {
+                                                    quantity: null,
+                                                });
+                                                return;
+                                            }
+                                            const parsedValue = parseInt(
+                                                rawValue,
+                                                10
+                                            );
+                                            if (
+                                                Number.isNaN(parsedValue) ||
+                                                parsedValue < 0
+                                            ) {
+                                                updateDonationInput(item.id, {
+                                                    quantity: null,
+                                                });
+                                                return;
+                                            }
                                             updateDonationInput(item.id, {
-                                                quantity: null,
+                                                quantity: parsedValue,
                                             });
-                                            return;
-                                        }
-                                        updateDonationInput(item.id, {
-                                            quantity: parsedValue,
-                                        });
-                                    }}
-                                />
+                                        }}
+                                    />
+                                    {itemErrors[item.id]?.quantity && (
+                                        <p className="text-red-500 text-sm mt-1">{itemErrors[item.id].quantity}</p>
+                                    )}
+                                </div>
                             </div>
 
                             <FormTextarea
@@ -252,7 +301,7 @@ export default function Step2AddDonations() {
 
                             <div>
                                 <label className="text-sm text-gray-700 mb-2 block">
-                                    Photos (4 maximum)
+                                    <span className="text-red-500">* </span>Photos (1 required, 4 maximum)
                                 </label>
                                 <div className="border-2 border-dashed border-gray-300 rounded p-8 text-center cursor-pointer">
                                     <div className="flex flex-col items-center justify-center gap-4">
@@ -378,6 +427,9 @@ export default function Step2AddDonations() {
                                         </div>
                                     </div>
                                 </div>
+                                {itemErrors[item.id]?.photos && (
+                                    <p className="text-red-500 text-sm mt-1">{itemErrors[item.id].photos}</p>
+                                )}
                             </div>
                         </div>
                     </div>
