@@ -69,7 +69,13 @@ export default function Step2AddDonations() {
         }
 
         setItemErrors(newErrors);
-        if (valid) setCurrentStep(3);
+        if (valid) {
+            setCurrentStep(3);
+        } else {
+            setTimeout(() => {
+                document.querySelector<HTMLElement>(".form-error")?.scrollIntoView({ behavior: "smooth", block: "center" });
+            }, 0);
+        }
     };
 
     const { inventoryCategories } = useInventoryCategories();
@@ -227,7 +233,7 @@ export default function Step2AddDonations() {
                                     }
                                 />
                                 {itemErrors[item.id]?.name && (
-                                    <p className="text-red-500 text-sm mt-1">{itemErrors[item.id].name}</p>
+                                    <p className="form-error text-red-500 text-sm mt-1">{itemErrors[item.id].name}</p>
                                 )}
                             </div>
 
@@ -245,7 +251,7 @@ export default function Step2AddDonations() {
                                         options={categoryOptions}
                                     />
                                     {itemErrors[item.id]?.category && (
-                                        <p className="text-red-500 text-sm mt-1">{itemErrors[item.id].category}</p>
+                                        <p className="form-error text-red-500 text-sm mt-1">{itemErrors[item.id].category}</p>
                                     )}
                                 </div>
 
@@ -283,7 +289,7 @@ export default function Step2AddDonations() {
                                         }}
                                     />
                                     {itemErrors[item.id]?.quantity && (
-                                        <p className="text-red-500 text-sm mt-1">{itemErrors[item.id].quantity}</p>
+                                        <p className="form-error text-red-500 text-sm mt-1">{itemErrors[item.id].quantity}</p>
                                     )}
                                 </div>
                             </div>
@@ -428,7 +434,7 @@ export default function Step2AddDonations() {
                                     </div>
                                 </div>
                                 {itemErrors[item.id]?.photos && (
-                                    <p className="text-red-500 text-sm mt-1">{itemErrors[item.id].photos}</p>
+                                    <p className="form-error text-red-500 text-sm mt-1">{itemErrors[item.id].photos}</p>
                                 )}
                             </div>
                         </div>

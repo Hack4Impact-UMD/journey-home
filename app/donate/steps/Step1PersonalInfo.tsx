@@ -66,6 +66,8 @@ export default function Step1PersonalInfo() {
     }
     if (!formState.donorInfo.address?.zipCode) {
       newErrors.zipCode = "Zip code is required";
+    } else if (!/^\d{5}$/.test(formState.donorInfo.address.zipCode)) {
+      newErrors.zipCode = "Zip code must be 5 digits";
     }
 
     // Required additional questions
@@ -92,6 +94,10 @@ export default function Step1PersonalInfo() {
     e.preventDefault();
     if (validateForm()) {
       setCurrentStep(2);
+    } else {
+      setTimeout(() => {
+        document.querySelector<HTMLElement>(".form-error")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 0);
     }
   };
 
@@ -136,7 +142,7 @@ export default function Step1PersonalInfo() {
                 if (errors.firstName) setErrors({ ...errors, firstName: "" });
               }}
             />
-            {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
+            {errors.firstName && <p className="form-error text-red-500 text-sm mt-1">{errors.firstName}</p>}
           </div>
           <div>
             <FormInput
@@ -148,7 +154,7 @@ export default function Step1PersonalInfo() {
                 if (errors.lastName) setErrors({ ...errors, lastName: "" });
               }}
             />
-            {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
+            {errors.lastName && <p className="form-error text-red-500 text-sm mt-1">{errors.lastName}</p>}
           </div>
         </div>
 
@@ -167,7 +173,7 @@ export default function Step1PersonalInfo() {
               if (errors.phoneNumber) setErrors({ ...errors, phoneNumber: "" });
             }}
           />
-          {errors.phoneNumber && <p className="text-red-500 text-sm mt-1">{errors.phoneNumber}</p>}
+          {errors.phoneNumber && <p className="form-error text-red-500 text-sm mt-1">{errors.phoneNumber}</p>}
         </div>
 
         <div>
@@ -181,7 +187,7 @@ export default function Step1PersonalInfo() {
               if (errors.email) setErrors({ ...errors, email: "" });
             }}
           />
-          {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+          {errors.email && <p className="form-error text-red-500 text-sm mt-1">{errors.email}</p>}
         </div>
 
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">Address</h2>
@@ -204,7 +210,7 @@ export default function Step1PersonalInfo() {
               if (errors.streetAddress) setErrors({ ...errors, streetAddress: "" });
             }}
           />
-          {errors.streetAddress && <p className="text-red-500 text-sm mt-1">{errors.streetAddress}</p>}
+          {errors.streetAddress && <p className="form-error text-red-500 text-sm mt-1">{errors.streetAddress}</p>}
         </div>
 
         <div>
@@ -278,7 +284,7 @@ export default function Step1PersonalInfo() {
                 }}
               />
             )}
-            {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city}</p>}
+            {errors.city && <p className="form-error text-red-500 text-sm mt-1">{errors.city}</p>}
           </div>
           <div>
             <p className="text-sm text-gray-700 pb-2">State</p>
@@ -304,7 +310,7 @@ export default function Step1PersonalInfo() {
                 if (errors.zipCode) setErrors({ ...errors, zipCode: "" });
               }}
             />
-            {errors.zipCode && <p className="text-red-500 text-sm mt-1">{errors.zipCode}</p>}
+            {errors.zipCode && <p className="form-error text-red-500 text-sm mt-1">{errors.zipCode}</p>}
           </div>
         </div>
 
@@ -385,7 +391,7 @@ export default function Step1PersonalInfo() {
             }}
             options={canDropOffOptions}
           />
-          {errors.canDropOff && <p className="text-red-500 text-sm mt-1">{errors.canDropOff}</p>}
+          {errors.canDropOff && <p className="form-error text-red-500 text-sm mt-1">{errors.canDropOff}</p>}
         </div>
 
         <FormTextarea
