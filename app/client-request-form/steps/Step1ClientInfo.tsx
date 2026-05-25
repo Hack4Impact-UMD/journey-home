@@ -564,18 +564,17 @@ export default function Step1ClientInfo() {
                                     {errors.moveInDate}
                                 </p>
                             )}
-                            <FormInput
-                                label="Notes/Comments"
-                                value={
-                                    formState.clientInfoAndNewHome.questions
-                                        .notes ?? ""
-                                }
-                                onChange={(e) =>
-                                    updateClientQuestions({
-                                        notes: e.target.value,
-                                    })
-                                }
-                            />
+                            <div>
+                                <label className="block mb-2">
+                                    <span className="text-sm text-gray-700">Notes/Comments</span>
+                                </label>
+                                <textarea
+                                    value={formState.clientInfoAndNewHome.questions.notes ?? ""}
+                                    onChange={(e) => updateClientQuestions({ notes: e.target.value })}
+                                    rows={4}
+                                    className="w-full border border-gray-300 rounded px-3 py-2 resize-none"
+                                />
+                            </div>
 
                             <h2 className="text-2xl font-bold text-gray-900 mb-6">
                                 Client&apos;s New Home

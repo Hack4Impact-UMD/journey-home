@@ -58,16 +58,22 @@ export function RequestDetailsPage({ client, userRole }: ClientProps) {
                     </div>
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Speaks/understands English?</div>
                     <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.clientSpeaksEnglish ? "Yes" : "No"}</div>
+                    {!questions.clientSpeaksEnglish && (
+                        <>
+                            <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Preferred language</div>
+                            <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.preferredLanguage || "—"}</div>
+                        </>
+                    )}
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Number of adults in the family</div>
                     <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.adultsInFamily ?? "—"}</div>
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Number of kids in the family</div>
                     <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.childrenInFamily ?? "—"}</div>
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Veteran status</div>
-                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.isVeteran == null ? "—" : questions.isVeteran ? "Yes" : "No"}</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.isVeteran ?? "—"}</div>
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Pick up items at the warehouse?</div>
                     <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.canPickUp ? "Yes" : "No"}</div>
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Chronic before housing?</div>
-                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.wasChronic == null ? "—" : questions.wasChronic ? "Yes" : "No"}</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.wasChronic ?? "—"}</div>
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Moved in status</div>
                     <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.hasMovedIn ? "Yes" : "No"}</div>
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Moved in date</div>
