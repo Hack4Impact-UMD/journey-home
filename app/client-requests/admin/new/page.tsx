@@ -9,12 +9,22 @@ import { ConfirmModal } from "@/components/general/ConfirmModal";
 import { DebounceTextbox } from "@/components/general/DebounceTextbox";
 import { useClientRequests } from "@/lib/queries/client-requests";
 import { useAllActiveAccounts } from "@/lib/queries/users";
-import { useState } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
+import { useExport } from "@/contexts/ExportContext";
+import { ClientRequest } from "@/types/client-requests";
+import { UserData } from "@/types/user";
+
+function escapeCSVField(value: string | null | undefined): string {
+    const str = String(value ?? "");
+    if (str.includes(",") || str.includes('"') || str.includes("\n") || str.includes("\r")) {
+        return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+}
 
 export default function ClientRequestsAdminPage() {
     const { clientRequests, refetch: refetchClientRequests, setClientRequest, setClientRequestToast } = useClientRequests();
     const { allAccounts } = useAllActiveAccounts();
-    const userById = new Map(allAccounts.map((u) => [u.uid, u]));
 
     const [selectedCRId, setSelectedCRId] = useState<string | null>(null);
     const selectedCR = clientRequests.find((cr) => cr.id === selectedCRId) ?? null;
@@ -24,7 +34,104 @@ export default function ClientRequestsAdminPage() {
 
     const [editSinceLabel, setEditSinceLabel] = useState<string | null>("Saved");
     const [pendingAction, setPendingAction] = useState<{ status: "Approved" | "Denied" } | null>(null);
+
+    const userById = useMemo(() => new Map(allAccounts.map((u) => [u.uid, u])), [allAccounts]);
     const pendingCaseManager = selectedCR ? (userById.get(selectedCR.caseManagerID) ?? null) : null;
+
+    const { setOnExport } = useExport();
+
+    const filtered = useMemo(() => {
+        return clientRequests
+            .filter((request) => {
+                if (request.status !== "Not Reviewed") return false;
+                const norm = (s: string) => s.toLowerCase().replace(/\s/g, "");
+                const q = norm(searchQuery);
+                if (!q) return true;
+                const cm = userById.get(request.caseManagerID);
+                return [
+                    `${request.client.firstName}${request.client.lastName}`,
+                    request.client.email,
+                    request.client.phoneNumber,
+                    cm ? `${cm.firstName}${cm.lastName}` : "",
+                    cm?.email ?? "",
+                ].some((field) => norm(field).includes(q));
+            })
+            .sort((req1, req2) => {
+                if (sortBy === "none") {
+                    return `${req1.client.lastName} ${req1.client.firstName}`.localeCompare(
+                        `${req2.client.lastName} ${req2.client.firstName}`,
+                    );
+                } else if (sortBy === "asc") {
+                    return (req1.date?.seconds ?? 0) - (req2.date?.seconds ?? 0);
+                } else {
+                    return (req2.date?.seconds ?? 0) - (req1.date?.seconds ?? 0);
+                }
+            });
+    }, [clientRequests, searchQuery, sortBy, userById]);
+
+    const handleExport = useCallback((requests: ClientRequest[], accounts: UserData[]) => {
+        const byId = new Map(accounts.map((u) => [u.uid, u]));
+        const headers = [
+            "First Name", "Last Name", "Email", "Phone Number",
+            "Street Address", "Apt", "City", "State", "Zip Code",
+            "HMIS", "Program Name",
+            "Secondary Contact Name", "Secondary Contact Relationship", "Secondary Contact Phone",
+            "Speaks English", "Adults in Family", "Children in Family", "Is Veteran",
+            "Can Pick Up", "Was Chronic", "Has Moved In", "Move In Date", "Has Elevator", "Client Notes",
+            "Date Submitted", "Case Manager", "Admin Notes", "Items",
+        ];
+        const rows = requests.map((r) => {
+            const cm = byId.get(r.caseManagerID);
+            const q = r.client.questions;
+            return [
+                r.client.firstName,
+                r.client.lastName,
+                r.client.email,
+                r.client.phoneNumber,
+                r.client.address.streetAddress,
+                r.client.address.apt ?? "",
+                r.client.address.city,
+                r.client.address.state,
+                r.client.address.zipCode,
+                r.client.hmis,
+                r.client.programName,
+                r.client.secondaryContact.name,
+                r.client.secondaryContact.relationship,
+                r.client.secondaryContact.phone,
+                q.clientSpeaksEnglish != null ? (q.clientSpeaksEnglish ? "Yes" : "No") : "",
+                q.adultsInFamily != null ? String(q.adultsInFamily) : "",
+                q.childrenInFamily != null ? String(q.childrenInFamily) : "",
+                q.isVeteran ?? "",
+                q.canPickUp != null ? (q.canPickUp ? "Yes" : "No") : "",
+                q.wasChronic ?? "",
+                q.hasMovedIn != null ? (q.hasMovedIn ? "Yes" : "No") : "",
+                q.moveInDate ? q.moveInDate.toDate().toLocaleDateString() : "",
+                q.hasElevator != null ? (q.hasElevator ? "Yes" : "No") : "",
+                q.notes ?? "",
+                r.date?.toDate().toLocaleDateString() ?? "",
+                cm ? `${cm.firstName} ${cm.lastName}` : "",
+                r.notes,
+                r.items.map((i) => `${i.name}(${i.quantity})`).join(";"),
+            ].map(escapeCSVField);
+        });
+        const csv = [headers, ...rows].map((row) => row.join(",")).join("\n");
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "new-client-requests.csv";
+        a.click();
+        URL.revokeObjectURL(url);
+    }, []);
+
+    useEffect(() => {
+        if (selectedCRId) {
+            setOnExport(null);
+            return;
+        }
+        setOnExport(() => () => handleExport(filtered, allAccounts));
+        return () => setOnExport(null);
+    }, [filtered, allAccounts, handleExport, setOnExport, selectedCRId]);
 
     const handleConfirm = async () => {
         if (!pendingAction || !selectedCR) return;
@@ -106,35 +213,7 @@ export default function ClientRequestsAdminPage() {
                         </div>
                     </div>
                     <AdminCRTable
-                        clientRequests={clientRequests
-                            .filter((request) => {
-                                if (request.status !== "Not Reviewed") return false;
-                                const norm = (s: string) => s.toLowerCase().replace(/\s/g, "");
-                                const q = norm(searchQuery);
-                                if (!q) return true;
-                                const cm = userById.get(request.caseManagerID);
-                                return [
-                                    `${request.client.firstName}${request.client.lastName}`,
-                                    request.client.email,
-                                    request.client.phoneNumber,
-                                    cm ? `${cm.firstName}${cm.lastName}` : "",
-                                    cm?.email ?? "",
-                                ].some((field) => norm(field).includes(q));
-                            })
-                            .sort((req1, req2) => {
-                                let diff;
-                                if (sortBy === "none") {
-                                    diff = `${req1.client.lastName} ${req1.client.firstName}`.localeCompare(
-                                        `${req2.client.lastName} ${req2.client.firstName}`,
-                                    );
-                                } else if (sortBy === "asc") {
-                                    diff = (req1.date?.seconds ?? 0) - (req2.date?.seconds ?? 0);
-                                } else {
-                                    diff = (req2.date?.seconds ?? 0) - (req1.date?.seconds ?? 0);
-                                }
-                                return diff;
-                            })
-                        }
+                        clientRequests={filtered}
                         openCR={(cr) => setSelectedCRId(cr.id)}
                         onUpdateStatus={async (cr, status) => setClientRequestToast({ ...cr, status })}
                     />

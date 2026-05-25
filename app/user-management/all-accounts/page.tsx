@@ -8,7 +8,7 @@ import { UserData, UserRole } from "@/types/user";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useAllActiveAccounts } from "@/lib/queries/users";
 import { Spinner } from "@/components/ui/spinner";
-import { useExport } from "@/contexts/UserExportContext";
+import { useExport } from "@/contexts/ExportContext";
 
 function escapeCSVField(value: string | null | undefined): string {
     const str = String(value ?? "");
@@ -44,7 +44,7 @@ export default function AllAccountsPage() {
     }, [allAccounts, selectedRoles, searchQuery]);
 
     const handleExport = useCallback((users: UserData[]) => {
-        const headers = ["First Name", "Last Name", "Role", "Email", "Date of Birth"];
+        const headers = ["First Name", "Last Name", "Role", "Email", "Phone Number"];
 
         const rows = users.map((u) =>
             [
@@ -52,7 +52,7 @@ export default function AllAccountsPage() {
                 u.lastName,
                 u.role,
                 u.email,
-                u.dob ? u.dob.toDate().toLocaleDateString() : "",
+                u.phone ?? "",
             ].map(escapeCSVField)
         );
 
