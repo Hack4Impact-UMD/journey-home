@@ -57,19 +57,25 @@ export function RequestDetailsPage({ client, userRole }: ClientProps) {
                             : secondaryContact.name || secondaryContact.relationship || "—"}
                     </div>
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Speaks/understands English?</div>
-                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.clientSpeaksEnglish ? "Yes" : "No"}</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.clientSpeaksEnglish == null ? "—" : questions.clientSpeaksEnglish ? "Yes" : "No"}</div>
+                    {questions.clientSpeaksEnglish === false && (
+                        <>
+                            <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Preferred language</div>
+                            <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.preferredLanguage || "—"}</div>
+                        </>
+                    )}
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Number of adults in the family</div>
                     <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.adultsInFamily ?? "—"}</div>
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Number of kids in the family</div>
                     <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.childrenInFamily ?? "—"}</div>
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Veteran status</div>
-                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.isVeteran == null ? "—" : questions.isVeteran ? "Yes" : "No"}</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.isVeteran ?? "—"}</div>
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Pick up items at the warehouse?</div>
-                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.canPickUp ? "Yes" : "No"}</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.canPickUp == null ? "—" : questions.canPickUp ? "Yes" : "No"}</div>
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Chronic before housing?</div>
-                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.wasChronic == null ? "—" : questions.wasChronic ? "Yes" : "No"}</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.wasChronic ?? "—"}</div>
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Moved in status</div>
-                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.hasMovedIn ? "Yes" : "No"}</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.hasMovedIn == null ? "—" : questions.hasMovedIn ? "Yes" : "No"}</div>
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Moved in date</div>
                     <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">
                         {questions.moveInDate ? questions.moveInDate.toDate().toLocaleDateString() : "N/A"}
@@ -91,7 +97,7 @@ export function RequestDetailsPage({ client, userRole }: ClientProps) {
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Apt, unit, etc.</div>
                     <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{address.apt ?? "—"}</div>
                     <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Working elevator?</div>
-                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.hasElevator ? "Yes" : "No"}</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{questions.hasElevator == null ? "—" : questions.hasElevator ? "Yes" : "No"}</div>
                 </div>
             </div>
 

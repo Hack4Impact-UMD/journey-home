@@ -12,13 +12,13 @@ export default function Step4Confirmation() {
           alt="Journey Home Logo"
           height={96}
           width={350}
-          className="h-24 w-auto"
+          className="h-16 md:h-24 w-auto"
         />
       </div>
 
       <div className="max-w-2xl mx-auto">
         <p className="text-gray-900 leading-relaxed">
-          We have received your request! You can expect to hear back from us within 2 business days. Thank you so much for your help!
+          We have received your request! You can expect to hear back from us soon. Thank you so much for your help!
         </p>
 
         <div className="mt-12">

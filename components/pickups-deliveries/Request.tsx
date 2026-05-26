@@ -13,7 +13,7 @@ type RequestProps = {
 
 export function getTotalItems(donation: Task) {
   if ("donor" in donation) {
-    return donation.items.filter(item => item.status === "Approved").length;
+    return donation.items.filter(item => item.status === "Approved").reduce((sum, item) => sum + item.item.quantity, 0);
   } else {
     return donation.items.reduce((sum, item) => sum + (item.quantity), 0);
   }
@@ -25,7 +25,7 @@ export function countItemsInRequest(donation: Task) {
     if ("donor" in donation) {
         donation.items.filter(item => item.status === "Approved").forEach(item => {
             const name = item.item.name;
-            counts[name] = (counts[name] || 0) + 1;
+            counts[name] = (counts[name] || 0) + item.item.quantity;
         });
     } else if ("client" in donation) {
         donation.items.forEach(item => {
@@ -94,7 +94,7 @@ export default function PickupDeliveryCard({ donation }: RequestProps) {
                 <div className="p-2">
                     <div className="text-md font-bold">Contact  </div>
                     <div className="text-sm break-words">
-                        <a href={`mailto:${email}`} className="flex flex-row items-center gap-1">{email} <EmailIcon/></a>
+                        {email && <a href={`mailto:${email}`} className="flex flex-row items-center gap-1">{email} <EmailIcon/></a>}
                         <a href={`tel:${phoneNumber}`} className="flex flex-row items-center gap-1">{phoneNumber} < PhoneIcon/></a>  
                     </div>
                 </div>

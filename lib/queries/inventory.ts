@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { v4 as uuidv4 } from "uuid";
 import { InventoryCategory, InventoryChange } from "@/types/inventory";
-import { getAllInventoryCategories, WAREHOUSE_COLLECTION } from "../services/inventory";
+import { getAllInventoryCategories, deleteInventoryCategory, WAREHOUSE_COLLECTION } from "../services/inventory";
 import { WAREHOUSE_HISTORY_COLLECTION } from "../services/warehouseHistory";
 import { db } from "../firebase";
 import { doc, getDoc, writeBatch, Timestamp } from "firebase/firestore";
@@ -33,7 +34,7 @@ export function useInventoryCategories() {
 
             if (category.quantity !== oldQuantity) {
                 const newChange: InventoryChange = {
-                    id: crypto.randomUUID(),
+                    id: uuidv4(),
                     userId,
                     timestamp: Timestamp.now(),
                     change: {
@@ -76,6 +77,25 @@ export function useInventoryCategories() {
         },
     });
 
+    const deleteMutation = useMutation({
+        mutationFn: async (categoryId: string) => {
+            await deleteInventoryCategory(categoryId);
+        },
+        onMutate: async (categoryId) => {
+            await queryClient.cancelQueries({ queryKey: ["inventoryCategories"] });
+            const prevData = queryClient.getQueryData<InventoryCategory[]>(["inventoryCategories"]);
+            queryClient.setQueryData(["inventoryCategories"], (oldData: InventoryCategory[] | undefined) =>
+                oldData ? oldData.filter((c) => c.id !== categoryId) : []
+            );
+            return { prevData };
+        },
+        onError: (_, __, context) => {
+            if (context?.prevData) {
+                queryClient.setQueryData(["inventoryCategories"], context.prevData);
+            }
+        },
+    });
+
     const setInventoryCategory = (category: InventoryCategory, userId: string, revertedChange?: InventoryChange) =>
         setMutation.mutateAsync({ category, userId, revertedChange });
 
@@ -89,10 +109,21 @@ export function useInventoryCategories() {
         await promise;
     };
 
+    const deleteInventoryCategoryWithToast = async (categoryId: string) => {
+        const promise = deleteMutation.mutateAsync(categoryId);
+        toast.promise(promise, {
+            loading: "Deleting category...",
+            success: "Category deleted.",
+            error: "Error: Couldn't delete category",
+        });
+        await promise;
+    };
+
     return {
         inventoryCategories: query.data ?? [],
         setInventoryCategory,
         setInventoryCategoryWithToast,
+        deleteInventoryCategoryWithToast,
         isMutating: setMutation.isPending,
         isLoading: query.isLoading,
         isFetching: query.isFetching,

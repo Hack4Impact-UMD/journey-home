@@ -11,7 +11,6 @@ interface StepIndicatorProps {
 }
 
 export default function StepIndicator({ currentStep, steps }: StepIndicatorProps) {
-
   return (
     <div className="flex items-center justify-center gap-4 mb-8">
       {steps.map((step, index) => {
@@ -19,12 +18,12 @@ export default function StepIndicator({ currentStep, steps }: StepIndicatorProps
         const isCompleted = currentStep > step.number;
 
         return (
-          <div key={step.number} className="flex items-center gap-2">
-            {index !== 0 && <div className={`h-px w-24 ${isCompleted ? "bg-primary" : "bg-gray-200"}`} />}
-            
+          <div key={step.number} className={`flex items-center gap-2 ${!isActive ? "max-md:hidden" : ""}`}>
+            {index !== 0 && <div className={`h-px w-24 md:block hidden ${isCompleted ? "bg-primary" : "bg-gray-200"}`} />}
+
             <div className="flex items-center gap-2">
               <div
-                className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
                   isActive
                     ? "bg-primary text-white"
                     : isCompleted
@@ -51,11 +50,9 @@ export default function StepIndicator({ currentStep, steps }: StepIndicatorProps
                   <span className="text-sm">{step.number}</span>
                 )}
               </div>
-              
+
               <span className={`text-base ${
-                isActive ? "text-black font-normal" : 
-                isCompleted ? "text-black" : 
-                "text-gray-400"
+                isActive ? "text-black font-normal" : isCompleted ? "text-black" : "text-gray-400"
               }`}>
                 {step.label}
               </span>

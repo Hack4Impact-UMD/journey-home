@@ -42,20 +42,13 @@ function DRContentsTableRow({ item, onOpen }: { item: DonationItem, onOpen: () =
                     {item.item.name}
                 </span>
             </div>
-            <div className="w-[15%] px-4 text-xs">
+            <div className="w-[20%] px-4 text-xs">
                 <Badge
                     text={item.item.category}
                     color="blue"
                 />
             </div>
-            <span className="w-[10%] px-4 text-xs">
-                <Badge text={item.item.size} color={
-                    (item.item.size == "Large") ? "pink" :
-                    (item.item.size == "Medium") ? "purple" :
-                    "yellow"
-                }/>
-            </span>
-            <span className="w-[10%] px-4 text-xs">
+            <span className="w-[15%] px-4 text-xs">
                 <Badge text={item.item.quantity.toString()} color="orange" />
             </span>
             <span className="w-[10%] px-4">

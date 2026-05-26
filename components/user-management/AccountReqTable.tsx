@@ -51,7 +51,7 @@ function AccountReqTableRow({
                 <span>{user.lastName}</span>
             </div>
             <div className="w-[20%] px-4 text-xs">
-                {user.pending && <Badge text={user.pending} color="gray" />}
+                {user.pending && <Badge text={user.pending} color={user.pending === "Admin" ? "light-pink" : "indigo"} />}
             </div>
             <div className="w-[20%] px-4 flex items-center">
                 <span>{user.email}</span>
