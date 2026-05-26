@@ -30,7 +30,7 @@ export default function DonationRequestsPage() {
         ascending: false,
     });
 
-    const { setOnExport } = useExport();
+    const { setExportHandler } = useExport();
 
     const filtered = useMemo(() => {
         return donationRequests
@@ -74,29 +74,33 @@ export default function DonationRequestsPage() {
     }, [donationRequests, searchQuery, searchParams]);
 
     const handleExport = useCallback((requests: DonationRequest[]) => {
-        const headers = ["First Name", "Last Name", "Email", "Phone Number", "Street Address", "Apt", "City", "State", "Zip Code", "First Time Donor", "Can Drop Off", "How Did You Hear", "Responded", "Notes", "Date Submitted", "Items"];
-        const rows = requests.map((r) =>
-            [
-                r.donor.firstName,
-                r.donor.lastName,
-                r.donor.email,
-                r.donor.phoneNumber,
-                r.donor.address.streetAddress,
-                r.donor.address.apt ?? "",
-                r.donor.address.city,
-                r.donor.address.state,
-                r.donor.address.zipCode,
-                r.firstTimeDonor ? "Yes" : "No",
-                r.canDropOff ? "Yes" : "No",
-                r.howDidYouHear,
-                r.responded ? "Yes" : "No",
-                r.notes,
-                r.date.toDate().toLocaleDateString(),
-                r.items.map((di) => `${di.item.category}(${di.item.quantity})-${di.status}`).join(";"),
-            ].map(escapeCSVField)
+        const headers = ["First Name", "Last Name", "Email", "Phone Number", "Street Address", "Apt", "City", "State", "Zip Code", "First Time Donor", "Can Drop Off", "How Did You Hear", "Responded", "Notes", "Date Submitted", "Category", "Quantity", "Item Status"];
+        const rows = requests.flatMap((r) =>
+            r.items.map((di) =>
+                [
+                    r.donor.firstName,
+                    r.donor.lastName,
+                    r.donor.email,
+                    r.donor.phoneNumber,
+                    r.donor.address.streetAddress,
+                    r.donor.address.apt ?? "",
+                    r.donor.address.city,
+                    r.donor.address.state,
+                    r.donor.address.zipCode,
+                    r.firstTimeDonor ? "Yes" : "No",
+                    r.canDropOff ? "Yes" : "No",
+                    r.howDidYouHear,
+                    r.responded ? "Yes" : "No",
+                    r.notes,
+                    r.date.toDate().toLocaleDateString(),
+                    di.item.category,
+                    String(di.item.quantity),
+                    di.status,
+                ].map(escapeCSVField)
+            )
         );
         const csv = [headers, ...rows].map((row) => row.join(",")).join("\n");
-        const blob = new Blob([csv], { type: "text/csv" });
+        const blob = new Blob(["﻿" + csv], { type: "text/csv" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
@@ -107,12 +111,12 @@ export default function DonationRequestsPage() {
 
     useEffect(() => {
         if (selectedDRId) {
-            setOnExport(null);
+            setExportHandler(null);
             return;
         }
-        setOnExport(() => () => handleExport(filtered));
-        return () => setOnExport(null);
-    }, [filtered, handleExport, setOnExport, selectedDRId]);
+        setExportHandler(() => handleExport(filtered));
+        return () => setExportHandler(null);
+    }, [filtered, handleExport, setExportHandler, selectedDRId]);
 
     return selectedDR ? (
         <>

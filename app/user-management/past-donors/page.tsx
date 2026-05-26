@@ -24,7 +24,7 @@ export default function PastDonorsPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [allDonors, setAllDonors] = useState<LocationContact[]>([]);
 
-    const { setOnExport } = useExport();
+    const { setExportHandler } = useExport();
 
     useEffect(() => {
         fetchAllDonors().then(setAllDonors);
@@ -71,7 +71,7 @@ export default function PastDonorsPage() {
 
         const csv = [headers, ...rows].map((r) => r.join(",")).join("\n");
 
-        const blob = new Blob([csv], { type: "text/csv" });
+        const blob = new Blob(["﻿" + csv], { type: "text/csv" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
@@ -81,12 +81,12 @@ export default function PastDonorsPage() {
     }, []);
 
     useEffect(() => {
-        setOnExport(() => () => handleExport(filtered));
+        setExportHandler(() => handleExport(filtered));
 
         return () => {
-            setOnExport(null);
+            setExportHandler(null);
         };
-    }, [filtered, handleExport, setOnExport]);
+    }, [filtered, handleExport, setExportHandler]);
 
     return (
         <>

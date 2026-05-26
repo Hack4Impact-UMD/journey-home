@@ -36,7 +36,7 @@ export default function ClientRequestsCaseManagerPage() {
     const { state: authState } = useAuth();
     const uidCM = authState.userData?.uid;
 
-    const { setOnExport } = useExport();
+    const { setExportHandler } = useExport();
 
     const filtered = useMemo(() => {
         return clientRequests
@@ -74,11 +74,11 @@ export default function ClientRequestsCaseManagerPage() {
             "Secondary Contact Name", "Secondary Contact Relationship", "Secondary Contact Phone",
             "Speaks English", "Adults in Family", "Children in Family", "Is Veteran",
             "Can Pick Up", "Was Chronic", "Has Moved In", "Move In Date", "Has Elevator", "Client Notes",
-            "Date Submitted", "Status", "Items",
+            "Date Submitted", "Status", "Item Name", "Item Quantity",
         ];
-        const rows = requests.map((r) => {
+        const rows = requests.flatMap((r) => {
             const q = r.client.questions;
-            return [
+            const base = [
                 r.client.firstName,
                 r.client.lastName,
                 r.client.email,
@@ -105,11 +105,11 @@ export default function ClientRequestsCaseManagerPage() {
                 q.notes ?? "",
                 r.date?.toDate().toLocaleDateString() ?? "",
                 r.status,
-                r.items.map((i) => `${i.name}(${i.quantity})`).join(";"),
-            ].map(escapeCSVField);
+            ];
+            return r.items.map((i) => [...base, i.name, String(i.quantity)].map(escapeCSVField));
         });
         const csv = [headers, ...rows].map((row) => row.join(",")).join("\n");
-        const blob = new Blob([csv], { type: "text/csv" });
+        const blob = new Blob(["﻿" + csv], { type: "text/csv" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
@@ -120,12 +120,12 @@ export default function ClientRequestsCaseManagerPage() {
 
     useEffect(() => {
         if (selectedCRId) {
-            setOnExport(null);
+            setExportHandler(null);
             return;
         }
-        setOnExport(() => () => handleExport(filtered));
-        return () => setOnExport(null);
-    }, [filtered, handleExport, setOnExport, selectedCRId]);
+        setExportHandler(() => handleExport(filtered));
+        return () => setExportHandler(null);
+    }, [filtered, handleExport, setExportHandler, selectedCRId]);
 
     return (
         <ProtectedRoute allow={["Case Manager"]}>

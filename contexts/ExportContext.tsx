@@ -1,24 +1,30 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useRef, useState, useCallback, ReactNode } from "react";
 
 type ExportContextType = {
-    onExport: (() => void) | null;
-    setOnExport: React.Dispatch<React.SetStateAction<(() => void) | null>>;
+    hasExport: boolean;
+    setExportHandler: (fn: (() => void) | null) => void;
+    triggerExport: () => void;
 };
 
 const ExportContext = createContext<ExportContextType | undefined>(undefined);
 
 export function ExportProvider({ children }: { children: ReactNode }) {
-    const [onExport, setOnExport] = useState<(() => void) | null>(null);
-     
+    const onExportRef = useRef<(() => void) | null>(null);
+    const [hasExport, setHasExport] = useState(false);
+
+    const setExportHandler = useCallback((fn: (() => void) | null) => {
+        onExportRef.current = fn;
+        setHasExport(fn !== null);
+    }, []);
+
+    const triggerExport = useCallback(() => {
+        onExportRef.current?.();
+    }, []);
+
     return (
-        <ExportContext.Provider
-            value={{
-                onExport,
-                setOnExport,
-            }}
-        >
+        <ExportContext.Provider value={{ hasExport, setExportHandler, triggerExport }}>
             {children}
         </ExportContext.Provider>
     );

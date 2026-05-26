@@ -9,16 +9,16 @@ import { Upload } from "lucide-react";
 import { ExportProvider, useExport } from "@/contexts/ExportContext";
 
 function ExportActions() {
-    const { onExport } = useExport();
+    const { hasExport, triggerExport } = useExport();
 
-    if (!onExport) return null;
+    if (!hasExport) return null;
 
     return (
         <div className="flex items-center gap-2 shrink-0">
             <button
                 type="button"
                 className="bg-primary text-white px-3 py-1.5 text-sm flex items-center gap-1.5"
-                onClick={onExport}
+                onClick={triggerExport}
             >
                 <Upload size={16} />
                 Export

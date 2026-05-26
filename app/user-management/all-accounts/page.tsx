@@ -26,7 +26,7 @@ export default function AllAccountsPage() {
     const [selectedAccount, setSelectedAccount] = useState<UserData | null>(null);
 
     const { allAccounts, editAccount, refetch, isLoading } = useAllActiveAccounts();
-    const { setOnExport } = useExport();
+    const { setExportHandler } = useExport();
 
     const filteredUsers = useMemo(() => {
         return allAccounts
@@ -58,7 +58,7 @@ export default function AllAccountsPage() {
 
         const csv = [headers, ...rows].map((r) => r.join(",")).join("\n");
 
-        const blob = new Blob([csv], { type: "text/csv" });
+        const blob = new Blob(["﻿" + csv], { type: "text/csv" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
@@ -67,12 +67,12 @@ export default function AllAccountsPage() {
         URL.revokeObjectURL(url);
     }, []);
     useEffect(() => {
-        setOnExport(() => () => handleExport(filteredUsers));
+        setExportHandler(() => handleExport(filteredUsers));
 
         return () => {
-            setOnExport(null);
+            setExportHandler(null);
         };
-    }, [filteredUsers, handleExport, setOnExport]);
+    }, [filteredUsers, handleExport, setExportHandler]);
 
     return (
         <>
