@@ -5,11 +5,11 @@ import { usePageTitle } from '@/lib/usePageTitle';
 import { useRouter } from 'next/navigation';
 import LongButton from '@/components/auth/LongButton';
 import InputBox from '../../components/auth/InputBox';
-import { FirebaseError } from 'firebase/app';
 import { useAuth } from '@/contexts/AuthContext';
+import { authErrorMessage } from '@/lib/utils/auth-errors';
 
 export default function LoginPage() {
-  usePageTitle("Login | Journey Home");
+  usePageTitle("Login – Journey Home");
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -28,7 +28,7 @@ export default function LoginPage() {
       router.push("/");
     } catch (e: unknown) {
       console.error("Login failed:", e);
-      setError((e as FirebaseError).message);
+      setError(authErrorMessage(e));
     }
     setLoading(false);
   };
@@ -48,7 +48,7 @@ export default function LoginPage() {
           onSubmit={handleLogin}
           className="w-full max-w-[24em] h-[35em] flex flex-col text-black space-y-[1.2em]"
         >
-          <div className="flex justify-center">
+          <div className="flex justify-center cursor-pointer" onClick={() => router.push('/login')}>
             <img
               src="/journey-home-logo.png"
               alt="Journey Home"
@@ -90,7 +90,10 @@ export default function LoginPage() {
             </div>
 
             <div className="w-full flex justify-end mt-2 mb-8">
-              <p className="mb-4 cursor-pointer hover:underline text-sm">
+              <p
+                className="mb-4 cursor-pointer hover:underline text-sm"
+                onClick={() => router.push('/forgot-password')}
+              >
                 Forgot Password?
               </p>
             </div>

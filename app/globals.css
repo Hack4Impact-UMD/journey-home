@@ -108,7 +108,7 @@
 }
 
 body {
-  font: var(--font-family-roboto);
+  font-family: var(--font-roboto);
   color: var(--color-text-1);
 }
 

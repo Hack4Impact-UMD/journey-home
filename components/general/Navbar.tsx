@@ -26,7 +26,7 @@ export default function Navbar({ pageTitle }: { pageTitle?: string }) {
     const auth = useAuth();
     const [drawerOpen, setDrawerOpen] = useState(false);
 
-    usePageTitle(pageTitle ? `${pageTitle} | Journey Home` : "Journey Home");
+    usePageTitle(pageTitle ? `${pageTitle} – Journey Home` : "Journey Home");
 
     const navLinks = (isMobile: boolean) => (
         <>

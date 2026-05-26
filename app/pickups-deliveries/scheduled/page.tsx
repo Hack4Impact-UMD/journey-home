@@ -24,6 +24,7 @@ export default function ScheduledTasksPage() {
     const approvedItems = useMemo(
         () => donationRequests.filter(
             (dr) => dr.associatedTimeBlockID !== null &&
+                    !dr.canDropOff &&
                     dr.items.every((item) => item.status === "Approved" || item.status === "Denied") &&
                     dr.items.some((item) => item.status === "Approved")
         ),
@@ -32,7 +33,7 @@ export default function ScheduledTasksPage() {
 
     const deliveryItems = useMemo(
         () => clientRequests.filter(
-            (cr) => cr.associatedTimeBlockID !== null && cr.status === "Approved"
+            (cr) => cr.associatedTimeBlockID !== null && cr.status === "Approved" && !cr.client.questions.canPickUp
         ),
         [clientRequests]
     );
