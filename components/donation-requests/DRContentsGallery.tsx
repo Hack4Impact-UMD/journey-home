@@ -30,43 +30,41 @@ function DRGalleryCard({
 }) {
     return (
         <div
-            className="w-[17.59em] rounded-sm border border-light-border h-[22.8em] shadow-md hover:shadow-lg cursor-pointer flex flex-col"
+            className="rounded-sm border border-light-border shadow-md hover:shadow-lg cursor-pointer flex flex-col items-center"
             onClick={onOpen}
         >
-            <div className="px-3 pt-3">
-                {item.item.photos.length > 0 ? (
-                    <img
-                        src={item.item.photos[0].url}
-                        alt={item.item.name}
-                        className="w-full aspect-square object-cover rounded-sm"
-                    />
-                ) : (
-                    <div className="w-full aspect-square flex items-center justify-center bg-light-border rounded-sm">
-                        No Image
-                    </div>
-                )}
-            </div>
-            <div className="w-full px-4 mt-1 flex flex-col">
+            {item.item.photos.length > 0 ? (
+                <img
+                    src={item.item.photos[0].url}
+                    alt={item.item.name}
+                    className="h-[16em] w-[16em] object-cover rounded-sm m-3"
+                />
+            ) : (
+                <div className="h-[16em] w-[16em] flex items-center justify-center bg-light-border m-3 rounded-sm">
+                    No Image
+                </div>
+            )}
+            <div className="w-full px-3 flex flex-col">
                 <span className="font-semibold text-sm truncate w-full">{item.item.name}</span>
                 <div className="text-xs flex flex-wrap gap-1 mt-1">
                     <Badge text={item.item.category} color="blue" />
+                    <Badge text={item.item.quantity.toString()} color="orange" />
                     <Badge
-                        text={item.item.size}
+                        text={item.status}
                         color={
-                            item.item.size === "Large"
-                                ? "pink"
-                                : item.item.size === "Medium"
-                                  ? "purple"
-                                  : "yellow"
+                            item.status === "Approved"
+                                ? "green"
+                                : item.status === "Denied"
+                                  ? "red"
+                                  : "gray"
                         }
                     />
-                    <Badge text={item.item.quantity.toString()} color="orange" />
                 </div>
-                <span className="text-xs text-[#818181] mt-2">
+                <span className="text-xs text-[#818181] mt-2 mb-2">
                     {item.item.dateAdded.toDate().toLocaleDateString("en-US", {
-                        month: "numeric",
-                        day: "numeric",
-                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        year: "2-digit",
                     })}
                 </span>
             </div>

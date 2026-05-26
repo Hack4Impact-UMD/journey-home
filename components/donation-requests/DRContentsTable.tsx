@@ -13,9 +13,8 @@ export function DRContentsTable({
         <div className="w-full min-w-4xl flex flex-col">
             <div className="h-12 bg-[#FAFAFB] border-light-border border flex items-center font-family-roboto font-bold text-sm text-text-1 shrink-0">
                 <span className="w-[30%] border-l-2 border-light-border px-4">Name</span>
-                <span className="w-[15%] border-l-2 border-light-border px-4">Category</span>
-                <span className="w-[10%] border-l-2 border-light-border px-4">Size</span>
-                <span className="w-[10%] border-l-2 border-light-border px-4">Quantity</span>
+                <span className="w-[20%] border-l-2 border-light-border px-4">Category</span>
+                <span className="w-[15%] border-l-2 border-light-border px-4">Quantity</span>
                 <span className="w-[10%] border-l-2 border-light-border px-4">Date</span>
                 <span className="w-[25%] border-l-2 border-light-border px-4">Status</span>
             </div>
@@ -43,10 +42,7 @@ function DRContentsTableRow({ item, onOpen }: { item: DonationItem, onOpen: () =
                 </span>
             </div>
             <div className="w-[20%] px-4 text-xs">
-                <Badge
-                    text={item.item.category}
-                    color="blue"
-                />
+                <Badge text={item.item.category} color="blue" />
             </div>
             <span className="w-[15%] px-4 text-xs">
                 <Badge text={item.item.quantity.toString()} color="orange" />

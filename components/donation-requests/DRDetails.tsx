@@ -1,4 +1,5 @@
 import { DonationRequest } from "@/types/donations";
+import { Badge } from "@/components/inventory/Badge";
 
 function SectionHeader({ title }: { title: string }) {
     return (
@@ -12,7 +13,7 @@ function DetailRow({ label, value }: { label: string; value: string }) {
     return (
         <>
             <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">{label}</div>
-            <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border">{value || "—"}</div>
+            <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border whitespace-pre-wrap">{value || "—"}</div>
         </>
     );
 }
@@ -41,7 +42,10 @@ export function DRDetails({ dr }: { dr: DonationRequest }) {
                 <div className="grid grid-cols-2">
                     <DetailRow label="Previously donated" value={dr.firstTimeDonor ? "No" : "Yes"} />
                     <DetailRow label="Heard about Journey Home through" value={dr.howDidYouHear} />
-                    <DetailRow label="Able to drop off items" value={dr.canDropOff ? "Yes" : "No"} />
+                    <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Able to drop off items</div>
+                    <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border text-sm">
+                        <Badge text={dr.canDropOff ? "Yes" : "No"} color={dr.canDropOff ? "green" : "red"} />
+                    </div>
                     <DetailRow label="Notes/comments" value={dr.notes} />
                 </div>
             </div>
