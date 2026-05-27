@@ -29,9 +29,12 @@ export default function ShiftTaskSummary() {
         return startMs <= nowMs && nowMs < endMs;
     });
 
-    const selectedShift = activeShift ?? [...todayShifts].sort(
-        (a, b) => a.startTime.toDate().getTime() - b.startTime.toDate().getTime()
-    )[0];
+    const selectedShift = activeShift ?? [...todayShifts]
+        .filter((tb) => {
+            const endMs = tb.endTime?.toDate().getTime() ?? (tb.startTime.toDate().getTime() + 3600000);
+            return endMs > nowMs;
+        })
+        .sort((a, b) => a.startTime.toDate().getTime() - b.startTime.toDate().getTime())[0];
 
     if (isLoading) {
         return (

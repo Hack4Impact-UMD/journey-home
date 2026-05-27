@@ -27,11 +27,10 @@ export default function VolunteerPage() {
         }
     };
 
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
+    const now = new Date();
 
     const filteredTimeBlocks = timeBlocks.filter((tb) => {
-        if (tb.startTime.toDate() < todayStart) return false;
+        if (tb.startTime.toDate() < now) return false;
         if (!tb.published) return false;
 
         const type = tb.type === "Pickup/Delivery" ? "Pickups / Deliveries" : "Warehouse";
