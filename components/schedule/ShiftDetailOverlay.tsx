@@ -7,12 +7,14 @@ import {
   TrashIcon,
   XIcon,
   XCircleIcon,
+  PlusCircleIcon,
   UserIcon,
   MapPinIcon,
   CubeIcon,
   SteeringWheelIcon,
   UsersThreeIcon,
 } from "@phosphor-icons/react";
+import { SearchBox } from "../inventory/SearchBox";
 import { TimeBlock, Task } from "../../types/schedule";
 import { DonationRequest } from "../../types/donations";
 import { ClientRequest } from "../../types/client-requests";
@@ -59,6 +61,9 @@ export function ShiftDetailOverlay({ timeBlock, onClose }: Props) {
     groupName: string;
     name: string;
   } | null>(null);
+  const [addVolunteerGroup, setAddVolunteerGroup] = useState<string | null>(null);
+  const [volunteerSearch, setVolunteerSearch] = useState("");
+  const [selectedVolunteerUids, setSelectedVolunteerUids] = useState<string[]>([]);
 
   // Always derive from live cache so optimistic updates (toggle, volunteer removal) reflect immediately
   const liveTimeBlock = timeBlock
@@ -69,6 +74,9 @@ export function ShiftDetailOverlay({ timeBlock, onClose }: Props) {
     setShowEdit(false);
     setConfirmDelete(false);
     setRemoveTarget(null);
+    setAddVolunteerGroup(null);
+    setVolunteerSearch("");
+    setSelectedVolunteerUids([]);
   }, [timeBlock]);
 
   useEffect(() => {
@@ -79,11 +87,13 @@ export function ShiftDetailOverlay({ timeBlock, onClose }: Props) {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && !confirmDelete && !removeTarget) onClose();
+      if (e.key !== "Escape") return;
+      if (addVolunteerGroup) { setAddVolunteerGroup(null); setVolunteerSearch(""); setSelectedVolunteerUids([]); }
+      else if (!confirmDelete && !removeTarget) onClose();
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [onClose, confirmDelete, removeTarget]);
+  }, [onClose, confirmDelete, removeTarget, addVolunteerGroup]);
 
   if (!liveTimeBlock) return null;
 
@@ -100,6 +110,22 @@ export function ShiftDetailOverlay({ timeBlock, onClose }: Props) {
   const startDate = liveTimeBlock.startTime.toDate();
   const endDate = liveTimeBlock.endTime.toDate();
   const isPickupType = liveTimeBlock.type === "Pickup/Delivery";
+
+  const currentGroup = addVolunteerGroup
+    ? (liveTimeBlock.volunteerGroups.find(g => g.name === addVolunteerGroup) ?? null)
+    : null;
+  const remainingSpots = currentGroup
+    ? currentGroup.maxNum - currentGroup.volunterIDs.length - selectedVolunteerUids.length
+    : 0;
+  const allAssignedUids = new Set(liveTimeBlock.volunteerGroups.flatMap(g => g.volunterIDs));
+  const volunteerSearchResults = volunteerSearch && currentGroup && remainingSpots > 0
+    ? allAccounts.filter(u =>
+        u.role === "Volunteer" &&
+        !allAssignedUids.has(u.uid) &&
+        !selectedVolunteerUids.includes(u.uid) &&
+        `${u.firstName} ${u.lastName}`.toLowerCase().includes(volunteerSearch.toLowerCase())
+      )
+    : null;
 
   const handleTogglePublished = async (checked: boolean) => {
     await setTimeblockToast({ ...liveTimeBlock, published: checked });
@@ -121,17 +147,30 @@ export function ShiftDetailOverlay({ timeBlock, onClose }: Props) {
     setRemoveTarget(null);
   };
 
+  const handleAddVolunteer = async () => {
+    if (!selectedVolunteerUids.length || !addVolunteerGroup) return;
+    const updatedGroups = liveTimeBlock.volunteerGroups.map(g =>
+      g.name === addVolunteerGroup
+        ? { ...g, volunterIDs: [...g.volunterIDs, ...selectedVolunteerUids.filter(uid => !g.volunterIDs.includes(uid))] }
+        : g
+    );
+    await setTimeblockToast({ ...liveTimeBlock, volunteerGroups: updatedGroups });
+    setAddVolunteerGroup(null);
+    setVolunteerSearch("");
+    setSelectedVolunteerUids([]);
+  };
+
   return createPortal(
     <>
       <div
         className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
         onClick={onClose}
       >
-        <div
-          ref={overlayRef}
-          className="w-[25em] h-[37.5em] rounded-[0.625em] bg-[#FBFCFD] shadow-2xl flex flex-col px-6 py-4.5 overflow-hidden"
-          onClick={e => e.stopPropagation()}
-        >
+        <div className="flex items-start gap-4" onClick={e => e.stopPropagation()}>
+          <div
+            ref={overlayRef}
+            className="w-[25em] h-[37.5em] rounded-[0.625em] bg-[#FBFCFD] shadow-2xl flex flex-col px-6 py-4.5 overflow-hidden"
+          >
           {/* Icon row */}
           <div className="flex justify-end gap-3 shrink-0">
             <button
@@ -197,7 +236,7 @@ export function ShiftDetailOverlay({ timeBlock, onClose }: Props) {
 
               {/* Volunteer groups */}
               {liveTimeBlock.volunteerGroups.length === 0 ? (
-                <p className="text-sm text-gray-400 italic">No volunteer groups</p>
+                <p className="text-sm text-gray-400">No volunteer groups</p>
               ) : (
                 <div className="space-y-4">
                   {liveTimeBlock.volunteerGroups.map(group => {
@@ -212,31 +251,36 @@ export function ShiftDetailOverlay({ timeBlock, onClose }: Props) {
                           <GroupIcon className="w-4 h-4 shrink-0" />
                           {group.name}&nbsp;|&nbsp;{group.volunterIDs.length}/{group.maxNum}
                         </p>
-                        {groupVolunteers.length === 0 ? (
-                          <p className="text-xs text-gray-400 italic mt-2">No one signed up</p>
-                        ) : (
-                          <div className="flex flex-wrap gap-2 mt-2">
-                            {groupVolunteers.map(v => (
-                              <span
-                                key={v.uid}
-                                className="inline-flex items-center gap-1 py-1 px-2.5 rounded-xs bg-[#D4F0ED] text-[#003530] text-sm"
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {groupVolunteers.map(v => (
+                            <span
+                              key={v.uid}
+                              className="inline-flex items-center gap-1 py-1 px-2.5 rounded-xs bg-[#D4F0ED] text-[#003530] text-sm"
+                            >
+                              {v.firstName} {v.lastName}
+                              <button
+                                onClick={() => setRemoveTarget({
+                                  userId: v.uid,
+                                  groupName: group.name,
+                                  name: `${v.firstName} ${v.lastName}`,
+                                })}
+                                className="flex items-center"
+                                aria-label={`Remove ${v.firstName} ${v.lastName}`}
                               >
-                                {v.firstName} {v.lastName}
-                                <button
-                                  onClick={() => setRemoveTarget({
-                                    userId: v.uid,
-                                    groupName: group.name,
-                                    name: `${v.firstName} ${v.lastName}`,
-                                  })}
-                                  className="flex items-center"
-                                  aria-label={`Remove ${v.firstName} ${v.lastName}`}
-                                >
-                                  <XCircleIcon className="h-[1em] w-[1em]" />
-                                </button>
-                              </span>
-                            ))}
-                          </div>
-                        )}
+                                <XCircleIcon className="h-[1em] w-[1em]" />
+                              </button>
+                            </span>
+                          ))}
+                          {group.volunterIDs.length < group.maxNum && (
+                            <button
+                              onClick={() => { setAddVolunteerGroup(group.name); setVolunteerSearch(""); setSelectedVolunteerUids([]); }}
+                              className="inline-flex items-center gap-1 py-1 px-2.5 rounded-xs bg-gray-100 text-black text-sm hover:opacity-70 transition-opacity"
+                            >
+                              Add volunteer
+                              <PlusCircleIcon className="h-[1em] w-[1em]" />
+                            </button>
+                          )}
+                        </div>
                       </div>
                     );
                   })}
@@ -252,7 +296,7 @@ export function ShiftDetailOverlay({ timeBlock, onClose }: Props) {
                 <p className="text-sm font-medium text-[#565656]">Shift Details</p>
 
                 {liveTimeBlock.tasks.length === 0 ? (
-                  <p className="text-sm text-gray-400 italic mt-3">No tasks assigned</p>
+                  <p className="text-sm italic text-gray-400 mt-3">No tasks assigned</p>
                 ) : (
                   <div className="space-y-4 mt-3">
                     {liveTimeBlock.tasks.map((task, idx) => {
@@ -334,6 +378,73 @@ export function ShiftDetailOverlay({ timeBlock, onClose }: Props) {
 
             </div>
           </div>
+          </div>
+
+          {/* Volunteer selection panel — appears to the right of the shift card */}
+          {addVolunteerGroup && (
+            <div className="w-56 shrink-0 bg-[#FBFCFD] rounded-[0.625em] shadow-2xl flex flex-col overflow-hidden">
+              {/* Header */}
+              <div className="px-6 py-4 shrink-0 flex items-center justify-between">
+                <h2 className="text-xl font-medium font-family-roboto text-[#565656]">Select volunteers</h2>
+                <button onClick={() => { setAddVolunteerGroup(null); setVolunteerSearch(""); setSelectedVolunteerUids([]); }} className="text-slate-400 hover:opacity-60 transition-opacity">
+                  <XIcon className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              {/* Body */}
+              <div className="px-6 pb-4">
+                <SearchBox value={volunteerSearch} onChange={setVolunteerSearch} onSubmit={() => {}} inputClassName="w-36" />
+                {volunteerSearch && (
+                  remainingSpots <= 0 ? (
+                    <p className="mt-2 text-xs text-gray-400 px-1">Group is full</p>
+                  ) : volunteerSearchResults && volunteerSearchResults.length > 0 ? (
+                    <div className="mt-2 border border-light-border rounded-xs max-h-36 overflow-y-auto">
+                      {volunteerSearchResults.map(u => (
+                        <button
+                          key={u.uid}
+                          onClick={() => setSelectedVolunteerUids(prev => [...prev, u.uid])}
+                          className="w-full text-left px-3 py-1.5 text-sm text-text-1 hover:bg-gray-50 transition-colors"
+                        >
+                          {u.firstName} {u.lastName}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="mt-2 text-xs text-gray-400 px-1">No volunteers found</p>
+                  )
+                )}
+                {selectedVolunteerUids.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {selectedVolunteerUids.map(uid => {
+                      const u = allAccounts.find(a => a.uid === uid);
+                      return (
+                        <span key={uid} className="inline-flex items-center gap-1 py-1 px-2.5 rounded-xs bg-[#D4F0ED] text-[#003530] text-sm">
+                          <span className="max-w-28 truncate">{u ? `${u.firstName} ${u.lastName}` : uid}</span>
+                          <button
+                            onClick={() => setSelectedVolunteerUids(prev => prev.filter(id => id !== uid))}
+                            className="flex items-center"
+                            aria-label={`Deselect ${u ? `${u.firstName} ${u.lastName}` : uid}`}
+                          >
+                            <XCircleIcon className="h-[1em] w-[1em]" />
+                          </button>
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+              {/* Footer */}
+              <div className="flex justify-end px-6 py-4 shrink-0">
+                <button
+                  onClick={handleAddVolunteer}
+                  disabled={!selectedVolunteerUids.length}
+                  className="h-8 px-6 bg-primary text-white text-sm rounded-sm hover:opacity-90 transition-opacity disabled:opacity-40"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
 
