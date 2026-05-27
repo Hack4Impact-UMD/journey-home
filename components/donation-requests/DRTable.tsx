@@ -20,7 +20,7 @@ export function DRTable({
     showResponded?: boolean;
 }) {
     return (
-        <div className="w-full min-w-3xl h-full flex flex-col">
+        <div className="w-full min-w-5xl h-full flex flex-col">
             <div className="h-12 bg-[#FAFAFB] border-light-border border flex items-center font-family-roboto font-bold text-sm text-text-1 shrink-0">
                 {showResponded ? (
                     <>
