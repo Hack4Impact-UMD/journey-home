@@ -133,7 +133,7 @@ function DRTableRow({
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </span>
-                    <span className="w-[13.70%] px-4">
+                    <span className="w-[13.70%] px-4 text-xs">
                         <Badge
                             text={request.canDropOff ? "Can Drop Off" : "Needs Pickup"}
                             color={request.canDropOff ? "indigo" : "orange"}
