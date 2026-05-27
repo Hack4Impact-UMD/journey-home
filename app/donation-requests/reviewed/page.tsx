@@ -3,11 +3,15 @@
 import { DRContentsTable } from "@/components/donation-requests/DRContentsTable";
 import { DRTable } from "@/components/donation-requests/DRTable";
 import { ItemReviewModal } from "@/components/donation-requests/ItemReviewModal";
+import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { SortOption } from "@/components/inventory/SortOption";
 import { useDonationRequests } from "@/lib/queries/donation-requests";
 import { DonationItem, DonationSearchParams } from "@/types/donations";
 import { useState } from "react";
+
+type AcquisitionType = "Can Drop Off" | "Needs Pickup";
+const ALL_ACQUISITION_TYPES: AcquisitionType[] = ["Can Drop Off", "Needs Pickup"];
 
 export default function ReviewedRequestsPage() {
     const { donationRequests, setDonationRequestToast, refetch } =
@@ -22,6 +26,7 @@ export default function ReviewedRequestsPage() {
         sortBy: "Date",
         ascending: false,
     });
+    const [acquisitionFilter, setAcquisitionFilter] = useState<AcquisitionType[]>([...ALL_ACQUISITION_TYPES]);
 
     return selectedDR ? (
         <>
@@ -50,17 +55,6 @@ export default function ReviewedRequestsPage() {
                     >
                         Back
                     </button>
-                    <SearchBox
-                        value={""}
-                        onChange={() => {}}
-                        onSubmit={() => {}}
-                    />
-                    <SortOption
-                        label="Date"
-                        onChange={() => {}}
-                        status="none"
-                    />
-                    <SortOption label="Qnt" onChange={() => {}} status="none" />
                 </div>
 
                 <span className="font-bold py-4.5">
@@ -114,6 +108,12 @@ export default function ReviewedRequestsPage() {
                             }));
                         }}
                     />
+                    <DropdownMultiselect
+                        label="Acquisition"
+                        options={ALL_ACQUISITION_TYPES}
+                        selected={acquisitionFilter}
+                        setSelected={setAcquisitionFilter}
+                    />
                 </div>
             </div>
             <div className="flex-1 overflow-auto min-h-0">
@@ -130,6 +130,9 @@ export default function ReviewedRequestsPage() {
                                 donItem.status === "Denied",
                         );
                         if (!completedRequest) return false;
+
+                        const acquisitionType: AcquisitionType = request.canDropOff ? "Can Drop Off" : "Needs Pickup";
+                        if (!acquisitionFilter.includes(acquisitionType)) return false;
 
                         //status depends on the donationitems, need to map through that array to define the status.
                         if (searchParams.status.length != 0) {
