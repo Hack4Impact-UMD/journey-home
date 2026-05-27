@@ -3,9 +3,9 @@
 import { ProtectedRoute } from "@/components/general/ProtectedRoute";
 import Navbar from "@/components/general/Navbar";
 import { ReactNode } from "react";
+import { StockSidebar } from "@/components/inventory/StockSidebar";
 
 export default function InventoryLayout({ children }: { children: ReactNode }) {
-
     return (
         <ProtectedRoute allow={["Admin"]}>
             <div className="h-full w-full flex flex-col font-family-roboto overflow-hidden">
@@ -20,6 +20,7 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
                         </div>
                     </div>
                 </div>
+                <StockSidebar />
             </div>
         </ProtectedRoute>
     );
