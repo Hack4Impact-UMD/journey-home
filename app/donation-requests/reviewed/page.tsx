@@ -14,6 +14,9 @@ import { DonationItem, DonationSearchParams } from "@/types/donations";
 import { ListIcon, SquaresFourIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 
+type AcquisitionType = "Can Drop Off" | "Needs Pickup";
+const ALL_ACQUISITION_TYPES: AcquisitionType[] = ["Can Drop Off", "Needs Pickup"];
+
 export default function ReviewedRequestsPage() {
     const { donationRequests, setDonationRequestToast, refetch } =
         useDonationRequests();
@@ -27,6 +30,7 @@ export default function ReviewedRequestsPage() {
         sortBy: "Date",
         ascending: false,
     });
+    const [acquisitionFilter, setAcquisitionFilter] = useState<AcquisitionType[]>([...ALL_ACQUISITION_TYPES]);
     const [viewMode, setViewMode] = useState<"list" | "gallery">("gallery");
 
     const [itemSearchQuery, setItemSearchQuery] = useState<string>("");
@@ -195,6 +199,12 @@ export default function ReviewedRequestsPage() {
                             }));
                         }}
                     />
+                    <DropdownMultiselect
+                        label="Acquisition"
+                        options={ALL_ACQUISITION_TYPES}
+                        selected={acquisitionFilter}
+                        setSelected={setAcquisitionFilter}
+                    />
                 </div>
             </div>
             <div className="flex-1 overflow-auto min-h-0">
@@ -211,6 +221,9 @@ export default function ReviewedRequestsPage() {
                                     donItem.status === "Denied",
                             );
                             if (!completedRequest) return false;
+
+                            const acquisitionType: AcquisitionType = request.canDropOff ? "Can Drop Off" : "Needs Pickup";
+                            if (!acquisitionFilter.includes(acquisitionType)) return false;
 
                             if (searchParams.status.length != 0) {
                                 if (!searchParams.status.includes("Finished")) {

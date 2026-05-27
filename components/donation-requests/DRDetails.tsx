@@ -42,9 +42,9 @@ export function DRDetails({ dr }: { dr: DonationRequest }) {
                 <div className="grid grid-cols-2">
                     <DetailRow label="Previously donated" value={dr.firstTimeDonor ? "No" : "Yes"} />
                     <DetailRow label="Heard about Journey Home through" value={dr.howDidYouHear} />
-                    <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Able to drop off items</div>
+                    <div className="font-bold text-sm text-black pl-4 min-h-10 bg-[#FAFAFB] flex items-start py-2 border-t border-r border-light-border">Acquisition</div>
                     <div className="pl-4 min-h-10 flex items-start py-2 border-t border-light-border text-sm">
-                        <Badge text={dr.canDropOff ? "Yes" : "No"} color={dr.canDropOff ? "green" : "red"} />
+                        <Badge text={dr.canDropOff ? "Can Drop Off" : "Needs Pickup"} color={dr.canDropOff ? "indigo" : "orange"} />
                     </div>
                     <DetailRow label="Notes/comments" value={dr.notes} />
                 </div>
