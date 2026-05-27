@@ -150,7 +150,7 @@ function DRTableRow({
                     <span className="w-[12.09%] px-4 truncate">{total}</span>
                     <span className="w-[18.78%] px-4 flex items-center gap-2">
                         <span className="shrink-0">{numReviewed}/{total}</span>
-                        <div className="flex-1 h-1.5 bg-[#F5F5F5] rounded-full overflow-hidden shrink-0">
+                        <div className="flex-1 h-1.5 bg-[#F5F5F5] rounded-full overflow-hidden shrink-0 outline outline-[#d9d9d9]">
                             <div
                                 className="h-full rounded-full transition-all duration-300"
                                 style={{ width: `${Math.min(reviewPct, 100)}%`, backgroundColor: "#02AFC7" }}
