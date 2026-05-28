@@ -13,7 +13,8 @@ export function formatTime(date: Date): string {
 }
 
 export function escapeCSVField(value: string | null | undefined): string {
-    const str = String(value ?? "");
+    let str = String(value ?? "");
+    if (/^[=+\-@]/.test(str)) str = "'" + str;
     if (str.includes(",") || str.includes('"') || str.includes("\n") || str.includes("\r")) {
         return `"${str.replace(/"/g, '""')}"`;
     }
