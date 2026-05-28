@@ -5,11 +5,11 @@ import { SearchBox } from "@/components/inventory/SearchBox";
 import { EditAccountModal } from "@/components/user-management/EditAccountModal";
 import { UserTable } from "@/components/user-management/UserTable";
 import { UserData, UserRole } from "@/types/user";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useAllActiveAccounts } from "@/lib/queries/users";
 import { Spinner } from "@/components/ui/spinner";
 import { useExport } from "@/contexts/ExportContext";
-import { escapeCSVField } from "@/lib/utils";
+import { exportUsers } from "@/lib/csv-exports";
 
 export default function AllAccountsPage() {
     const roleOptions: UserRole[] = ["Admin", "Case Manager", "Volunteer"];
@@ -39,36 +39,10 @@ export default function AllAccountsPage() {
             );
     }, [allAccounts, selectedRoles, searchQuery]);
 
-    const handleExport = useCallback((users: UserData[]) => {
-        const headers = ["First Name", "Last Name", "Role", "Email", "Phone Number"];
-
-        const rows = users.map((u) =>
-            [
-                u.firstName,
-                u.lastName,
-                u.role,
-                u.email,
-                u.phone ?? "",
-            ].map(escapeCSVField)
-        );
-
-        const csv = [headers, ...rows].map((r) => r.join(",")).join("\n");
-
-        const blob = new Blob(["﻿" + csv], { type: "text/csv" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "users.csv";
-        a.click();
-        URL.revokeObjectURL(url);
-    }, []);
     useEffect(() => {
-        setExportHandler(() => handleExport(filteredUsers));
-
-        return () => {
-            setExportHandler(null);
-        };
-    }, [filteredUsers, handleExport, setExportHandler]);
+        setExportHandler(() => exportUsers(filteredUsers));
+        return () => setExportHandler(null);
+    }, [filteredUsers, setExportHandler]);
 
     return (
         <>

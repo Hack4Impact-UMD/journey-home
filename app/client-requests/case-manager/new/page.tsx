@@ -3,14 +3,13 @@
 import { RequestDetailsPage } from "@/components/client-requests/RequestDetails";
 import { ProtectedRoute } from "@/components/general/ProtectedRoute";
 import { useClientRequests } from "@/lib/queries/client-requests";
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { SortOption } from "@/components/inventory/SortOption";
 import { CaseMCRTable } from "@/components/client-requests/CaseMCRTable";
 import { useAuth } from "@/contexts/AuthContext";
 import { useExport } from "@/contexts/ExportContext";
-import { ClientRequest } from "@/types/client-requests";
-import { escapeCSVField } from "@/lib/utils";
+import { exportClientRequestsCaseManager } from "@/lib/csv-exports";
 
 export default function ClientRequestsCaseManagerPage() {
     const { clientRequests, refetch: refetchClientRequests } = useClientRequests();
@@ -53,65 +52,14 @@ export default function ClientRequestsCaseManagerPage() {
             });
     }, [clientRequests, searchQuery, sortBy, uidCM]);
 
-    const handleExport = useCallback((requests: ClientRequest[]) => {
-        const headers = [
-            "First Name", "Last Name", "Email", "Phone Number",
-            "Street Address", "Apt", "City", "State", "Zip Code",
-            "HMIS", "Program Name",
-            "Secondary Contact Name", "Secondary Contact Relationship", "Secondary Contact Phone",
-            "Speaks English", "Adults in Family", "Children in Family", "Is Veteran",
-            "Can Pick Up", "Was Chronic", "Has Moved In", "Move In Date", "Has Elevator", "Client Notes",
-            "Date Submitted", "Item Name", "Item Quantity",
-        ];
-        const rows = requests.flatMap((r) => {
-            const q = r.client.questions;
-            const base = [
-                r.client.firstName,
-                r.client.lastName,
-                r.client.email,
-                r.client.phoneNumber,
-                r.client.address.streetAddress,
-                r.client.address.apt ?? "",
-                r.client.address.city,
-                r.client.address.state,
-                r.client.address.zipCode,
-                r.client.hmis,
-                r.client.programName,
-                r.client.secondaryContact.name,
-                r.client.secondaryContact.relationship,
-                r.client.secondaryContact.phone,
-                q.clientSpeaksEnglish != null ? (q.clientSpeaksEnglish ? "Yes" : "No") : "",
-                q.adultsInFamily != null ? String(q.adultsInFamily) : "",
-                q.childrenInFamily != null ? String(q.childrenInFamily) : "",
-                q.isVeteran ?? "",
-                q.canPickUp != null ? (q.canPickUp ? "Yes" : "No") : "",
-                q.wasChronic ?? "",
-                q.hasMovedIn != null ? (q.hasMovedIn ? "Yes" : "No") : "",
-                q.moveInDate ? q.moveInDate.toDate().toLocaleDateString() : "",
-                q.hasElevator != null ? (q.hasElevator ? "Yes" : "No") : "",
-                q.notes ?? "",
-                r.date?.toDate().toLocaleDateString() ?? "",
-            ];
-            return r.items.map((i) => [...base, i.name, String(i.quantity)].map(escapeCSVField));
-        });
-        const csv = [headers, ...rows].map((row) => row.join(",")).join("\n");
-        const blob = new Blob(["﻿" + csv], { type: "text/csv" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "new-client-requests.csv";
-        a.click();
-        URL.revokeObjectURL(url);
-    }, []);
-
     useEffect(() => {
         if (selectedCRId) {
             setExportHandler(null);
             return;
         }
-        setExportHandler(() => handleExport(filtered));
+        setExportHandler(() => exportClientRequestsCaseManager(filtered, "new-client-requests.csv", false));
         return () => setExportHandler(null);
-    }, [filtered, handleExport, setExportHandler, selectedCRId]);
+    }, [filtered, setExportHandler, selectedCRId]);
 
     return (
         <ProtectedRoute allow={["Case Manager"]}>

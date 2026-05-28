@@ -4,21 +4,9 @@ import { SearchBox } from "@/components/inventory/SearchBox";
 import { DonorsTable } from "@/components/user-management/DonorsTable";
 import { fetchAllDonors } from "@/lib/services/donations";
 import { LocationContact } from "@/types/general";
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useExport } from "@/contexts/ExportContext";
-
-function escapeCSVField(value: string | null | undefined): string {
-    const str = String(value ?? "");
-    if (
-        str.includes(",") ||
-        str.includes('"') ||
-        str.includes("\n") ||
-        str.includes("\r")
-    ) {
-        return `"${str.replace(/"/g, '""')}"`;
-    }
-    return str;
-}
+import { exportDonors } from "@/lib/csv-exports";
 
 export default function PastDonorsPage() {
     const [searchQuery, setSearchQuery] = useState("");
@@ -44,49 +32,10 @@ export default function PastDonorsPage() {
             );
     }, [allDonors, searchQuery]);
 
-    const handleExport = useCallback((donors: LocationContact[]) => {
-        const headers = [
-            "First Name",
-            "Last Name",
-            "Email",
-            "Phone Number",
-            "Street Address",
-            "City",
-            "State",
-            "Zip Code",
-        ];
-
-        const rows = donors.map((d) =>
-            [
-                d.firstName,
-                d.lastName,
-                d.email,
-                d.phoneNumber,
-                d.address.streetAddress,
-                d.address.city,
-                d.address.state,
-                d.address.zipCode,
-            ].map(escapeCSVField)
-        );
-
-        const csv = [headers, ...rows].map((r) => r.join(",")).join("\n");
-
-        const blob = new Blob(["﻿" + csv], { type: "text/csv" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "donors.csv";
-        a.click();
-        URL.revokeObjectURL(url);
-    }, []);
-
     useEffect(() => {
-        setExportHandler(() => handleExport(filtered));
-
-        return () => {
-            setExportHandler(null);
-        };
-    }, [filtered, handleExport, setExportHandler]);
+        setExportHandler(() => exportDonors(filtered));
+        return () => setExportHandler(null);
+    }, [filtered, setExportHandler]);
 
     return (
         <>

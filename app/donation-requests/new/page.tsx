@@ -10,11 +10,11 @@ import { SearchBox } from "@/components/inventory/SearchBox";
 import { SortOption } from "@/components/inventory/SortOption";
 import { useDonationRequests } from "@/lib/queries/donation-requests";
 import { ReviewStatus } from "@/types/general";
-import { DonationItem, DonationRequest, DonationSearchParams } from "@/types/donations";
+import { DonationItem, DonationSearchParams } from "@/types/donations";
 import { ListIcon, SquaresFourIcon } from "@phosphor-icons/react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useExport } from "@/contexts/ExportContext";
-import { escapeCSVField } from "@/lib/utils";
+import { exportDonationRequests } from "@/lib/csv-exports";
 
 type AcquisitionType = "Can Drop Off" | "Needs Pickup";
 const ALL_ACQUISITION_TYPES: AcquisitionType[] = ["Can Drop Off", "Needs Pickup"];
@@ -112,50 +112,14 @@ export default function NewRequestsPage() {
             });
     }, [donationRequests, searchQuery, searchParams]);
 
-    const handleExport = useCallback((requests: DonationRequest[]) => {
-        const headers = ["First Name", "Last Name", "Email", "Phone Number", "Street Address", "Apt", "City", "State", "Zip Code", "First Time Donor", "Can Drop Off", "How Did You Hear", "Responded", "Notes", "Date Submitted", "Category", "Quantity", "Item Status"];
-        const rows = requests.flatMap((r) =>
-            r.items.map((di) =>
-                [
-                    r.donor.firstName,
-                    r.donor.lastName,
-                    r.donor.email,
-                    r.donor.phoneNumber,
-                    r.donor.address.streetAddress,
-                    r.donor.address.apt ?? "",
-                    r.donor.address.city,
-                    r.donor.address.state,
-                    r.donor.address.zipCode,
-                    r.firstTimeDonor ? "Yes" : "No",
-                    r.canDropOff ? "Yes" : "No",
-                    r.howDidYouHear,
-                    r.responded ? "Yes" : "No",
-                    r.notes,
-                    r.date.toDate().toLocaleDateString(),
-                    di.item.category,
-                    String(di.item.quantity),
-                    di.status,
-                ].map(escapeCSVField)
-            )
-        );
-        const csv = [headers, ...rows].map((row) => row.join(",")).join("\n");
-        const blob = new Blob(["﻿" + csv], { type: "text/csv" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "new-donation-requests.csv";
-        a.click();
-        URL.revokeObjectURL(url);
-    }, []);
-
     useEffect(() => {
         if (selectedDRId) {
             setExportHandler(null);
             return;
         }
-        setExportHandler(() => handleExport(filtered));
+        setExportHandler(() => exportDonationRequests(filtered, "new-donation-requests.csv"));
         return () => setExportHandler(null);
-    }, [filtered, handleExport, setExportHandler, selectedDRId]);
+    }, [filtered, setExportHandler, selectedDRId]);
 
     return selectedDR ? (
         <>
