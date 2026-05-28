@@ -32,13 +32,29 @@ export default function WaiverPending() {
         const uid = auth.state.currentUser?.uid;
         if (!uid) return;
         setSubmitting(true);
+        const p = signWaiver(uid);
+        toast.promise(p, {
+            loading: "Submitting waiver...",
+            success: "Waiver signed successfully.",
+            error: "Failed to submit waiver.",
+        });
         try {
-            await signWaiver(uid);
+            await p;
             await auth.refreshUser();
             router.push("/");
-        } catch {
-            toast.error("Failed to submit waiver. Please try again.");
-            setSubmitting(false);
+        } catch (e: unknown) {
+            const code = (e as { code?: string }).code;
+            if (code === "permission-denied") {
+                toast.error("You don't have permission to sign the waiver.");
+                setSubmitting(false);
+                return;
+            }
+            if (code === "unavailable") {
+                toast.error("Network error. Please try again.");
+                setSubmitting(false);
+                return;
+            }
+            throw e;
         }
     };
 

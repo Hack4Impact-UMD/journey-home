@@ -15,7 +15,7 @@ export default function WaiverPage() {
 
     useEffect(() => {
         if (activeWaiver && !selectedWaiver) setSelectedWaiver(activeWaiver);
-    }, [activeWaiver]);
+    }, [activeWaiver, selectedWaiver]);
 
     useEffect(() => {
         if (!dateFilter) {
@@ -29,7 +29,7 @@ export default function WaiverPage() {
             return started && notEnded;
         });
         if (match) setSelectedWaiver(match);
-    }, [dateFilter, waivers]);
+    }, [dateFilter, waivers, activeWaiver]);
 
     async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];

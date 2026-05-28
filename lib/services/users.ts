@@ -1,7 +1,7 @@
 "use client";
 
 import { db } from "../firebase";
-import { collection, doc, getDocs, setDoc, updateDoc, deleteDoc, query, where} from "firebase/firestore";
+import { collection, doc, getDocs, setDoc, updateDoc, deleteDoc, query, where, Timestamp } from "firebase/firestore";
 import { UserData, UserRole } from "../../types/user";
 
 const usersCol = collection(db, "users");
@@ -89,7 +89,7 @@ export const deleteUser = async (uid: string) => {
 
 export const signWaiver = async (uid: string) => {
   const userRef = doc(db, "users", uid);
-  await updateDoc(userRef, { signedWaiver: new Date() });
+  await updateDoc(userRef, { signedWaiver: Timestamp.now() });
 };
 
 /**

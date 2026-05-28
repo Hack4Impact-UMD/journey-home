@@ -1,5 +1,6 @@
-import { UserData } from "@/types/user";
+﻿import { UserData } from "@/types/user";
 import { Badge } from "../inventory/Badge";
+import { DogSitIcon } from "@/components/icons/DogSitIcon";
 
 type AccountReqTableProps = {
     requests: UserData[];
@@ -27,7 +28,12 @@ export function AccountReqTable({ requests, onAccept }: AccountReqTableProps) {
                 </span>
             </div>
             <div className="flex-1 overflow-auto min-h-0">
-                {requests.map((user) => (
+                {requests.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-full gap-2 py-8">
+                        <DogSitIcon />
+                        <p className="text-sm text-[#A2A2A2]">No account requests found.</p>
+                    </div>
+                ) : requests.map((user) => (
                     <AccountReqTableRow user={user} key={user.uid} onAccept={onAccept}/>
                 ))}
             </div>
@@ -70,3 +76,4 @@ function AccountReqTableRow({
         </div>
     );
 }
+

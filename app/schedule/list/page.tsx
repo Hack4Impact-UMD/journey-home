@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useTimeBlocks } from "../../../lib/queries/timeblocks";
 import { TimeBlock } from "../../../types/schedule";
@@ -10,6 +10,7 @@ import { AdminCalendarPeople } from "@/components/icons/AdminCalendarPeople";
 import { AdminCalendarDriver } from "@/components/icons/AdminCalendarDriver";
 import { ShiftDetailOverlay } from "@/components/schedule/ShiftDetailOverlay";
 import { Spinner } from "@/components/ui/spinner";
+import { DogSitIcon } from "@/components/icons/DogSitIcon";
 
 const SHIFT_OPTIONS = ["Warehouse", "Pickup/Delivery"] as const;
 type ShiftType = (typeof SHIFT_OPTIONS)[number];
@@ -122,6 +123,11 @@ export default function ListView() {
                     <div className="flex flex-1 items-center justify-center">
                         <Spinner className="size-6 text-primary" />
                     </div>
+                ) : groupedEvents.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center flex-1 gap-2 py-8">
+                        <DogSitIcon />
+                        <p className="text-sm text-[#A2A2A2]">No shifts found.</p>
+                    </div>
                 ) : groupedEvents.map(({ dateKey, date, events }, idx) => {
                     const isPast = date.getTime() < todayStart;
                     const nextDate = idx < groupedEvents.length - 1 ? groupedEvents[idx + 1].date : null;
@@ -197,3 +203,4 @@ export default function ListView() {
         </>
     );
 }
+

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { InventoryCategory } from "@/types/inventory";
@@ -7,6 +7,7 @@ import { EditCountModal } from "./EditCountModal";
 import { ConfirmModal } from "@/components/general/ConfirmModal";
 import { useInventoryCategories } from "../../lib/queries/inventory";
 import { useAuth } from "@/contexts/AuthContext";
+import { DogSitIcon } from "@/components/icons/DogSitIcon";
 
 interface ModalState {
     category: InventoryCategory;
@@ -43,8 +44,9 @@ export function CategoryDialsGrid({ categories }: { categories: InventoryCategor
 
     if (categories.length === 0) {
         return (
-            <div className="w-full h-full flex items-center justify-center text-sm text-[#BFBFBF]">
-                No categories found.
+            <div className="w-full h-full flex flex-col items-center justify-center gap-2 py-8">
+                <DogSitIcon />
+                <p className="text-sm text-[#A2A2A2]">No categories found.</p>
             </div>
         );
     }

@@ -1,6 +1,7 @@
-"use client";
+﻿"use client";
 
 import { LocationContact } from "@/types/general";
+import { DogSitIcon } from "@/components/icons/DogSitIcon";
 
 type DonorsTableProps = {
     donors: LocationContact[];
@@ -24,7 +25,12 @@ export function DonorsTable({ donors }: DonorsTableProps) {
                 </span>
             </div>
             <div className="flex-1 overflow-auto min-h-0">
-                {donors.map((donor) => (
+                {donors.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-full gap-2 py-8">
+                        <DogSitIcon />
+                        <p className="text-sm text-[#A2A2A2]">No donors found.</p>
+                    </div>
+                ) : donors.map((donor) => (
                     <DonorsTableRow donor={donor} key={donor.email} />
                 ))}
             </div>
@@ -56,3 +62,4 @@ function DonorsTableRow({ donor }: { donor: LocationContact }) {
         </div>
     );
 }
+

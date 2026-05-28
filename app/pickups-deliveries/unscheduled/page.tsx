@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { SortOption } from "@/components/inventory/SortOption";
@@ -6,6 +6,7 @@ import PickupDeliveryCard, { getTotalItems } from "@/components/pickups-deliveri
 import { useDonationRequests } from "@/lib/queries/donation-requests";
 import { useClientRequests } from "@/lib/queries/client-requests";
 import { useState, useMemo } from "react";
+import { DogSitIcon } from "@/components/icons/DogSitIcon";
 
 export default function UnscheduledTasksPage() {
     const [searchQuery, setSearchQuery] = useState("");
@@ -76,27 +77,40 @@ export default function UnscheduledTasksPage() {
                                     
             </div>
             <div className="flex-1 overflow-auto min-h-0">
-            <div className="w-full flex flex-wrap gap-x-3 gap-y-6 content-start">
-                {[...approvedItems, ...deliveryItems]
-                .filter(item =>
-                    selectedOptions.includes("All") ||
-                    ("donor" in item && selectedOptions.includes("Pickups")) ||
-                    ("client" in item && selectedOptions.includes("Deliveries"))
-                ).filter(item => {
-                    const query = searchQuery.toLowerCase().trim();
-                    if (!query) return true; 
-                    const searchable = JSON.stringify(item).toLowerCase();
-                    return searchable.includes(query);
-                }).sort((a, b) => { //will change this later once clientRequest date gets implemented
-                    const totalA = getTotalItems(a);
-                    const totalB = getTotalItems(b);
-                    return sortAsc ? totalA - totalB : totalB - totalA;
-                }).map(item => (
-                    <PickupDeliveryCard donation={item} key={item.id} />
-                ))
-            }
-            </div>
+            {(() => {
+                const filtered = [...approvedItems, ...deliveryItems]
+                    .filter(item =>
+                        selectedOptions.includes("All") ||
+                        ("donor" in item && selectedOptions.includes("Pickups")) ||
+                        ("client" in item && selectedOptions.includes("Deliveries"))
+                    ).filter(item => {
+                        const query = searchQuery.toLowerCase().trim();
+                        if (!query) return true;
+                        const searchable = JSON.stringify(item).toLowerCase();
+                        return searchable.includes(query);
+                    }).sort((a, b) => {
+                        const totalA = getTotalItems(a);
+                        const totalB = getTotalItems(b);
+                        return sortAsc ? totalA - totalB : totalB - totalA;
+                    });
+                if (filtered.length === 0) {
+                    return (
+                        <div className="flex flex-col items-center justify-center h-full gap-2 py-8">
+                            <DogSitIcon />
+                            <p className="text-sm text-[#A2A2A2]">No unscheduled tasks found.</p>
+                        </div>
+                    );
+                }
+                return (
+                    <div className="w-full flex flex-wrap gap-x-3 gap-y-6 content-start">
+                        {filtered.map(item => (
+                            <PickupDeliveryCard donation={item} key={item.id} />
+                        ))}
+                    </div>
+                );
+            })()}
             </div>
         </div>
     )
 }
+

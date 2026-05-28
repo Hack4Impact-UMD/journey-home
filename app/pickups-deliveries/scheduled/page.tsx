@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 import PickupDeliveryCard, { getTotalItems } from "@/components/pickups-deliveries/Request";
 import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
 import { SearchBox } from "@/components/inventory/SearchBox";
@@ -7,6 +7,7 @@ import { useState, useMemo } from "react";
 import { useDonationRequests } from "@/lib/queries/donation-requests";
 import { useClientRequests } from "@/lib/queries/client-requests";
 import { useTimeBlocks } from "@/lib/queries/timeblocks";
+import { DogSitIcon } from "@/components/icons/DogSitIcon";
 
 export default function ScheduledTasksPage() {
     const [searchQuery, setSearchQuery] = useState("");
@@ -93,35 +94,47 @@ export default function ScheduledTasksPage() {
                                         
             </div>
             <div className="flex-1 overflow-auto min-h-0">
-            <div className="w-full flex flex-wrap gap-x-3 gap-y-6 content-start">
-                {[...approvedItems, ...deliveryItems]
+            {(() => {
+                const filtered = [...approvedItems, ...deliveryItems]
                     .filter(item =>
-                    selectedOptions.includes("All") ||
-                    ("donor" in item && selectedOptions.includes("Pickups")) ||
-                    ("client" in item && selectedOptions.includes("Deliveries"))
-                ).filter(item => {
-                    const query = searchQuery.toLowerCase().trim();
-                    if (!query) return true; 
-                    const searchable = JSON.stringify(item).toLowerCase();
-                    return searchable.includes(query);
-                }).sort((a, b) => {
-                    if (sortBy === "Date") {
-                        const timeA = a.associatedTimeBlockID
-                            ? (tbMap.get(a.associatedTimeBlockID)?.startTime.toMillis() ?? 0)
-                            : 0;
-                        const timeB = b.associatedTimeBlockID
-                            ? (tbMap.get(b.associatedTimeBlockID)?.startTime.toMillis() ?? 0)
-                            : 0;
-                        return sortAsc ? timeA - timeB : timeB - timeA;
-                    }
-                    const totalA = getTotalItems(a);
-                    const totalB = getTotalItems(b);
-                    return sortAsc ? totalA - totalB : totalB - totalA;
-                }).map(item => (
-                    <PickupDeliveryCard donation={item} key={item.id} />
-                ))
-            }
-            </div>
+                        selectedOptions.includes("All") ||
+                        ("donor" in item && selectedOptions.includes("Pickups")) ||
+                        ("client" in item && selectedOptions.includes("Deliveries"))
+                    ).filter(item => {
+                        const query = searchQuery.toLowerCase().trim();
+                        if (!query) return true;
+                        const searchable = JSON.stringify(item).toLowerCase();
+                        return searchable.includes(query);
+                    }).sort((a, b) => {
+                        if (sortBy === "Date") {
+                            const timeA = a.associatedTimeBlockID
+                                ? (tbMap.get(a.associatedTimeBlockID)?.startTime.toMillis() ?? 0)
+                                : 0;
+                            const timeB = b.associatedTimeBlockID
+                                ? (tbMap.get(b.associatedTimeBlockID)?.startTime.toMillis() ?? 0)
+                                : 0;
+                            return sortAsc ? timeA - timeB : timeB - timeA;
+                        }
+                        const totalA = getTotalItems(a);
+                        const totalB = getTotalItems(b);
+                        return sortAsc ? totalA - totalB : totalB - totalA;
+                    });
+                if (filtered.length === 0) {
+                    return (
+                        <div className="flex flex-col items-center justify-center h-full gap-2 py-8">
+                            <DogSitIcon />
+                            <p className="text-sm text-[#A2A2A2]">No scheduled tasks found.</p>
+                        </div>
+                    );
+                }
+                return (
+                    <div className="w-full flex flex-wrap gap-x-3 gap-y-6 content-start">
+                        {filtered.map(item => (
+                            <PickupDeliveryCard donation={item} key={item.id} />
+                        ))}
+                    </div>
+                );
+            })()}
             </div>
         </div>
     )

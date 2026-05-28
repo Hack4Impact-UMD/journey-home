@@ -107,7 +107,7 @@ export default function ClientRequestsAdminPage() {
                     )}
                 </div>
             ) : (
-                <div>
+                <div className="flex flex-col flex-1 min-h-0">
                     <div className="flex flex-col mb-6">
                         <div className="flex flex-wrap gap-3">
                             <SearchBox
@@ -138,6 +138,7 @@ export default function ClientRequestsAdminPage() {
                             />
                         </div>
                     </div>
+                    <div className="flex-1 min-h-0">
                     <AdminCRTable
                         clientRequests={clientRequests
                             .filter((request) => {
@@ -172,6 +173,7 @@ export default function ClientRequestsAdminPage() {
                         openCR={(cr) => setSelectedCRId(cr.id)}
                         onUpdateStatus={async (cr, status) => setClientRequestToast({ ...cr, status })}
                     />
+                    </div>
                 </div>
             )}
         </ProtectedRoute>

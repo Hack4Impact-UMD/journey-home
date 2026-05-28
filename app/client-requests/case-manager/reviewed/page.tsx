@@ -97,10 +97,12 @@ export default function ClientRequestsCaseManagerPage() {
                                 />
                             </div>
                         </div>
-                        <CaseMCRTable
-                            clientRequests={filtered}
-                            openCR={(cr) => setSelectedCRId(cr.id)}
-                        />
+                        <div className="flex-1 min-h-0">
+                            <CaseMCRTable
+                                clientRequests={filtered}
+                                openCR={(cr) => setSelectedCRId(cr.id)}
+                            />
+                        </div>
                     </>
                 )}
             </div>

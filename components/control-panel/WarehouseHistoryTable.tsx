@@ -1,8 +1,9 @@
-"use client";
+﻿"use client";
 
 import { InventoryChange, InventoryCategory } from "@/types/inventory";
 import { Badge } from "@/components/inventory/Badge";
 import { UserData } from "@/types/user";
+import { DogSitIcon } from "@/components/icons/DogSitIcon";
 import { useState } from "react";
 import { ConfirmModal } from "@/components/general/ConfirmModal";
 import { RevertIcon } from "@/components/icons/RevertIcon";
@@ -47,8 +48,9 @@ export function WarehouseHistoryTable({ changes, userById, inventoryCategories, 
             <div className="w-full h-full flex flex-col">
                 <div className="flex-1 overflow-auto min-h-0 flex flex-col gap-2">
                 {changes.length === 0 && (
-                    <div className="flex items-center justify-center h-24 text-sm text-[#A2A2A2]">
-                        No history entries found.
+                    <div className="flex flex-col items-center justify-center h-full gap-2 py-8">
+                        <DogSitIcon />
+                        <p className="text-sm text-[#A2A2A2]">No history entries found.</p>
                     </div>
                 )}
                 {changes.map((change) => {
@@ -156,3 +158,4 @@ function WarehouseHistoryRow({
         </div>
     );
 }
+

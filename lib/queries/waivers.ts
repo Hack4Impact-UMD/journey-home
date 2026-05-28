@@ -22,7 +22,7 @@ export function useWaivers() {
         toast.promise(promise, {
             loading: "Updating waiver...",
             success: "Waiver updated successfully.",
-            error: "Failed to udpate waiver.",
+            error: "Failed to update waiver.",
         });
         await promise;
     };
