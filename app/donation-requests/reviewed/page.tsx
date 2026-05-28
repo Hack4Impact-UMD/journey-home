@@ -9,20 +9,20 @@ import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect"
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { SortOption } from "@/components/inventory/SortOption";
 import { useDonationRequests } from "@/lib/queries/donation-requests";
-import { ReviewStatus } from "@/types/general";
 import { DonationItem, DonationSearchParams } from "@/types/donations";
-import { ListIcon, SquaresFourIcon } from "@phosphor-icons/react";
 import { useState } from "react";
+import { ReviewStatus } from "@/types/general";
+import { ListIcon, SquaresFourIcon } from "@phosphor-icons/react";
+import { exportDonationRequests } from "@/lib/csv-exports";
+import { ExportButton } from "@/components/general/ExportButton";
 
 type AcquisitionType = "Can Drop Off" | "Needs Pickup";
 const ALL_ACQUISITION_TYPES: AcquisitionType[] = ["Can Drop Off", "Needs Pickup"];
 
 export default function ReviewedRequestsPage() {
-    const { donationRequests, setDonationRequestToast, refetch } =
-        useDonationRequests();
+    const { donationRequests, setDonationRequestToast, refetch } = useDonationRequests();
     const [selectedDRId, setSelectedDRId] = useState<string | null>(null);
-    const selectedDR =
-        donationRequests.find((dr) => dr.id === selectedDRId) ?? null;
+    const selectedDR = donationRequests.find((dr) => dr.id === selectedDRId) ?? null;
     const [selectedItem, setSelectedItem] = useState<DonationItem | null>(null);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [searchParams, setSearchParams] = useState<DonationSearchParams>({
@@ -67,6 +67,7 @@ export default function ReviewedRequestsPage() {
                   return itemAscending ? diff : -diff;
               })
         : [];
+
 
     return selectedDR ? (
         <>
@@ -204,6 +205,14 @@ export default function ReviewedRequestsPage() {
                         options={ALL_ACQUISITION_TYPES}
                         selected={acquisitionFilter}
                         setSelected={setAcquisitionFilter}
+                    />
+                    <ExportButton
+                        label="Export Reviewed Requests"
+                        onClick={() => exportDonationRequests(
+                            donationRequests.filter((r) => r.items.every((i) => i.status === "Approved" || i.status === "Denied")),
+                            "reviewed-donation-requests.csv"
+                        )}
+                        className="ml-auto"
                     />
                 </div>
             </div>

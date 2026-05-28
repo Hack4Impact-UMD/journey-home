@@ -13,6 +13,8 @@ import { ReviewStatus } from "@/types/general";
 import { DonationItem, DonationSearchParams } from "@/types/donations";
 import { ListIcon, SquaresFourIcon } from "@phosphor-icons/react";
 import { useState } from "react";
+import { exportDonationRequests } from "@/lib/csv-exports";
+import { ExportButton } from "@/components/general/ExportButton";
 
 type AcquisitionType = "Can Drop Off" | "Needs Pickup";
 const ALL_ACQUISITION_TYPES: AcquisitionType[] = ["Can Drop Off", "Needs Pickup"];
@@ -21,8 +23,7 @@ export default function NewRequestsPage() {
     const { donationRequests, setDonationRequestToast, refetch } =
         useDonationRequests();
     const [selectedDRId, setSelectedDRId] = useState<string | null>(null);
-    const selectedDR =
-        donationRequests.find((dr) => dr.id === selectedDRId) ?? null;
+    const selectedDR = donationRequests.find((dr) => dr.id === selectedDRId) ?? null;
     const [selectedItem, setSelectedItem] = useState<DonationItem | null>(null);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [searchParams, setSearchParams] = useState<DonationSearchParams>({
@@ -67,6 +68,7 @@ export default function NewRequestsPage() {
                   return itemAscending ? diff : -diff;
               })
         : [];
+
 
     return selectedDR ? (
         <>
@@ -204,6 +206,14 @@ export default function NewRequestsPage() {
                         options={ALL_ACQUISITION_TYPES}
                         selected={acquisitionFilter}
                         setSelected={setAcquisitionFilter}
+                    />
+                    <ExportButton
+                        label="Export New Requests"
+                        onClick={() => exportDonationRequests(
+                            donationRequests.filter((r) => !r.items.every((i) => i.status === "Approved" || i.status === "Denied")),
+                            "new-donation-requests.csv"
+                        )}
+                        className="ml-auto"
                     />
                 </div>
             </div>
