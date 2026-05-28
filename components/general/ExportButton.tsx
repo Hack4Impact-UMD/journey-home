@@ -12,7 +12,7 @@ export function ExportButton({ label, onClick, className = "" }: ExportButtonPro
     return (
         <button
             type="button"
-            className={`bg-primary text-white px-3 py-1.5 text-sm flex items-center gap-1.5 shrink-0 ${className}`}
+            className={`bg-primary text-white px-3 py-1.5 text-sm rounded-xs flex items-center gap-1.5 shrink-0 ${className}`}
             onClick={onClick}
         >
             <Upload size={16} />

@@ -153,26 +153,3 @@ export function exportClientRequestsAdmin(
     downloadCSV(filename, headers, rows);
 }
 
-export function exportClientRequestsCaseManager(
-    requests: ClientRequest[],
-    filename: string,
-    includeStatus: boolean,
-): void {
-    const headers = [
-        ...CLIENT_REQUEST_BASE_HEADERS,
-        "Date Submitted",
-        ...(includeStatus ? ["Status"] : []),
-        "Admin Notes", "Items",
-    ];
-    const rows = requests.map((r) => {
-        const items = r.items.map((i) => `${i.quantity} ${i.name}`).join("\n");
-        return [
-            ...clientRequestBaseRow(r),
-            r.date.toDate().toLocaleDateString(),
-            ...(includeStatus ? [r.status] : []),
-            r.notes,
-            items,
-        ].map(escapeCSVField);
-    });
-    downloadCSV(filename, headers, rows);
-}
