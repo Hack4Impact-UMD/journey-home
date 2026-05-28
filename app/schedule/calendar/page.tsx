@@ -32,7 +32,7 @@ export default function CalendarPage() {
             : date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
 
     return (
-        <>
+        <div className="w-full h-full flex flex-col px-6">
             {/* Toolbar */}
             <div className="grid grid-cols-3 items-center mb-4">
                 <div className="flex items-center gap-3">
@@ -111,6 +111,6 @@ export default function CalendarPage() {
                 onClose={() => setEditingTB(null)}
                 onSaved={() => setEditingTB(null)}
             />
-        </>
+        </div>
     );
 }
