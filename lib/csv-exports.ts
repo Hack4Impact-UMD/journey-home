@@ -5,12 +5,21 @@ import { LocationContact } from "@/types/general";
 import { UserData } from "@/types/user";
 
 function downloadCSV(filename: string, headers: string[], rows: string[][]): void {
+    const now = new Date();
+    const date = now.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    const time = now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }).replace(":", ".");
+    const timestamp = `${date} at ${time}`;
+    const dotIndex = filename.lastIndexOf(".");
+    const base = filename.slice(0, dotIndex === -1 ? undefined : dotIndex);
+    const ext = dotIndex === -1 ? "" : filename.slice(dotIndex);
+    const titledBase = base.split(/[-_]/).map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+    const stampedFilename = `${titledBase} - ${timestamp}${ext}`;
     const csv = [headers, ...rows].map((row) => row.join(",")).join("\n");
     const blob = new Blob(["﻿" + csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = filename;
+    a.download = stampedFilename;
     a.click();
     URL.revokeObjectURL(url);
 }
@@ -30,7 +39,7 @@ export function exportUsers(users: UserData[]): void {
                 u.email,
                 u.phone ?? "",
                 u.createdTime.toDate().toLocaleDateString(),
-                u.signedWaiver ? u.signedWaiver.toDate().toLocaleDateString() : "",
+                u.signedWaiver ? u.signedWaiver.toDate().toLocaleString() : "",
                 u.disabled ? "Yes" : "No",
                 u.emailVerified ? "Yes" : "No",
             ].map(escapeCSVField)
@@ -126,18 +135,20 @@ export function exportClientRequestsAdmin(
         ...CLIENT_REQUEST_BASE_HEADERS,
         "Date Submitted",
         ...(includeStatus ? ["Status"] : []),
-        "Case Manager", "Admin Notes", "Item Name", "Item Quantity",
+        "Case Manager", "Case Manager Email", "Admin Notes", "Items",
     ];
-    const rows = requests.flatMap((r) => {
+    const rows = requests.map((r) => {
         const cm = byId.get(r.caseManagerID);
-        const base = [
+        const items = r.items.map((i) => `${i.quantity} ${i.name}`).join("\n");
+        return [
             ...clientRequestBaseRow(r),
             r.date.toDate().toLocaleDateString(),
             ...(includeStatus ? [r.status] : []),
             cm ? `${cm.firstName} ${cm.lastName}` : "",
+            cm?.email ?? "",
             r.notes,
-        ];
-        return r.items.map((i) => [...base, i.name, String(i.quantity)].map(escapeCSVField));
+            items,
+        ].map(escapeCSVField);
     });
     downloadCSV(filename, headers, rows);
 }
@@ -151,16 +162,17 @@ export function exportClientRequestsCaseManager(
         ...CLIENT_REQUEST_BASE_HEADERS,
         "Date Submitted",
         ...(includeStatus ? ["Status"] : []),
-        "Admin Notes", "Item Name", "Item Quantity",
+        "Admin Notes", "Items",
     ];
-    const rows = requests.flatMap((r) => {
-        const base = [
+    const rows = requests.map((r) => {
+        const items = r.items.map((i) => `${i.quantity} ${i.name}`).join("\n");
+        return [
             ...clientRequestBaseRow(r),
             r.date.toDate().toLocaleDateString(),
             ...(includeStatus ? [r.status] : []),
             r.notes,
-        ];
-        return r.items.map((i) => [...base, i.name, String(i.quantity)].map(escapeCSVField));
+            items,
+        ].map(escapeCSVField);
     });
     downloadCSV(filename, headers, rows);
 }

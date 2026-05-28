@@ -5,7 +5,7 @@ import { SearchBox } from "@/components/inventory/SearchBox";
 import { EditAccountModal } from "@/components/user-management/EditAccountModal";
 import { UserTable } from "@/components/user-management/UserTable";
 import { UserData, UserRole } from "@/types/user";
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useAllActiveAccounts } from "@/lib/queries/users";
 import { Spinner } from "@/components/ui/spinner";
 import { exportUsers } from "@/lib/csv-exports";
@@ -22,21 +22,6 @@ export default function AllAccountsPage() {
     const [selectedStatuses, setSelectedStatuses] = useState<AccountStatus[]>([...statusOptions]);
 
     const { allAccounts, editAccount, refetch: refetchAllAccounts, isLoading } = useAllActiveAccounts();
-
-    const filteredUsers = useMemo(() => {
-        return allAccounts
-            .filter((u) => selectedRoles.includes(u.role))
-            .filter((u) =>
-                (u.firstName + u.lastName + u.email)
-                    .toLowerCase()
-                    .includes(searchQuery.toLowerCase().trim())
-            )
-            .sort((a, b) =>
-                (a.lastName + a.firstName)
-                    .toLowerCase()
-                    .localeCompare((b.lastName + b.firstName).toLowerCase())
-            );
-    }, [allAccounts, selectedRoles, searchQuery]);
 
     return (
         <>
