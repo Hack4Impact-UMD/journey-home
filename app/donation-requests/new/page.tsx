@@ -256,13 +256,37 @@ export default function NewRequestsPage() {
                     />
                     <SortOption
                         label="Date"
-                        status={searchParams.sortBy != "Date" ? "none" : searchParams.ascending ? "asc" : "desc"}
-                        onChange={(status) => setSearchParams((prev) => ({ ...prev, sortBy: "Date", ascending: status == "asc" }))}
+                        status={
+                            searchParams.sortBy != "Date"
+                                ? "none"
+                                : searchParams.ascending
+                                  ? "asc"
+                                  : "desc"
+                        }
+                        onChange={(status) => {
+                            setSearchParams((prev) => ({
+                                ...prev,
+                                sortBy: "Date",
+                                ascending: status == "asc",
+                            }));
+                        }}
                     />
                     <SortOption
                         label="Qnt"
-                        status={searchParams.sortBy != "Quantity" ? "none" : searchParams.ascending ? "asc" : "desc"}
-                        onChange={(status) => setSearchParams((prev) => ({ ...prev, sortBy: "Quantity", ascending: status == "asc" }))}
+                        status={
+                            searchParams.sortBy != "Quantity"
+                                ? "none"
+                                : searchParams.ascending
+                                  ? "asc"
+                                  : "desc"
+                        }
+                        onChange={(status) => {
+                            setSearchParams((prev) => ({
+                                ...prev,
+                                sortBy: "Quantity",
+                                ascending: status == "asc",
+                            }));
+                        }}
                     />
                     <DropdownMultiselect
                         label="Acquisition"

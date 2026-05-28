@@ -23,10 +23,9 @@ export function DonorsTable({ donors }: DonorsTableProps) {
                     Address
                 </span>
             </div>
-
             <div className="flex-1 overflow-auto min-h-0">
                 {donors.map((donor) => (
-                    <DonorsTableRow key={donor.email} donor={donor} />
+                    <DonorsTableRow donor={donor} key={donor.email} />
                 ))}
             </div>
         </div>
@@ -35,15 +34,21 @@ export function DonorsTable({ donors }: DonorsTableProps) {
 
 function DonorsTableRow({ donor }: { donor: LocationContact }) {
     return (
-        <div className="h-10 border-light-border border-b border-x flex items-center font-family-roboto text-sm text-text-1">
+        <div
+            className="h-10 border-light-border border-b border-x flex items-center font-family-roboto text-sm text-text-1"
+        >
             <div className="w-[25%] px-4 flex items-center">
-                <span>{donor.firstName} {donor.lastName}</span>
+                <span>
+                    {donor.firstName} {donor.lastName}
+                </span>
             </div>
             <div className="w-[25%] px-4">
                 <span>{donor.phoneNumber}</span>
             </div>
             <div className="w-[25%] px-4 flex items-center">
-                <span>{donor.email}</span>
+                <span>
+                    {donor.email}
+                </span>
             </div>
             <span className="w-[25%] px-4">
                 {donor.address.streetAddress}, {donor.address.city} {donor.address.zipCode}

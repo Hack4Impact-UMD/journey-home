@@ -9,14 +9,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { useAllActiveAccounts } from "@/lib/queries/users";
 import { Spinner } from "@/components/ui/spinner";
 import { useExport } from "@/contexts/ExportContext";
-
-function escapeCSVField(value: string | null | undefined): string {
-    const str = String(value ?? "");
-    if (str.includes(",") || str.includes('"') || str.includes("\n") || str.includes("\r")) {
-        return `"${str.replace(/"/g, '""')}"`;
-    }
-    return str;
-}
+import { escapeCSVField } from "@/lib/utils";
 
 export default function AllAccountsPage() {
     const roleOptions: UserRole[] = ["Admin", "Case Manager", "Volunteer"];
@@ -28,7 +21,7 @@ export default function AllAccountsPage() {
     const [selectedAccount, setSelectedAccount] = useState<UserData | null>(null);
     const [selectedStatuses, setSelectedStatuses] = useState<AccountStatus[]>([...statusOptions]);
 
-    const { allAccounts, editAccount, refetch, isLoading } = useAllActiveAccounts();
+    const { allAccounts, editAccount, refetch: refetchAllAccounts, isLoading } = useAllActiveAccounts();
     const { setExportHandler } = useExport();
 
     const filteredUsers = useMemo(() => {
@@ -91,7 +84,7 @@ export default function AllAccountsPage() {
                     <SearchBox
                         value={searchQuery}
                         onChange={setSearchQuery}
-                        onSubmit={refetch}
+                        onSubmit={refetchAllAccounts}
                     />
                     <DropdownMultiselect
                         label="User Type"
@@ -112,7 +105,6 @@ export default function AllAccountsPage() {
                     )}
                 </div>
             </div>
-
             <div className="flex-1 overflow-auto min-h-0">
             <UserTable
                 users={allAccounts

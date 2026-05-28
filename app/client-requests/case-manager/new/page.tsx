@@ -10,14 +10,7 @@ import { CaseMCRTable } from "@/components/client-requests/CaseMCRTable";
 import { useAuth } from "@/contexts/AuthContext";
 import { useExport } from "@/contexts/ExportContext";
 import { ClientRequest } from "@/types/client-requests";
-
-function escapeCSVField(value: string | null | undefined): string {
-    const str = String(value ?? "");
-    if (str.includes(",") || str.includes('"') || str.includes("\n") || str.includes("\r")) {
-        return `"${str.replace(/"/g, '""')}"`;
-    }
-    return str;
-}
+import { escapeCSVField } from "@/lib/utils";
 
 export default function ClientRequestsCaseManagerPage() {
     const { clientRequests, refetch: refetchClientRequests } = useClientRequests();

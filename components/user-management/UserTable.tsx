@@ -25,21 +25,16 @@ export function UserTable({ users, onSelect }: UserTableProps) {
                     Phone Number
                 </span>
             </div>
-
             <div className="flex-1 overflow-auto min-h-0">
                 {users.map((user) => (
-                    <UserTableRow
-                        key={user.uid}
-                        user={user}
-                        onSelect={() => onSelect(user)}
-                    />
+                    <UserTableRow user={user} key={user.uid} onSelect={() => onSelect(user)} />
                 ))}
             </div>
         </div>
     );
 }
 
-function UserTableRow({ user, onSelect }: { user: UserData; onSelect: () => void }) {
+function UserTableRow({ user, onSelect }: { user: UserData, onSelect: () => void }) {
     return (
         <div
             className="h-10 border-light-border border-b border-x flex items-center font-family-roboto text-sm text-text-1 hover:bg-blue-50 cursor-pointer"
@@ -62,10 +57,14 @@ function UserTableRow({ user, onSelect }: { user: UserData; onSelect: () => void
                 />
             </div>
             <div className="w-[35%] px-4 flex items-center">
-                <span>{user.email}</span>
+                <span>
+                    {user.email}
+                </span>
             </div>
             <div className="w-[20%] px-4 flex items-center">
-                <span>{user.phone ?? "—"}</span>
+                <span>
+                    {user.phone ?? "—"}
+                </span>
             </div>
         </div>
     );
