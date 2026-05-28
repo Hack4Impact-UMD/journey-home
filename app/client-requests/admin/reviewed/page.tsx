@@ -10,10 +10,10 @@ import { ConfirmModal } from "@/components/general/ConfirmModal";
 import { DebounceTextbox } from "@/components/general/DebounceTextbox";
 import { useClientRequests } from "@/lib/queries/client-requests";
 import { useAllActiveAccounts } from "@/lib/queries/users";
-import { useState, useMemo, useEffect } from "react";
-import { useExport } from "@/contexts/ExportContext";
+import { useState, useMemo } from "react";
 import { ReviewStatus } from "@/types/general";
 import { exportClientRequestsAdmin } from "@/lib/csv-exports";
+import { Upload } from "lucide-react";
 
 const statusOpts: ReviewStatus[] = ["Approved", "Denied"];
 
@@ -34,8 +34,6 @@ export default function ClientRequestsAdminPage() {
     const userById = useMemo(() => new Map(allAccounts.map((u) => [u.uid, u])), [allAccounts]);
     const pendingCaseManager = selectedCR ? (userById.get(selectedCR.caseManagerID) ?? null) : null;
 
-    const { setExportHandler } = useExport();
-
     const filtered = useMemo(() => {
         return clientRequests
             .filter((request) => {
@@ -47,7 +45,7 @@ export default function ClientRequestsAdminPage() {
                 const cm = userById.get(request.caseManagerID);
                 return [
                     `${request.client.firstName}${request.client.lastName}`,
-                    request.client.email,
+                    request.client.email ?? "",
                     request.client.phoneNumber,
                     cm ? `${cm.firstName}${cm.lastName}` : "",
                     cm?.email ?? "",
@@ -65,15 +63,6 @@ export default function ClientRequestsAdminPage() {
                 }
             });
     }, [clientRequests, searchQuery, sortBy, selectedStatus, userById]);
-
-    useEffect(() => {
-        if (selectedCRId) {
-            setExportHandler(null);
-            return;
-        }
-        setExportHandler(() => exportClientRequestsAdmin(filtered, allAccounts, "reviewed-client-requests.csv", true));
-        return () => setExportHandler(null);
-    }, [filtered, allAccounts, setExportHandler, selectedCRId]);
 
     const handleConfirm = async () => {
         if (!pendingAction || !selectedCR) return;
@@ -166,6 +155,14 @@ export default function ClientRequestsAdminPage() {
                                 selected={selectedStatus}
                                 setSelected={setStatus}
                             />
+                            <button
+                                type="button"
+                                className="bg-primary text-white px-3 py-1.5 text-sm flex items-center gap-1.5 shrink-0 ml-auto"
+                                onClick={() => exportClientRequestsAdmin(filtered, allAccounts, "reviewed-client-requests.csv", true)}
+                            >
+                                <Upload size={16} />
+                                Export Reviewed Requests
+                            </button>
                         </div>
                     </div>
                     <AdminCRTable

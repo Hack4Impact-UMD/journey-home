@@ -10,11 +10,11 @@ import { SearchBox } from "@/components/inventory/SearchBox";
 import { SortOption } from "@/components/inventory/SortOption";
 import { useDonationRequests } from "@/lib/queries/donation-requests";
 import { DonationItem, DonationSearchParams } from "@/types/donations";
-import { useState, useMemo, useEffect } from "react";
-import { useExport } from "@/contexts/ExportContext";
+import { useState, useMemo } from "react";
 import { ReviewStatus } from "@/types/general";
 import { ListIcon, SquaresFourIcon } from "@phosphor-icons/react";
 import { exportDonationRequests } from "@/lib/csv-exports";
+import { Upload } from "lucide-react";
 
 type AcquisitionType = "Can Drop Off" | "Needs Pickup";
 const ALL_ACQUISITION_TYPES: AcquisitionType[] = ["Can Drop Off", "Needs Pickup"];
@@ -68,8 +68,6 @@ export default function ReviewedRequestsPage() {
               })
         : [];
 
-    const { setExportHandler } = useExport();
-
     const filtered = useMemo(() => {
         return donationRequests
             .filter((request) => {
@@ -100,15 +98,6 @@ export default function ReviewedRequestsPage() {
                 return diff;
             });
     }, [donationRequests, searchQuery, searchParams]);
-
-    useEffect(() => {
-        if (selectedDRId) {
-            setExportHandler(null);
-            return;
-        }
-        setExportHandler(() => exportDonationRequests(filtered, "reviewed-donation-requests.csv"));
-        return () => setExportHandler(null);
-    }, [filtered, setExportHandler, selectedDRId]);
 
     return selectedDR ? (
         <>
@@ -247,6 +236,14 @@ export default function ReviewedRequestsPage() {
                         selected={acquisitionFilter}
                         setSelected={setAcquisitionFilter}
                     />
+                    <button
+                        type="button"
+                        className="bg-primary text-white px-3 py-1.5 text-sm flex items-center gap-1.5 shrink-0 ml-auto"
+                        onClick={() => exportDonationRequests(filtered, "reviewed-donation-requests.csv")}
+                    >
+                        <Upload size={16} />
+                        Export Reviewed Requests
+                    </button>
                 </div>
             </div>
             <div className="flex-1 overflow-auto min-h-0">

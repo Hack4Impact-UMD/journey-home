@@ -3,15 +3,15 @@
 import { RequestDetailsPage } from "@/components/client-requests/RequestDetails";
 import { ProtectedRoute } from "@/components/general/ProtectedRoute";
 import { useClientRequests } from "@/lib/queries/client-requests";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { SortOption } from "@/components/inventory/SortOption";
 import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
 import { CaseMCRTable } from "@/components/client-requests/CaseMCRTable";
 import { useAuth } from "@/contexts/AuthContext";
-import { useExport } from "@/contexts/ExportContext";
 import { ReviewStatus } from "@/types/general";
 import { exportClientRequestsCaseManager } from "@/lib/csv-exports";
+import { Upload } from "lucide-react";
 
 const statusOpts: ReviewStatus[] = ["Approved", "Denied"];
 
@@ -27,8 +27,6 @@ export default function ClientRequestsCaseManagerPage() {
 
     const { state: authState } = useAuth();
     const uidCM = authState.userData?.uid;
-
-    const { setExportHandler } = useExport();
 
     const filtered = useMemo(() => {
         return clientRequests
@@ -57,15 +55,6 @@ export default function ClientRequestsCaseManagerPage() {
                 }
             });
     }, [clientRequests, searchQuery, sortBy, selectedStatus, uidCM]);
-
-    useEffect(() => {
-        if (selectedCRId) {
-            setExportHandler(null);
-            return;
-        }
-        setExportHandler(() => exportClientRequestsCaseManager(filtered, "reviewed-client-requests.csv", true));
-        return () => setExportHandler(null);
-    }, [filtered, setExportHandler, selectedCRId]);
 
     return (
         <ProtectedRoute allow={["Case Manager"]}>
@@ -108,6 +97,14 @@ export default function ClientRequestsCaseManagerPage() {
                                     selected={selectedStatus}
                                     setSelected={setStatus}
                                 />
+                                <button
+                                    type="button"
+                                    className="bg-primary text-white px-3 py-1.5 text-sm flex items-center gap-1.5 shrink-0 ml-auto"
+                                    onClick={() => exportClientRequestsCaseManager(filtered, "reviewed-client-requests.csv", true)}
+                                >
+                                    <Upload size={16} />
+                                    Export Reviewed Requests
+                                </button>
                             </div>
                         </div>
                         <CaseMCRTable

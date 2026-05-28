@@ -5,14 +5,12 @@ import { DonorsTable } from "@/components/user-management/DonorsTable";
 import { fetchAllDonors } from "@/lib/services/donations";
 import { LocationContact } from "@/types/general";
 import { useEffect, useMemo, useState } from "react";
-import { useExport } from "@/contexts/ExportContext";
 import { exportDonors } from "@/lib/csv-exports";
+import { Upload } from "lucide-react";
 
 export default function PastDonorsPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [allDonors, setAllDonors] = useState<LocationContact[]>([]);
-
-    const { setExportHandler } = useExport();
 
     useEffect(() => {
         fetchAllDonors().then(setAllDonors);
@@ -32,21 +30,22 @@ export default function PastDonorsPage() {
             );
     }, [allDonors, searchQuery]);
 
-    useEffect(() => {
-        setExportHandler(() => exportDonors(filtered));
-        return () => setExportHandler(null);
-    }, [filtered, setExportHandler]);
-
     return (
         <>
-            <div className="flex flex-col mb-6">
-                <div className="flex flex-wrap gap-3">
-                    <SearchBox
-                        value={searchQuery}
-                        onChange={setSearchQuery}
-                        onSubmit={() => fetchAllDonors().then(setAllDonors)}
-                    />
-                </div>
+            <div className="flex flex-wrap items-center gap-3 mb-6">
+                <SearchBox
+                    value={searchQuery}
+                    onChange={setSearchQuery}
+                    onSubmit={() => fetchAllDonors().then(setAllDonors)}
+                />
+                <button
+                    type="button"
+                    className="bg-primary text-white px-3 py-1.5 text-sm flex items-center gap-1.5 shrink-0 md:ml-auto"
+                    onClick={() => exportDonors(filtered)}
+                >
+                    <Upload size={16} />
+                    Export Past Donors
+                </button>
             </div>
 
             <div className="flex-1 overflow-auto min-h-0">

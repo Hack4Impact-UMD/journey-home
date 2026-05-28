@@ -12,9 +12,9 @@ import { useDonationRequests } from "@/lib/queries/donation-requests";
 import { ReviewStatus } from "@/types/general";
 import { DonationItem, DonationSearchParams } from "@/types/donations";
 import { ListIcon, SquaresFourIcon } from "@phosphor-icons/react";
-import { useEffect, useMemo, useState } from "react";
-import { useExport } from "@/contexts/ExportContext";
+import { useMemo, useState } from "react";
 import { exportDonationRequests } from "@/lib/csv-exports";
+import { Upload } from "lucide-react";
 
 type AcquisitionType = "Can Drop Off" | "Needs Pickup";
 const ALL_ACQUISITION_TYPES: AcquisitionType[] = ["Can Drop Off", "Needs Pickup"];
@@ -69,8 +69,6 @@ export default function NewRequestsPage() {
               })
         : [];
 
-    const { setExportHandler } = useExport();
-
     const filtered = useMemo(() => {
         return donationRequests
             .filter((request) => {
@@ -111,15 +109,6 @@ export default function NewRequestsPage() {
                 return diff;
             });
     }, [donationRequests, searchQuery, searchParams]);
-
-    useEffect(() => {
-        if (selectedDRId) {
-            setExportHandler(null);
-            return;
-        }
-        setExportHandler(() => exportDonationRequests(filtered, "new-donation-requests.csv"));
-        return () => setExportHandler(null);
-    }, [filtered, setExportHandler, selectedDRId]);
 
     return selectedDR ? (
         <>
@@ -258,6 +247,14 @@ export default function NewRequestsPage() {
                         selected={acquisitionFilter}
                         setSelected={setAcquisitionFilter}
                     />
+                    <button
+                        type="button"
+                        className="bg-primary text-white px-3 py-1.5 text-sm flex items-center gap-1.5 shrink-0 ml-auto"
+                        onClick={() => exportDonationRequests(filtered, "new-donation-requests.csv")}
+                    >
+                        <Upload size={16} />
+                        Export New Requests
+                    </button>
                 </div>
             </div>
             <div className="flex-1 overflow-auto min-h-0 pr-4">

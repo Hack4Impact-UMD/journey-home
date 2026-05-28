@@ -9,9 +9,9 @@ import { ConfirmModal } from "@/components/general/ConfirmModal";
 import { DebounceTextbox } from "@/components/general/DebounceTextbox";
 import { useClientRequests } from "@/lib/queries/client-requests";
 import { useAllActiveAccounts } from "@/lib/queries/users";
-import { useState, useMemo, useEffect } from "react";
-import { useExport } from "@/contexts/ExportContext";
+import { useState, useMemo } from "react";
 import { exportClientRequestsAdmin } from "@/lib/csv-exports";
+import { Upload } from "lucide-react";
 
 export default function ClientRequestsAdminPage() {
     const { clientRequests, refetch: refetchClientRequests, setClientRequest, setClientRequestToast } = useClientRequests();
@@ -29,8 +29,6 @@ export default function ClientRequestsAdminPage() {
     const userById = useMemo(() => new Map(allAccounts.map((u) => [u.uid, u])), [allAccounts]);
     const pendingCaseManager = selectedCR ? (userById.get(selectedCR.caseManagerID) ?? null) : null;
 
-    const { setExportHandler } = useExport();
-
     const filtered = useMemo(() => {
         return clientRequests
             .filter((request) => {
@@ -41,7 +39,7 @@ export default function ClientRequestsAdminPage() {
                 const cm = userById.get(request.caseManagerID);
                 return [
                     `${request.client.firstName}${request.client.lastName}`,
-                    request.client.email,
+                    request.client.email ?? "",
                     request.client.phoneNumber,
                     cm ? `${cm.firstName}${cm.lastName}` : "",
                     cm?.email ?? "",
@@ -59,15 +57,6 @@ export default function ClientRequestsAdminPage() {
                 }
             });
     }, [clientRequests, searchQuery, sortBy, userById]);
-
-    useEffect(() => {
-        if (selectedCRId) {
-            setExportHandler(null);
-            return;
-        }
-        setExportHandler(() => exportClientRequestsAdmin(filtered, allAccounts, "new-client-requests.csv", false));
-        return () => setExportHandler(null);
-    }, [filtered, allAccounts, setExportHandler, selectedCRId]);
 
     const handleConfirm = async () => {
         if (!pendingAction || !selectedCR) return;
@@ -146,6 +135,14 @@ export default function ClientRequestsAdminPage() {
                                 status={sortBy}
                                 onChange={(status) => setSortBy(status)}
                             />
+                            <button
+                                type="button"
+                                className="bg-primary text-white px-3 py-1.5 text-sm flex items-center gap-1.5 shrink-0 ml-auto"
+                                onClick={() => exportClientRequestsAdmin(filtered, allAccounts, "new-client-requests.csv", false)}
+                            >
+                                <Upload size={16} />
+                                Export New Requests
+                            </button>
                         </div>
                     </div>
                     <AdminCRTable

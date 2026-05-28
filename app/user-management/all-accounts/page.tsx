@@ -5,11 +5,11 @@ import { SearchBox } from "@/components/inventory/SearchBox";
 import { EditAccountModal } from "@/components/user-management/EditAccountModal";
 import { UserTable } from "@/components/user-management/UserTable";
 import { UserData, UserRole } from "@/types/user";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useAllActiveAccounts } from "@/lib/queries/users";
 import { Spinner } from "@/components/ui/spinner";
-import { useExport } from "@/contexts/ExportContext";
 import { exportUsers } from "@/lib/csv-exports";
+import { Upload } from "lucide-react";
 
 export default function AllAccountsPage() {
     const roleOptions: UserRole[] = ["Admin", "Case Manager", "Volunteer"];
@@ -22,7 +22,6 @@ export default function AllAccountsPage() {
     const [selectedStatuses, setSelectedStatuses] = useState<AccountStatus[]>([...statusOptions]);
 
     const { allAccounts, editAccount, refetch: refetchAllAccounts, isLoading } = useAllActiveAccounts();
-    const { setExportHandler } = useExport();
 
     const filteredUsers = useMemo(() => {
         return allAccounts
@@ -39,11 +38,6 @@ export default function AllAccountsPage() {
             );
     }, [allAccounts, selectedRoles, searchQuery]);
 
-    useEffect(() => {
-        setExportHandler(() => exportUsers(filteredUsers));
-        return () => setExportHandler(null);
-    }, [filteredUsers, setExportHandler]);
-
     return (
         <>
             {selectedAccount && (
@@ -53,31 +47,37 @@ export default function AllAccountsPage() {
                     editAccount={editAccount}
                 />
             )}
-            <div className="flex flex-col mb-6">
-                <div className="flex flex-wrap gap-3">
-                    <SearchBox
-                        value={searchQuery}
-                        onChange={setSearchQuery}
-                        onSubmit={refetchAllAccounts}
-                    />
-                    <DropdownMultiselect
-                        label="User Type"
-                        options={roleOptions}
-                        selected={selectedRoles}
-                        setSelected={setSelectedRoles}
-                    />
-                    <DropdownMultiselect
-                        label="Status"
-                        options={[...statusOptions]}
-                        selected={selectedStatuses}
-                        setSelected={setSelectedStatuses}
-                    />
-                    {isLoading && (
-                        <div className="flex items-center">
-                            <Spinner className="size-5 text-primary" />
-                        </div>
-                    )}
-                </div>
+            <div className="flex flex-wrap items-center gap-3 mb-6">
+                <SearchBox
+                    value={searchQuery}
+                    onChange={setSearchQuery}
+                    onSubmit={refetchAllAccounts}
+                />
+                <DropdownMultiselect
+                    label="User Type"
+                    options={roleOptions}
+                    selected={selectedRoles}
+                    setSelected={setSelectedRoles}
+                />
+                <DropdownMultiselect
+                    label="Status"
+                    options={[...statusOptions]}
+                    selected={selectedStatuses}
+                    setSelected={setSelectedStatuses}
+                />
+                {isLoading && (
+                    <div className="flex items-center">
+                        <Spinner className="size-5 text-primary" />
+                    </div>
+                )}
+                <button
+                    type="button"
+                    className="bg-primary text-white px-3 py-1.5 text-sm flex items-center gap-1.5 shrink-0 md:ml-auto"
+                    onClick={() => exportUsers(filteredUsers)}
+                >
+                    <Upload size={16} />
+                    Export All Accounts
+                </button>
             </div>
             <div className="flex-1 overflow-auto min-h-0">
             <UserTable
