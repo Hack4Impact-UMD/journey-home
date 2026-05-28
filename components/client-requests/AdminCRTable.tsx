@@ -1,7 +1,8 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { ClientRequest } from "@/types/client-requests";
+import { DogSitIcon } from "@/components/icons/DogSitIcon";
 import { ReviewStatus } from "@/types/general";
 import { useAllActiveAccounts } from "@/lib/queries/users";
 import { UserData } from "@/types/user";
@@ -55,7 +56,12 @@ export function AdminCRTable({
                 </span>
             </div>
             <div className="flex-1 overflow-auto min-h-0">
-                {clientRequests.map((cr) => (
+                {clientRequests.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-full gap-2 py-8">
+                        <DogSitIcon />
+                        <p className="text-sm text-[#A2A2A2]">No client requests found.</p>
+                    </div>
+                ) : clientRequests.map((cr) => (
                     <CRTableRow
                         request={cr}
                         key={cr.id}
@@ -107,7 +113,7 @@ function CRTableRow({
                 </span>
             </div>
             <div className="w-[25%] px-4">
-                <span>{caseManager?.email ?? "—"}</span>
+                <span>{caseManager?.email ?? "â€”"}</span>
             </div>
             <span className="w-[15%] px-4">
                 {request.date
@@ -116,7 +122,7 @@ function CRTableRow({
                         day: "2-digit",
                         year: "2-digit",
                     })
-                    : "—"
+                    : "â€”"
                 }
             </span>
             <div className="w-[20%] px-4 flex items-center">
@@ -151,3 +157,4 @@ function CRTableRow({
         </div>
     );
 }
+

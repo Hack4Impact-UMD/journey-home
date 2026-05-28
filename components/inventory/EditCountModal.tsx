@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { BoxIcon } from "lucide-react";
 import { InventoryCategory } from "@/types/inventory";
+import { PresetIcon } from "@/components/icons/PresetIcon";
 
 interface EditCountModalProps {
     category: InventoryCategory;
@@ -33,7 +33,7 @@ export function EditCountModal({ category, onClose, onSubmit }: EditCountModalPr
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="absolute -bottom-6 -right-6 pointer-events-none select-none opacity-10 -z-10">
-                    <BoxIcon className="w-52 h-52 text-gray-400" strokeWidth={1} />
+                    <PresetIcon icon={category.icon} className="w-52 h-52 text-gray-400" />
                 </div>
 
                 <h2 className="text-2xl font-bold text-[#17B8C4] mb-5">{category.name}</h2>

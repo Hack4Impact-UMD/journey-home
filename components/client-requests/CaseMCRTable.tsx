@@ -1,5 +1,6 @@
-import { ClientRequest } from "@/types/client-requests";
+﻿import { ClientRequest } from "@/types/client-requests";
 import { Badge } from "../inventory/Badge";
+import { DogSitIcon } from "@/components/icons/DogSitIcon";
 
 export function CaseMCRTable({
     clientRequests,
@@ -28,7 +29,12 @@ export function CaseMCRTable({
                 </span>
             </div>
             <div className="flex-1 overflow-auto min-h-0">
-                {clientRequests.map((cr) => (
+                {clientRequests.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-full gap-2 py-8">
+                        <DogSitIcon />
+                        <p className="text-sm text-[#A2A2A2]">No client requests found.</p>
+                    </div>
+                ) : clientRequests.map((cr) => (
                     <CRTableRow request={cr} key={cr.id} onOpen={() => openCR(cr)} />
                 ))}
             </div>
@@ -83,3 +89,4 @@ function CRTableRow({ request, onOpen }: { request: ClientRequest; onOpen: () =>
         </div>
     );
 }
+

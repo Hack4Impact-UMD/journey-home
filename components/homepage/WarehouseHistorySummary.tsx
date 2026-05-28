@@ -3,6 +3,8 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import { useWarehouseHistory } from "@/lib/queries/warehouse-history";
+import { useAllActiveAccounts } from "@/lib/queries/users";
+import { Badge } from "@/components/inventory/Badge";
 
 function PlusIcon() {
     return (
@@ -22,6 +24,8 @@ function MinusIcon() {
 
 export default function WarehouseHistorySummary() {
     const { changes: warehouseChanges = [], isLoading } = useWarehouseHistory();
+    const { allAccounts } = useAllActiveAccounts();
+    const userById = new Map(allAccounts.map((u) => [u.uid, u]));
 
     const sortedChanges = useMemo(() =>
         [...warehouseChanges]
@@ -60,6 +64,9 @@ export default function WarehouseHistorySummary() {
                     {mostRecent.map((c) => {
                         const diff = c.change.newQuantity - c.change.oldQuantity;
                         const isPositive = diff > 0;
+                        const user = userById.get(c.userId);
+                        const displayName = user ? `${user.firstName} ${user.lastName}` : c.userId;
+                        const roleColor = user?.role === "Admin" ? "light-pink" : user?.role === "Case Manager" ? "indigo" : "light-green";
                         return (
                             <Link key={c.id} href="/control-panel/warehouse-history" className="flex items-center gap-3 bg-white/70 border border-[#DCDDDD] rounded-xl px-3 py-2">
                                 <span className="shrink-0">
@@ -69,7 +76,10 @@ export default function WarehouseHistorySummary() {
                                     {c.timestamp.toDate().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).replaceAll(",", "").replace(" AM", "am").replace(" PM", "pm")}
                                 </span>
                                 <span className="border-l border-gray-200 self-stretch" />
-                                <span className="text-sm text-gray-700">
+                                <span className="text-xs shrink-0">
+                                    <Badge text={displayName} color={roleColor} />
+                                </span>
+                                <span className="text-sm text-gray-700 truncate">
                                     {isPositive ? "added " : "removed "}
                                     {Math.abs(diff)} {c.change.category} ({c.change.oldQuantity} → {c.change.newQuantity})
                                 </span>

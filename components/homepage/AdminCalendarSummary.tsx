@@ -110,7 +110,7 @@ export default function AdminCalendarSummary() {
                                                 <Link href="/schedule/calendar" className="flex items-center gap-2 py-5">
                                                     <span className={`h-3.5 w-3.5 rounded-full shrink-0 ${type_dot_color[tb.type]}`} />
                                                     <span className="w-24 shrink-0 text-sm">{formatTime(tb.startTime)}-{formatTime(tb.endTime)}</span>
-                                                    <span className="flex-1 text-sm">{tb.type}</span>
+                                                    <span className="flex-1 text-sm">{tb.name}</span>
                                                     <div className="flex items-center gap-2">
                                                         <span className={`flex text-sm items-center gap-[0.25rem] ${lowVol ? "text-[#E16060]" : "text-[#000000]"}`}>
                                                             <AdminCalendarPeople fill={lowVol ? "#E16060" : "#000000"} />

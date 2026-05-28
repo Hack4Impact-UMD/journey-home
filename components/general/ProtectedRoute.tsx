@@ -39,6 +39,12 @@ export function ProtectedRoute({children, allow}: ProtectedRouteProps) {
             return;
         }
 
+        if (authState.userData.role === "Volunteer" && authState.userData.pending === null && authState.userData.signedWaiver === null) {
+            setShow(false);
+            router.push("/status/waiver-pending");
+            return;
+        }
+
         if (!authState.userData.emailVerified) {
             setShow(false);
             router.push("/status/verify-email");

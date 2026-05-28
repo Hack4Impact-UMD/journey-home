@@ -39,3 +39,10 @@ export interface AuthContextType {
     sendVerificationEmail: () => Promise<void>;
     checkVerification: () => Promise<{ verified: boolean }>;
 }
+
+export type Waiver = {
+    id: string,
+    file: string,
+    start: Timestamp,
+    end: Timestamp | null,
+}

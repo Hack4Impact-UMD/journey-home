@@ -1,5 +1,6 @@
-import { DonationRequest } from "@/types/donations";
+﻿import { DonationRequest } from "@/types/donations";
 import { Badge } from "../inventory/Badge";
+import { DogSitIcon } from "@/components/icons/DogSitIcon";
 import { DropdownIcon } from "../icons/DropdownIcon";
 import {
     DropdownMenu,
@@ -44,7 +45,12 @@ export function DRTable({
                 )}
             </div>
             <div className="flex-1 overflow-auto min-h-0">
-                {donationRequests.map((dr) => (
+                {donationRequests.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-full gap-2 py-8">
+                        <DogSitIcon />
+                        <p className="text-sm text-[#A2A2A2]">No donation requests found.</p>
+                    </div>
+                ) : donationRequests.map((dr) => (
                     <DRTableRow
                         request={dr}
                         onOpen={() => openDR(dr)}
@@ -169,3 +175,4 @@ function DRTableRow({
         </div>
     );
 }
+

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useInventoryCategories } from "@/lib/queries/inventory";
@@ -10,6 +10,7 @@ import { SearchBox } from "@/components/inventory/SearchBox";
 import { Badge } from "@/components/inventory/Badge";
 import { CategoryModal } from "@/components/control-panel/CategoryModal";
 import { PresetIcon } from "@/components/icons/PresetIcon";
+import { DogSitIcon } from "@/components/icons/DogSitIcon";
 
 export default function CategoriesPage() {
   const { state: { userData } } = useAuth();
@@ -57,8 +58,9 @@ export default function CategoriesPage() {
           </div>
 
             {filteredCategories.length === 0 ? (
-              <div className="flex items-center justify-center h-24 text-sm text-[#A2A2A2]">
-                No categories found.
+              <div className="flex flex-col items-center justify-center gap-2 py-8">
+                <DogSitIcon />
+                <p className="text-sm text-[#A2A2A2]">No categories found.</p>
               </div>
             ) : (
               filteredCategories.map((category) => (
@@ -105,3 +107,4 @@ export default function CategoriesPage() {
     </>
   );
 }
+

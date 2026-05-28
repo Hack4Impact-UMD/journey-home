@@ -1,7 +1,8 @@
-"use client";
+﻿"use client";
 
 import { UserData } from "@/types/user";
 import { Badge } from "../inventory/Badge";
+import { DogSitIcon } from "@/components/icons/DogSitIcon";
 
 type UserTableProps = {
     users: UserData[];
@@ -26,7 +27,12 @@ export function UserTable({ users, onSelect }: UserTableProps) {
                 </span>
             </div>
             <div className="flex-1 overflow-auto min-h-0">
-                {users.map((user) => (
+                {users.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-full gap-2 py-8">
+                        <DogSitIcon />
+                        <p className="text-sm text-[#A2A2A2]">No accounts found.</p>
+                    </div>
+                ) : users.map((user) => (
                     <UserTableRow user={user} key={user.uid} onSelect={() => onSelect(user)} />
                 ))}
             </div>
@@ -63,9 +69,10 @@ function UserTableRow({ user, onSelect }: { user: UserData, onSelect: () => void
             </div>
             <div className="w-[20%] px-4 flex items-center">
                 <span>
-                    {user.phone ?? "—"}
+                    {user.phone ?? "â€”"}
                 </span>
             </div>
         </div>
     );
 }
+

@@ -139,11 +139,11 @@ export default function VerifyEmailPage() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Left side - background image, desktop only */}
-        <div className="hidden md:flex shrink-0 items-start justify-start h-full">
+        <div className="hidden md:flex h-full max-w-[30em] overflow-hidden justify-center items-center">
           <img
             src="/background.png"
             alt="Background"
-            className="h-[58em] w-[30em] object-cover object-left overflow-hidden"
+            className="object-cover min-h-full"
           />
         </div>
 
