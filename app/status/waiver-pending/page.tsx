@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import AuthMobileNavbar from "@/components/auth/AuthMobileNavbar";
 import { WaiverPdfViewer } from "@/components/control-panel/WaiverPdfViewer";
 import { useWaivers } from "@/lib/queries/waivers";
 import { signWaiver } from "@/lib/services/users";
+import { toast } from "sonner";
 
 export default function WaiverPending() {
     const auth = useAuth();
@@ -17,6 +18,12 @@ export default function WaiverPending() {
     const [error, setError] = useState(false);
     const [submitting, setSubmitting] = useState(false);
 
+    useEffect(() => {
+        if (!auth.state.loading && auth.state.userData?.signedWaiver) {
+            router.replace("/");
+        }
+    }, [auth.state.loading, auth.state.userData, router]);
+
     const handleContinue = async () => {
         if (!agreed) {
             setError(true);
@@ -25,9 +32,14 @@ export default function WaiverPending() {
         const uid = auth.state.currentUser?.uid;
         if (!uid) return;
         setSubmitting(true);
-        await signWaiver(uid);
-        await auth.refreshUser();
-        router.push("/");
+        try {
+            await signWaiver(uid);
+            await auth.refreshUser();
+            router.push("/");
+        } catch {
+            toast.error("Failed to submit waiver. Please try again.");
+            setSubmitting(false);
+        }
     };
 
     return (
