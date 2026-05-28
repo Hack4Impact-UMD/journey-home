@@ -32,9 +32,9 @@ export default function CalendarPage() {
             : date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
 
     return (
-        <>
+        <div className="w-full h-full flex flex-col px-6">
             {/* Toolbar */}
-            <div className="grid grid-cols-3 items-center mb-4 px-6">
+            <div className="grid grid-cols-3 items-center mb-4">
                 <div className="flex items-center gap-3">
                     <button onClick={() => setDate(new Date())} className="px-4 py-1 rounded-full border border-light-border text-sm bg-white shadow-[0_1px_3px_rgba(38,51,77,0.06)]">
                         <span className={todayHighlight ? "text-[#02AFC7]" : "text-[#6B7A99]"}>Today</span>
@@ -111,6 +111,6 @@ export default function CalendarPage() {
                 onClose={() => setEditingTB(null)}
                 onSaved={() => setEditingTB(null)}
             />
-        </>
+        </div>
     );
 }

@@ -9,6 +9,7 @@ import { SearchBox } from "@/components/inventory/SearchBox";
 import { AdminCalendarPeople } from "@/components/icons/AdminCalendarPeople";
 import { AdminCalendarDriver } from "@/components/icons/AdminCalendarDriver";
 import { ShiftDetailOverlay } from "@/components/schedule/ShiftDetailOverlay";
+import { Spinner } from "@/components/ui/spinner";
 
 const SHIFT_OPTIONS = ["Warehouse", "Pickup/Delivery"] as const;
 type ShiftType = (typeof SHIFT_OPTIONS)[number];
@@ -49,7 +50,7 @@ function getDriverStats(tb: TimeBlock) {
 }
 
 export default function ListView() {
-    const { allTB: blocks } = useTimeBlocks();
+    const { allTB: blocks, isLoading, refetch } = useTimeBlocks();
     const [selectedTypes, setSelectedTypes] = useState<ShiftType[]>([...SHIFT_OPTIONS]);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [selectedTimeBlock, setSelectedTimeBlock] = useState<TimeBlock | null>(null);
@@ -79,9 +80,11 @@ export default function ListView() {
         return groups;
     }, [filteredBlocks]);
 
+    const scrollToToday = () => todayLineRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+
     useEffect(() => {
-        todayLineRef.current?.scrollIntoView({ block: "center" });
-    }, [groupedEvents]);
+        if (!isLoading) scrollToToday();
+    }, [isLoading]);
 
     const todayStart = useMemo(() => {
         const d = new Date(Date.now());
@@ -92,13 +95,19 @@ export default function ListView() {
     return (
         <>
             <div className="mb-4 px-6 flex flex-wrap items-center gap-3">
-                <SearchBox value={searchQuery} onChange={setSearchQuery} onSubmit={() => {}} />
+                <SearchBox value={searchQuery} onChange={setSearchQuery} onSubmit={refetch} />
                 <DropdownMultiselect
                     label="Shift Type"
                     options={[...SHIFT_OPTIONS]}
                     selected={selectedTypes}
                     setSelected={setSelectedTypes}
                 />
+                <button
+                    onClick={scrollToToday}
+                    className="h-8 shrink-0 px-3 rounded-xs border border-[#02AFC7] text-sm bg-[#02AFC7] text-white cursor-pointer"
+                >
+                    Today
+                </button>
                 <button
                     onClick={() => setEditingTB(makeDefaultTimeBlock())}
                     className="ml-auto flex items-center gap-1.5 px-3 py-2 rounded-sm cursor-pointer text-white text-sm bg-[#02AFC7]"
@@ -109,7 +118,11 @@ export default function ListView() {
             </div>
 
             <div className="flex-1 overflow-auto min-h-0 flex flex-col border-t border-gray-200">
-                {groupedEvents.map(({ dateKey, date, events }, idx) => {
+                {isLoading ? (
+                    <div className="flex flex-1 items-center justify-center">
+                        <Spinner className="size-6 text-primary" />
+                    </div>
+                ) : groupedEvents.map(({ dateKey, date, events }, idx) => {
                     const isPast = date.getTime() < todayStart;
                     const nextDate = idx < groupedEvents.length - 1 ? groupedEvents[idx + 1].date : null;
                     const isLastPast = isPast && (nextDate === null || nextDate.getTime() >= todayStart);
