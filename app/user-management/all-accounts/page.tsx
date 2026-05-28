@@ -72,7 +72,7 @@ export default function AllAccountsPage() {
                 )}
                 <ExportButton
                     label="Export All Accounts"
-                    onClick={() => exportUsers(filteredUsers)}
+                    onClick={() => exportUsers(allAccounts)}
                     className="md:ml-auto"
                 />
             </div>

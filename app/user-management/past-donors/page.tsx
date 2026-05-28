@@ -40,7 +40,7 @@ export default function PastDonorsPage() {
                 />
                 <ExportButton
                     label="Export Past Donors"
-                    onClick={() => exportDonors(filtered)}
+                    onClick={() => exportDonors(allDonors)}
                     className="md:ml-auto"
                 />
             </div>

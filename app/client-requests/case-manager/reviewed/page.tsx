@@ -10,8 +10,6 @@ import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect"
 import { CaseMCRTable } from "@/components/client-requests/CaseMCRTable";
 import { useAuth } from "@/contexts/AuthContext";
 import { ReviewStatus } from "@/types/general";
-import { exportClientRequestsCaseManager } from "@/lib/csv-exports";
-import { ExportButton } from "@/components/general/ExportButton";
 
 const statusOpts: ReviewStatus[] = ["Approved", "Denied"];
 
@@ -96,11 +94,6 @@ export default function ClientRequestsCaseManagerPage() {
                                     options={statusOpts}
                                     selected={selectedStatus}
                                     setSelected={setStatus}
-                                />
-                                <ExportButton
-                                    label="Export Reviewed Requests"
-                                    onClick={() => exportClientRequestsCaseManager(filtered, "reviewed-client-requests.csv", true)}
-                                    className="ml-auto"
                                 />
                             </div>
                         </div>

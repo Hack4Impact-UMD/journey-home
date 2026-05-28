@@ -8,8 +8,6 @@ import { SearchBox } from "@/components/inventory/SearchBox";
 import { SortOption } from "@/components/inventory/SortOption";
 import { CaseMCRTable } from "@/components/client-requests/CaseMCRTable";
 import { useAuth } from "@/contexts/AuthContext";
-import { exportClientRequestsCaseManager } from "@/lib/csv-exports";
-import { ExportButton } from "@/components/general/ExportButton";
 
 export default function ClientRequestsCaseManagerPage() {
     const { clientRequests, refetch: refetchClientRequests } = useClientRequests();
@@ -84,11 +82,6 @@ export default function ClientRequestsCaseManagerPage() {
                                     label="Date"
                                     status={sortBy}
                                     onChange={(status) => setSortBy(status)}
-                                />
-                                <ExportButton
-                                    label="Export New Requests"
-                                    onClick={() => exportClientRequestsCaseManager(filtered, "new-client-requests.csv", false)}
-                                    className="ml-auto"
                                 />
                             </div>
                         </div>

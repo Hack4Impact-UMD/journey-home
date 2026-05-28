@@ -29,34 +29,6 @@ export default function ClientRequestsAdminPage() {
     const userById = useMemo(() => new Map(allAccounts.map((u) => [u.uid, u])), [allAccounts]);
     const pendingCaseManager = selectedCR ? (userById.get(selectedCR.caseManagerID) ?? null) : null;
 
-    const filtered = useMemo(() => {
-        return clientRequests
-            .filter((request) => {
-                if (request.status !== "Not Reviewed") return false;
-                const norm = (s: string) => s.toLowerCase().replace(/\s/g, "");
-                const q = norm(searchQuery);
-                if (!q) return true;
-                const cm = userById.get(request.caseManagerID);
-                return [
-                    `${request.client.firstName}${request.client.lastName}`,
-                    request.client.email ?? "",
-                    request.client.phoneNumber,
-                    cm ? `${cm.firstName}${cm.lastName}` : "",
-                    cm?.email ?? "",
-                ].some((field) => norm(field).includes(q));
-            })
-            .sort((req1, req2) => {
-                if (sortBy === "none") {
-                    return `${req1.client.lastName} ${req1.client.firstName}`.localeCompare(
-                        `${req2.client.lastName} ${req2.client.firstName}`,
-                    );
-                } else if (sortBy === "asc") {
-                    return (req1.date?.seconds ?? 0) - (req2.date?.seconds ?? 0);
-                } else {
-                    return (req2.date?.seconds ?? 0) - (req1.date?.seconds ?? 0);
-                }
-            });
-    }, [clientRequests, searchQuery, sortBy, userById]);
 
     const handleConfirm = async () => {
         if (!pendingAction || !selectedCR) return;
@@ -137,7 +109,12 @@ export default function ClientRequestsAdminPage() {
                             />
                             <ExportButton
                                 label="Export New Requests"
-                                onClick={() => exportClientRequestsAdmin(filtered, allAccounts, "new-client-requests.csv", false)}
+                                onClick={() => exportClientRequestsAdmin(
+                                    clientRequests.filter((r) => r.status === "Not Reviewed"),
+                                    allAccounts,
+                                    "new-client-requests.csv",
+                                    false
+                                )}
                                 className="ml-auto"
                             />
                         </div>

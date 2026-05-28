@@ -12,7 +12,7 @@ import { useDonationRequests } from "@/lib/queries/donation-requests";
 import { ReviewStatus } from "@/types/general";
 import { DonationItem, DonationSearchParams } from "@/types/donations";
 import { ListIcon, SquaresFourIcon } from "@phosphor-icons/react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { exportDonationRequests } from "@/lib/csv-exports";
 import { ExportButton } from "@/components/general/ExportButton";
 
@@ -69,46 +69,6 @@ export default function NewRequestsPage() {
               })
         : [];
 
-    const filtered = useMemo(() => {
-        return donationRequests
-            .filter((request) => {
-                const donorFullName = `${request.donor.firstName} ${request.donor.lastName}`.toLowerCase();
-                const completedRequest = request.items.every(
-                    (donItem) => donItem.status === "Approved" || donItem.status === "Denied",
-                );
-                if (completedRequest) return false;
-
-                if (searchParams.status.length != 0) {
-                    const startedRequest = request.items.some(
-                        (donItem) => donItem.status === "Approved" || donItem.status === "Denied",
-                    );
-                    const allDone = request.items.every(
-                        (donItem) => donItem.status === "Approved" || donItem.status === "Denied",
-                    );
-                    let requestStat: "Not Reviewed" | "Unfinished" | "Finished";
-                    if (!startedRequest) requestStat = "Not Reviewed";
-                    else if (!allDone) requestStat = "Unfinished";
-                    else requestStat = "Finished";
-                    if (!searchParams.status.includes(requestStat)) return false;
-                }
-
-                return donorFullName.includes(searchQuery.toLowerCase());
-            })
-            .sort((req1, req2) => {
-                let diff;
-                if (searchParams.sortBy == "Date") {
-                    diff = req1.date.seconds - req2.date.seconds;
-                } else if (searchParams.sortBy == "Quantity") {
-                    diff = req1.items.length - req2.items.length;
-                } else {
-                    diff = `${req1.donor.lastName} ${req1.donor.firstName}`.localeCompare(
-                        `${req2.donor.lastName} ${req2.donor.firstName}`,
-                    );
-                }
-                if (!searchParams.ascending) diff *= -1;
-                return diff;
-            });
-    }, [donationRequests, searchQuery, searchParams]);
 
     return selectedDR ? (
         <>
@@ -249,7 +209,10 @@ export default function NewRequestsPage() {
                     />
                     <ExportButton
                         label="Export New Requests"
-                        onClick={() => exportDonationRequests(filtered, "new-donation-requests.csv")}
+                        onClick={() => exportDonationRequests(
+                            donationRequests.filter((r) => !r.items.every((i) => i.status === "Approved" || i.status === "Denied")),
+                            "new-donation-requests.csv"
+                        )}
                         className="ml-auto"
                     />
                 </div>
