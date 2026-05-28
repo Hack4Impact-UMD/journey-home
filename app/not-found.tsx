@@ -4,7 +4,7 @@ import { StatusPage } from "@/components/general/StatusPage";
 import { usePageTitle } from "@/lib/usePageTitle";
 
 export default function NotFound() {
-    usePageTitle("404 Page Not Found | Journey Home");
+    usePageTitle("404 Page Not Found – Journey Home");
     return (
         <StatusPage
             title="404 Page Not Found"

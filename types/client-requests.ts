@@ -14,7 +14,8 @@ export type ClientRequest = {
     date: Timestamp
 };
 
-export type Client = LocationContact & {
+export type Client = Omit<LocationContact, 'email'> & {
+    email?: string,
     hmis: string,
     programName: string,
     secondaryContact: ClientSecondaryContact,
@@ -29,6 +30,7 @@ export type ClientSecondaryContact = {
 
 export type ClientQuestions = {
     clientSpeaksEnglish?: boolean,
+    preferredLanguage?: string,
     adultsInFamily?: number,
     childrenInFamily?: number,
     isVeteran?: YesNoUnsure,

@@ -11,3 +11,12 @@ export function formatTime(date: Date): string {
   const suffix = hours >= 12 ? "pm" : "am";
   return `${hour12}${suffix}`;
 }
+
+export function escapeCSVField(value: string | null | undefined): string {
+    let str = String(value ?? "");
+    if (/^[=+\-@]/.test(str)) str = "'" + str;
+    if (str.includes(",") || str.includes('"') || str.includes("\n") || str.includes("\r")) {
+        return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+}

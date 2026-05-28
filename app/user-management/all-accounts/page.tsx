@@ -8,25 +8,21 @@ import { UserData, UserRole } from "@/types/user";
 import { useState } from "react";
 import { useAllActiveAccounts } from "@/lib/queries/users";
 import { Spinner } from "@/components/ui/spinner";
+import { exportUsers } from "@/lib/csv-exports";
+import { ExportButton } from "@/components/general/ExportButton";
 
 export default function AllAccountsPage() {
     const roleOptions: UserRole[] = ["Admin", "Case Manager", "Volunteer"];
+    const statusOptions = ["Active", "Disabled"] as const;
+    type AccountStatus = typeof statusOptions[number];
 
-    const [searchQuery, setSearchQuery] = useState<string>("");
+    const [searchQuery, setSearchQuery] = useState("");
     const [selectedRoles, setSelectedRoles] = useState<UserRole[]>(roleOptions);
+    const [selectedAccount, setSelectedAccount] = useState<UserData | null>(null);
+    const [selectedStatuses, setSelectedStatuses] = useState<AccountStatus[]>([...statusOptions]);
 
-    const {
-        allAccounts,
-        editAccount,
-        refetch: refetchAllAccounts,
-        isLoading,
-    } = useAllActiveAccounts();
+    const { allAccounts, editAccount, refetch: refetchAllAccounts, isLoading } = useAllActiveAccounts();
 
-    const [selectedAccount, setSelectedAccount] = useState<UserData | null>(
-        null,
-    );
-    console.log("Account stuff: ");
-    console.log(allAccounts);
     return (
         <>
             {selectedAccount && (
@@ -36,30 +32,40 @@ export default function AllAccountsPage() {
                     editAccount={editAccount}
                 />
             )}
-            <div className="flex flex-col mb-6">
-                <div className="flex flex-wrap gap-3">
-                    <SearchBox
-                        value={searchQuery}
-                        onChange={setSearchQuery}
-                        onSubmit={refetchAllAccounts}
-                    />
-                    <DropdownMultiselect
-                        label="User Type"
-                        options={roleOptions}
-                        selected={selectedRoles}
-                        setSelected={setSelectedRoles}
-                    />
-                    {isLoading && (
-                        <div className="flex items-center">
-                            <Spinner className="size-5 text-primary" />
-                        </div>
-                    )}
-                </div>
+            <div className="flex flex-wrap items-center gap-3 mb-6">
+                <SearchBox
+                    value={searchQuery}
+                    onChange={setSearchQuery}
+                    onSubmit={refetchAllAccounts}
+                />
+                <DropdownMultiselect
+                    label="User Type"
+                    options={roleOptions}
+                    selected={selectedRoles}
+                    setSelected={setSelectedRoles}
+                />
+                <DropdownMultiselect
+                    label="Status"
+                    options={[...statusOptions]}
+                    selected={selectedStatuses}
+                    setSelected={setSelectedStatuses}
+                />
+                {isLoading && (
+                    <div className="flex items-center">
+                        <Spinner className="size-5 text-primary" />
+                    </div>
+                )}
+                <ExportButton
+                    label="Export All Accounts"
+                    onClick={() => exportUsers(allAccounts)}
+                    className="md:ml-auto"
+                />
             </div>
             <div className="flex-1 overflow-auto min-h-0">
             <UserTable
                 users={allAccounts
                     .filter((user) => selectedRoles.includes(user.role))
+                    .filter((user) => selectedStatuses.includes(user.disabled ? "Disabled" : "Active"))
                     .filter((user) =>
                         ("" + user.firstName + user.lastName + user.email)
                             .trim()

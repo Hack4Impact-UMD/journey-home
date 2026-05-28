@@ -9,7 +9,12 @@ interface FormInputProps {
   className?: string;
   disabled?: boolean;
   min?: number;
+  step?: number;
+  maxLength?: number;
   id?: string;
+  placeholder?: string;
+  pattern?: string;
+  onInvalid?: (e: React.FormEvent<HTMLInputElement>) => void;
 }
 
 export default function FormInput({
@@ -21,7 +26,12 @@ export default function FormInput({
   className = "",
   disabled = false,
   min,
+  step,
+  maxLength,
   id,
+  placeholder,
+  pattern,
+  onInvalid,
 }: FormInputProps) {
   return (
     <div id={id} className={className}>
@@ -32,7 +42,12 @@ export default function FormInput({
       <input
         type={type}
         min={min}
+        step={step}
+        maxLength={maxLength}
         disabled={disabled}
+        placeholder={placeholder}
+        pattern={pattern}
+        onInvalid={onInvalid}
         {...(onChange
           ? { value: value ?? "", onChange }
           : { value: value ?? "", readOnly: true })}

@@ -1,15 +1,33 @@
 "use client";
 
+import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import AuthMobileNavbar from "@/components/auth/AuthMobileNavbar";
+import { getUserByUID } from "@/lib/services/users";
+import { auth } from "@/lib/firebase";
 
 export default function AccountPending() {
-    const auth = useAuth();
+    const authContext = useAuth();
     const router = useRouter();
 
+    useEffect(() => {
+        const handleFocus = async () => {
+            if (!auth.currentUser) return;
+            const userData = await getUserByUID(auth.currentUser.uid);
+            if (userData?.disabled) {
+                router.push("/status/account-disabled");
+            } else if (!userData?.pending) {
+                await authContext.refreshUser();
+                router.push("/");
+            }
+        };
+        window.addEventListener("focus", handleFocus);
+        return () => window.removeEventListener("focus", handleFocus);
+    }, [authContext, router]);
+
     const handleLogout = async () => {
-        await auth.logout();
+        await authContext.logout();
         router.push("/login");
     };
 
@@ -31,7 +49,7 @@ export default function AccountPending() {
                 <div className="flex flex-1 flex-col h-full items-center justify-center" style={{ paddingLeft: '2rem', paddingRight: '2rem' }}>
                 <div className="flex flex-col items-center w-full max-w-[28em]">
                     {/* Logo */}
-                    <div className="flex justify-center mb-16">
+                    <div className="flex justify-center mb-16 cursor-pointer" onClick={() => router.push('/login')}>
                         <img
                             src="/journey-home-logo.png"
                             alt="Journey Home"

@@ -5,6 +5,7 @@ import {
     signOut,
     User,
     sendEmailVerification,
+    sendPasswordResetEmail,
 } from "firebase/auth";
 import { auth } from "../firebase";
 import { Timestamp } from "firebase/firestore";
@@ -17,8 +18,6 @@ export async function signUp(
     firstName: string,
     lastName: string,
     phone: string,
-    phoneExtension: string,
-    dob: string,
     role: UserRole
 ): Promise<User> {
     const userCredential = await createUserWithEmailAndPassword(
@@ -33,9 +32,10 @@ export async function signUp(
         firstName,
         lastName,
         email: user.email!,
-        ...(phone && { phone }),
-        ...(phoneExtension && { phoneExtension }),
-        dob: dob ? Timestamp.fromDate(new Date(dob)) : null,
+        phone: phone,
+        createdTime: Timestamp.now(),
+        disabled: false,
+        signedWaiver: null,
         role: "Volunteer",
         pending: (role == "Volunteer") ? null : role,
         emailVerified: user.emailVerified,
@@ -63,4 +63,8 @@ export async function logout(): Promise<void> {
 
 export async function sendVerificationEmail(user: User): Promise<void> {
     await sendEmailVerification(user);
+}
+
+export async function resetPassword(email: string): Promise<void> {
+    await sendPasswordResetEmail(auth, email);
 }

@@ -11,6 +11,7 @@ import { uploadImage } from "@/lib/services/inventory";
 import { useDonationRequests } from "@/lib/queries/donation-requests";
 import { toast } from "sonner";
 import Image from "next/image";
+import { v4 as uuidv4 } from "uuid";
 
 
 export default function Step3Review() {
@@ -29,21 +30,15 @@ export default function Step3Review() {
             phoneNumber: formState.donorInfo.phoneNumber ?? "",
             address: formState.donorInfo.address ?? {
                 streetAddress: "",
+                apt: "",
                 city: "",
                 state: "CT",
                 zipCode: "",
             },
         };
 
-        const validSizes = ["Small", "Medium", "Large"];
         const items: DonationItem[] = await Promise.all(
             formState.donationItems.map(async (donationItem) => {
-                const size =
-                    donationItem.size &&
-                    validSizes.includes(donationItem.size)
-                        ? donationItem.size
-                        : "Medium";
-
                 const photos: InventoryPhoto[] = await Promise.all(
                     (donationItem.photos ?? []).map(async (file) => ({
                         url: await uploadImage(file),
@@ -53,10 +48,9 @@ export default function Step3Review() {
 
                 return {
                     item: {
-                        id: crypto.randomUUID(),
+                        id: uuidv4(),
                         name: donationItem.name ?? "",
                         category: donationItem.category ?? "",
-                        size: size as "Small" | "Medium" | "Large",
                         quantity: donationItem.quantity ?? 1,
                         notes: donationItem.notes ?? "",
                         dateAdded: Timestamp.now(),
@@ -74,7 +68,7 @@ export default function Step3Review() {
                 : formState.firstTimeDonor;
 
         const request: DonationRequest = {
-            id: crypto.randomUUID(),
+            id: uuidv4(),
             donor,
             firstTimeDonor: isFirstTimeDonor,
             howDidYouHear: formState.howDidYouHear ?? "",
@@ -119,7 +113,7 @@ export default function Step3Review() {
                     alt="Journey Home Logo"
                     height={96}
                     width={350}
-                    className="h-24 w-auto"
+                    className="h-16 md:h-24 w-auto"
                 />
             </div>
 
@@ -130,7 +124,7 @@ export default function Step3Review() {
             </h2>
 
             <div className="border border-gray-300 rounded">
-                <div className="grid grid-cols-2 gap-y-6 p-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 p-6">
                     <div className="font-semibold text-gray-900">Name</div>
                     <div className="text-gray-700">
                         {formState.donorInfo.firstName || ""}{" "}
@@ -152,6 +146,7 @@ export default function Step3Review() {
                     <div className="font-semibold text-gray-900">Address</div>
                     <div className="text-gray-700">
                         {formState.donorInfo.address?.streetAddress || ""}
+                        {formState.donorInfo.address?.apt && ` ${formState.donorInfo.address.apt}`}
                         {formState.donorInfo.address?.streetAddress &&
                             formState.donorInfo.address?.city &&
                             ", "}
@@ -200,7 +195,7 @@ export default function Step3Review() {
                                     Item {index + 1}
                                 </h3>
                             </div>
-                            <div className="grid grid-cols-2 gap-y-6 p-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 p-6">
                                 <div className="font-semibold text-gray-900">
                                     Short Description
                                 </div>
@@ -213,13 +208,6 @@ export default function Step3Review() {
                                 </div>
                                 <div className="text-gray-700">
                                     {item.category || "N/A"}
-                                </div>
-
-                                <div className="font-semibold text-gray-900">
-                                    Size
-                                </div>
-                                <div className="text-gray-700">
-                                    {item.size || "N/A"}
                                 </div>
 
                                 <div className="font-semibold text-gray-900">

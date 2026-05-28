@@ -7,6 +7,7 @@ import { createPortal } from "react-dom";
 import { CloseIcon } from "../icons/CloseIcon";
 import { Badge } from "../inventory/Badge";
 
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { ReviewStatus } from "@/types/general";
@@ -31,6 +32,7 @@ export function ItemReviewModal({
     const markerRef = useRef<mapboxgl.Marker | null>(null);
 
     const [mapError, setMapError] = useState<string | null>(null);
+    const [photoIndex, setPhotoIndex] = useState(0);
 
    const geocodeAddress = async (address: string, expectedCity: string, expectedState: string): Promise<[number, number] | null> => {
         const token = mapboxgl.accessToken;
@@ -124,13 +126,47 @@ export function ItemReviewModal({
         <>
             <div className="fixed inset-0 z-50 flex items-center justify-center font-family-roboto overflow-y-auto">
                 <div className="bg-white w-full h-full flex">
-                    <div className="flex-1 border-light-border justify-center flex items-center bg-gray-100">
+                    <div className="flex-1 border-light-border relative flex items-center bg-gray-100 overflow-hidden">
                         {item.item.photos.length > 0 ? (
-                            <img
-                                className="w-full h-full object-contain"
-                                src={item.item.photos[0].url}
-                                alt="Item photo"
-                            />
+                            <>
+                                <img
+                                    className="w-full h-full object-contain"
+                                    src={item.item.photos[photoIndex].url}
+                                    alt={item.item.photos[photoIndex].altText || "Item photo"}
+                                />
+                                {item.item.photos.length > 1 && (
+                                    <>
+                                        {photoIndex > 0 && (
+                                            <button
+                                                className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full w-9 h-9 flex items-center justify-center bg-[#BFBFBF] hover:bg-[#a8a8a8] transition-colors"
+                                                onClick={() => setPhotoIndex((i) => i - 1)}
+                                                aria-label="Previous photo"
+                                            >
+                                                <ChevronLeft className="w-6 h-6 text-white" strokeWidth={2.5} />
+                                            </button>
+                                        )}
+                                        {photoIndex < item.item.photos.length - 1 && (
+                                            <button
+                                                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full w-9 h-9 flex items-center justify-center bg-[#BFBFBF] hover:bg-[#a8a8a8] transition-colors"
+                                                onClick={() => setPhotoIndex((i) => i + 1)}
+                                                aria-label="Next photo"
+                                            >
+                                                <ChevronRight className="w-6 h-6 text-white" strokeWidth={2.5} />
+                                            </button>
+                                        )}
+                                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 bg-[#808080] rounded-full px-2.5 py-1.5">
+                                            {item.item.photos.map((_, i) => (
+                                                <button
+                                                    key={i}
+                                                    className={`w-2 h-2 rounded-full transition-colors ${i === photoIndex ? "bg-white" : "bg-white/50"}`}
+                                                    onClick={() => setPhotoIndex(i)}
+                                                    aria-label={`Go to photo ${i + 1}`}
+                                                />
+                                            ))}
+                                        </div>
+                                    </>
+                                )}
+                            </>
                         ) : null}
                     </div>
                     <div className="w-[30em] p-10 flex flex-col overflow-y-auto">
@@ -147,16 +183,6 @@ export function ItemReviewModal({
                         </div>
                         <div className="text-xs flex gap-2 my-2">
                             <Badge text={item.item.category} color="blue" />
-                            <Badge
-                                text={item.item.size}
-                                color={
-                                    item.item.size == "Large"
-                                        ? "pink"
-                                        : item.item.size == "Medium"
-                                        ? "purple"
-                                        : "yellow"
-                                }
-                            />
                             <Badge
                                 text={item.item.quantity.toString()}
                                 color="orange"
@@ -235,6 +261,14 @@ export function ItemReviewModal({
                             >
                                 Deny
                             </button>
+                            {(item.status === "Approved" || item.status === "Denied") && (
+                                <button
+                                    className="text-sm rounded-xs h-8 px-4 border border-light-border"
+                                    onClick={() => setStatus("Not Reviewed")}
+                                >
+                                    Mark Unfinished
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>

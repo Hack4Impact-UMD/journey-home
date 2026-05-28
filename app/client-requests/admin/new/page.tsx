@@ -9,12 +9,13 @@ import { ConfirmModal } from "@/components/general/ConfirmModal";
 import { DebounceTextbox } from "@/components/general/DebounceTextbox";
 import { useClientRequests } from "@/lib/queries/client-requests";
 import { useAllActiveAccounts } from "@/lib/queries/users";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { exportClientRequestsAdmin } from "@/lib/csv-exports";
+import { ExportButton } from "@/components/general/ExportButton";
 
 export default function ClientRequestsAdminPage() {
     const { clientRequests, refetch: refetchClientRequests, setClientRequest, setClientRequestToast } = useClientRequests();
     const { allAccounts } = useAllActiveAccounts();
-    const userById = new Map(allAccounts.map((u) => [u.uid, u]));
 
     const [selectedCRId, setSelectedCRId] = useState<string | null>(null);
     const selectedCR = clientRequests.find((cr) => cr.id === selectedCRId) ?? null;
@@ -24,7 +25,10 @@ export default function ClientRequestsAdminPage() {
 
     const [editSinceLabel, setEditSinceLabel] = useState<string | null>("Saved");
     const [pendingAction, setPendingAction] = useState<{ status: "Approved" | "Denied" } | null>(null);
+
+    const userById = useMemo(() => new Map(allAccounts.map((u) => [u.uid, u])), [allAccounts]);
     const pendingCaseManager = selectedCR ? (userById.get(selectedCR.caseManagerID) ?? null) : null;
+
 
     const handleConfirm = async () => {
         if (!pendingAction || !selectedCR) return;
@@ -103,6 +107,16 @@ export default function ClientRequestsAdminPage() {
                                 status={sortBy}
                                 onChange={(status) => setSortBy(status)}
                             />
+                            <ExportButton
+                                label="Export New Requests"
+                                onClick={() => exportClientRequestsAdmin(
+                                    clientRequests.filter((r) => r.status === "Not Reviewed"),
+                                    allAccounts,
+                                    "new-client-requests.csv",
+                                    false
+                                )}
+                                className="ml-auto"
+                            />
                         </div>
                     </div>
                     <AdminCRTable
@@ -115,7 +129,7 @@ export default function ClientRequestsAdminPage() {
                                 const cm = userById.get(request.caseManagerID);
                                 return [
                                     `${request.client.firstName}${request.client.lastName}`,
-                                    request.client.email,
+                                    request.client.email ?? "",
                                     request.client.phoneNumber,
                                     cm ? `${cm.firstName}${cm.lastName}` : "",
                                     cm?.email ?? "",

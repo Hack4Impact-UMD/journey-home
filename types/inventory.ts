@@ -5,8 +5,6 @@ export type InventoryPhoto = {
   altText: string,
 };
 
-export type ItemSize = "Small" | "Medium" | "Large"
-
 export type InventoryRecord = {
   id: string,
   name: string,
@@ -14,7 +12,6 @@ export type InventoryRecord = {
   category: string,
   notes: string,
   quantity: number,
-  size: ItemSize,
   dateAdded: Timestamp,
   donorEmail: string | null,
 };
@@ -27,6 +24,7 @@ export type InventoryCategory = {
   quantity: number,
   lowThreshold: number,
   highThreshold: number,
+  icon: string;
 }
 
 export type CategoryQuantityChange = {

@@ -3,7 +3,7 @@
 import { RequestDetailsPage } from "@/components/client-requests/RequestDetails";
 import { ProtectedRoute } from "@/components/general/ProtectedRoute";
 import { useClientRequests } from "@/lib/queries/client-requests";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { SearchBox } from "@/components/inventory/SearchBox";
 import { SortOption } from "@/components/inventory/SortOption";
 import { CaseMCRTable } from "@/components/client-requests/CaseMCRTable";
@@ -20,6 +20,33 @@ export default function ClientRequestsCaseManagerPage() {
 
     const { state: authState } = useAuth();
     const uidCM = authState.userData?.uid;
+
+    const filtered = useMemo(() => {
+        return clientRequests
+            .filter((request) => {
+                if (request.caseManagerID !== uidCM) return false;
+                if (request.status !== "Not Reviewed") return false;
+                const norm = (s: string) => s.toLowerCase().replace(/\s/g, "");
+                const q = norm(searchQuery);
+                if (!q) return true;
+                return [
+                    `${request.client.firstName}${request.client.lastName}`,
+                    request.client.phoneNumber,
+                    request.client.hmis,
+                ].some((field) => norm(field).includes(q));
+            })
+            .sort((req1, req2) => {
+                if (sortBy === "none") {
+                    return `${req1.client.lastName} ${req1.client.firstName}`.localeCompare(
+                        `${req2.client.lastName} ${req2.client.firstName}`,
+                    );
+                } else if (sortBy === "asc") {
+                    return (req1.date?.seconds ?? 0) - (req2.date?.seconds ?? 0);
+                } else {
+                    return (req2.date?.seconds ?? 0) - (req1.date?.seconds ?? 0);
+                }
+            });
+    }, [clientRequests, searchQuery, sortBy, uidCM]);
 
     return (
         <ProtectedRoute allow={["Case Manager"]}>
@@ -59,38 +86,7 @@ export default function ClientRequestsCaseManagerPage() {
                             </div>
                         </div>
                         <CaseMCRTable
-                            clientRequests={clientRequests
-                                .filter((request) => {
-                                    if (request.caseManagerID !== uidCM) return false;
-                                    if (request.status !== "Not Reviewed") return false;
-                                    const norm = (s: string) => s.toLowerCase().replace(/\s/g, "");
-                                    const q = norm(searchQuery);
-                                    if (!q) return true;
-                                    return [
-                                        `${request.client.firstName}${request.client.lastName}`,
-                                        request.client.phoneNumber,
-                                        request.client.hmis,
-                                    ].some((field) => norm(field).includes(q));
-                                })
-                                .sort((req1, req2) => {
-                                    let diff;
-                                    //by name if default
-                                    if (sortBy === "none") {
-                                        diff = `${req1.client.lastName} ${req1.client.firstName}`.localeCompare(
-                                            `${req2.client.lastName} ${req2.client.firstName}`,
-                                        );
-                                    }
-                                    //by date ascending
-                                    else if (sortBy === "asc") {
-                                        diff = (req1.date?.seconds ?? 0) - (req2.date?.seconds ?? 0);
-                                    }
-                                    //by date descending
-                                    else {
-                                        diff = (req2.date?.seconds ?? 0) - (req1.date?.seconds ?? 0);
-                                    }
-                                    return diff;
-                                })
-                            }
+                            clientRequests={filtered}
                             openCR={(cr) => setSelectedCRId(cr.id)}
                         />
                     </>
