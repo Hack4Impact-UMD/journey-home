@@ -45,8 +45,15 @@ function UserTableRow({ user, onSelect }: { user: UserData; onSelect: () => void
             className="h-10 border-light-border border-b border-x flex items-center font-family-roboto text-sm text-text-1 hover:bg-blue-50 cursor-pointer"
             onClick={onSelect}
         >
-            <div className="w-[25%] px-4 flex items-center">
-                <span>{user.firstName} {user.lastName}</span>
+            <div className="w-[25%] px-4 flex items-center gap-2">
+                <span>
+                    {user.firstName} {user.lastName}
+                </span>
+                {user.disabled && (
+                    <span className="text-xs">
+                        <Badge text="Disabled" color="red" />
+                    </span>
+                )}
             </div>
             <div className="w-[20%] px-4 text-xs">
                 <Badge

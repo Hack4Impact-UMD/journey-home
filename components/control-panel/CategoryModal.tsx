@@ -5,13 +5,16 @@ import { createPortal } from "react-dom";
 import { MagnifyingGlassIcon } from "@phosphor-icons/react";
 import { InventoryCategory } from "@/types/inventory";
 import { CloseIcon } from "@/components/icons/CloseIcon";
+import { ConfirmModal } from "@/components/general/ConfirmModal";
 import { ICON_MAP, DEFAULT_ICON_KEY } from "@/lib/icons";
 import { PresetIcon } from "@/components/icons/PresetIcon";
+import { v4 as uuidv4 } from "uuid";
 
 interface Props {
   category: InventoryCategory | null;
   categories: InventoryCategory[];
   onSave: (category: InventoryCategory) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
   onClose: () => void;
 }
 
@@ -19,6 +22,7 @@ export function CategoryModal({
   category,
   categories,
   onSave,
+  onDelete,
   onClose,
 }: Props) {
   const isEdit = category !== null;
@@ -30,6 +34,7 @@ export function CategoryModal({
   const [error, setError] = useState("");
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [iconSearch, setIconSearch] = useState("");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     if (category) {
@@ -68,7 +73,7 @@ export function CategoryModal({
 
     const updated: InventoryCategory = isEdit
       ? { ...category!, name, icon, lowThreshold: min, highThreshold: mid }
-      : { id: crypto.randomUUID(), name, icon, quantity: 0, lowThreshold: min, highThreshold: mid };
+      : { id: uuidv4(), name, icon, quantity: 0, lowThreshold: min, highThreshold: mid };
 
     await onSave(updated);
     onClose();
@@ -233,17 +238,37 @@ export function CategoryModal({
             <p className="text-red-500 text-sm mb-4">{error}</p>
           )}
 
-          <div className="mt-6">
+          <div className="mt-6 flex items-center justify-between">
             <button
               className="bg-primary text-white text-sm px-6 py-2 rounded-xs cursor-pointer"
               onClick={save}
             >
               Save
             </button>
+            {isEdit && (
+              <button
+                className="text-sm text-red-500 hover:text-red-700"
+                onClick={() => setShowDeleteConfirm(true)}
+              >
+                Delete category
+              </button>
+            )}
           </div>
 
         </div>
       </div>
+
+      {showDeleteConfirm && (
+        <ConfirmModal
+          title="Delete category"
+          message={`Deleting "${name}" is permanent and cannot be undone. Are you sure?`}
+          onConfirm={async () => {
+            await onDelete(category!.id);
+            onClose();
+          }}
+          onCancel={() => setShowDeleteConfirm(false)}
+        />
+      )}
     </div>,
     document.body
   );

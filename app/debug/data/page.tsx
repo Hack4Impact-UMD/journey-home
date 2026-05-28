@@ -7,30 +7,31 @@ import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { toast, Toaster } from "sonner";
+import { v4 as uuidv4 } from "uuid";
 
-const CATEGORIES: Omit<InventoryCategory, "quantity">[] = [
-    { id: crypto.randomUUID(), name: "Mattresses",        icon: "box", lowThreshold: 5,  highThreshold: 10 },
-    { id: crypto.randomUUID(), name: "Box Springs",       icon: "box", lowThreshold: 5,  highThreshold: 10 },
-    { id: crypto.randomUUID(), name: "Sofas",             icon: "box", lowThreshold: 3,  highThreshold: 7  },
-    { id: crypto.randomUUID(), name: "Loveseats",         icon: "box", lowThreshold: 3,  highThreshold: 6  },
-    { id: crypto.randomUUID(), name: "Kitchen Tables",    icon: "box", lowThreshold: 4,  highThreshold: 8  },
-    { id: crypto.randomUUID(), name: "Kitchen Chairs",    icon: "box", lowThreshold: 8,  highThreshold: 15 },
-    { id: crypto.randomUUID(), name: "Armchairs",         icon: "box", lowThreshold: 4,  highThreshold: 8  },
-    { id: crypto.randomUUID(), name: "Coffee Tables",     icon: "box", lowThreshold: 4,  highThreshold: 8  },
-    { id: crypto.randomUUID(), name: "Dressers",          icon: "box", lowThreshold: 5,  highThreshold: 10 },
-    { id: crypto.randomUUID(), name: "Nightstands",       icon: "box", lowThreshold: 6,  highThreshold: 12 },
-    { id: crypto.randomUUID(), name: "TVs",               icon: "box", lowThreshold: 3,  highThreshold: 6  },
-    { id: crypto.randomUUID(), name: "TV Stands",         icon: "box", lowThreshold: 3,  highThreshold: 6  },
-    { id: crypto.randomUUID(), name: "Microwave Stands",  icon: "box", lowThreshold: 4,  highThreshold: 8  },
-    { id: crypto.randomUUID(), name: "Small Bookshelves", icon: "box", lowThreshold: 4,  highThreshold: 8  },
-    { id: crypto.randomUUID(), name: "Area Rugs",         icon: "box", lowThreshold: 5,  highThreshold: 10 },
-    { id: crypto.randomUUID(), name: "End Tables",        icon: "box", lowThreshold: 5,  highThreshold: 10 },
+const CATEGORY_NAMES: Omit<InventoryCategory, "id" | "quantity">[] = [
+    { name: "Mattresses",        icon: "box", lowThreshold: 5,  highThreshold: 10 },
+    { name: "Box Springs",       icon: "box", lowThreshold: 5,  highThreshold: 10 },
+    { name: "Sofas",             icon: "box", lowThreshold: 3,  highThreshold: 7  },
+    { name: "Loveseats",         icon: "box", lowThreshold: 3,  highThreshold: 6  },
+    { name: "Kitchen Tables",    icon: "box", lowThreshold: 4,  highThreshold: 8  },
+    { name: "Kitchen Chairs",    icon: "box", lowThreshold: 8,  highThreshold: 15 },
+    { name: "Armchairs",         icon: "box", lowThreshold: 4,  highThreshold: 8  },
+    { name: "Coffee Tables",     icon: "box", lowThreshold: 4,  highThreshold: 8  },
+    { name: "Dressers",          icon: "box", lowThreshold: 5,  highThreshold: 10 },
+    { name: "Nightstands",       icon: "box", lowThreshold: 6,  highThreshold: 12 },
+    { name: "TVs",               icon: "box", lowThreshold: 3,  highThreshold: 6  },
+    { name: "TV Stands",         icon: "box", lowThreshold: 3,  highThreshold: 6  },
+    { name: "Microwave Stands",  icon: "box", lowThreshold: 4,  highThreshold: 8  },
+    { name: "Small Bookshelves", icon: "box", lowThreshold: 4,  highThreshold: 8  },
+    { name: "Area Rugs",         icon: "box", lowThreshold: 5,  highThreshold: 10 },
+    { name: "End Tables",        icon: "box", lowThreshold: 5,  highThreshold: 10 },
 ];
 
 const TEST_ACCOUNTS = [
-    { email: "admin@test.com",        password: "password", first: "Admin",       last: "Test", role: "Admin"        },
-    { email: "casemanager@test.com",  password: "password", first: "CaseManager", last: "Test", role: "Case Manager" },
-    { email: "volunteer@test.com",    password: "password", first: "Volunteer",   last: "Test", role: "Volunteer"    },
+    { email: "admin@test.com",        password: "password", first: "Admin",       last: "Test", role: "Admin",        phone: "555-000-0001", waiver: false },
+    { email: "casemanager@test.com",  password: "password", first: "CaseManager", last: "Test", role: "Case Manager", phone: "555-000-0002", waiver: false },
+    { email: "volunteer@test.com",    password: "password", first: "Volunteer",   last: "Test", role: "Volunteer",    phone: "555-000-0003", waiver: true  },
 ];
 
 async function addMinimumData() {
@@ -40,15 +41,18 @@ async function addMinimumData() {
             uid: cred.user.uid,
             firstName: user.first,
             lastName: user.last,
-            dob: Timestamp.fromDate(new Date("1990-01-01T00:00:00")),
-            role: user.role,
             email: user.email,
+            phone: user.phone,
+            createdTime: Timestamp.now(),
+            signedWaiver: null,
+            disabled: false,
+            role: user.role,
             pending: null,
             emailVerified: false,
         });
     }
 
-    await Promise.all(CATEGORIES.map((cat) => setInventoryCategory({ ...cat, quantity: cat.highThreshold + 5 })));
+    await Promise.all(CATEGORY_NAMES.map((cat) => setInventoryCategory({ ...cat, id: uuidv4(), quantity: cat.highThreshold + 5 })));
 }
 
 export default function page() {

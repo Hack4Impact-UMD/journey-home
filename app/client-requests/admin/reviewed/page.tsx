@@ -15,16 +15,9 @@ import { useExport } from "@/contexts/ExportContext";
 import { ClientRequest } from "@/types/client-requests";
 import { UserData } from "@/types/user";
 import { ReviewStatus } from "@/types/general";
+import { escapeCSVField } from "@/lib/utils";
 
 const statusOpts: ReviewStatus[] = ["Approved", "Denied"];
-
-function escapeCSVField(value: string | null | undefined): string {
-    const str = String(value ?? "");
-    if (str.includes(",") || str.includes('"') || str.includes("\n") || str.includes("\r")) {
-        return `"${str.replace(/"/g, '""')}"`;
-    }
-    return str;
-}
 
 export default function ClientRequestsAdminPage() {
     const { clientRequests, refetch: refetchClientRequests, setClientRequest, setClientRequestToast } = useClientRequests();
@@ -234,7 +227,36 @@ export default function ClientRequestsAdminPage() {
                         </div>
                     </div>
                     <AdminCRTable
-                        clientRequests={filtered}
+                        clientRequests={clientRequests
+                            .filter((request) => {
+                                if (!selectedStatus.includes(request.status)) return false;
+                                if (request.status === "Not Reviewed") return false;
+                                const norm = (s: string) => s.toLowerCase().replace(/\s/g, "");
+                                const q = norm(searchQuery);
+                                if (!q) return true;
+                                const cm = userById.get(request.caseManagerID);
+                                return [
+                                    `${request.client.firstName}${request.client.lastName}`,
+                                    request.client.email ?? "",
+                                    request.client.phoneNumber,
+                                    cm ? `${cm.firstName}${cm.lastName}` : "",
+                                    cm?.email ?? "",
+                                ].some((field) => norm(field).includes(q));
+                            })
+                            .sort((req1, req2) => {
+                                let diff;
+                                if (sortBy === "none") {
+                                    diff = `${req1.client.lastName} ${req1.client.firstName}`.localeCompare(
+                                        `${req2.client.lastName} ${req2.client.firstName}`,
+                                    );
+                                } else if (sortBy === "asc") {
+                                    diff = (req1.date?.seconds ?? 0) - (req2.date?.seconds ?? 0);
+                                } else {
+                                    diff = (req2.date?.seconds ?? 0) - (req1.date?.seconds ?? 0);
+                                }
+                                return diff;
+                            })
+                        }
                         openCR={(cr) => setSelectedCRId(cr.id)}
                         onUpdateStatus={async (cr, status) => setClientRequestToast({ ...cr, status })}
                     />

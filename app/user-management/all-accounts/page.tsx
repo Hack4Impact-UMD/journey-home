@@ -20,10 +20,13 @@ function escapeCSVField(value: string | null | undefined): string {
 
 export default function AllAccountsPage() {
     const roleOptions: UserRole[] = ["Admin", "Case Manager", "Volunteer"];
+    const statusOptions = ["Active", "Disabled"] as const;
+    type AccountStatus = typeof statusOptions[number];
 
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedRoles, setSelectedRoles] = useState<UserRole[]>(roleOptions);
     const [selectedAccount, setSelectedAccount] = useState<UserData | null>(null);
+    const [selectedStatuses, setSelectedStatuses] = useState<AccountStatus[]>([...statusOptions]);
 
     const { allAccounts, editAccount, refetch, isLoading } = useAllActiveAccounts();
     const { setExportHandler } = useExport();
@@ -96,6 +99,12 @@ export default function AllAccountsPage() {
                         selected={selectedRoles}
                         setSelected={setSelectedRoles}
                     />
+                    <DropdownMultiselect
+                        label="Status"
+                        options={[...statusOptions]}
+                        selected={selectedStatuses}
+                        setSelected={setSelectedStatuses}
+                    />
                     {isLoading && (
                         <div className="flex items-center">
                             <Spinner className="size-5 text-primary" />
@@ -105,10 +114,28 @@ export default function AllAccountsPage() {
             </div>
 
             <div className="flex-1 overflow-auto min-h-0">
-                <UserTable
-                    users={filteredUsers}
-                    onSelect={setSelectedAccount}
-                />
+            <UserTable
+                users={allAccounts
+                    .filter((user) => selectedRoles.includes(user.role))
+                    .filter((user) => selectedStatuses.includes(user.disabled ? "Disabled" : "Active"))
+                    .filter((user) =>
+                        ("" + user.firstName + user.lastName + user.email)
+                            .trim()
+                            .toLowerCase()
+                            .replace(/\s/g, "")
+                            .includes(searchQuery.toLowerCase().trim()),
+                    )
+                    .sort((a, b) =>
+                        (a.lastName + a.firstName)
+                            .toLowerCase()
+                            .localeCompare(
+                                (b.lastName + b.firstName).toLowerCase(),
+                            ),
+                    )}
+                onSelect={(user: UserData) => {
+                    setSelectedAccount(user);
+                }}
+            />
             </div>
         </>
     );
