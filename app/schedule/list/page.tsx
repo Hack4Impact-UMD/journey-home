@@ -128,11 +128,16 @@ export default function ListView() {
                     const isLastPast = isPast && (nextDate === null || nextDate.getTime() >= todayStart);
                     return (
                     <div key={dateKey} ref={isLastPast ? todayLineRef : undefined} className={`flex flex-row border-b ${isLastPast ? "border-red-500" : "border-gray-200"}`}>
-                        <div className="flex flex-col items-center justify-center text-center w-21 shrink-0 py-2 pl-6 pr-6">
-                            <span className="font-semibold text-base text-[#6B7A99]">{date.getDate()}</span>
-                            <span className="text-xs text-[#6B7A99]">
-                                {date.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase()}
+                        <div className="flex items-center justify-center w-32 shrink-0 py-2 pl-4 pr-4">
+                            <span className="text-xs font-semibold text-[#6B7A99] tracking-wide pl-0 pr-6">
+                                {date.toLocaleDateString("en-US", { month: "short" }).toUpperCase()}
                             </span>
+                            <div className="flex flex-col items-center text-center">
+                                <span className="font-semibold text-base text-[#6B7A99]">{date.getDate()}</span>
+                                <span className="text-xs text-[#6B7A99]">
+                                    {date.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase()}
+                                </span>
+                            </div>
                         </div>
                         <div className="border-l border-[#E3E3E3] my-4" />
                         <div className="flex flex-col flex-1 min-w-0">
