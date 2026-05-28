@@ -5,6 +5,7 @@ import { CaretRightIcon } from "@phosphor-icons/react";
 import { useTimeBlocks } from "@/lib/queries/timeblocks";
 import { useAuth } from "@/contexts/AuthContext";
 import { formatTime } from "@/lib/utils";
+import { DogSitIcon } from "@/components/icons/DogSitIcon";
 
 export default function ShiftTaskSummary() {
     const { allTB: timeblocks = [], isLoading } = useTimeBlocks();
@@ -44,7 +45,21 @@ export default function ShiftTaskSummary() {
         );
     }
 
-    if (!selectedShift) return null;
+    if (!selectedShift) return (
+        <div>
+            <Link href="/volunteer-tasks">
+                <div className="flex items-center mb-5 cursor-pointer gap-2">
+                    <h2 className="text-2xl font-semibold text-gray-800 leading-none">Shift Tasks</h2>
+                    <CaretRightIcon className="w-5 h-5" />
+                </div>
+            </Link>
+            <div className="border bg-white overflow-hidden md:rounded flex flex-col items-center justify-center py-4 gap-2">
+                <DogSitIcon/>
+                
+                <p className="text-sm font-medium">No upcoming shifts!</p>
+            </div>
+        </div>
+    );
 
     const start = selectedShift.startTime.toDate();
     const end = selectedShift.endTime?.toDate();

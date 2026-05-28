@@ -1,17 +1,64 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { createPortal } from "react-dom";
 import { useTimeBlocks } from "@/lib/queries/timeblocks";
 import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
 import ShiftListView from "@/components/schedule/ShiftListView";
-import { ConfirmModal } from "@/components/general/ConfirmModal";
 import { useAuth } from "@/contexts/AuthContext";
+
+function SignInRequiredModal({ onLogin, onCreateAccount, onClose }: {
+    onLogin: () => void;
+    onCreateAccount: () => void;
+    onClose: () => void;
+}) {
+    useEffect(() => {
+        const prev = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
+        const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+        document.addEventListener("keydown", onKey);
+        return () => { document.body.style.overflow = prev; document.removeEventListener("keydown", onKey); };
+    }, [onClose]);
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/25 font-family-roboto">
+            <div className="absolute inset-0" onClick={onClose} />
+            <div className="relative bg-white w-full max-w-md mx-4 px-8 py-7 flex flex-col rounded-xl shadow-lg">
+                <h1 className="text-xl font-semibold text-gray-900">Volunteer account required</h1>
+                <p className="text-sm text-[#8D8D8D] font-family-opensans mt-2">
+                    To sign up for a shift, you need to be logged in to a Journey Home volunteer account.
+                    If you don&apos;t have one yet, you can create one.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 mt-8">
+                    <button
+                        onClick={onLogin}
+                        className="flex-1 h-10 bg-primary text-white text-sm font-medium rounded-sm hover:opacity-90 transition-opacity"
+                    >
+                        Log In
+                    </button>
+                    <button
+                        onClick={onCreateAccount}
+                        className="flex-1 h-10 border border-primary text-primary text-sm font-medium rounded-sm hover:bg-primary/5 transition-colors"
+                    >
+                        Create Account
+                    </button>
+                </div>
+                <button
+                    onClick={onClose}
+                    className="mt-4 text-sm text-gray-400 hover:text-gray-600 transition-colors self-center"
+                >
+                    Cancel
+                </button>
+            </div>
+        </div>
+    );
+}
 
 export default function VolunteerPage() {
     const router = useRouter();
     const { state: { currentUser, userData } } = useAuth();
-    const { allTB: timeBlocks = [] } = useTimeBlocks();
+    const { allTB: timeBlocks = [], isLoading } = useTimeBlocks();
 
     const [selectedTypes, setSelectedTypes] = useState<string[]>(["Warehouse", "Pickups / Deliveries"]);
     const [selectedAvailability, setSelectedAvailability] = useState<string[]>(["Available", "Full"]);
@@ -57,14 +104,18 @@ export default function VolunteerPage() {
                 <h1 className="text-xl font-medium md:text-2xl md:font-bold text-primary font-raleway">
                     Volunteering for JourneyHome
                 </h1>
-                <p className="text-sm font-bold text-text-1 mt-3">
-                    Be part of something that matters.
-                </p>
-                <p className="text-sm text-text-1 mt-1">
-                    Volunteering with Journey Home puts you at the center of the work — moving donations and getting essential items directly into the hands of families. It&apos;s hands-on, meaningful, and no experience is needed.
+                <p className="text-sm text-text-1 mt-3">
+                    Welcome to Journey Home's Sign Up System for our weekly Volunteer Pickups, Deliveries, and Organizing Days! We are ending homelessness, please join us and sign up to help! 
                 </p>
                 <p className="text-sm text-text-1 mt-3">
-                    <span className="font-semibold">Warehouse shifts</span> take place at our facility, where you&apos;ll help sort and organize donated goods to keep our shelves stocked.<br /><br /><span className="font-semibold">Pickup &amp; Delivery shifts</span> involve collecting donations from donors and bringing them to clients across the community.
+                    All Organizing Days are at our warehouse at 595 New Park Ave., West Hartford - NOTE this is a NEW address as of August 2024!
+                </p>
+                <p className="text-sm text-text-1 mt-3">
+                    Pick-up and delivery days typically also start at our warehouse on New Park Ave., but emails with the day's specific schedule will be sent out to all volunteers by the day before the event.  
+                </p>
+
+                <p className="text-sm text-text-1 mt-3">
+                    To ensure you receive the day's schedule, <span className="font-bold underline">please sign up at least 24 hours in advance of your volunteer shift.</span>
                 </p>
 
                 <div className="md:hidden mt-6 border-b border-gray-200" />
@@ -90,20 +141,26 @@ export default function VolunteerPage() {
             </div>
 
             <div className="w-full mt-5 pb-16 overflow-x-auto">
-                <ShiftListView
-                    timeBlocks={filteredTimeBlocks}
-                    currentUserID=""
-                    onSignUpClick={handleSignUpClick}
-                />
+                {isLoading ? (
+                    <div className="flex justify-center py-12">
+                        <div className="w-5 h-5 border-2 border-gray-200 border-t-primary rounded-full animate-spin" />
+                    </div>
+                ) : (
+                    <ShiftListView
+                        timeBlocks={filteredTimeBlocks}
+                        currentUserID=""
+                        onSignUpClick={handleSignUpClick}
+                    />
+                )}
             </div>
 
-            {showModal && (
-                <ConfirmModal
-                    title="Sign Up Required"
-                    message="To sign up for a shift, you'll need an account. Confirm to create one now."
-                    onConfirm={() => router.push("/signup")}
-                    onCancel={() => setShowModal(false)}
-                />
+            {showModal && createPortal(
+                <SignInRequiredModal
+                    onLogin={() => router.push("/login")}
+                    onCreateAccount={() => router.push("/signup")}
+                    onClose={() => setShowModal(false)}
+                />,
+                document.body
             )}
         </div>
     );

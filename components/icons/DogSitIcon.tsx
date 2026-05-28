@@ -1,13 +1,14 @@
 "use client";
 
-export function DogSitIcon() {
+export function DogSitIcon({ className }: { className?: string }) {
     return (
         <svg
-            width="185"
-            height="210"
+            width="4em"
+            height="4em"
             viewBox="0 0 185 210"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
+            className={className}
         >
             <path
                 d="M146.82 94.6699C157.44 88.9099 161.95 80.4599 163.16 77.5399C165.58 71.7099 165.35 64.9599 162.11 59.2599C161.98 59.0399 161.85 58.8099 161.72 58.5899C154.13 45.9199 157.59 6.56992 126.29 11.2299C94.9905 15.8899 66.5105 23.2599 79.8705 49.5399C92.8905 75.1399 53.2404 86.6099 118.53 99.1599C126.57 100.7 138.22 99.2599 146.82 94.6699Z"

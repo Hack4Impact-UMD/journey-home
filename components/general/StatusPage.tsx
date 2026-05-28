@@ -14,7 +14,7 @@ export function StatusPage({
 }) {
     return (
         <div className="w-full h-full flex items-center justify-center flex-col gap-4 bg-[#ECFBFE]">
-            <DogSitIcon />
+            <DogSitIcon className="text-[3em]"/>
             <h1 className="text-3xl text-text-2 pt-3">{title}</h1>
             <div className="flex items-center justify-center flex-col pt-3">
                 <p className="text-text-2">{message}</p>

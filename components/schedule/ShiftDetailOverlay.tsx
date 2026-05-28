@@ -44,6 +44,97 @@ function formatAddress(addr: { streetAddress: string; apt: string; city: string;
   return `${addr.streetAddress}${aptSuffix}, ${addr.city}, ${addr.state} ${addr.zipCode}`;
 }
 
+interface VolunteerSelectPanelProps {
+  groupName: string;
+  remainingSpots: number;
+  allAccounts: ReturnType<typeof useAllActiveAccounts>["allAccounts"];
+  assignedUids: string[];
+  onClose: () => void;
+  onSave: (uids: string[]) => void;
+}
+
+function VolunteerSelectPanel({ groupName, remainingSpots, allAccounts, assignedUids, onClose, onSave }: VolunteerSelectPanelProps) {
+  const [search, setSearch] = useState("");
+  const [selectedUids, setSelectedUids] = useState<string[]>([]);
+
+  const spotsLeft = remainingSpots - selectedUids.length;
+  const assignedSet = new Set(assignedUids);
+
+  const searchResults = search && spotsLeft > 0
+    ? allAccounts.filter(u =>
+        u.role === "Volunteer" &&
+        !assignedSet.has(u.uid) &&
+        !selectedUids.includes(u.uid) &&
+        (
+          `${u.firstName} ${u.lastName}`.toLowerCase().includes(search.toLowerCase()) ||
+          u.email?.toLowerCase().includes(search.toLowerCase())
+        )
+      )
+    : null;
+
+  return (
+    <div className="w-80 shrink-0 bg-[#FBFCFD] rounded-[0.625em] shadow-2xl flex flex-col overflow-hidden">
+      <div className="px-6 py-4 shrink-0 flex items-center justify-between border-b border-[#E3E3E3]">
+        <h2 className="text-base font-medium font-family-roboto text-[#565656]">Add to {groupName}</h2>
+        <button onClick={onClose} className="text-slate-400 hover:opacity-60 transition-opacity">
+          <XIcon className="w-3.5 h-3.5" />
+        </button>
+      </div>
+      <div className="px-6 py-4 flex-1 overflow-y-auto space-y-3">
+        <SearchBox value={search} onChange={setSearch} onSubmit={() => {}}/>
+        {search && (
+          spotsLeft <= 0 ? (
+            <p className="text-xs text-gray-400">Group is full</p>
+          ) : searchResults && searchResults.length > 0 ? (
+            <div className="border border-light-border rounded-xs max-h-40 overflow-y-auto">
+              {searchResults.map(u => (
+                <button
+                  key={u.uid}
+                  onClick={() => setSelectedUids(prev => [...prev, u.uid])}
+                  className="w-full text-left px-3 py-2 hover:bg-gray-50 transition-colors"
+                >
+                  <div className="text-sm text-text-1">{u.firstName} {u.lastName}</div>
+                  <div className="text-xs text-gray-400">{u.email}</div>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-gray-400">No volunteers found</p>
+          )
+        )}
+        {selectedUids.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {selectedUids.map(uid => {
+              const u = allAccounts.find(a => a.uid === uid);
+              return (
+                <span key={uid} className="inline-flex items-center gap-1 py-1 px-2.5 rounded-xs bg-[#D4F0ED] text-[#003530] text-sm">
+                  <span className="max-w-32 truncate">{u ? `${u.firstName} ${u.lastName}` : uid}</span>
+                  <button
+                    onClick={() => setSelectedUids(prev => prev.filter(id => id !== uid))}
+                    className="flex items-center"
+                    aria-label={`Deselect ${u ? `${u.firstName} ${u.lastName}` : uid}`}
+                  >
+                    <XCircleIcon className="h-[1em] w-[1em]" />
+                  </button>
+                </span>
+              );
+            })}
+          </div>
+        )}
+      </div>
+      <div className="flex justify-end px-6 py-4 shrink-0 border-t border-[#E3E3E3]">
+        <button
+          onClick={() => onSave(selectedUids)}
+          disabled={!selectedUids.length}
+          className="h-8 px-6 bg-primary text-white text-sm rounded-sm hover:opacity-90 transition-opacity disabled:opacity-40"
+        >
+          Add
+        </button>
+      </div>
+    </div>
+  );
+}
+
 interface Props {
   timeBlock: TimeBlock | null;
   onClose: () => void;
@@ -62,8 +153,6 @@ export function ShiftDetailOverlay({ timeBlock, onClose }: Props) {
     name: string;
   } | null>(null);
   const [addVolunteerGroup, setAddVolunteerGroup] = useState<string | null>(null);
-  const [volunteerSearch, setVolunteerSearch] = useState("");
-  const [selectedVolunteerUids, setSelectedVolunteerUids] = useState<string[]>([]);
 
   // Always derive from live cache so optimistic updates (toggle, volunteer removal) reflect immediately
   const liveTimeBlock = timeBlock
@@ -75,8 +164,6 @@ export function ShiftDetailOverlay({ timeBlock, onClose }: Props) {
     setConfirmDelete(false);
     setRemoveTarget(null);
     setAddVolunteerGroup(null);
-    setVolunteerSearch("");
-    setSelectedVolunteerUids([]);
   }, [timeBlock]);
 
   useEffect(() => {
@@ -88,7 +175,7 @@ export function ShiftDetailOverlay({ timeBlock, onClose }: Props) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      if (addVolunteerGroup) { setAddVolunteerGroup(null); setVolunteerSearch(""); setSelectedVolunteerUids([]); }
+      if (addVolunteerGroup) { setAddVolunteerGroup(null); }
       else if (!confirmDelete && !removeTarget) onClose();
     };
     document.addEventListener("keydown", handleKeyDown);
@@ -111,20 +198,8 @@ export function ShiftDetailOverlay({ timeBlock, onClose }: Props) {
   const endDate = liveTimeBlock.endTime.toDate();
   const isPickupType = liveTimeBlock.type === "Pickup/Delivery";
 
-  const currentGroup = addVolunteerGroup
+  const addVolunteerGroupData = addVolunteerGroup
     ? (liveTimeBlock.volunteerGroups.find(g => g.name === addVolunteerGroup) ?? null)
-    : null;
-  const remainingSpots = currentGroup
-    ? currentGroup.maxNum - currentGroup.volunterIDs.length - selectedVolunteerUids.length
-    : 0;
-  const allAssignedUids = new Set(liveTimeBlock.volunteerGroups.flatMap(g => g.volunterIDs));
-  const volunteerSearchResults = volunteerSearch && currentGroup && remainingSpots > 0
-    ? allAccounts.filter(u =>
-        u.role === "Volunteer" &&
-        !allAssignedUids.has(u.uid) &&
-        !selectedVolunteerUids.includes(u.uid) &&
-        `${u.firstName} ${u.lastName}`.toLowerCase().includes(volunteerSearch.toLowerCase())
-      )
     : null;
 
   const handleTogglePublished = async (checked: boolean) => {
@@ -147,17 +222,15 @@ export function ShiftDetailOverlay({ timeBlock, onClose }: Props) {
     setRemoveTarget(null);
   };
 
-  const handleAddVolunteer = async () => {
-    if (!selectedVolunteerUids.length || !addVolunteerGroup) return;
+  const handleAddVolunteer = async (uids: string[]) => {
+    if (!uids.length || !addVolunteerGroup) return;
     const updatedGroups = liveTimeBlock.volunteerGroups.map(g =>
       g.name === addVolunteerGroup
-        ? { ...g, volunterIDs: [...g.volunterIDs, ...selectedVolunteerUids.filter(uid => !g.volunterIDs.includes(uid))] }
+        ? { ...g, volunterIDs: [...g.volunterIDs, ...uids.filter(uid => !g.volunterIDs.includes(uid))] }
         : g
     );
     await setTimeblockToast({ ...liveTimeBlock, volunteerGroups: updatedGroups });
     setAddVolunteerGroup(null);
-    setVolunteerSearch("");
-    setSelectedVolunteerUids([]);
   };
 
   return createPortal(
@@ -231,7 +304,7 @@ export function ShiftDetailOverlay({ timeBlock, onClose }: Props) {
           <div className="mt-4 h-px bg-[#E3E3E3] shrink-0" />
 
           {/* Scrollable body */}
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden">
             <div className="pt-4 pb-1">
 
               {/* Volunteer groups */}
@@ -273,8 +346,8 @@ export function ShiftDetailOverlay({ timeBlock, onClose }: Props) {
                           ))}
                           {group.volunterIDs.length < group.maxNum && (
                             <button
-                              onClick={() => { setAddVolunteerGroup(group.name); setVolunteerSearch(""); setSelectedVolunteerUids([]); }}
-                              className="inline-flex items-center gap-1 py-1 px-2.5 rounded-xs bg-gray-100 text-black text-sm hover:opacity-70 transition-opacity"
+                              onClick={() => setAddVolunteerGroup(group.name)}
+                              className="inline-flex items-center gap-1 py-1 px-2.5 rounded-xs bg-[#E3E3E3] text-black text-sm hover:opacity-70 transition-opacity"
                             >
                               Add volunteer
                               <PlusCircleIcon className="h-[1em] w-[1em]" />
@@ -381,68 +454,15 @@ export function ShiftDetailOverlay({ timeBlock, onClose }: Props) {
           </div>
 
           {/* Volunteer selection panel — appears to the right of the shift card */}
-          {addVolunteerGroup && (
-            <div className="w-56 shrink-0 bg-[#FBFCFD] rounded-[0.625em] shadow-2xl flex flex-col overflow-hidden">
-              {/* Header */}
-              <div className="px-6 py-4 shrink-0 flex items-center justify-between">
-                <h2 className="text-xl font-medium font-family-roboto text-[#565656]">Select volunteers</h2>
-                <button onClick={() => { setAddVolunteerGroup(null); setVolunteerSearch(""); setSelectedVolunteerUids([]); }} className="text-slate-400 hover:opacity-60 transition-opacity">
-                  <XIcon className="w-3.5 h-3.5" />
-                </button>
-              </div>
-              {/* Body */}
-              <div className="px-6 pb-4">
-                <SearchBox value={volunteerSearch} onChange={setVolunteerSearch} onSubmit={() => {}} inputClassName="w-36" />
-                {volunteerSearch && (
-                  remainingSpots <= 0 ? (
-                    <p className="mt-2 text-xs text-gray-400 px-1">Group is full</p>
-                  ) : volunteerSearchResults && volunteerSearchResults.length > 0 ? (
-                    <div className="mt-2 border border-light-border rounded-xs max-h-36 overflow-y-auto">
-                      {volunteerSearchResults.map(u => (
-                        <button
-                          key={u.uid}
-                          onClick={() => setSelectedVolunteerUids(prev => [...prev, u.uid])}
-                          className="w-full text-left px-3 py-1.5 text-sm text-text-1 hover:bg-gray-50 transition-colors"
-                        >
-                          {u.firstName} {u.lastName}
-                        </button>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="mt-2 text-xs text-gray-400 px-1">No volunteers found</p>
-                  )
-                )}
-                {selectedVolunteerUids.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {selectedVolunteerUids.map(uid => {
-                      const u = allAccounts.find(a => a.uid === uid);
-                      return (
-                        <span key={uid} className="inline-flex items-center gap-1 py-1 px-2.5 rounded-xs bg-[#D4F0ED] text-[#003530] text-sm">
-                          <span className="max-w-28 truncate">{u ? `${u.firstName} ${u.lastName}` : uid}</span>
-                          <button
-                            onClick={() => setSelectedVolunteerUids(prev => prev.filter(id => id !== uid))}
-                            className="flex items-center"
-                            aria-label={`Deselect ${u ? `${u.firstName} ${u.lastName}` : uid}`}
-                          >
-                            <XCircleIcon className="h-[1em] w-[1em]" />
-                          </button>
-                        </span>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-              {/* Footer */}
-              <div className="flex justify-end px-6 py-4 shrink-0">
-                <button
-                  onClick={handleAddVolunteer}
-                  disabled={!selectedVolunteerUids.length}
-                  className="h-8 px-6 bg-primary text-white text-sm rounded-sm hover:opacity-90 transition-opacity disabled:opacity-40"
-                >
-                  Save
-                </button>
-              </div>
-            </div>
+          {addVolunteerGroup && addVolunteerGroupData && (
+            <VolunteerSelectPanel
+              groupName={addVolunteerGroup}
+              remainingSpots={addVolunteerGroupData.maxNum - addVolunteerGroupData.volunterIDs.length}
+              allAccounts={allAccounts}
+              assignedUids={liveTimeBlock.volunteerGroups.flatMap(g => g.volunterIDs)}
+              onClose={() => setAddVolunteerGroup(null)}
+              onSave={handleAddVolunteer}
+            />
           )}
 
         </div>

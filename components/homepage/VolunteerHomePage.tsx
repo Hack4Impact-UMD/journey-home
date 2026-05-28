@@ -17,7 +17,7 @@ export default function VolunteerHomePage() {
             <div className="h-full w-full flex flex-col font-family-roboto">
                 <div className="flex flex-1 min-h-0 max-md:flex-col">
                     <Navbar />
-                    <div className="flex-1 overflow-y-auto bg-linear-to-r from-[#F8FDFE] to-[#DAF2F5] pt-14 max-md:pt-4 pb-4 px-14 max-md:px-6 flex flex-col gap-6 border-l border-light-border">
+                    <div className="flex-1 overflow-y-auto bg-linear-to-r from-[#F8FDFE] to-[#EDF7F8] pt-14 max-md:pt-4 pb-4 px-14 max-md:px-6 flex flex-col gap-6 border-l border-light-border">
                         <span className="text-5xl font-semibold text-primary leading-none block">
                             Welcome, {name}!
                         </span>
@@ -29,7 +29,7 @@ export default function VolunteerHomePage() {
 
                         {/* volunteer blurb */}
                         <div className="mt-3 md:border md:border-light-border md:rounded-[0.625rem] md:pt-6 md:pr-4 md:pb-7 md:pl-5 md:shadow-sm md:overflow-hidden md:bg-white">
-                            <h2 className="text-2xl font-semibold text-black leading-none">Volunteering for JourneyHome</h2>
+                            <h2 className="text-2xl font-semibold text-black leading-none">Volunteering for Journey Home</h2>
                             <p className="text-sm font-bold text-text-1 mt-5">Be part of something that matters.</p>
                             <p className="text-sm text-text-1 mt-1">
                                 Volunteering with Journey Home puts you at the center of the work — moving donations and getting essential items directly into the hands of families. It&apos;s hands-on, meaningful, and no experience is needed.
