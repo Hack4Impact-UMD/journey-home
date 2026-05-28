@@ -13,6 +13,8 @@ import { VolunteerModifyStepOneIcon } from "@/components/icons/VolunteerModifySt
 import { VolunteerModifyStepTwoIcon } from "@/components/icons/VolunteerModifyStepTwoIcon";
 import { JourneyTheDogIcon } from "@/components/icons/JourneyTheDogIcon";
 import { ChevronDown, ChevronUp, X } from "lucide-react";
+import { WarehouseIcon } from "@phosphor-icons/react";
+import { PickupDeliveryIcon } from "@/components/icons/PickupDeliveryIcon";
 import { useAuth } from "@/contexts/AuthContext";
 import { TimeBlock } from "@/types/schedule";
 import { formatTime } from "@/lib/utils";
@@ -92,7 +94,7 @@ export default function VolunteerTasks() {
     return (
         <div className="h-full flex flex-col">
             {screen === "shiftlist" && (
-                <div className="flex flex-col gap-4 pt-4 flex-1 min-h-0 overflow-y-auto">
+                <div className="flex flex-col gap-4 md:gap-0 pt-4 flex-1 min-h-0 overflow-y-auto">
                     {userTimeBlocks.length === 0 && (
                         <div className="flex flex-1 flex-col items-center justify-center gap-9">
                             <div className="grayscale opacity-40"><JourneyTheDogIcon /></div>
@@ -110,8 +112,9 @@ export default function VolunteerTasks() {
                         const dateLabel = `${start.toLocaleDateString("en-US", { month: "short" }).toUpperCase()}, ${start.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase()}`;
 
                         return (
-                            <div key={tb.id} className="w-full">
-                                <div className="pb-4">
+                            <div key={tb.id} className="w-full border-b border-gray-200">
+                                {/* mobile */}
+                                <div className="md:hidden pb-4">
                                     <div className="flex justify-between items-stretch">
                                         <div className="flex flex-col gap-2">
                                             <div className="flex items-center gap-3">
@@ -121,13 +124,17 @@ export default function VolunteerTasks() {
                                                 <p className="font-family-roboto font-semibold text-sm text-[#6B7A99]">{dateLabel}</p>
                                             </div>
                                             <div className="pl-10">
-                                                <p className="text-sm font-family-roboto">{tb.type === "Pickup/Delivery" ? "Pickups / Deliveries" : "Warehouse"}</p>
+                                                <p className="text-sm font-semibold text-text-1">{tb.name || <span className="italic text-gray-400">Unnamed Shift</span>}</p>
+                                                <div className="flex items-center gap-2 text-sm text-text-1">
+                                                    {tb.type === "Pickup/Delivery" ? <PickupDeliveryIcon /> : <WarehouseIcon className="w-4 h-4 shrink-0" />}
+                                                    {tb.type === "Pickup/Delivery" ? "Pickup/Delivery" : "Warehouse"}
+                                                </div>
                                                 <p className="text-sm font-family-roboto text-primary">Group: {userGroup?.name}</p>
                                             </div>
                                         </div>
                                         <div className="flex flex-col items-end justify-between">
                                             <div className="flex items-center gap-2 h-7">
-                                                <div className={`w-3 h-3 rounded-full ${tb.type === "Warehouse" ? "bg-yellow-400" : "bg-primary"}`} />
+                                                <div className={`w-3 h-3 rounded-full ${tb.type === "Warehouse" ? "bg-[#FBCF0B]" : "bg-primary"}`} />
                                                 <span className="text-sm">{timeRange}</span>
                                             </div>
                                             {isActive ? (
@@ -144,9 +151,46 @@ export default function VolunteerTasks() {
                                             )}
                                         </div>
                                     </div>
-
                                 </div>
-                                <div className="border-b border-gray-200" />
+
+                                {/* desktop */}
+                                <div className="hidden md:flex py-3 px-8 gap-5.5 items-center">
+                                    <div className="flex items-start gap-3 w-30 shrink-0">
+                                        <div className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center font-semibold shrink-0">
+                                            {start.getDate()}
+                                        </div>
+                                        <div className="text-sm text-gray-500 font-medium mt-2">{dateLabel}</div>
+                                    </div>
+
+                                    <div className="flex items-center gap-2 shrink-0">
+                                        <div className={`w-3 h-3 rounded-full shrink-0 ${tb.type === "Warehouse" ? "bg-[#FBCF0B]" : "bg-primary"}`} />
+                                        <div className="w-27.5 text-sm text-text-1">{timeRange}</div>
+                                    </div>
+
+                                    <div className="ml-6 flex-1 min-w-16 text-sm font-semibold text-text-1 truncate">{tb.name || <span className="italic text-gray-400">Unnamed Shift</span>}</div>
+
+                                    <div className="ml-10 w-33.25 shrink-0 flex items-center gap-2 text-sm text-text-1">
+                                        {tb.type === "Pickup/Delivery" ? <PickupDeliveryIcon /> : <WarehouseIcon className="w-5 h-5 shrink-0" />}
+                                        {tb.type === "Pickup/Delivery" ? "Pickup/Delivery" : "Warehouse"}
+                                    </div>
+
+                                    <div className="ml-9 w-36 shrink-0 text-sm text-primary">{userGroup?.name}</div>
+
+                                    <div className="ml-auto shrink-0">
+                                        {isActive ? (
+                                            <button
+                                                onClick={() => { setSelectedShift(tb); setScreen("shiftoverview"); }}
+                                                className="bg-primary text-white w-24 h-8 rounded-sm text-sm"
+                                            >
+                                                Open
+                                            </button>
+                                        ) : (
+                                            <button className="border border-gray-300 text-primary w-24 h-8 rounded-sm text-sm">
+                                                Upcoming
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         );
                     })}

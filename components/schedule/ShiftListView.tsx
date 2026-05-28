@@ -7,14 +7,17 @@ import { ConfirmModal } from "@/components/general/ConfirmModal";
 import Button from "@/components/form/Button";
 import { useTimeBlocks } from "@/lib/queries/timeblocks";
 import { Check } from "lucide-react";
+import { WarehouseIcon } from "@phosphor-icons/react";
+import { PickupDeliveryIcon } from "@/components/icons/PickupDeliveryIcon";
 import ShiftSignUpConfirm from "@/components/schedule/ShiftSignUpConfirm";
 
 type Props = {
     timeBlocks: TimeBlock[];
     currentUserID: string;
+    onSignUpClick?: () => void;
 };
 
-export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
+export default function ShiftListView({ timeBlocks, currentUserID, onSignUpClick }: Props) {
     const [selectedTB, setSelectedTB] = useState<TimeBlock | null>(null);
     const [action, setAction] = useState<"signup" | "drop" | null>(null);
     const { setTimeblockToast, signUpToast } = useTimeBlocks();
@@ -92,6 +95,10 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                         />
                                     );
 
+                                    const typeIcon = type === "Pickup/Delivery"
+                                        ? <PickupDeliveryIcon />
+                                        : <WarehouseIcon className="w-4 h-4 shrink-0" />;
+
                                     const timeEl = (
                                         <div className="flex items-center gap-2 text-sm text-text-1 shrink-0">
                                             {typeDot}
@@ -114,6 +121,7 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                         <Button
                                             className="text-sm w-22 h-8 py-0 flex items-center justify-center shrink-0 rounded-xs"
                                             onClick={() => {
+                                                if (onSignUpClick) { onSignUpClick(); return; }
                                                 setSelectedTB(tb);
                                                 setAction("signup");
                                                 setSelectedGroup(null);
@@ -139,9 +147,13 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                                 </div>
                                             )}
 
-                                            <div className="flex items-start justify-between gap-4 pl-[2.5rem]">
-                                                <div className="flex flex-col gap-1">
-                                                    <div className="text-sm text-text-1">{tb.name}</div>
+                                            <div className="flex items-start justify-between gap-4 pl-10">
+                                                <div className="flex flex-col gap-1 flex-1 min-w-0">
+                                                    <div className="text-sm font-semibold text-text-1">{tb.name || <span className="italic text-gray-400">Unnamed Shift</span>}</div>
+                                                    <div className="flex items-center gap-2 text-sm text-text-1">
+                                                        {typeIcon}
+                                                        {type === "Pickup/Delivery" ? "Pickup/Delivery" : "Warehouse"}
+                                                    </div>
                                                     <div className="flex flex-col gap-1 text-sm text-primary">
                                                         {tb.volunteerGroups.map((group) => (
                                                             <div key={group.name}>
@@ -182,13 +194,13 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
 
                     return (
                         <div key={dateKey} className="border-b border-gray-200">
-                            <div className="py-3 px-8 flex gap-6 items-start">
-                            <div className="flex items-start gap-4 w-40">
-                                <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-semibold">
+                            <div className="py-3 px-8 flex gap-5.5 items-start">
+                            <div className="flex items-start gap-3 w-30">
+                                <div className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center font-semibold">
                                     {date.getDate()}
                                 </div>
 
-                                <div className="text-sm text-gray-500 font-medium mt-2.5">
+                                <div className="text-sm text-gray-500 font-medium mt-2">
                                     {`${date.toLocaleDateString("en-US", {
                                         month: "short",
                                     }).toUpperCase()}, ${date
@@ -215,27 +227,39 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                     const type = tb.type;
 
                                     return (
-                                        <div
-                                            key={tb.id}
-                                            className="flex items-center gap-4"
-                                        >
-                                            <div
-                                                className={`w-3 h-3 rounded-full shrink-0 ${
-                                                    type === "Warehouse"
-                                                        ? "bg-[#FBCF0B]"
-                                                        : "bg-primary"
-                                                }`}
-                                            />
-
-                                            <div className="w-28 shrink-0 text-sm text-text-1">
-                                                {timeRange}
+                                        <div key={tb.id} className="flex items-center">
+                                            <div className="flex items-center gap-2 shrink-0">
+                                                <div
+                                                    className={`w-3 h-3 rounded-full shrink-0 ${
+                                                        type === "Warehouse"
+                                                            ? "bg-[#FBCF0B]"
+                                                            : "bg-primary"
+                                                    }`}
+                                                />
+                                                <div className="w-27.5 text-sm text-text-1">
+                                                    {timeRange}
+                                                </div>
                                             </div>
 
-                                            <div className="w-64 shrink-0 text-sm text-text-1">
-                                                {tb.name}
+                                            <div className="ml-6 flex-1 min-w-16 text-sm font-semibold text-text-1 truncate">
+                                                {tb.name || <span className="italic text-gray-400">Unnamed Shift</span>}
                                             </div>
 
-                                            <div className="flex flex-col gap-1 text-primary text-sm">
+                                            <div className="ml-10 w-33.25 shrink-0 flex items-center gap-2 text-sm text-text-1">
+                                                {type === "Pickup/Delivery" ? (
+                                                    <>
+                                                        <PickupDeliveryIcon />
+                                                        Pickup/Delivery
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <WarehouseIcon className="w-5 h-5 shrink-0" />
+                                                        Warehouse
+                                                    </>
+                                                )}
+                                            </div>
+
+                                            <div className="ml-9 shrink-0 flex flex-col gap-1 text-primary text-sm">
                                                 {tb.volunteerGroups.map((group) => (
                                                     <span key={group.name}>
                                                         {group.volunterIDs.length}/{group.maxNum} {group.name}
@@ -243,7 +267,7 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                                 ))}
                                             </div>
 
-                                            <div className="ml-auto flex items-center gap-3 shrink-0">
+                                            <div className="ml-10 flex items-center gap-3 shrink-0">
                                                 {isSignedUp && (
                                                     <span className="flex items-center gap-1 text-sm text-primary">
                                                         <Check className="w-4 h-4" />
@@ -254,7 +278,7 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                                 {isSignedUp ? (
                                                     <Button
                                                         variant="secondary"
-                                                        className="text-sm font-roboto h-8 py-0 px-4 rounded-xs flex items-center"
+                                                        className="text-sm font-roboto h-8 py-0 w-24 rounded-xs flex items-center justify-center"
                                                         onClick={() => {
                                                             setSelectedTB(tb);
                                                             setAction("drop");
@@ -264,8 +288,9 @@ export default function ShiftListView({ timeBlocks, currentUserID }: Props) {
                                                     </Button>
                                                 ) : (
                                                     <Button
-                                                        className="text-sm font-roboto h-8 py-0 px-4 rounded-xs flex items-center"
+                                                        className="text-sm font-roboto h-8 py-0 w-24 rounded-xs flex items-center justify-center"
                                                         onClick={() => {
+                                                            if (onSignUpClick) { onSignUpClick(); return; }
                                                             setSelectedTB(tb);
                                                             setAction("signup");
                                                             setSelectedGroup(null);
