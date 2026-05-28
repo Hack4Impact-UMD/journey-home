@@ -30,6 +30,7 @@ export function useWaivers() {
     return {
         waivers: query.data ?? [],
         activeWaiver: query.data?.find((w) => w.end === null) ?? null,
+        currentWaiver: query.data?.find((w) => w.end === null) ?? null,
         uploadWaiver,
         isMutating: addMutation.isPending,
         isLoading: query.isLoading,
