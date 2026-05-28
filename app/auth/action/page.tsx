@@ -37,7 +37,7 @@ function Shell({ children }: { children: React.ReactNode }) {
 function VerifyEmailView({ oobCode }: { oobCode: string }) {
   const router = useRouter();
   const { refreshUser } = useAuth();
-  const [status, setStatus] = useState<'loading' | 'error'>('loading');
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
 
   useEffect(() => {
     applyActionCode(auth, oobCode)
@@ -50,7 +50,7 @@ function VerifyEmailView({ oobCode }: { oobCode: string }) {
           const userData = await getUserByUID(currentUser.uid);
           router.replace(userData?.pending ? '/status/account-pending' : '/status/account-created');
         } else {
-          router.replace('/login');
+          setStatus('success');
         }
       })
       .catch(() => setStatus('error'));
@@ -61,6 +61,14 @@ function VerifyEmailView({ oobCode }: { oobCode: string }) {
       <h1 className="font-bold text-2xl text-center font-raleway">Verify Email</h1>
       {status === 'loading' && (
         <p className="text-center text-sm text-text-1 font-family-roboto">Verifying your email...</p>
+      )}
+      {status === 'success' && (
+        <div className="flex flex-col gap-6 font-family-roboto">
+          <p className="text-center text-sm text-text-1">
+            Your email has been verified. You can now log in.
+          </p>
+          <LongButton name="Go to Login" onClick={() => router.push('/login')} />
+        </div>
       )}
       {status === 'error' && (
         <div className="flex flex-col gap-6 font-family-roboto">

@@ -39,7 +39,7 @@ export default function SignUpPage() {
               <SignUpInformation
                 selectedRole={role}
                 onBack={() => setStep("pick")}
-                onSuccess={() => router.push("/status/verify-email")}
+                onSuccess={() => router.push(role === "Volunteer" ? "/status/waiver-pending" : "/status/verify-email")}
               />
             )}
           </div>

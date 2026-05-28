@@ -87,6 +87,11 @@ export const deleteUser = async (uid: string) => {
   await deleteDoc(userRef);
 };
 
+export const signWaiver = async (uid: string) => {
+  const userRef = doc(db, "users", uid);
+  await updateDoc(userRef, { signedWaiver: new Date() });
+};
+
 /**
  * Update user's email verification status
  */
