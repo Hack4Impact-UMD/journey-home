@@ -11,7 +11,7 @@ import { useClientRequests } from "@/lib/queries/client-requests";
 import { useAllActiveAccounts } from "@/lib/queries/users";
 import { useState, useMemo } from "react";
 import { exportClientRequestsAdmin } from "@/lib/csv-exports";
-import { Upload } from "lucide-react";
+import { ExportButton } from "@/components/general/ExportButton";
 
 export default function ClientRequestsAdminPage() {
     const { clientRequests, refetch: refetchClientRequests, setClientRequest, setClientRequestToast } = useClientRequests();
@@ -135,14 +135,11 @@ export default function ClientRequestsAdminPage() {
                                 status={sortBy}
                                 onChange={(status) => setSortBy(status)}
                             />
-                            <button
-                                type="button"
-                                className="bg-primary text-white px-3 py-1.5 text-sm flex items-center gap-1.5 shrink-0 ml-auto"
+                            <ExportButton
+                                label="Export New Requests"
                                 onClick={() => exportClientRequestsAdmin(filtered, allAccounts, "new-client-requests.csv", false)}
-                            >
-                                <Upload size={16} />
-                                Export New Requests
-                            </button>
+                                className="ml-auto"
+                            />
                         </div>
                     </div>
                     <AdminCRTable

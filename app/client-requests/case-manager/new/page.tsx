@@ -9,7 +9,7 @@ import { SortOption } from "@/components/inventory/SortOption";
 import { CaseMCRTable } from "@/components/client-requests/CaseMCRTable";
 import { useAuth } from "@/contexts/AuthContext";
 import { exportClientRequestsCaseManager } from "@/lib/csv-exports";
-import { Upload } from "lucide-react";
+import { ExportButton } from "@/components/general/ExportButton";
 
 export default function ClientRequestsCaseManagerPage() {
     const { clientRequests, refetch: refetchClientRequests } = useClientRequests();
@@ -85,14 +85,11 @@ export default function ClientRequestsCaseManagerPage() {
                                     status={sortBy}
                                     onChange={(status) => setSortBy(status)}
                                 />
-                                <button
-                                    type="button"
-                                    className="bg-primary text-white px-3 py-1.5 text-sm flex items-center gap-1.5 shrink-0 ml-auto"
+                                <ExportButton
+                                    label="Export New Requests"
                                     onClick={() => exportClientRequestsCaseManager(filtered, "new-client-requests.csv", false)}
-                                >
-                                    <Upload size={16} />
-                                    Export New Requests
-                                </button>
+                                    className="ml-auto"
+                                />
                             </div>
                         </div>
                         <CaseMCRTable

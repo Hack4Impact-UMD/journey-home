@@ -11,7 +11,7 @@ import { CaseMCRTable } from "@/components/client-requests/CaseMCRTable";
 import { useAuth } from "@/contexts/AuthContext";
 import { ReviewStatus } from "@/types/general";
 import { exportClientRequestsCaseManager } from "@/lib/csv-exports";
-import { Upload } from "lucide-react";
+import { ExportButton } from "@/components/general/ExportButton";
 
 const statusOpts: ReviewStatus[] = ["Approved", "Denied"];
 
@@ -97,14 +97,11 @@ export default function ClientRequestsCaseManagerPage() {
                                     selected={selectedStatus}
                                     setSelected={setStatus}
                                 />
-                                <button
-                                    type="button"
-                                    className="bg-primary text-white px-3 py-1.5 text-sm flex items-center gap-1.5 shrink-0 ml-auto"
+                                <ExportButton
+                                    label="Export Reviewed Requests"
                                     onClick={() => exportClientRequestsCaseManager(filtered, "reviewed-client-requests.csv", true)}
-                                >
-                                    <Upload size={16} />
-                                    Export Reviewed Requests
-                                </button>
+                                    className="ml-auto"
+                                />
                             </div>
                         </div>
                         <CaseMCRTable

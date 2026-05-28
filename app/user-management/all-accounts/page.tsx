@@ -9,7 +9,7 @@ import { useState, useMemo } from "react";
 import { useAllActiveAccounts } from "@/lib/queries/users";
 import { Spinner } from "@/components/ui/spinner";
 import { exportUsers } from "@/lib/csv-exports";
-import { Upload } from "lucide-react";
+import { ExportButton } from "@/components/general/ExportButton";
 
 export default function AllAccountsPage() {
     const roleOptions: UserRole[] = ["Admin", "Case Manager", "Volunteer"];
@@ -70,14 +70,11 @@ export default function AllAccountsPage() {
                         <Spinner className="size-5 text-primary" />
                     </div>
                 )}
-                <button
-                    type="button"
-                    className="bg-primary text-white px-3 py-1.5 text-sm flex items-center gap-1.5 shrink-0 md:ml-auto"
+                <ExportButton
+                    label="Export All Accounts"
                     onClick={() => exportUsers(filteredUsers)}
-                >
-                    <Upload size={16} />
-                    Export All Accounts
-                </button>
+                    className="md:ml-auto"
+                />
             </div>
             <div className="flex-1 overflow-auto min-h-0">
             <UserTable

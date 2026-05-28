@@ -14,7 +14,7 @@ import { DonationItem, DonationSearchParams } from "@/types/donations";
 import { ListIcon, SquaresFourIcon } from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
 import { exportDonationRequests } from "@/lib/csv-exports";
-import { Upload } from "lucide-react";
+import { ExportButton } from "@/components/general/ExportButton";
 
 type AcquisitionType = "Can Drop Off" | "Needs Pickup";
 const ALL_ACQUISITION_TYPES: AcquisitionType[] = ["Can Drop Off", "Needs Pickup"];
@@ -247,14 +247,11 @@ export default function NewRequestsPage() {
                         selected={acquisitionFilter}
                         setSelected={setAcquisitionFilter}
                     />
-                    <button
-                        type="button"
-                        className="bg-primary text-white px-3 py-1.5 text-sm flex items-center gap-1.5 shrink-0 ml-auto"
+                    <ExportButton
+                        label="Export New Requests"
                         onClick={() => exportDonationRequests(filtered, "new-donation-requests.csv")}
-                    >
-                        <Upload size={16} />
-                        Export New Requests
-                    </button>
+                        className="ml-auto"
+                    />
                 </div>
             </div>
             <div className="flex-1 overflow-auto min-h-0 pr-4">
