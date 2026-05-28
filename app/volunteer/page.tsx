@@ -13,6 +13,7 @@ function SignInRequiredModal({ onLogin, onCreateAccount, onClose }: {
     onCreateAccount: () => void;
     onClose: () => void;
 }) {
+
     useEffect(() => {
         const prev = document.body.style.overflow;
         document.body.style.overflow = "hidden";
@@ -105,17 +106,17 @@ export default function VolunteerPage() {
                     Volunteering for JourneyHome
                 </h1>
                 <p className="text-sm text-text-1 mt-3">
-                    Welcome to Journey Home's Sign Up System for our weekly Volunteer Pickups, Deliveries, and Organizing Days! We are ending homelessness, please join us and sign up to help! 
+                    Welcome to Journey Home&apos;s Sign Up System for our weekly Volunteer Pickups, Deliveries, and Organizing Days! We are ending homelessness, please join us and sign up to help!
                 </p>
                 <p className="text-sm text-text-1 mt-3">
                     All Organizing Days are at our warehouse at 595 New Park Ave., West Hartford - NOTE this is a NEW address as of August 2024!
                 </p>
                 <p className="text-sm text-text-1 mt-3">
-                    Pick-up and delivery days typically also start at our warehouse on New Park Ave., but emails with the day's specific schedule will be sent out to all volunteers by the day before the event.  
+                    Pick-up and delivery days typically also start at our warehouse on New Park Ave., but emails with the day&apos;s specific schedule will be sent out to all volunteers by the day before the event.
                 </p>
 
                 <p className="text-sm text-text-1 mt-3">
-                    To ensure you receive the day's schedule, <span className="font-bold underline">please sign up at least 24 hours in advance of your volunteer shift.</span>
+                    To ensure you receive the day&apos;s schedule, <span className="font-bold underline">please sign up at least 24 hours in advance of your volunteer shift.</span>
                 </p>
 
                 <div className="md:hidden mt-6 border-b border-gray-200" />
@@ -148,7 +149,7 @@ export default function VolunteerPage() {
                 ) : (
                     <ShiftListView
                         timeBlocks={filteredTimeBlocks}
-                        currentUserID=""
+                        currentUserID={userData?.uid ?? ""}
                         onSignUpClick={handleSignUpClick}
                     />
                 )}
