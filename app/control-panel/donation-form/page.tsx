@@ -83,13 +83,18 @@ export default function DonationFormPage() {
         if (!showPreview) return;
         const prev = document.body.style.overflow;
         document.body.style.overflow = "hidden";
-        const handleEscape = (e: KeyboardEvent) => { if (e.key === "Escape") handleClosePreview(); };
+        const handleEscape = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                setShowPreview(false);
+                queryClient.invalidateQueries({ queryKey: ["donationForm"] });
+            }
+        };
         document.addEventListener("keydown", handleEscape);
         return () => {
             document.body.style.overflow = prev;
             document.removeEventListener("keydown", handleEscape);
         };
-    }, [showPreview]);
+    }, [showPreview, queryClient]);
 
     async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
