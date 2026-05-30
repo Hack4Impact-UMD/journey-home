@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchDonationForm, uploadDonationForm, removeDonationForm, saveDonationFormContent } from "../services/donationForm";
+import { fetchDonationForm, uploadDonationForm, saveDonationFormContent } from "../services/donationForm";
 import { toast } from "sonner";
 
 export function useDonationForm() {
@@ -12,13 +12,6 @@ export function useDonationForm() {
 
     const uploadMutation = useMutation({
         mutationFn: uploadDonationForm,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["donationForm"] });
-        },
-    });
-
-    const removeMutation = useMutation({
-        mutationFn: removeDonationForm,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["donationForm"] });
         },
@@ -51,21 +44,13 @@ export function useDonationForm() {
         await promise;
     };
 
-    const deleteBanner = async () => {
-        const promise = removeMutation.mutateAsync();
-        toast.promise(promise, {
-            loading: "Removing banner...",
-            success: "Banner removed.",
-            error: "Failed to remove banner.",
-        });
-        await promise;
-    };
+    const saveContentSilent = (content: string) => contentMutation.mutateAsync(content);
 
     return {
         formData: query.data ?? null,
         uploadBanner,
-        deleteBanner,
         saveContent,
-        isMutating: uploadMutation.isPending || removeMutation.isPending || contentMutation.isPending,
+        saveContentSilent,
+        isMutating: uploadMutation.isPending || contentMutation.isPending,
     };
 }

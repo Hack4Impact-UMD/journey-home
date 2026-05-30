@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useDonationForm } from "@/lib/queries/donationForm";
+import { useQueryClient } from "@tanstack/react-query";
 import { EditIcon } from "@/components/icons/EditIcon";
 import { Bold, Italic, Heading1, Heading2, Heading3, List, ListOrdered, Undo, Redo, X } from "lucide-react";
 import { DonorFormProvider } from "@/app/donate/DonorFormContext";
@@ -15,7 +16,7 @@ function ToolbarButton({ onClick, active, children }: { onClick: () => void; act
         <button
             type="button"
             onMouseDown={(e) => { e.preventDefault(); onClick(); }}
-            className={`p-1.5 rounded hover:bg-gray-100 ${active ? "bg-gray-200 text-primary" : "text-gray-600"}`}
+            className={`p-1.5 rounded hover:bg-gray-100 focus:outline-none ${active ? "bg-gray-200 text-primary" : "text-gray-600"}`}
         >
             {children}
         </button>
@@ -60,7 +61,8 @@ function Toolbar({ editor }: { editor: Editor }) {
 }
 
 export default function DonationFormPage() {
-    const { formData, uploadBanner, saveContent, isMutating } = useDonationForm();
+    const { formData, uploadBanner, saveContent, saveContentSilent, isMutating } = useDonationForm();
+    const queryClient = useQueryClient();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const originalContentRef = useRef<string>("");
     const [isEditing, setIsEditing] = useState(false);
@@ -72,16 +74,16 @@ export default function DonationFormPage() {
     });
 
     useEffect(() => {
-        if (editor && formData?.content) {
+        if (editor && formData?.content && !isEditing) {
             editor.commands.setContent(formData.content);
         }
-    }, [editor, formData?.content]);
+    }, [editor, formData?.content, isEditing]);
 
     useEffect(() => {
         if (!showPreview) return;
         const prev = document.body.style.overflow;
         document.body.style.overflow = "hidden";
-        const handleEscape = (e: KeyboardEvent) => { if (e.key === "Escape") setShowPreview(false); };
+        const handleEscape = (e: KeyboardEvent) => { if (e.key === "Escape") handleClosePreview(); };
         document.addEventListener("keydown", handleEscape);
         return () => {
             document.body.style.overflow = prev;
@@ -110,6 +112,26 @@ export default function DonationFormPage() {
     function handleCancel() {
         editor?.commands.setContent(originalContentRef.current);
         setIsEditing(false);
+        saveContentSilent(originalContentRef.current)
+            .then(() => queryClient.invalidateQueries({ queryKey: ["donationForm"] }))
+            .catch(() => queryClient.invalidateQueries({ queryKey: ["donationForm"] }));
+    }
+
+    async function handleOpenPreview() {
+        if (isEditing && editor) {
+            const content = editor.getHTML();
+            await saveContentSilent(content);
+            queryClient.setQueryData(["donationForm"], (old: typeof formData) => ({
+                ...(old ?? {}),
+                content,
+            }));
+        }
+        setShowPreview(true);
+    }
+
+    function handleClosePreview() {
+        setShowPreview(false);
+        queryClient.invalidateQueries({ queryKey: ["donationForm"] });
     }
 
     return (
@@ -137,7 +159,7 @@ export default function DonationFormPage() {
                         />
                     )}
                     <button
-                        className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center cursor-pointer focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                         onClick={() => fileInputRef.current?.click()}
                         disabled={isMutating}
                     >
@@ -147,7 +169,7 @@ export default function DonationFormPage() {
                 <div className="relative mt-4 border border-light-border rounded-sm">
                     {isEditing && editor && <Toolbar editor={editor} />}
                     <div
-                        className={`h-80 overflow-y-auto px-4 pb-2 [&_.ProseMirror]:outline-none${isEditing ? " cursor-text" : ""}`}
+                        className={`h-80 overflow-y-auto px-4 pb-2 [&_.ProseMirror]:outline-none [&_.ProseMirror:focus]:outline-none${isEditing ? " cursor-text" : ""}`}
                         onClick={() => isEditing && editor?.commands.focus()}
                     >
                         <EditorContent editor={editor} className={isEditing ? "pt-4" : "hidden"} />
@@ -160,7 +182,7 @@ export default function DonationFormPage() {
                     </div>
                     {!isEditing && (
                         <button
-                            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center cursor-pointer"
+                            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center cursor-pointer focus:outline-none"
                             onClick={handleEdit}
                         >
                             <EditIcon />
@@ -171,7 +193,7 @@ export default function DonationFormPage() {
                     <div className="mt-8 flex items-center justify-end">
                         <button
                             type="button"
-                            onClick={() => setShowPreview(true)}
+                            onClick={handleOpenPreview}
                             className="text-sm h-8 rounded-xs bg-primary text-white w-35"
                         >
                             Preview Form
@@ -189,7 +211,7 @@ export default function DonationFormPage() {
                         </button>
                         <button
                             type="button"
-                            onClick={() => setShowPreview(true)}
+                            onClick={handleOpenPreview}
                             className="text-sm h-8 rounded-xs bg-white border border-light-border text-text-1 w-35"
                         >
                             Preview Form
@@ -207,11 +229,11 @@ export default function DonationFormPage() {
 
             {showPreview && createPortal(
                 <div className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center font-family-roboto">
-                    <div className="absolute inset-0" onClick={() => setShowPreview(false)} />
+                    <div className="absolute inset-0" onClick={() => handleClosePreview()} />
                     <div className="relative bg-white rounded-xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-xl">
                         <div className="flex items-center justify-between px-8 py-4 border-b border-light-border shrink-0 shadow-[0_2px_6px_rgba(0,0,0,0.08)]">
                             <span className="font-semibold text-text-1">Form Preview</span>
-                            <button onClick={() => setShowPreview(false)}>
+                            <button onClick={() => handleClosePreview()}>
                                 <X className="w-5 h-5 text-text-1" />
                             </button>
                         </div>

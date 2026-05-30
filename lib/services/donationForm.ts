@@ -1,5 +1,5 @@
 import { db, storage } from "../firebase";
-import { doc, getDoc, setDoc, deleteDoc, Timestamp } from "firebase/firestore";
+import { doc, getDoc, setDoc, Timestamp } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 
 type FormDoc = { file: string; storagePath: string; uploadedAt: Timestamp; content?: string };
@@ -27,7 +27,7 @@ export async function uploadDonationForm(file: File): Promise<void> {
         uploadedAt: Timestamp.now(),
     }, { merge: true });
 
-    if (existing) {
+    if (existing && existing.storagePath !== storagePath) {
         try {
             await deleteObject(ref(storage, existing.storagePath));
         } catch (e: unknown) {
@@ -40,11 +40,3 @@ export async function saveDonationFormContent(content: string): Promise<void> {
     await setDoc(formDocRef, { content }, { merge: true });
 }
 
-export async function removeDonationForm(): Promise<void> {
-    const existing = await fetchDonationForm();
-    if (!existing) return;
-    await Promise.all([
-        deleteObject(ref(storage, existing.storagePath)),
-        deleteDoc(formDocRef),
-    ]);
-}
