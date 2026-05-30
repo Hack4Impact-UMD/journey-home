@@ -16,14 +16,14 @@ Next.js 16 (App Router, standalone) + Firebase (Auth, Firestore, Storage, Functi
 ## Architecture
 - **Data flow:** Components → `lib/queries/` (React Query) → `lib/services/` (Firebase) → SDK. Never call Firestore from components.
 - **Auth:** `useAuth().state` = `{ currentUser, userData, loading }`. Role via `userData?.role` = `Admin` | `Case Manager` | `Volunteer`. Call `refreshUser()` after manually writing to the `users` doc to sync without waiting for `onAuthStateChanged`.
-- **ProtectedRoute:** `allow={[...]}` redirect order: unauthenticated → `/login`, missing data → `/status/missing-user-data`, unverified → `/status/verify-email`, pending → `/status/account-pending`, wrong role → `/status/invalid-perms`. `/status/verify-email` and `/status/account-pending` skip `ProtectedRoute` (would loop).
+- **ProtectedRoute:** `allow={[...]}` redirect order: unauthenticated → `/login`, missing data → `/status/missing-user-data`, **disabled → `/status/account-disabled`**, unverified → `/status/verify-email`, pending → `/status/account-pending`, wrong role → `/status/invalid-perms`. `/status/verify-email`, `/status/account-pending`, and `/status/account-disabled` skip `ProtectedRoute` (would loop).
 - **Page layout:** Pages under a group `layout.tsx` render content only — layout handles `ProtectedRoute` + `Navbar`. No TopNavbar. Tab-based layouts (user-management, donation-requests, pickups-deliveries) use `pathname.startsWith(...)` for active tab styling.
 - **Navbar:** `components/general/Navbar.tsx`. On desktop (`≥md`): fixed-width `w-[13em] shrink-0` sidebar. On mobile (`<md`): top bar with hamburger + slide-in drawer. Pass `pageTitle` to show the page name in the mobile top bar; omit it to show the JOURNEY HOME logo instead (used on the home page). Layout wrappers must use `flex flex-1 min-h-0 max-md:flex-col` and hide the desktop `<span>` title with `max-md:hidden`.
 - **Redirects:** `permanentRedirect` for static destinations. Role-based: `useAuth()` + `useRouter()` + `useEffect` in the page component.
 - **Types:** `types/general.ts` holds shared primitives (`Address`, `ContactInfo`, `LocationContact`, `ReviewStatus`); domain files import from there, never duplicate.
 
 ## Firestore
-- `users` — `pending: null` (active) or `UserRole` (role being requested). `emailVerified` synced by `onAuthStateChanged` or manually via `updateEmailVerificationStatus`.
+- `users` — fields: `uid`, `firstName`, `lastName`, `email`, `phone` (format `XXX-XXX-XXXX`), `createdTime: Timestamp`, `signedWaiver: Timestamp | null` (volunteers only — null = not signed), `disabled: boolean`, `role: UserRole`, `pending: null` (active) or `UserRole` (role being requested), `emailVerified`. `emailVerified` synced by `onAuthStateChanged` or manually via `updateEmailVerificationStatus`.
 - `warehouseHistory` — written atomically via `useInventoryCategories` only, never directly. Fields: `id`, `userId`, `timestamp`, `change: { category, oldQuantity, newQuantity }`, `reverted`.
 - `donation-requests`, `donors`, `inventory`, `timeblocks`
 
@@ -36,7 +36,7 @@ Next.js 16 (App Router, standalone) + Firebase (Auth, Firestore, Storage, Functi
 - Shortcut `permanentRedirect`s: `/inventory`, `/donation-requests`, `/user-management`, `/pickups-deliveries`, `/control-panel` → each default sub-page.
 
 ## Env
-Copy `.env.example` → `.env`. Emulator vars pre-configured; `NEXT_PUBLIC_FIREBASE_*` for production.
+Copy `.env.example` → `.env`. Emulator vars pre-configured; `NEXT_PUBLIC_FIREBASE_*` for production. Emulators bind to `0.0.0.0` (not localhost) — see `firebase.json`.
 
 ## Conventions
 - **Parallel writes:** `Promise.all` for independent Firestore writes.
@@ -49,3 +49,6 @@ Copy `.env.example` → `.env`. Emulator vars pre-configured; `NEXT_PUBLIC_FIREB
 - **Filter/sort bars:** Wrap controls in `flex flex-wrap gap-3`. All three control components (`SearchBox`, `DropdownMultiselect`, `SortOption`) have `shrink-0` and explicit `h-8` so they hold size when wrapping to a new line.
 - **Multi-select:** `DropdownMultiselect<T>` at `components/inventory/DropdownMultiselect.tsx` — reusable anywhere.
 - **Tailwind sizing:** No `px` in arbitrary values. Use scale classes (`w-96`) or `rem` (`w-[22.5rem]`).
+- **UUIDs:** Do not use `crypto.randomUUID()` — it requires HTTPS and breaks on the HTTP emulator. Use `v4` from the `uuid` package (`import { v4 as uuidv4 } from "uuid"`).
+- **Badges:** `Badge` at `components/inventory/Badge.tsx` — props: `text`, `color`. Available colors: `orange`, `yellow`, `blue`, `green`, `red`, `gray`, `purple`, `pink`, `indigo`, `light-green`, `light-pink`. Wrap in `text-xs` to match the size used in table rows.
+- **Status pages:** `/status/account-disabled` — no ProtectedRoute, has Log Out button. Pattern for all status pages: `AuthMobileNavbar` + left background image + centered right column with logo, heading, message, button.

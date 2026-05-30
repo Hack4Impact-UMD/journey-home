@@ -6,8 +6,8 @@ import PasswordResetSection from "@/components/profile/PasswordResetSection";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAllActiveAccounts } from "@/lib/queries/users";
 import { useEffect, useState } from "react";
-import { Timestamp } from "firebase/firestore";
 import { toast } from "sonner";
+import { formatPhone } from "@/lib/utils/phone";
 
 export default function ProfilePage() {
     const { state, logout } = useAuth();
@@ -17,7 +17,6 @@ export default function ProfilePage() {
 
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
-    const [dob, setDob] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
     const [showPasswordReset, setShowPasswordReset] = useState(false);
 
@@ -25,15 +24,6 @@ export default function ProfilePage() {
         if (account) {
             setFirstName(account.firstName || "");
             setLastName(account.lastName || "");
-            if (account.dob) {
-                const date = new Date(account.dob.seconds * 1000);
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, "0");
-                const day = String(date.getDate()).padStart(2, "0");
-                setDob(`${year}-${month}-${day}`);
-            } else {
-                setDob("");
-            }
             setPhoneNumber(account.phone || "");
         }
     }, [account]);
@@ -47,24 +37,21 @@ export default function ProfilePage() {
             toast.error("Last name is required");
             return;
         }
-        if (phoneNumber && !/^\+?[\d\s\-()]+$/.test(phoneNumber)) {
-            toast.error("Invalid phone number format");
+        if (!phoneNumber.trim()) {
+            toast.error("Phone number is required");
+            return;
+        }
+        if (!/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/.test(phoneNumber)) {
+            toast.error("Phone number must be in the format 123-456-7890.");
             return;
         }
 
         if (!account) return;
 
-        let dobTimestamp: Timestamp | null = null;
-        if (dob) {
-            const [y, m, d] = dob.split("-").map(Number);
-            dobTimestamp = Timestamp.fromDate(new Date(y, m - 1, d, 12, 0, 0));
-        }
-
         await editAccount({
             ...account,
             firstName: firstName.trim(),
             lastName: lastName.trim(),
-            dob: dobTimestamp,
             phone: phoneNumber.trim(),
         });
     };
@@ -73,15 +60,6 @@ export default function ProfilePage() {
         if (account) {
             setFirstName(account.firstName || "");
             setLastName(account.lastName || "");
-            if (account.dob) {
-                const date = new Date(account.dob.seconds * 1000);
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, "0");
-                const day = String(date.getDate()).padStart(2, "0");
-                setDob(`${year}-${month}-${day}`);
-            } else {
-                setDob("");
-            }
             setPhoneNumber(account.phone || "");
         }
     };
@@ -137,23 +115,18 @@ export default function ProfilePage() {
                                         </div>
                                         <div className="flex gap-4 max-md:flex-col">
                                             <div className="flex-1">
-                                                <label className="block mb-1 text-sm text-text-1">Date of Birth</label>
-                                                <input
-                                                    type="date"
-                                                    value={dob}
-                                                    onChange={(e) => setDob(e.target.value)}
-                                                    className="w-full border border-gray-300 rounded-xs h-10 px-3"
-                                                />
-                                            </div>
-                                            <div className="flex-1">
                                                 <label className="block mb-1 text-sm text-text-1">Phone Number</label>
                                                 <input
                                                     type="tel"
                                                     value={phoneNumber}
-                                                    onChange={(e) => setPhoneNumber(e.target.value)}
+                                                    placeholder="XXX-XXX-XXXX"
+                                                    pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+                                                    onChange={(e) => { e.target.setCustomValidity(""); setPhoneNumber(formatPhone(e.target.value)); }}
+                                                    onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Please enter a complete phone number in the format 123-456-7890.")}
                                                     className="w-full border border-gray-300 rounded-xs h-10 px-3"
                                                 />
                                             </div>
+                                            <div className="flex-1 max-md:hidden" />
                                         </div>
                                     </div>
 

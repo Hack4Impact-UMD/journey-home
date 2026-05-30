@@ -26,7 +26,7 @@ export default function AccountCreated() {
           <div className="flex flex-1 flex-col h-full items-center justify-center" style={{ paddingLeft: '2rem', paddingRight: '2rem' }}>
         <div className="flex flex-col items-center w-full max-w-[28em]">
           {/* Logo */}
-          <div className="flex justify-center mb-16">
+          <div className="flex justify-center mb-16 cursor-pointer" onClick={() => router.push('/login')}>
             <img
               src="/journey-home-logo.png"
               alt="Journey Home"

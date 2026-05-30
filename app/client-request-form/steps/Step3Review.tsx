@@ -182,6 +182,13 @@ export default function Step3Review() {
                                 {renderBoolean(questions.clientSpeaksEnglish)}
                             </div>
 
+                            {questions.clientSpeaksEnglish === false && (
+                                <>
+                                    <div className="font-semibold">Preferred language</div>
+                                    <div>{questions.preferredLanguage || "Not specified"}</div>
+                                </>
+                            )}
+
                             <div className="font-semibold">
                                 Adults in family
                             </div>

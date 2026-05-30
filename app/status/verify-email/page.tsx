@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/lib/firebase';
+import { getUserByUID } from '@/lib/services/users';
 import AuthMobileNavbar from '@/components/auth/AuthMobileNavbar';
 import { Spinner } from '@/components/ui/spinner';
 
@@ -22,6 +23,25 @@ export default function VerifyEmailPage() {
       if (redirectTimeout.current) clearTimeout(redirectTimeout.current);
     };
   }, []);
+
+  useEffect(() => {
+    const handleFocus = async () => {
+      if (!auth.currentUser) return;
+      const { verified } = await authContext.checkVerification();
+      if (verified) {
+        const userData = await getUserByUID(auth.currentUser.uid);
+        if (userData?.disabled) {
+          router.push('/status/account-disabled');
+        } else if (userData?.pending) {
+          router.push('/status/account-pending');
+        } else {
+          router.push('/status/account-created');
+        }
+      }
+    };
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [authContext, router]);
 
   useEffect(() => {
     if (authContext.state.loading) return;
@@ -96,7 +116,7 @@ export default function VerifyEmailPage() {
         }
       } else {
         setIsError(true);
-        setMessage('Email not verified yet. Please check your inbox and click the verification link.');
+        setMessage('Email not verified yet. Please check your inbox (don\'t forget Spam/Junk!) and click the verification link.');
       }
     } catch (error: unknown) {
       console.error('Error checking verification:', error);
@@ -131,7 +151,7 @@ export default function VerifyEmailPage() {
         <div className="flex flex-1 flex-col h-full items-center justify-center" style={{ paddingLeft: '2rem', paddingRight: '2rem' }}>
           <div className="w-full max-w-[28em] text-center">
             {/* Logo */}
-            <div className="flex justify-center mb-16">
+            <div className="flex justify-center mb-16 cursor-pointer" onClick={() => router.push('/login')}>
               <img
                 src="/journey-home-logo.png"
                 alt="Journey Home"
@@ -149,7 +169,8 @@ export default function VerifyEmailPage() {
             </h1>
 
             <p className="text-center font-family-roboto text-text-1 mb-8">
-              We sent a message to your email. Please click the link in the email to verify your account.
+              We sent a verification link to your email. Click the link to verify your account.
+              If you don&apos;t see it, check your Spam or Junk folder.
             </p>
 
             {message && (
