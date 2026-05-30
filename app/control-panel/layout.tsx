@@ -33,6 +33,13 @@ export default function ControlPanelLayout({ children }: { children: ReactNode }
                             >
                                 Warehouse History
                             </Link>
+                            <Link
+                                className={`py-4 font-family-roboto text-sm${pathname.startsWith("/control-panel/donation-form") ? " border-b-2 border-primary text-primary" : ""}`}
+                                href="/control-panel/donation-form"
+                                aria-current={pathname.startsWith("/control-panel/donation-form") ? "page" : undefined}
+                            >
+                                Donation Form
+                            </Link>
                         </div>
                         <div className="bg-background rounded-xl my-2 flex-1 py-4 px-6 min-h-0 overflow-hidden flex flex-col max-md:bg-transparent max-md:m-0 max-md:rounded-none">
                             {children}

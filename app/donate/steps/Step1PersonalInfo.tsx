@@ -9,8 +9,10 @@ import FormTextarea from "../../../components/form/FormTextarea";
 import FormCheckbox from "../../../components/form/FormCheckbox";
 import Button from "../../../components/form/Button";
 import Image from "next/image";
+import { useDonationForm } from "@/lib/queries/donationForm";
 
 export default function Step1PersonalInfo() {
+  const { formData } = useDonationForm();
   const { formState, updateDonorInfo, updateAdditionalInfo, updateAcknowledgements, setCurrentStep } = useDonorForm();
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -119,6 +121,23 @@ export default function Step1PersonalInfo() {
       </div>
 
       <StepIndicator currentStep={1} steps={steps}/>
+
+      {formData?.file ? (
+        <img
+          src={formData.file}
+          alt="Donation form banner"
+          className="w-full"
+        />
+      ) : (
+        <div className="w-full h-48 bg-gray-200 rounded-sm" />
+      )}
+
+      {formData?.content && (
+        <div
+          className="prose max-w-none"
+          dangerouslySetInnerHTML={{ __html: formData.content }}
+        />
+      )}
 
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Contact</h2>
 
