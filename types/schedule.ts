@@ -7,6 +7,12 @@ export type VolunteerGroup = {
     maxNum: number;
     volunterIDs: string[]; // user IDs of volunteers associated with this group
 }
+export type RecurrenceFrequency = "daily" | "weekly" | "biweekly" | "monthly";
+
+export type RecurrenceRule = {
+    frequency: RecurrenceFrequency;
+    until: Timestamp
+}
 
 export type TimeBlock = {
     id: string;
@@ -18,6 +24,8 @@ export type TimeBlock = {
     endTime: Timestamp;
     volunteerGroups: VolunteerGroup[];
     published: boolean;
+    seriesId: string;
+    recurrence: RecurrenceRule | null;
 };
 
 export type Task = Pickup | Delivery;

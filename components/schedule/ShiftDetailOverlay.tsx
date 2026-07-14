@@ -20,7 +20,9 @@ import { DonationRequest } from "../../types/donations";
 import { ClientRequest } from "../../types/client-requests";
 import { useAllActiveAccounts } from "../../lib/queries/users";
 import { useTimeBlocks } from "../../lib/queries/timeblocks";
+import { isInSeries, getFollowingInSeries } from "../../lib/recurrence";
 import { ConfirmModal } from "../general/ConfirmModal";
+import { ScopeModal } from "./ScopeModal";
 import { ShiftEditModal } from "./ShiftEditModal";
 import { Switch } from "../ui/switch";
 
@@ -142,7 +144,7 @@ interface Props {
 
 export function ShiftDetailOverlay({ timeBlock, onClose }: Props) {
   const overlayRef = useRef<HTMLDivElement>(null);
-  const { allTB, setTimeblockToast, deleteTimeblockToast } = useTimeBlocks();
+  const { allTB, setTimeblockToast, deleteTimeblockToast, deleteTimeblocksBulkToast } = useTimeBlocks();
   const { allAccounts, isLoading: accountsLoading } = useAllActiveAccounts();
 
   const [showEdit, setShowEdit] = useState(false);
@@ -197,6 +199,7 @@ export function ShiftDetailOverlay({ timeBlock, onClose }: Props) {
   const startDate = liveTimeBlock.startTime.toDate();
   const endDate = liveTimeBlock.endTime.toDate();
   const isPickupType = liveTimeBlock.type === "Pickup/Delivery";
+  const inSeries = isInSeries(liveTimeBlock, allTB);
 
   const addVolunteerGroupData = addVolunteerGroup
     ? (liveTimeBlock.volunteerGroups.find(g => g.name === addVolunteerGroup) ?? null)
@@ -208,6 +211,11 @@ export function ShiftDetailOverlay({ timeBlock, onClose }: Props) {
 
   const handleDelete = async () => {
     await deleteTimeblockToast(liveTimeBlock);
+    onClose();
+  };
+
+  const handleDeleteFollowing = async () => {
+    await deleteTimeblocksBulkToast(getFollowingInSeries(liveTimeBlock, allTB));
     onClose();
   };
 
@@ -277,6 +285,7 @@ export function ShiftDetailOverlay({ timeBlock, onClose }: Props) {
           {/* Date and time */}
           <p className="text-xs text-gray-500 mt-2 shrink-0">
             {formatHeaderDate(startDate)}&nbsp;|&nbsp;{shortenTime(startDate)}–{shortenTime(endDate)}
+            {liveTimeBlock.recurrence && <>&nbsp;|&nbsp;{liveTimeBlock.recurrence.frequency.charAt(0).toUpperCase() + liveTimeBlock.recurrence.frequency.slice(1)}</>}
           </p>
 
           {/* Shift type indicator */}
@@ -469,12 +478,22 @@ export function ShiftDetailOverlay({ timeBlock, onClose }: Props) {
       </div>
 
       {confirmDelete && (
-        <ConfirmModal
-          title="Delete Shift"
-          message="Are you sure you want to delete this time block?"
-          onConfirm={handleDelete}
-          onCancel={() => setConfirmDelete(false)}
-        />
+        inSeries ? (
+          <ScopeModal
+            title="Delete Recurring Shift"
+            message="Delete this shift only, or this and all following shifts?"
+            onThisShift={handleDelete}
+            onThisAndFollowing={handleDeleteFollowing}
+            onCancel={() => setConfirmDelete(false)}
+          />
+        ) : (
+          <ConfirmModal
+            title="Delete Shift"
+            message="Are you sure you want to delete this time block?"
+            onConfirm={handleDelete}
+            onCancel={() => setConfirmDelete(false)}
+          />
+        )
       )}
 
       {removeTarget && (
