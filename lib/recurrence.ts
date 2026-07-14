@@ -23,6 +23,11 @@ function applyClockTime(date: Date, h: number, m:number):Date {
     return newDate;
 }
 
+function shiftMonthClamped(date: Date, monthOffset: number, day: number): Date {
+    const lastDay = new Date(date.getFullYear(), date.getMonth() + monthOffset + 1, 0).getDate();
+    return new Date(date.getFullYear(), date.getMonth() + monthOffset, Math.min(day, lastDay));
+}
+
 function addOccurenceDate(baseDate: Date, frequency: RecurrenceFrequency, stepIndex: number): Date | null {
     const base = new Date(baseDate.getTime())
     base.setHours(0,0,0,0);
@@ -34,8 +39,7 @@ function addOccurenceDate(baseDate: Date, frequency: RecurrenceFrequency, stepIn
         case "biweekly":
             return new Date(base.getFullYear(), base.getMonth(), base.getDate() + stepIndex * 14);
         case "monthly":
-            const c = new Date(base.getFullYear(), base.getMonth() + stepIndex, base.getDate());
-            return c.getDate() === base.getDate() ? c : null;
+            return shiftMonthClamped(base, stepIndex, base.getDate());
         default:
             return null
     }
@@ -110,8 +114,7 @@ export function applyEditToSeries(edited: TimeBlock, original: TimeBlock, target
         const targetDate = target.startTime.toDate();
         let shifted: Date;
         if (monthly) {
-            const lastDay = new Date(targetDate.getFullYear(), targetDate.getMonth() + monthOffset + 1, 0).getDate();
-            shifted = new Date(targetDate.getFullYear(), targetDate.getMonth() + monthOffset, Math.min(editedDate.getDate(), lastDay));
+            shifted = shiftMonthClamped(targetDate, monthOffset, editedDate.getDate());
         } else {
             shifted = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate() + dayOffset);
         }

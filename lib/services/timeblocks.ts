@@ -42,16 +42,33 @@ export const deleteTB = async (id: string) => {
   await deleteDoc(timeRef);
 };
 
-export const deleteTBBulk = async (ids: string[]) => {
-  const chunks: string[][] = []
-  for(let i = 0; i < ids.length; i += 450) {
-    chunks.push(ids.slice(i, i + 450))
+export const deleteTBBulk = async (tbs: TimeBlock[]) => {
+  // chunk by total batch operations (1 delete + 1 ref-clear per task), not just timeblock count,
+  // since each timeblock can bring along a variable number of task ref-clears into the same batch
+  const chunks: TimeBlock[][] = []
+  let current: TimeBlock[] = []
+  let opCount = 0
+
+  for (const tb of tbs) {
+    const tbOps = 1 + tb.tasks.length;
+    if (current.length > 0 && opCount + tbOps > 450) {
+      chunks.push(current)
+      current = []
+      opCount = 0
+    }
+    current.push(tb)
+    opCount += tbOps
   }
+  if (current.length > 0) chunks.push(current)
 
   return Promise.all(chunks.map(async (chunk) => {
     const batch = writeBatch(db);
-    chunk.forEach((id) => {
-      batch.delete(doc(db, "timeblocks", id))
+    chunk.forEach((tb) => {
+      batch.delete(doc(db, "timeblocks", tb.id))
+      tb.tasks.forEach((task) => {
+        const collectionName = "donor" in task ? "donation-requests" : "client-requests";
+        batch.update(doc(db, collectionName, task.id), { associatedTimeBlockID: null })
+      })
     })
     await batch.commit()
   }))

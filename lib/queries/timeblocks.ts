@@ -109,16 +109,7 @@ export function useTimeBlocks() {
 
     const deleteBulkMutation = useMutation({
         mutationFn: async (tbs: TimeBlock[]) => {
-            await Promise.all(
-                tbs.flatMap(tb =>
-                    tb.tasks.map(task =>
-                        "donor" in task
-                            ? clearDonationRequestTimeBlockRef(task.id)
-                            : clearClientRequestTimeBlockRef(task.id)
-                    )
-                )
-            );
-            await deleteTBBulk(tbs.map(tb => tb.id));
+            await deleteTBBulk(tbs);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ["timeblocks"]});
