@@ -1,5 +1,5 @@
 import { db } from "../firebase";
-import { collection, doc, getDocs, setDoc, deleteDoc, runTransaction } from "firebase/firestore";
+import { collection, doc, getDocs, setDoc, deleteDoc, runTransaction, writeBatch } from "firebase/firestore";
 import { TimeBlock } from "../../types/schedule";
 
 const timeCol = collection(db, "timeblocks");
@@ -10,13 +10,28 @@ export const setTB = async(timeblock: TimeBlock) => {
   await setDoc(timeRef, timeblock);
 }
 
+export const setTBBulk = async (tbs: TimeBlock[]) => {
+  const chunks: TimeBlock[][] = []
+  for(let i = 0; i < tbs.length; i += 450) {
+    chunks.push(tbs.slice(i, i + 450))
+  }
+
+  return Promise.all(chunks.map(async (chunk) => {
+    const batch = writeBatch(db);
+    chunk.forEach((tb) => {
+      batch.set(doc(db, "timeblocks", tb.id), tb)
+    })
+    await batch.commit()
+  }))
+}
+
 //fetch all time blocks
 export const fetchAllTB = async (): Promise<TimeBlock[]> => {
   const snapshot = await getDocs(timeCol);
   const TBs: TimeBlock[] = [];
 
   snapshot.forEach((doc) => {
-    TBs.push(doc.data() as TimeBlock);
+    TBs.push({ seriesId: doc.id, recurrence: null, ...doc.data() } as TimeBlock);
   });
   return TBs;
 };
@@ -26,6 +41,21 @@ export const deleteTB = async (id: string) => {
   const timeRef = doc(db, "timeblocks", id);
   await deleteDoc(timeRef);
 };
+
+export const deleteTBBulk = async (ids: string[]) => {
+  const chunks: string[][] = []
+  for(let i = 0; i < ids.length; i += 450) {
+    chunks.push(ids.slice(i, i + 450))
+  }
+
+  return Promise.all(chunks.map(async (chunk) => {
+    const batch = writeBatch(db);
+    chunk.forEach((id) => {
+      batch.delete(doc(db, "timeblocks", id))
+    })
+    await batch.commit()
+  }))
+}
 
 // sign up a volunteer for a shift group atomically — throws if the group is full
 export const signUpForShift = async (tbId: string, groupName: string, userId: string): Promise<TimeBlock> => {

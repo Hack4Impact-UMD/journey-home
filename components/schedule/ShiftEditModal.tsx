@@ -3,10 +3,13 @@
 import { createPortal } from "react-dom";
 import { useState, useEffect, useRef } from "react";
 import { Timestamp } from "firebase/firestore";
+import { v4 as uuidv4 } from "uuid";
 import { Clock } from "lucide-react";
-import { XIcon, PencilSimpleIcon, WarehouseIcon, UsersIcon, XCircleIcon, PlusIcon, TextAlignLeftIcon } from "@phosphor-icons/react";
-import { TimeBlock, VolunteerGroup } from "../../types/schedule";
+import { XIcon, PencilSimpleIcon, WarehouseIcon, UsersIcon, XCircleIcon, PlusIcon, TextAlignLeftIcon, CalendarBlankIcon } from "@phosphor-icons/react";
+import { TimeBlock, VolunteerGroup, RecurrenceFrequency, RecurrenceRule } from "../../types/schedule";
 import { useTimeBlocks } from "../../lib/queries/timeblocks";
+import { isInSeries, generateSeries, getFollowingInSeries, applyEditToSeries, getSeriesLeader } from "../../lib/recurrence";
+import { ScopeModal } from "./ScopeModal";
 import { Switch } from "../ui/switch";
 
 export function makeDefaultTimeBlock(slotStart?: Date): TimeBlock {
@@ -29,8 +32,9 @@ export function makeDefaultTimeBlock(slotStart?: Date): TimeBlock {
         endDate = new Date(year, month - 1, day, 12, 0, 0);
     }
 
+    const id = uuidv4();
     return {
-        id: crypto.randomUUID(),
+        id,
         name: "",
         type: "Warehouse",
         notes: "",
@@ -39,6 +43,8 @@ export function makeDefaultTimeBlock(slotStart?: Date): TimeBlock {
         volunteerGroups: [{ name: "General Volunteers", maxNum: 5, volunterIDs: [] }],
         tasks: [],
         published: false,
+        seriesId: id,
+        recurrence: null,
     };
 }
 
@@ -55,6 +61,14 @@ function formatDisplayDate(dateStr: string): string {
     const [year, month, day] = dateStr.split("-").map(Number);
     return new Date(year, month - 1, day).toLocaleDateString("en-US", {
         weekday: "long", month: "long", day: "numeric",
+    });
+}
+
+function formatEndDate(dateStr: string): string {
+    if (!dateStr) return "";
+    const [year, month, day] = dateStr.split("-").map(Number);
+    return new Date(year, month - 1, day).toLocaleDateString("en-US", {
+        month: "long", day: "numeric", year: "numeric",
     });
 }
 
@@ -79,8 +93,9 @@ interface Props {
 }
 
 export function ShiftEditModal({ timeBlock, onClose, onSaved }: Props) {
-    const { setTimeblockToast } = useTimeBlocks();
+    const { allTB, setTimeblockToast, setTimeblocksBulkToast } = useTimeBlocks();
     const dateInputRef = useRef<HTMLInputElement>(null);
+    const untilInputRef = useRef<HTMLInputElement>(null);
 
     const [name, setName] = useState("");
     const [date, setDate] = useState("");
@@ -90,6 +105,9 @@ export function ShiftEditModal({ timeBlock, onClose, onSaved }: Props) {
     const [volunteerGroups, setVolunteerGroups] = useState<VolunteerGroup[]>([]);
     const [notes, setNotes] = useState("");
     const [published, setPublished] = useState(false);
+    const [frequency, setFrequency] = useState<RecurrenceFrequency | "none">("none");
+    const [until, setUntil] = useState("");
+    const [pendingSave, setPendingSave] = useState<TimeBlock | null>(null);
 
     useEffect(() => {
         if (!timeBlock) return;
@@ -101,6 +119,9 @@ export function ShiftEditModal({ timeBlock, onClose, onSaved }: Props) {
         setVolunteerGroups(timeBlock.volunteerGroups);
         setNotes(timeBlock.notes);
         setPublished(timeBlock.published);
+        setFrequency("none");
+        setUntil("");
+        setPendingSave(null);
     }, [timeBlock]);
 
     useEffect(() => {
@@ -112,12 +133,15 @@ export function ShiftEditModal({ timeBlock, onClose, onSaved }: Props) {
 
     useEffect(() => {
         if (!timeBlock) return;
-        const handleKeyDown = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+        const handleKeyDown = (e: KeyboardEvent) => { if (e.key === "Escape" && !pendingSave) onClose(); };
         document.addEventListener("keydown", handleKeyDown);
         return () => document.removeEventListener("keydown", handleKeyDown);
-    }, [timeBlock, onClose]);
+    }, [timeBlock, onClose, pendingSave]);
 
     if (!timeBlock) return null;
+
+    const inSeries = isInSeries(timeBlock, allTB);
+    const seriesLeader = getSeriesLeader(timeBlock, allTB);
 
     const handleStartChange = (newStart: string) => {
         setStartTime(newStart);
@@ -149,7 +173,47 @@ export function ShiftEditModal({ timeBlock, onClose, onSaved }: Props) {
             endTime: Timestamp.fromDate(new Date(`${date}T${endTime}`)),
             volunteerGroups: volunteerGroups.filter(g => g.name.trim() !== ""),
         };
-        await setTimeblockToast(updated);
+        const unchanged =
+            frequency === "none" &&
+            updated.name === timeBlock!.name &&
+            updated.type === timeBlock!.type &&
+            updated.notes === timeBlock!.notes &&
+            updated.published === timeBlock!.published &&
+            updated.startTime.isEqual(timeBlock!.startTime) &&
+            updated.endTime.isEqual(timeBlock!.endTime) &&
+            JSON.stringify(updated.volunteerGroups) === JSON.stringify(timeBlock!.volunteerGroups);
+        if (unchanged) {
+            onClose();
+            return;
+        }
+        if (!inSeries && frequency !== "none") {
+            const rule: RecurrenceRule = { frequency, until: Timestamp.fromDate(new Date(`${until}T23:59`)) };
+            const { occurences, truncated } = generateSeries(updated, rule);
+            await setTimeblocksBulkToast(
+                occurences,
+                truncated ? `Shifts saved — capped at the first ${occurences.length} shifts, short of the end date` : undefined,
+            );
+        } else if (inSeries) {
+            setPendingSave(updated);
+            return;
+        } else {
+            await setTimeblockToast({ ...updated, recurrence: null });
+        }
+        onSaved();
+        onClose();
+    };
+
+    const handleSaveThisShift = async () => {
+        await setTimeblockToast({ ...pendingSave!, seriesId: pendingSave!.id, recurrence: null });
+        setPendingSave(null);
+        onSaved();
+        onClose();
+    };
+
+    const handleSaveThisAndFollowing = async () => {
+        const targets = getFollowingInSeries(timeBlock!, allTB);
+        await setTimeblocksBulkToast(applyEditToSeries(pendingSave!, timeBlock!, targets, uuidv4()));
+        setPendingSave(null);
         onSaved();
         onClose();
     };
@@ -176,6 +240,7 @@ export function ShiftEditModal({ timeBlock, onClose, onSaved }: Props) {
     };
 
     return createPortal(
+        <>
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40" onClick={onClose}>
             <div
                 className="w-[37.5em] h-[44em] rounded-[0.625em] bg-[#FBFCFD] shadow-2xl flex flex-col overflow-hidden px-6 py-4"
@@ -204,7 +269,7 @@ export function ShiftEditModal({ timeBlock, onClose, onSaved }: Props) {
                 <div className="flex-1 overflow-y-auto mt-4 flex flex-col">
 
                     {/* Date + Time row */}
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex items-center gap-3 shrink-0">
                         <Clock className="w-4 h-4 text-text-1 shrink-0" />
 
                         <button
@@ -238,6 +303,59 @@ export function ShiftEditModal({ timeBlock, onClose, onSaved }: Props) {
                             onChange={e => handleEndChange(e.target.value)}
                             className={`w-30 ${inputCls} [&::-webkit-calendar-picker-indicator]:hidden`}
                         />
+                    </div>
+
+                    {/* Recurrence row */}
+                    <div className="mt-3 ml-[1.875em] flex items-center gap-3 shrink-0">
+                        {inSeries ? (
+                            timeBlock.recurrence && (
+                                <span className="text-sm text-slate-700">
+                                    Repeats {timeBlock.recurrence.frequency} until {formatEndDate(toDateString(timeBlock.recurrence.until))}
+                                    &nbsp;|&nbsp;
+                                    {seriesLeader.id === timeBlock.id
+                                        ? "First shift in this series"
+                                        : `Series started ${formatEndDate(toDateString(seriesLeader.startTime))}`}
+                                </span>
+                            )
+                        ) : (
+                            <>
+                                <select
+                                    value={frequency}
+                                    onChange={e => setFrequency(e.target.value as RecurrenceFrequency | "none")}
+                                    className={`w-40 ${inputCls} outline-0`}
+                                >
+                                    <option value="none">Does not repeat</option>
+                                    <option value="daily">Repeats daily</option>
+                                    <option value="weekly">Repeats weekly</option>
+                                    <option value="biweekly">Repeats biweekly</option>
+                                    <option value="monthly">Repeats monthly</option>
+                                </select>
+
+                                {frequency !== "none" && (
+                                    <>
+                                        <button
+                                            type="button"
+                                            onClick={() => untilInputRef.current?.showPicker()}
+                                            className={`${inputCls} flex items-center gap-2`}
+                                        >
+                                            {until
+                                                ? <span className="text-slate-700">Ends {formatEndDate(until)}</span>
+                                                : <span className="text-gray-300">Select end date</span>
+                                            }
+                                            <CalendarBlankIcon className="w-4 h-4 shrink-0" />
+                                        </button>
+                                        <input
+                                            ref={untilInputRef}
+                                            type="date"
+                                            value={until}
+                                            min={date}
+                                            onChange={e => setUntil(e.target.value)}
+                                            className="sr-only"
+                                        />
+                                    </>
+                                )}
+                            </>
+                        )}
                     </div>
 
                     {/* Divider */}
@@ -339,13 +457,25 @@ export function ShiftEditModal({ timeBlock, onClose, onSaved }: Props) {
                     </div>
                     <button
                         onClick={handleSave}
-                        className="h-6 w-16 text-sm bg-primary text-white rounded-sm hover:opacity-90 transition-opacity"
+                        disabled={!inSeries && frequency !== "none" && !until}
+                        className="h-6 w-16 text-sm bg-primary text-white rounded-sm hover:opacity-90 transition-opacity disabled:opacity-40"
                     >
                         Save
                     </button>
                 </div>
             </div>
-        </div>,
+        </div>
+
+        {pendingSave && (
+            <ScopeModal
+                title="Edit Recurring Shift"
+                message="Apply changes to this shift only, or to this and all following shifts?"
+                onThisShift={handleSaveThisShift}
+                onThisAndFollowing={handleSaveThisAndFollowing}
+                onCancel={() => setPendingSave(null)}
+            />
+        )}
+        </>,
         document.body
     );
 }

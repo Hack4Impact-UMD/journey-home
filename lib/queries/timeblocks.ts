@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { deleteTB, fetchAllTB, setTB, signUpForShift } from "../services/timeblocks";
+import { deleteTB, deleteTBBulk, fetchAllTB, setTB, setTBBulk, signUpForShift } from "../services/timeblocks";
 import { clearDonationRequestTimeBlockRef } from "../services/donations";
 import { clearClientRequestTimeBlockRef } from "../services/client-request";
 import { TimeBlock } from "@/types/schedule";
@@ -91,6 +91,51 @@ export function useTimeBlocks() {
         await promise;
     };
 
+    const setBulkMutation = useMutation({
+        mutationFn: setTBBulk,
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ["timeblocks"]});
+        }
+    });
+    const setTimeblocksBulkToast = async (tbs: TimeBlock[], successMessage?: string) => {
+        const promise = setBulkMutation.mutateAsync(tbs);
+        toast.promise(promise, {
+            loading: "Saving shifts...",
+            success: successMessage ?? "Shifts saved successfully!",
+            error: "Error: Couldn't save shifts",
+        });
+        await promise;
+    };
+
+    const deleteBulkMutation = useMutation({
+        mutationFn: async (tbs: TimeBlock[]) => {
+            await Promise.all(
+                tbs.flatMap(tb =>
+                    tb.tasks.map(task =>
+                        "donor" in task
+                            ? clearDonationRequestTimeBlockRef(task.id)
+                            : clearClientRequestTimeBlockRef(task.id)
+                    )
+                )
+            );
+            await deleteTBBulk(tbs.map(tb => tb.id));
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ["timeblocks"]});
+            queryClient.invalidateQueries({ queryKey: ["donationRequests"] });
+            queryClient.invalidateQueries({ queryKey: ["clientRequests"] });
+        }
+    });
+
+    const deleteTimeblocksBulkToast = async (tbs: TimeBlock[]) => {
+        const promise = deleteBulkMutation.mutateAsync(tbs);
+        toast.promise(promise, {
+            loading: "Deleting shifts...",
+            success: "Shifts deleted!",
+            error: "Couldn't delete shifts",
+        });
+        await promise;
+    };
     const signUpToast = async (tbId: string, groupName: string, userId: string) => {
         const toastId = toast.loading("Signing up...");
         try {
@@ -109,6 +154,8 @@ export function useTimeBlocks() {
 
         setTimeblockToast: setTimeblockToast,
         setTimeblock: setMutation.mutateAsync,
+        setTimeblockBulk: setBulkMutation.mutateAsync, setTimeblocksBulkToast,
+        deleteTimeblockBulk: deleteBulkMutation.mutateAsync, deleteTimeblocksBulkToast,
         deleteTimeblockToast,
         signUpToast,
 
