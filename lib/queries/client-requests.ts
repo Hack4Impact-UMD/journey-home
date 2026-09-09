@@ -1,23 +1,30 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ClientRequest } from "@/types/client-requests";
-import { getAllClientRequest, setClientRequest } from "../services/client-request";
+import { getAllClientRequest, getClientRequestsByCaseManager, setClientRequest } from "../services/client-request";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
 export function useClientRequests() {
     const queryClient = useQueryClient();
+    const { state } = useAuth();
+
+    const uid = state.userData?.uid;
+    const scopedToSelf = state.userData?.role === "Case Manager";
+    const queryKey = ["clientRequests", scopedToSelf ? uid : "all"];
 
     const query = useQuery({
-        queryKey: ["clientRequests"],
-        queryFn: getAllClientRequest,
+        queryKey,
+        queryFn: () => (scopedToSelf ? getClientRequestsByCaseManager(uid!) : getAllClientRequest()),
+        enabled: !state.loading && !!state.userData,
     });
 
     const setMutation = useMutation({
         mutationFn: setClientRequest,
         onMutate: async (newClientRequest: ClientRequest) => {
-            await queryClient.cancelQueries({ queryKey: ["clientRequests"] });
-            const prevData = queryClient.getQueryData<ClientRequest[]>(["clientRequests"]);
+            await queryClient.cancelQueries({ queryKey });
+            const prevData = queryClient.getQueryData<ClientRequest[]>(queryKey);
 
-            queryClient.setQueryData(["clientRequests"], (oldData: ClientRequest[] | undefined) => {
+            queryClient.setQueryData(queryKey, (oldData: ClientRequest[] | undefined) => {
                 if (!oldData) return [newClientRequest];
 
                 if (oldData.find((cr) => cr.id === newClientRequest.id)) {
@@ -33,7 +40,7 @@ export function useClientRequests() {
         },
         onError: (error, newClientRequest, context) => {
             if (context?.prevData) {
-                queryClient.setQueryData(["clientRequests"], context.prevData);
+                queryClient.setQueryData(queryKey, context.prevData);
             }
         },
     });

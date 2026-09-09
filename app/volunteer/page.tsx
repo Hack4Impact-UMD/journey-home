@@ -3,10 +3,11 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
-import { useTimeBlocks } from "@/lib/queries/timeblocks";
+import { usePublicTimeBlocks, useTimeBlocks } from "@/lib/queries/timeblocks";
 import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
 import ShiftListView from "@/components/schedule/ShiftListView";
 import { useAuth } from "@/contexts/AuthContext";
+import { volunteerGroupFilled } from "@/types/schedule";
 
 function SignInRequiredModal({ onLogin, onCreateAccount, onClose }: {
     onLogin: () => void;
@@ -58,8 +59,24 @@ function SignInRequiredModal({ onLogin, onCreateAccount, onClose }: {
 
 export default function VolunteerPage() {
     const router = useRouter();
-    const { state: { currentUser, userData } } = useAuth();
-    const { allTB: timeBlocks = [], isLoading } = useTimeBlocks();
+    const { state: { currentUser, userData, loading } } = useAuth();
+
+    // This page is public, so visitors without an active account read the
+    // PII-free projection. Active accounts read the real time blocks, which is
+    // what lets a signed-up volunteer drop a shift from here.
+    const canReadPrivate = !!userData
+        && !userData.disabled
+        && userData.pending === null
+        && userData.emailVerified
+        && (userData.role !== "Volunteer" || userData.signedWaiver !== null);
+
+    const { allTB, isLoading: privateLoading } = useTimeBlocks({ enabled: canReadPrivate });
+    const { publicTB, isLoading: publicLoading } = usePublicTimeBlocks({
+        enabled: !loading && !canReadPrivate,
+    });
+
+    const timeBlocks = canReadPrivate ? allTB : publicTB;
+    const isLoading = loading || (canReadPrivate ? privateLoading : publicLoading);
 
     const [selectedTypes, setSelectedTypes] = useState<string[]>(["Warehouse", "Pickups / Deliveries"]);
     const [selectedAvailability, setSelectedAvailability] = useState<string[]>(["Available", "Full"]);
@@ -82,7 +99,7 @@ export default function VolunteerPage() {
         if (!tb.published) return false;
 
         const type = tb.type === "Pickup/Delivery" ? "Pickups / Deliveries" : "Warehouse";
-        const isAvailable = tb.volunteerGroups.some((g) => g.volunterIDs.length < g.maxNum);
+        const isAvailable = tb.volunteerGroups.some((g) => volunteerGroupFilled(g) < g.maxNum);
         const availability = isAvailable ? "Available" : "Full";
 
         return selectedTypes.includes(type) && selectedAvailability.includes(availability);

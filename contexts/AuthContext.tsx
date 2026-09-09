@@ -100,6 +100,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await user.reload();
 
     if (user.emailVerified) {
+      // reload() refreshes the user object but not the ID token, and security
+      // rules read email_verified off the token.
+      await user.getIdToken(true);
       try {
         await updateEmailVerificationStatus(user.uid, true);
       } catch (err) {

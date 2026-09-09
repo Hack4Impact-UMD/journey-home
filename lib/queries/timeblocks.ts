@@ -1,25 +1,31 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { deleteTB, fetchAllTB, setTB, signUpForShift } from "../services/timeblocks";
+import { deleteTB, fetchAllTB, fetchPublicTB, setTB, signUpForShift } from "../services/timeblocks";
 import { clearDonationRequestTimeBlockRef } from "../services/donations";
 import { clearClientRequestTimeBlockRef } from "../services/client-request";
 import { TimeBlock } from "@/types/schedule";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
-export function useTimeBlocks() {
+export function useTimeBlocks(options?: { enabled?: boolean }) {
     const queryClient = useQueryClient();
+    const { state } = useAuth();
+
+    const publishedOnly = state.userData?.role !== "Admin";
+    const queryKey = ["timeblocks", publishedOnly];
 
     const query = useQuery({
-        queryKey: ["timeblocks"],
-        queryFn: fetchAllTB
+        queryKey,
+        queryFn: () => fetchAllTB(publishedOnly),
+        enabled: (options?.enabled ?? true) && !state.loading && !!state.userData,
     });
 
     const setMutation = useMutation({
         mutationFn: setTB,
         onMutate: async (newTB: TimeBlock) => {
-            await queryClient.cancelQueries({ queryKey: ["timeblocks"] });
-            const prevData = queryClient.getQueryData<TimeBlock[]>(["timeblocks"]);
+            await queryClient.cancelQueries({ queryKey });
+            const prevData = queryClient.getQueryData<TimeBlock[]>(queryKey);
 
-            queryClient.setQueryData(["timeblocks"], (oldData: TimeBlock[] | undefined) => {
+            queryClient.setQueryData(queryKey, (oldData: TimeBlock[] | undefined) => {
                 if (!oldData) return [newTB];
 
                 if(oldData.find((TB) => TB.id === newTB.id)) {
@@ -35,8 +41,11 @@ export function useTimeBlocks() {
         },
         onError: (_error, _newTB, context) => {
             if (context?.prevData) {
-                queryClient.setQueryData(["timeblocks"], context.prevData);
+                queryClient.setQueryData(queryKey, context.prevData);
             }
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["timeblocks-public"] });
         },
     });
 
@@ -47,7 +56,7 @@ export function useTimeBlocks() {
             success: "Timeblock set successfully!",
             error: "Error: Couldn't update timeblock",
         });
-        
+
         await promise;
     };
 
@@ -63,21 +72,22 @@ export function useTimeBlocks() {
             await deleteTB(tb.id);
         },
         onMutate: async (tb: TimeBlock) => {
-            await queryClient.cancelQueries({ queryKey: ["timeblocks"] });
-            const prevData = queryClient.getQueryData<TimeBlock[]>(["timeblocks"]);
-            queryClient.setQueryData(["timeblocks"], (old: TimeBlock[] | undefined) =>
+            await queryClient.cancelQueries({ queryKey });
+            const prevData = queryClient.getQueryData<TimeBlock[]>(queryKey);
+            queryClient.setQueryData(queryKey, (old: TimeBlock[] | undefined) =>
                 old ? old.filter(t => t.id !== tb.id) : []
             );
             return { prevData };
         },
         onError: (_err, _tb, context) => {
             if (context?.prevData) {
-                queryClient.setQueryData(["timeblocks"], context.prevData);
+                queryClient.setQueryData(queryKey, context.prevData);
             }
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["donationRequests"] });
             queryClient.invalidateQueries({ queryKey: ["clientRequests"] });
+            queryClient.invalidateQueries({ queryKey: ["timeblocks-public"] });
         },
     });
 
@@ -96,9 +106,10 @@ export function useTimeBlocks() {
         try {
             const updatedTB = await signUpForShift(tbId, groupName, userId);
             toast.success("Signed up successfully!", { id: toastId });
-            queryClient.setQueryData(["timeblocks"], (old: TimeBlock[] | undefined) =>
+            queryClient.setQueryData(queryKey, (old: TimeBlock[] | undefined) =>
                 old ? old.map((tb) => tb.id === updatedTB.id ? updatedTB : tb) : [updatedTB]
             );
+            queryClient.invalidateQueries({ queryKey: ["timeblocks-public"] });
         } catch (err) {
             toast.error(err instanceof Error ? err.message : "Couldn't sign up for shift", { id: toastId });
         }
@@ -119,4 +130,19 @@ export function useTimeBlocks() {
 
     };
 
+}
+
+// PII-free projection used by the public /volunteer page.
+export function usePublicTimeBlocks(options?: { enabled?: boolean }) {
+    const query = useQuery({
+        queryKey: ["timeblocks-public"],
+        queryFn: fetchPublicTB,
+        enabled: options?.enabled ?? true,
+    });
+
+    return {
+        publicTB: query.data ?? [],
+        isLoading: query.isLoading,
+        isError: query.isError,
+    };
 }

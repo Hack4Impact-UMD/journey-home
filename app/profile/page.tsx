@@ -4,16 +4,16 @@ import { ProtectedRoute } from "@/components/general/ProtectedRoute";
 import Navbar from "@/components/general/Navbar";
 import PasswordResetSection from "@/components/profile/PasswordResetSection";
 import { useAuth } from "@/contexts/AuthContext";
-import { useAllActiveAccounts } from "@/lib/queries/users";
+import { useUpdateOwnProfile } from "@/lib/queries/users";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { formatPhone } from "@/lib/utils/phone";
 
 export default function ProfilePage() {
     const { state, logout } = useAuth();
-    const currentUser = state.userData;
-    const { allAccounts, editAccount, isLoading } = useAllActiveAccounts();
-    const account = allAccounts.find((u) => u.uid === currentUser?.uid) ?? null;
+    const { editAccount } = useUpdateOwnProfile();
+    const account = state.userData;
+    const isLoading = state.loading;
 
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
