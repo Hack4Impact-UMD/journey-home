@@ -62,6 +62,10 @@ export default function VerifyEmailPage() {
         setIsError(true);
         setMessage('Failed to send verification email. Please try again.');
       });
+    }).catch((error) => {
+      console.error('Error checking verification:', error);
+      setIsError(true);
+      setMessage('We could not check your verification status. Please try again.');
     });
   }, [authContext, router]);
 

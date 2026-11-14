@@ -3,6 +3,17 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
 
+    // Mirrors isAdmin() in firestore.rules: a disabled, pending or unverified
+    // admin account cannot upload.
+    function isActiveAdmin() {
+      let user = firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data;
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && user.get('role', '') == 'Admin'
+        && user.get('disabled', false) == false
+        && user.get('pending', null) == null;
+    }
+
     // Photos attached to a donation. Uploaded by anonymous donors from /donate
     // (lib/services/inventory.ts), then rendered by admins reviewing the request.
     // Paths are uuid-prefixed and objects are immutable once written.
@@ -18,8 +29,7 @@ service firebase.storage {
     // on /status/waiver-pending have to see the document before signing it.
     match /waivers/{waiverFile} {
       allow read: if request.auth != null;
-      allow create: if request.auth != null
-        && firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'Admin'
+      allow create: if isActiveAdmin()
         && request.resource.size < 20 * 1024 * 1024
         && request.resource.contentType == 'application/pdf';
       allow update, delete: if false;

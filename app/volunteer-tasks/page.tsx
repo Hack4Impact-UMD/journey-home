@@ -87,7 +87,14 @@ export default function VolunteerTasks() {
                 ...category!,
                 quantity: summaryMode === "remove" ? category!.quantity - qty : category!.quantity + qty,
             }, currentUser.uid));
-        await Promise.all(writes);
+        // Each write toasts its own failure; this stops a rejection escaping the
+        // click handler and reporting success for a batch that partly failed.
+        try {
+            await Promise.all(writes);
+        } catch (e) {
+            console.error("Inventory update failed:", e);
+            return false;
+        }
         return true;
     };
 

@@ -9,6 +9,7 @@ import { ConfirmModal } from "@/components/general/ConfirmModal";
 import { ICON_MAP, DEFAULT_ICON_KEY } from "@/lib/icons";
 import { PresetIcon } from "@/components/icons/PresetIcon";
 import { v4 as uuidv4 } from "uuid";
+import { MAX_NAME } from "@/lib/utils/limits";
 
 interface Props {
   category: InventoryCategory | null;
@@ -154,6 +155,7 @@ export function CategoryModal({
           <input
             className="border border-[#D9D9D9] w-full px-3 py-2.5 mb-4 rounded-xs text-sm"
             placeholder="Add"
+            maxLength={MAX_NAME}
             value={name}
             onChange={(e) => setName(e.target.value)}
           />

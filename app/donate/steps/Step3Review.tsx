@@ -9,20 +9,38 @@ import { DonationRequest, DonationItem } from "../../../types/donations";
 import { InventoryPhoto } from "@/types/inventory";
 import { uploadImage } from "@/lib/services/inventory";
 import { useDonationRequests } from "@/lib/queries/donation-requests";
+import { writeErrorMessage } from "@/lib/utils/firebase-errors";
 import { toast } from "sonner";
 import Image from "next/image";
+import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 
 export default function Step3Review() {
     const { formState, setCurrentStep } = useDonorForm();
     const { setDonationRequest } = useDonationRequests();
+    const [submitting, setSubmitting] = useState(false);
 
     const handleBack = () => {
         setCurrentStep(2);
     };
 
     const handleSubmit = async () => {
+        if (submitting) return;
+        setSubmitting(true);
+        try {
+            await submitDonation();
+        } catch (e) {
+            console.error("Donation submission failed:", e);
+            toast.error("We couldn't submit your donation.", {
+                description: writeErrorMessage(e),
+            });
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const submitDonation = async () => {
         const donor = {
             firstName: formState.donorInfo.firstName ?? "",
             lastName: formState.donorInfo.lastName ?? "",
@@ -80,23 +98,26 @@ export default function Step3Review() {
             associatedTimeBlockID: null // Placeholder for now, need to replace to create a Time Block
         };
 
-        await toast.promise(
-            Promise.all([
-                addDonorIfNotExists({
-                    ...donor,
-                    firstTimeDonor: isFirstTimeDonor,
-                    howDidYouHear: formState.howDidYouHear ?? "",
-                    canDropOff: formState.canDropOff ?? false,
-                    notes: formState.notes ?? "",
-                }),
-                setDonationRequest(request),
-            ]),
-            {
-                loading: "Submitting your donation...",
-                success: "Donation submitted successfully!",
-                error: "There was a problem submitting your donation. Please try again.",
-            },
-        );
+        // toast.promise does not return a rejecting promise, so the submission has
+        // to be awaited separately — otherwise a failed write still advances to the
+        // confirmation screen and the donor is told it worked.
+        const submission = Promise.all([
+            addDonorIfNotExists({
+                ...donor,
+                firstTimeDonor: isFirstTimeDonor,
+                howDidYouHear: formState.howDidYouHear ?? "",
+                canDropOff: formState.canDropOff ?? false,
+                notes: formState.notes ?? "",
+            }),
+            setDonationRequest(request),
+        ]);
+        toast.promise(submission, {
+            loading: "Submitting your donation...",
+            success: "Donation submitted successfully!",
+            error: "There was a problem submitting your donation. Please try again.",
+        });
+        await submission;
+
         setCurrentStep(4);
     };
 
@@ -277,9 +298,10 @@ export default function Step3Review() {
                 <Button
                     onClick={handleSubmit}
                     variant="primary"
+                    disabled={submitting}
                     className="min-w-[9.375em]"
                 >
-                    Submit
+                    {submitting ? "Submitting..." : "Submit"}
                 </Button>
             </div>
         </div>

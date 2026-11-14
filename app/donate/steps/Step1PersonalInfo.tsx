@@ -6,6 +6,7 @@ import StepIndicator from "../../../components/form/StepIndicator";
 import FormInput from "../../../components/form/FormInput";
 import FormSelect from "../../../components/form/FormSelect";
 import FormTextarea from "../../../components/form/FormTextarea";
+import { MAX_NAME, MAX_SHORT_TEXT } from "@/lib/utils/limits";
 import FormCheckbox from "../../../components/form/FormCheckbox";
 import Button from "../../../components/form/Button";
 import Image from "next/image";
@@ -136,6 +137,7 @@ export default function Step1PersonalInfo() {
             <FormInput
               label="First Name"
               required
+              maxLength={MAX_NAME}
               value={formState.donorInfo.firstName || ""}
               onChange={(e) => {
                 updateDonorInfo({ firstName: e.target.value });
@@ -148,6 +150,7 @@ export default function Step1PersonalInfo() {
             <FormInput
               label="Last Name"
               required
+              maxLength={MAX_NAME}
               value={formState.donorInfo.lastName || ""}
               onChange={(e) => {
                 updateDonorInfo({ lastName: e.target.value });
@@ -362,6 +365,7 @@ export default function Step1PersonalInfo() {
         {hearSelect === "Other" && (
           <FormInput
             label="Please specify"
+            maxLength={MAX_SHORT_TEXT}
             value={formState.howDidYouHear}
             onChange={(e) =>
               updateAdditionalInfo({ howDidYouHear: e.target.value })

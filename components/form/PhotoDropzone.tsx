@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { useDropzone } from "react-dropzone";
+import { FileRejection, useDropzone } from "react-dropzone";
 import { toast } from "sonner";
+import { MAX_PHOTO_BYTES, formatBytes } from "@/lib/utils/limits";
 import { CloseIcon } from "@/components/icons/CloseIcon";
 import { PlusIcon } from "lucide-react";
 
@@ -50,8 +51,23 @@ export default function PhotoDropzone({ photos, onChange, error }: PhotoDropzone
     [photos, onChange]
   );
 
+  // Without this, react-dropzone drops oversized or wrong-type files silently and
+  // the donor never learns why their photo vanished.
+  const onDropRejected = useCallback((rejections: FileRejection[]) => {
+    for (const { file, errors } of rejections) {
+      const tooBig = errors.some((err) => err.code === "file-too-large");
+      toast.error(`"${file.name}" wasn't added`, {
+        description: tooBig
+          ? `Photos must be under ${formatBytes(MAX_PHOTO_BYTES)}. This one is ${formatBytes(file.size)}.`
+          : "Only JPG, PNG, GIF, WebP, and AVIF images are accepted.",
+      });
+    }
+  }, []);
+
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     onDrop,
+    onDropRejected,
+    maxSize: MAX_PHOTO_BYTES,
     accept: {
       "image/jpeg": [".jpg", ".jpeg"],
       "image/png": [".png"],
@@ -96,7 +112,7 @@ export default function PhotoDropzone({ photos, onChange, error }: PhotoDropzone
                 <p className="text-gray-700 mb-1">
                   {isDragActive ? "Drop files here" : "Click or drag file to this area to upload"}
                 </p>
-                <p className="text-sm text-gray-500">JPG, PNG, GIF, WebP, or AVIF. Up to 4 photos.</p>
+                <p className="text-sm text-gray-500">JPG, PNG, GIF, WebP, or AVIF. Up to 4 photos, {formatBytes(MAX_PHOTO_BYTES)} each.</p>
               </div>
             </>
           ) : (

@@ -64,8 +64,11 @@ service cloud.firestore {
       return s is string && s.size() <= max;
     }
 
+    // Caps below are deliberately generous — they exist to stop someone padding a
+    // document toward Firestore's 1 MiB ceiling, not to police how much people
+    // write. Keep them in step with lib/utils/limits.ts, which the forms enforce.
     function isName(s) {
-      return s is string && s.size() > 0 && s.size() <= 100;
+      return s is string && s.size() > 0 && s.size() <= 200;
     }
 
     function isRole(r) {
@@ -162,7 +165,7 @@ service cloud.firestore {
         && isStatus(request.resource.data.status)
         && (request.resource.data.associatedTimeBlockID == null
             || request.resource.data.associatedTimeBlockID is string)
-        && (!changed().hasAny(['notes']) || isText(request.resource.data.notes, 5000));
+        && (!changed().hasAny(['notes']) || isText(request.resource.data.notes, 20000));
 
       allow delete: if isAdmin();
     }
@@ -188,15 +191,21 @@ service cloud.firestore {
         && request.resource.data.associatedTimeBlockID == null
         && request.resource.data.firstTimeDonor is bool
         && request.resource.data.canDropOff is bool
-        && isText(request.resource.data.howDidYouHear, 500)
-        && isText(request.resource.data.notes, 2000)
+        && isText(request.resource.data.howDidYouHear, 2000)
+        && isText(request.resource.data.notes, 20000)
         && request.resource.data.items is list
         && request.resource.data.items.size() > 0
         && request.resource.data.items.size() <= 100
         && isDonorContact(request.resource.data.donor);
 
       allow update: if isAdmin()
-        && changed().hasOnly(['items', 'responded', 'notes', 'associatedTimeBlockID']);
+        && changed().hasOnly(['items', 'responded', 'notes', 'associatedTimeBlockID'])
+        && request.resource.data.items is list
+        && request.resource.data.items.size() <= 100
+        && request.resource.data.responded is bool
+        && isText(request.resource.data.notes, 20000)
+        && (request.resource.data.associatedTimeBlockID == null
+            || request.resource.data.associatedTimeBlockID is string);
 
       allow delete: if isAdmin();
     }
@@ -207,8 +216,8 @@ service cloud.firestore {
         && d.keys().hasOnly(['firstName', 'lastName', 'email', 'phoneNumber', 'address'])
         && isEmail(d.email)
         && isPhone(d.phoneNumber)
-        && isText(d.firstName, 100)
-        && isText(d.lastName, 100)
+        && isText(d.firstName, 200)
+        && isText(d.lastName, 200)
         && d.address is map;
     }
 
@@ -227,13 +236,13 @@ service cloud.firestore {
         && request.resource.data.email == donorEmail
         && isEmail(donorEmail)
         && isPhone(request.resource.data.phoneNumber)
-        && isText(request.resource.data.firstName, 100)
-        && isText(request.resource.data.lastName, 100)
+        && isText(request.resource.data.firstName, 200)
+        && isText(request.resource.data.lastName, 200)
         && request.resource.data.address is map
         && request.resource.data.firstTimeDonor is bool
         && request.resource.data.canDropOff is bool
-        && isText(request.resource.data.howDidYouHear, 500)
-        && isText(request.resource.data.notes, 2000);
+        && isText(request.resource.data.howDidYouHear, 2000)
+        && isText(request.resource.data.notes, 20000);
 
       allow delete: if isAdmin();
     }
@@ -262,7 +271,7 @@ service cloud.firestore {
                                                  'highThreshold', 'icon'])
         && request.resource.data.get('id', id) == id
         && isName(request.resource.data.name)
-        && isText(request.resource.data.icon, 100)
+        && isText(request.resource.data.icon, 200)
         && request.resource.data.quantity is int
         && request.resource.data.quantity >= 0
         && request.resource.data.lowThreshold is int
@@ -344,8 +353,8 @@ service cloud.firestore {
       return exactKeys(['id', 'name', 'type', 'notes', 'tasks', 'startTime', 'endTime',
                         'volunteerGroups', 'published'])
         && request.resource.data.id == id
-        && isText(request.resource.data.name, 200)
-        && isText(request.resource.data.notes, 2000)
+        && isText(request.resource.data.name, 500)
+        && isText(request.resource.data.notes, 20000)
         && request.resource.data.type in ['Pickup/Delivery', 'Warehouse']
         && request.resource.data.startTime is timestamp
         && request.resource.data.endTime is timestamp
