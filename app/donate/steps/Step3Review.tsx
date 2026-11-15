@@ -111,10 +111,11 @@ export default function Step3Review() {
             }),
             setDonationRequest(request),
         ]);
+        // No `error` here: sonner then just dismisses the loading toast on failure and
+        // handleSubmit shows the one error toast, which says why.
         toast.promise(submission, {
             loading: "Submitting your donation...",
             success: "Donation submitted successfully!",
-            error: "There was a problem submitting your donation. Please try again.",
         });
         await submission;
 

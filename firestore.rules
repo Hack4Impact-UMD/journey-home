@@ -17,21 +17,27 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
     }
 
-    // Mirrors components/general/ProtectedRoute.tsx. Legacy user docs predate
-    // some of these fields, so every lookup falls back to a permissive default
-    // and only an explicit value locks the account out.
-    function isActive() {
+    // An active account with the given role. Mirrors components/general/ProtectedRoute.tsx.
+    // Legacy user docs predate some of these fields, so every lookup falls back to a
+    // permissive default and only an explicit value locks the account out. A missing
+    // user doc makes get() fail, which denies. Rules have a per-request budget of
+    // expressions, so this reads the user doc once and keeps the checks few.
+    function hasRole(role) {
       return signedIn()
-        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
         && request.auth.token.email_verified == true
-        && me().get('disabled', false) == false
-        && me().get('pending', null) == null
-        && (me().get('role', '') != 'Volunteer' || me().get('signedWaiver', null) != null);
+        && activeAs(me(), role);
     }
 
-    function isAdmin()       { return isActive() && me().get('role', '') == 'Admin'; }
-    function isCaseManager() { return isActive() && me().get('role', '') == 'Case Manager'; }
-    function isVolunteer()   { return isActive() && me().get('role', '') == 'Volunteer'; }
+    function activeAs(m, role) {
+      return m.get('role', '') == role
+        && m.get('disabled', false) == false
+        && m.get('pending', null) == null
+        && (role != 'Volunteer' || m.get('signedWaiver', null) != null);
+    }
+
+    function isAdmin()       { return hasRole('Admin'); }
+    function isCaseManager() { return hasRole('Case Manager'); }
+    function isVolunteer()   { return hasRole('Volunteer'); }
 
     // Keys whose values actually differ in this write. Almost every write in the
     // app is a full-document setDoc, so key-set checks alone would be useless.
@@ -64,7 +70,7 @@ service cloud.firestore {
       return s is string && s.size() <= max;
     }
 
-    // Caps below are deliberately generous — they exist to stop someone padding a
+    // Caps below are deliberately generous â€” they exist to stop someone padding a
     // document toward Firestore's 1 MiB ceiling, not to police how much people
     // write. Keep them in step with lib/utils/limits.ts, which the forms enforce.
     function isName(s) {
@@ -308,32 +314,57 @@ service cloud.firestore {
 
     // ------------------------------------------------------------- timeblocks
 
-    // tasks[] embeds whole donation and client requests, PII included, so this
-    // collection is never readable anonymously. The public /volunteer page reads
-    // the timeblocks-public projection below instead.
+    // A shift is three documents, always written together:
+    //   timeblocks         what volunteers may read (no tasks)
+    //   timeblock-tasks    donation and client requests, PII included: admin only
+    //   timeblocks-public  the anonymous projection behind the public /volunteer page
+    //
+    // Volunteers sign up and drop by writing timeblocks and timeblocks-public in one
+    // transaction (lib/services/timeblocks.ts). Rules cannot loop over
+    // volunteerGroups, so the roster checks further down spell out each group slot.
+    // That is why a shift is capped at 5 volunteer groups (MAX_VOLUNTEER_GROUPS in
+    // lib/utils/limits.ts): raising it means adding slots to every unrolled list below.
     match /timeblocks/{timeBlockId} {
-      allow read: if isAdmin() || (isActive() && resource.data.published == true);
+      // `resource == null` lets a volunteer's read of a deleted shift come back as
+      // "not found" (so the app can say so) instead of an opaque permission error.
+      allow read: if isAdmin()
+        || (isVolunteer() && (resource == null || resource.data.published == true));
 
       allow create: if isAdmin()
         && validTimeBlock(timeBlockId)
         && publicMirrorMatches(timeBlockId);
 
-      // Volunteers sign up for and drop published shifts. Rules cannot iterate
-      // volunteerGroups, so this cannot prove a volunteer only added or removed
-      // their own uid — it only confines them to that one field.
+      // An admin may rewrite the shift. A volunteer may only change the roster, to add
+      // or remove themselves, on a published shift that hasn't ended. The roster
+      // check keeps the rest of the document as it was, so validTimeBlock is only
+      // needed on the admin path.
       allow update: if (isAdmin()
-          || (isVolunteer()
-              && resource.data.published == true
-              && changed().hasOnly(['volunteerGroups'])))
-        && validTimeBlock(timeBlockId)
-        && publicMirrorMatches(timeBlockId);
+            && validTimeBlock(timeBlockId)
+            && publicMirrorMatches(timeBlockId))
+        || (isVolunteer()
+            && resource.data.published == true
+            && request.time < resource.data.endTime
+            && changed().hasOnly(['volunteerGroups'])
+            && ownRosterChangeOnly()
+            && publicMirrorMatches(timeBlockId));
 
       allow delete: if isAdmin()
         && !existsAfter(/databases/$(database)/documents/timeblocks-public/$(timeBlockId));
     }
 
+    match /timeblock-tasks/{timeBlockId} {
+      allow read, delete: if isAdmin();
+
+      allow create, update: if isAdmin()
+        && exactKeys(['id', 'tasks'])
+        && request.resource.data.id == timeBlockId
+        && request.resource.data.tasks is list
+        && request.resource.data.tasks.size() <= 200;
+    }
+
     // Projection of the fields /volunteer needs, with volunteerGroups reduced to
-    // {name, maxNum, filled} and tasks dropped entirely.
+    // {name, maxNum, filled}. A volunteer may write it only to keep it identical to
+    // the projection of the timeblocks doc, so they can't tamper with what it shows.
     match /timeblocks-public/{timeBlockId} {
       allow read: if isAdmin() || resource.data.published == true;
 
@@ -350,7 +381,7 @@ service cloud.firestore {
     }
 
     function validTimeBlock(id) {
-      return exactKeys(['id', 'name', 'type', 'notes', 'tasks', 'startTime', 'endTime',
+      return exactKeys(['id', 'name', 'type', 'notes', 'startTime', 'endTime',
                         'volunteerGroups', 'published'])
         && request.resource.data.id == id
         && isText(request.resource.data.name, 500)
@@ -359,14 +390,13 @@ service cloud.firestore {
         && request.resource.data.startTime is timestamp
         && request.resource.data.endTime is timestamp
         && request.resource.data.published is bool
-        && request.resource.data.tasks is list
         && request.resource.data.volunteerGroups is list
-        && request.resource.data.volunteerGroups.size() <= 20;
+        && request.resource.data.volunteerGroups.size() <= 5;
     }
 
     // Both directions of the mirror are enforced, so neither document can be
-    // written without the other landing in the same batch or transaction with
-    // matching values. Group *counts* cannot be verified without iteration.
+    // written without the other landing in the same batch with matching values,
+    // down to each group's name, cap and filled count.
     function publicMirrorMatches(id) {
       return mirrorAgrees(
         request.resource.data,
@@ -388,9 +418,67 @@ service cloud.firestore {
         && p.startTime == t.startTime
         && p.endTime == t.endTime
         && p.published == t.published
-        && p.volunteerGroups.size() == t.volunteerGroups.size();
+        && p.volunteerGroups.size() == t.volunteerGroups.size()
+        && mirrorGroup(t.volunteerGroups, p.volunteerGroups, 0)
+        && mirrorGroup(t.volunteerGroups, p.volunteerGroups, 1)
+        && mirrorGroup(t.volunteerGroups, p.volunteerGroups, 2)
+        && mirrorGroup(t.volunteerGroups, p.volunteerGroups, 3)
+        && mirrorGroup(t.volunteerGroups, p.volunteerGroups, 4);
     }
 
+    function mirrorGroup(t, p, i) {
+      return t.size() <= i
+        || p[i] == { 'name': t[i].name, 'maxNum': t[i].maxNum, 'filled': t[i].volunterIDs.size() };
+    }
+
+    // ---- volunteer sign-up / drop
+    //
+    // A volunteer may change the roster only by adding their own uid to a group (at
+    // the end, below its maxNum) or removing their own uid from one. Everything else
+    // about every group stays as it was, nobody else's uid moves, and the volunteer
+    // ends up in at most one group. Rules cannot loop, so each of the 5 group slots is
+    // spelled out, and the arithmetic is kept small because rules also cap how many
+    // expressions one request may evaluate.
+    function ownRosterChangeOnly() {
+      let uid = request.auth.uid;
+      let o = resource.data.volunteerGroups;
+      let n = request.resource.data.volunteerGroups;
+      let net = slotDelta(o, n, 0, uid) + slotDelta(o, n, 1, uid) + slotDelta(o, n, 2, uid)
+        + slotDelta(o, n, 3, uid) + slotDelta(o, n, 4, uid);
+      return n.size() == o.size()
+        && net >= -1 && net <= 1
+        && memberAt(n, 0, uid) + memberAt(n, 1, uid) + memberAt(n, 2, uid)
+           + memberAt(n, 3, uid) + memberAt(n, 4, uid) <= 1;
+    }
+
+    // 0 = slot untouched (or past the end), 1 = uid joined, -1 = uid left, 99 = any other
+    // change, which pushes the total out of range.
+    function slotDelta(o, n, i, uid) {
+      return o.size() <= i ? 0 : slotChange(o[i], n[i], uid);
+    }
+
+    function slotChange(og, ng, uid) {
+      return og.diff(ng).affectedKeys().hasOnly(['volunterIDs'])
+        ? (ng.volunterIDs == og.volunterIDs
+            ? 0
+            : (joined(og, ng, uid) ? 1 : (left(og, ng, uid) ? -1 : 99)))
+        : 99;
+    }
+
+    function joined(og, ng, uid) {
+      return !(uid in og.volunterIDs)
+        && ng.volunterIDs == og.volunterIDs.concat([uid])
+        && ng.volunterIDs.size() <= og.maxNum;
+    }
+
+    function left(og, ng, uid) {
+      return uid in og.volunterIDs
+        && ng.volunterIDs == og.volunterIDs.removeAll([uid]);
+    }
+
+    function memberAt(g, i, uid) {
+      return (g.size() > i && uid in g[i].volunterIDs) ? 1 : 0;
+    }
     // ---------------------------------------------------------------- waivers
 
     match /waivers/{waiverId} {
@@ -428,3 +516,4 @@ service cloud.firestore {
     }
   }
 }
+

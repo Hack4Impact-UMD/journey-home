@@ -30,8 +30,12 @@ export type PublicVolunteerGroup = {
     filled: number;
 };
 
-// Shown on the public /volunteer page. Everything a visitor doesn't need is
-// dropped — above all `tasks`, which embeds whole donation and client requests.
+// What volunteers may read. `tasks` embeds whole donation and client requests, so
+// it lives in an admin-only collection and never reaches a volunteer's browser.
+export type VolunteerTimeBlock = Omit<TimeBlock, "tasks">;
+
+// Shown to visitors without an active volunteer account. Also drops the notes and
+// the volunteer ids.
 export type PublicTimeBlock = {
     id: string;
     name: string;
@@ -42,15 +46,15 @@ export type PublicTimeBlock = {
     volunteerGroups: PublicVolunteerGroup[];
 };
 
-export function isPrivateTimeBlock(tb: TimeBlock | PublicTimeBlock): tb is TimeBlock {
-    return "tasks" in tb;
+export function isVolunteerTimeBlock(tb: VolunteerTimeBlock | PublicTimeBlock): tb is VolunteerTimeBlock {
+    return "notes" in tb;
 }
 
 export function volunteerGroupFilled(group: VolunteerGroup | PublicVolunteerGroup): number {
     return "filled" in group ? group.filled : group.volunterIDs.length;
 }
 
-export function toPublicTimeBlock(tb: TimeBlock): PublicTimeBlock {
+export function toPublicTimeBlock(tb: VolunteerTimeBlock): PublicTimeBlock {
     return {
         id: tb.id,
         name: tb.name,

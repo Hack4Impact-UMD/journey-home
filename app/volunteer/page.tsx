@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
-import { usePublicTimeBlocks, useTimeBlocks } from "@/lib/queries/timeblocks";
+import { usePublicTimeBlocks, useVolunteerTimeBlocks } from "@/lib/queries/timeblocks";
 import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
 import ShiftListView from "@/components/schedule/ShiftListView";
 import { useAuth } from "@/contexts/AuthContext";
 import { volunteerGroupFilled } from "@/types/schedule";
+import { isActiveVolunteer } from "@/lib/utils/account";
 
 function SignInRequiredModal({ onLogin, onCreateAccount, onClose }: {
     onLogin: () => void;
@@ -61,22 +62,18 @@ export default function VolunteerPage() {
     const router = useRouter();
     const { state: { currentUser, userData, loading } } = useAuth();
 
-    // This page is public, so visitors without an active account read the
-    // PII-free projection. Active accounts read the real time blocks, which is
-    // what lets a signed-up volunteer drop a shift from here.
-    const canReadPrivate = !!userData
-        && !userData.disabled
-        && userData.pending === null
-        && userData.emailVerified
-        && (userData.role !== "Volunteer" || userData.signedWaiver !== null);
+    // This page is public, so everyone except an active volunteer reads the
+    // anonymous projection. Active volunteers read the real shifts, which is what
+    // lets a signed-up volunteer drop a shift from here.
+    const isVolunteer = isActiveVolunteer(userData);
 
-    const { allTB, isLoading: privateLoading } = useTimeBlocks({ enabled: canReadPrivate });
+    const { volunteerTB, isLoading: volunteerLoading } = useVolunteerTimeBlocks();
     const { publicTB, isLoading: publicLoading } = usePublicTimeBlocks({
-        enabled: !loading && !canReadPrivate,
+        enabled: !loading && !isVolunteer,
     });
 
-    const timeBlocks = canReadPrivate ? allTB : publicTB;
-    const isLoading = loading || (canReadPrivate ? privateLoading : publicLoading);
+    const timeBlocks = isVolunteer ? volunteerTB : publicTB;
+    const isLoading = loading || (isVolunteer ? volunteerLoading : publicLoading);
 
     const [selectedTypes, setSelectedTypes] = useState<string[]>(["Warehouse", "Pickups / Deliveries"]);
     const [selectedAvailability, setSelectedAvailability] = useState<string[]>(["Available", "Full"]);

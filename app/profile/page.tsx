@@ -111,7 +111,7 @@ export default function ProfilePage() {
                                                     type="text"
                                                     value={lastName}
                                                     onChange={(e) => setLastName(e.target.value)}
-                                                    maxLength={12}
+                                                    maxLength={MAX_NAME}
                                                     className="w-full border border-gray-300 rounded-xs h-10 px-3"
                                                 />
                                             </div>

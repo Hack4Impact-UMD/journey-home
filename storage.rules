@@ -16,11 +16,13 @@ service firebase.storage {
 
     // Photos attached to a donation. Uploaded by anonymous donors from /donate
     // (lib/services/inventory.ts), then rendered by admins reviewing the request.
-    // Paths are uuid-prefixed and objects are immutable once written.
+    // Paths are uuid-prefixed and objects are immutable once written. The type list
+    // matches components/form/PhotoDropzone.tsx and leaves out SVG, which can carry script.
     match /images/{imageId} {
       allow read: if true;
       allow create: if request.resource.size < 10 * 1024 * 1024
-        && request.resource.contentType.matches('image/.*');
+        && request.resource.contentType in ['image/jpeg', 'image/png', 'image/gif',
+                                            'image/webp', 'image/avif'];
       allow update, delete: if false;
     }
 

@@ -25,7 +25,9 @@ Next.js 16 (App Router, standalone) + Firebase (Auth, Firestore, Storage, Functi
 ## Firestore
 - `users` — fields: `uid`, `firstName`, `lastName`, `email`, `phone` (format `XXX-XXX-XXXX`), `createdTime: Timestamp`, `signedWaiver: Timestamp | null` (volunteers only — null = not signed), `disabled: boolean`, `role: UserRole`, `pending: null` (active) or `UserRole` (role being requested), `emailVerified`. `emailVerified` synced by `onAuthStateChanged` or manually via `updateEmailVerificationStatus`.
 - `warehouseHistory` — written atomically via `useInventoryCategories` only, never directly. Fields: `id`, `userId`, `timestamp`, `change: { category, oldQuantity, newQuantity }`, `reverted`.
-- `donation-requests`, `donors`, `inventory`, `timeblocks`
+- `donation-requests`, `donors`, `inventory`, `waivers`
+- A shift is three docs written together by `setTB`: `timeblocks` (volunteer-readable, no tasks), `timeblock-tasks` (admin-only, PII), `timeblocks-public` (anonymous projection). Volunteers sign up/drop via the transactions in `lib/services/timeblocks.ts`; rules unroll per-group checks, so a shift is capped at `MAX_VOLUNTEER_GROUPS`.
+- **Rules:** `firestore.rules` / `storage.rules` deny anything not listed, so a new collection needs a block there. Caps mirror `lib/utils/limits.ts`.
 
 ## Pages
 - **Public:** `/login`, `/signup`, `/donate` (4-step `DonorFormContext`), `/status/*`

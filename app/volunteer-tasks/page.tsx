@@ -7,7 +7,7 @@ import { createPortal } from "react-dom";
 import ItemSearch from "@/components/volunteer-tasks/ItemSearch";
 
 import { useInventoryCategories } from "@/lib/queries/inventory";
-import { useTimeBlocks } from "@/lib/queries/timeblocks";
+import { useVolunteerTimeBlocks } from "@/lib/queries/timeblocks";
 import { toast } from "sonner";
 import { VolunteerModifyStepOneIcon } from "@/components/icons/VolunteerModifyStepOneIcon";
 import { VolunteerModifyStepTwoIcon } from "@/components/icons/VolunteerModifyStepTwoIcon";
@@ -16,19 +16,19 @@ import { ChevronDown, ChevronUp, X } from "lucide-react";
 import { WarehouseIcon } from "@phosphor-icons/react";
 import { PickupDeliveryIcon } from "@/components/icons/PickupDeliveryIcon";
 import { useAuth } from "@/contexts/AuthContext";
-import { TimeBlock } from "@/types/schedule";
+import { VolunteerTimeBlock } from "@/types/schedule";
 import { formatTime } from "@/lib/utils";
 
 type ItemMap = Record<string, number>;
 
 export default function VolunteerTasks() {
     const { state: { currentUser } } = useAuth();
-    const { allTB } = useTimeBlocks();
+    const { volunteerTB: allTB } = useVolunteerTimeBlocks();
     const searchParams = useSearchParams();
     const tbId = searchParams.get("id");
 
     const [screen, setScreen] = useState<"shiftlist" | "shiftoverview" | "modify" | "summary">("shiftlist");
-    const [selectedShift, setSelectedShift] = useState<TimeBlock | null>(null);
+    const [selectedShift, setSelectedShift] = useState<VolunteerTimeBlock | null>(null);
 
     const [items, setItems] = useState<ItemMap>({});
     const [summaryMode, setSummaryMode] = useState<"add" | "remove">("remove");

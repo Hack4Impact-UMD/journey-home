@@ -1,4 +1,4 @@
-import { MAX_PHOTO_BYTES, formatBytes } from "./limits";
+import { MAX_PHOTO_BYTES, clockLooksWrong, formatBytes } from "./limits";
 
 // Turns a Firestore/Storage failure into something a user can act on. Every save
 // path should surface one of these rather than failing quietly.
@@ -7,7 +7,11 @@ export function writeErrorMessage(e: unknown): string {
 
     switch (code) {
         case "permission-denied":
-            return "The server rejected this save. If your device's date and time are wrong, correct them and try again.";
+            // Blame the clock only when it was measured as wrong: rules also reject
+            // saves for reasons the user can't see, like a role that just changed.
+            return clockLooksWrong()
+                ? "The server rejected this save, and your device's date and time look wrong. Correct them and try again."
+                : "The server rejected this save. Refresh the page and try again, and let Journey Home know if it keeps happening.";
         case "unavailable":
         case "storage/retry-limit-exceeded":
             return "We couldn't reach the server. Check your connection and try again.";

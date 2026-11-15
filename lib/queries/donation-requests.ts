@@ -1,14 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { DonationRequest } from "@/types/donations";
 import { getAllDonationRequests, setDonationRequest } from "../services/donations";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
 export function useDonationRequests() {
     const queryClient = useQueryClient();
+    const { state } = useAuth();
 
     const query = useQuery({
         queryKey: ["donationRequests"],
         queryFn: getAllDonationRequests,
+        // Only admins can list donation requests. The public /donate form mounts this
+        // hook just for the write, so it must not fire a read that is bound to be denied.
+        enabled: !state.loading && state.userData?.role === "Admin",
     });
 
     const setMutation = useMutation({

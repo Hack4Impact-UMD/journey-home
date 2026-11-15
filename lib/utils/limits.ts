@@ -9,6 +9,10 @@ export const MAX_SHORT_TEXT = 2000;
 export const MAX_NOTES = 20000;
 export const MAX_EMAIL = 320;
 
+// Volunteer groups per shift. firestore.rules checks each group slot by hand because
+// rules cannot loop, so raising this means adding slots there too.
+export const MAX_VOLUNTEER_GROUPS = 5;
+
 export const MAX_PHOTO_BYTES = 10 * 1024 * 1024;
 export const MAX_WAIVER_BYTES = 20 * 1024 * 1024;
 
@@ -20,6 +24,14 @@ export function formatBytes(bytes: number): string {
     return `${(bytes / (1024 * 1024)).toFixed(0)}MB`;
 }
 
+// Last skew measured by getClockSkewMs, so error messages can say whether a bad
+// clock is a plausible cause instead of guessing.
+let lastSkewMs: number | null = null;
+
+export function clockLooksWrong(): boolean {
+    return lastSkewMs !== null && Math.abs(lastSkewMs) > CLOCK_SKEW_WARN_MS;
+}
+
 // Positive means the device clock is ahead of the server. Returns null when the
 // server time can't be read — that is not itself worth reporting to the user.
 export async function getClockSkewMs(): Promise<number | null> {
@@ -29,7 +41,8 @@ export async function getClockSkewMs(): Promise<number | null> {
         if (!serverDate) return null;
         const serverMs = new Date(serverDate).getTime();
         if (Number.isNaN(serverMs)) return null;
-        return Date.now() - serverMs;
+        lastSkewMs = Date.now() - serverMs;
+        return lastSkewMs;
     } catch {
         return null;
     }

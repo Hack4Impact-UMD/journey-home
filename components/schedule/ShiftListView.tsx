@@ -2,34 +2,34 @@
 
 import { useState } from "react";
 import { Timestamp } from "firebase/firestore";
-import { isPrivateTimeBlock, PublicTimeBlock, TimeBlock, volunteerGroupFilled } from "@/types/schedule";
+import { isVolunteerTimeBlock, PublicTimeBlock, VolunteerTimeBlock, volunteerGroupFilled } from "@/types/schedule";
 import { ConfirmModal } from "@/components/general/ConfirmModal";
 import Button from "@/components/form/Button";
-import { useTimeBlocks } from "@/lib/queries/timeblocks";
+import { useShiftSignup } from "@/lib/queries/timeblocks";
 import { Check } from "lucide-react";
 import { WarehouseIcon } from "@phosphor-icons/react";
 import { PickupDeliveryIcon } from "@/components/icons/PickupDeliveryIcon";
 import ShiftSignUpConfirm from "@/components/schedule/ShiftSignUpConfirm";
 
-type ListTimeBlock = TimeBlock | PublicTimeBlock;
+type ListTimeBlock = VolunteerTimeBlock | PublicTimeBlock;
 
 type Props = {
-    // The public /volunteer page passes the PII-free projection, which carries a
-    // roster count instead of the volunteer ids themselves.
+    // Visitors without an active volunteer account pass the anonymous projection,
+    // which carries a roster count instead of the volunteer ids themselves.
     timeBlocks: ListTimeBlock[];
     currentUserID: string;
     onSignUpClick?: () => void;
 };
 
 function signedUpFor(tb: ListTimeBlock, userID: string): boolean {
-    return isPrivateTimeBlock(tb)
+    return isVolunteerTimeBlock(tb)
         && tb.volunteerGroups.some((group) => group.volunterIDs.includes(userID));
 }
 
 export default function ShiftListView({ timeBlocks, currentUserID, onSignUpClick }: Props) {
-    const [selectedTB, setSelectedTB] = useState<TimeBlock | null>(null);
+    const [selectedTB, setSelectedTB] = useState<VolunteerTimeBlock | null>(null);
     const [action, setAction] = useState<"signup" | "drop" | null>(null);
-    const { setTimeblockToast, signUpToast } = useTimeBlocks();
+    const { signUpToast, dropToast } = useShiftSignup();
     const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
 
     const formatTime = (timestamp: Timestamp) => {
@@ -115,7 +115,7 @@ export default function ShiftListView({ timeBlocks, currentUserID, onSignUpClick
                                             variant="secondary"
                                             className="text-sm w-22 h-8 py-0 flex items-center justify-center shrink-0 rounded-xs"
                                             onClick={() => {
-                                                if (!isPrivateTimeBlock(tb)) return;
+                                                if (!isVolunteerTimeBlock(tb)) return;
                                                 setSelectedTB(tb);
                                                 setAction("drop");
                                             }}
@@ -127,7 +127,7 @@ export default function ShiftListView({ timeBlocks, currentUserID, onSignUpClick
                                             className="text-sm w-22 h-8 py-0 flex items-center justify-center shrink-0 rounded-xs"
                                             onClick={() => {
                                                 if (onSignUpClick) { onSignUpClick(); return; }
-                                                if (!isPrivateTimeBlock(tb)) return;
+                                                if (!isVolunteerTimeBlock(tb)) return;
                                                 setSelectedTB(tb);
                                                 setAction("signup");
                                                 setSelectedGroup(null);
@@ -281,7 +281,7 @@ export default function ShiftListView({ timeBlocks, currentUserID, onSignUpClick
                                                         variant="secondary"
                                                         className="text-sm font-roboto h-8 py-0 w-24 rounded-xs flex items-center justify-center"
                                                         onClick={() => {
-                                                            if (!isPrivateTimeBlock(tb)) return;
+                                                            if (!isVolunteerTimeBlock(tb)) return;
                                                             setSelectedTB(tb);
                                                             setAction("drop");
                                                         }}
@@ -293,7 +293,7 @@ export default function ShiftListView({ timeBlocks, currentUserID, onSignUpClick
                                                         className="text-sm font-roboto h-8 py-0 w-24 rounded-xs flex items-center justify-center"
                                                         onClick={() => {
                                                             if (onSignUpClick) { onSignUpClick(); return; }
-                                                            if (!isPrivateTimeBlock(tb)) return;
+                                                            if (!isVolunteerTimeBlock(tb)) return;
                                                             setSelectedTB(tb);
                                                             setAction("signup");
                                                             setSelectedGroup(null);
@@ -329,7 +329,7 @@ export default function ShiftListView({ timeBlocks, currentUserID, onSignUpClick
                     onConfirm={() => {
                         if (!selectedTB || !selectedGroup) return;
 
-                        signUpToast(selectedTB.id, selectedGroup, currentUserID);
+                        signUpToast(selectedTB.id, selectedGroup);
 
                         setSelectedTB(null);
                         setAction(null);
@@ -348,15 +348,7 @@ export default function ShiftListView({ timeBlocks, currentUserID, onSignUpClick
                         setAction(null);
                     }}
                     onConfirm={() => {
-                        const updatedTB = {
-                            ...selectedTB,
-                            volunteerGroups: selectedTB.volunteerGroups.map((group) => ({
-                                ...group,
-                                volunterIDs: group.volunterIDs.filter((id) => id !== currentUserID),
-                            })),
-                        };
-
-                        setTimeblockToast(updatedTB);
+                        dropToast(selectedTB.id);
 
                         setSelectedTB(null);
                         setAction(null);
