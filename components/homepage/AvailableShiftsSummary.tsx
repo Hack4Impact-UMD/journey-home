@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { CaretRightIcon } from "@phosphor-icons/react";
-import { useTimeBlocks } from "@/lib/queries/timeblocks";
+import { useVolunteerTimeBlocks } from "@/lib/queries/timeblocks";
 import { useAuth } from "@/contexts/AuthContext";
 import { formatTime } from "@/lib/utils";
-import { TimeBlock } from "@/types/schedule";
+import { VolunteerTimeBlock } from "@/types/schedule";
 
 export default function AvailableShiftsSummary() {
-    const { allTB: timeblocks = [], isLoading } = useTimeBlocks();
+    const { volunteerTB: timeblocks, isLoading } = useVolunteerTimeBlocks();
     const { state } = useAuth();
     const userId = state.currentUser?.uid;
 
@@ -43,7 +43,7 @@ export default function AvailableShiftsSummary() {
         if (!acc[dateKey]) acc[dateKey] = [];
         acc[dateKey].push(tb);
         return acc;
-    }, {} as Record<string, TimeBlock[]>);
+    }, {} as Record<string, VolunteerTimeBlock[]>);
 
     const sortedDateEntries = Object.entries(groupedByDate).sort(
         ([a], [b]) => new Date(a).getTime() - new Date(b).getTime()

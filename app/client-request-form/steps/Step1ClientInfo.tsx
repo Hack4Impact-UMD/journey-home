@@ -10,6 +10,7 @@ import Image from "next/image";
 import { Timestamp } from "firebase/firestore";
 import { YesNoUnsure } from "@/types/client-requests";
 import { formatPhone } from "@/lib/utils/phone";
+import { MAX_NOTES } from "@/lib/utils/limits";
 
 export default function Step1ClientInfo() {
     const {
@@ -571,6 +572,7 @@ export default function Step1ClientInfo() {
                                 <textarea
                                     value={formState.clientInfoAndNewHome.questions.notes ?? ""}
                                     onChange={(e) => updateClientQuestions({ notes: e.target.value })}
+                                    maxLength={MAX_NOTES}
                                     rows={4}
                                     className="w-full border border-gray-300 rounded px-3 py-2 resize-none"
                                 />

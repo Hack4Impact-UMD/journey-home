@@ -1,7 +1,7 @@
 "use client";
 
 import { db } from "../firebase";
-import { collection, doc, getDocs, setDoc, updateDoc, deleteDoc, query, where, Timestamp } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, Timestamp } from "firebase/firestore";
 import { UserData, UserRole } from "../../types/user";
 
 const usersCol = collection(db, "users");
@@ -38,17 +38,8 @@ export const fetchAllAccountRequests = async (): Promise<UserData[]> => {
 };
 
 export async function getUserByUID(uid: string): Promise<UserData | null> {
-  const q = query(usersCol, where('uid', '==', uid));
-  
-  const querySnapshot = await getDocs(q);
-  
-  if (querySnapshot.empty) {
-    return null;
-  }
-  
-  // Return first matching document
-  const doc = querySnapshot.docs[0];
-  return doc.data() as UserData;
+  const snapshot = await getDoc(doc(db, "users", uid));
+  return snapshot.exists() ? (snapshot.data() as UserData) : null;
 }
 
 /**

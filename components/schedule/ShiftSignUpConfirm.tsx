@@ -2,13 +2,13 @@
 
 import { createPortal } from "react-dom";
 import { useEffect } from "react";
-import { TimeBlock } from "@/types/schedule";
+import { VolunteerTimeBlock } from "@/types/schedule";
 import Button from "@/components/form/Button";
 import { Timestamp } from "firebase/firestore";
 import { CalendarBlank, Clock, X } from "@phosphor-icons/react";
 
 type Props = {
-    timeBlock: TimeBlock;
+    timeBlock: VolunteerTimeBlock;
     selectedGroup: string | null;
     onGroupSelect: (name: string) => void;
     onConfirm: () => void;

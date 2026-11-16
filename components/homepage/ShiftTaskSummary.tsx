@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { CaretRightIcon } from "@phosphor-icons/react";
-import { useTimeBlocks } from "@/lib/queries/timeblocks";
+import { useVolunteerTimeBlocks } from "@/lib/queries/timeblocks";
 import { useAuth } from "@/contexts/AuthContext";
 import { formatTime } from "@/lib/utils";
 import { DogSitIcon } from "@/components/icons/DogSitIcon";
 
 export default function ShiftTaskSummary() {
-    const { allTB: timeblocks = [], isLoading } = useTimeBlocks();
+    const { volunteerTB: timeblocks, isLoading } = useVolunteerTimeBlocks();
     const { state } = useAuth();
     const userId = state.currentUser?.uid;
 

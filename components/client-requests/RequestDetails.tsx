@@ -1,5 +1,5 @@
 import { ClientRequest } from "@/types/client-requests";
-import { useAllActiveAccounts } from "@/lib/queries/users";
+import { useUser } from "@/lib/queries/users";
 
 type ClientProps = {
   client: ClientRequest;
@@ -7,11 +7,9 @@ type ClientProps = {
 };
 
 export function RequestDetailsPage({ client, userRole }: ClientProps) {
-    const { allAccounts } = useAllActiveAccounts();
-
-    const caseManager = allAccounts.find(
-        (user: { uid: string }) => user.uid === client.caseManagerID
-    );
+    const { user: caseManager } = useUser(client.caseManagerID, {
+        enabled: userRole === "Admin",
+    });
 
     const { questions, secondaryContact, address } = client.client;
 

@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { authErrorMessage } from "@/lib/utils/auth-errors";
 import Link from "next/link";
 import { formatPhone } from "@/lib/utils/phone";
+import { MAX_NAME } from "@/lib/utils/limits";
 
 export default function SignUpInformation({
     selectedRole,
@@ -69,6 +70,7 @@ export default function SignUpInformation({
                             type="text"
                             value={first}
                             onChange={(e) => setFirst(e.target.value)}
+                            maxLength={MAX_NAME}
                             className="rounded-xs border-[#D9D9D9] py-1.5 px-3 text-sm border w-full mt-2 mb-4"
                             required
                         />
@@ -81,6 +83,7 @@ export default function SignUpInformation({
                             type="text"
                             value={last}
                             onChange={(e) => setLast(e.target.value)}
+                            maxLength={MAX_NAME}
                             className="rounded-xs border-[#D9D9D9] py-1.5 px-3 text-sm border w-full mt-2 mb-4"
                             required
                         />

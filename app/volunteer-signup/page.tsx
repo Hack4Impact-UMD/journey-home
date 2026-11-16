@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import ShiftListView from "@/components/schedule/ShiftListView";
-import { useTimeBlocks } from "@/lib/queries/timeblocks";
+import { useVolunteerTimeBlocks } from "@/lib/queries/timeblocks";
 import { useAuth } from "@/contexts/AuthContext";
 import { DropdownMultiselect } from "@/components/inventory/DropdownMultiselect";
 import { SearchBox } from "@/components/inventory/SearchBox";
@@ -10,12 +10,12 @@ import { Spinner } from "@/components/ui/spinner";
 
 export default function VolunteerSignupPage() {
     const {
-        allTB: timeBlocks = [],
+        volunteerTB: timeBlocks,
         isLoading,
         isError,
         error,
         refetch,
-    } = useTimeBlocks();
+    } = useVolunteerTimeBlocks();
 
     const { state } = useAuth();
     const user = state.currentUser;

@@ -7,6 +7,7 @@ import { Clock } from "lucide-react";
 import { XIcon, PencilSimpleIcon, WarehouseIcon, UsersIcon, XCircleIcon, PlusIcon, TextAlignLeftIcon } from "@phosphor-icons/react";
 import { TimeBlock, VolunteerGroup } from "../../types/schedule";
 import { useTimeBlocks } from "../../lib/queries/timeblocks";
+import { MAX_NOTES, MAX_TITLE, MAX_VOLUNTEER_GROUPS } from "@/lib/utils/limits";
 import { Switch } from "../ui/switch";
 
 export function makeDefaultTimeBlock(slotStart?: Date): TimeBlock {
@@ -195,6 +196,7 @@ export function ShiftEditModal({ timeBlock, onClose, onSaved }: Props) {
                         type="text"
                         value={name}
                         onChange={e => setName(e.target.value)}
+                        maxLength={MAX_TITLE}
                         placeholder="Enter Shift Title"
                         className="flex-1 text-xl font-bold bg-transparent outline-none text-primary placeholder:text-gray-300 placeholder:font-bold"
                     />
@@ -299,13 +301,19 @@ export function ShiftEditModal({ timeBlock, onClose, onSaved }: Props) {
                                 </div>
                             ))}
                         </div>
-                        <button
-                            onClick={addGroup}
-                            className="mt-2 ml-[1.625em] flex items-center gap-1 text-sm text-[#BBBDBE] hover:opacity-70 transition-opacity"
-                        >
-                            <PlusIcon className="w-4 h-4" />
-                            Add Volunteer Group
-                        </button>
+                        {volunteerGroups.length < MAX_VOLUNTEER_GROUPS ? (
+                            <button
+                                onClick={addGroup}
+                                className="mt-2 ml-[1.625em] flex items-center gap-1 text-sm text-[#BBBDBE] hover:opacity-70 transition-opacity"
+                            >
+                                <PlusIcon className="w-4 h-4" />
+                                Add Volunteer Group
+                            </button>
+                        ) : (
+                            <p className="mt-2 ml-[1.625em] text-sm text-[#BBBDBE]">
+                                A shift can have up to {MAX_VOLUNTEER_GROUPS} volunteer groups.
+                            </p>
+                        )}
                     </div>
 
                     {/* Divider */}
@@ -320,6 +328,7 @@ export function ShiftEditModal({ timeBlock, onClose, onSaved }: Props) {
                         <textarea
                             value={notes}
                             onChange={e => setNotes(e.target.value)}
+                            maxLength={MAX_NOTES}
                             placeholder="Write notes telling volunteers what to do..."
                             className="mt-4 flex-1 w-full text-sm px-4 py-4 rounded-xs bg-white border border-light-border resize-none"
                         />

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchAllUsers, updateUser } from "../services/users";
+import { fetchAllUsers, getUserByUID, updateUser } from "../services/users";
 import { UserData } from "@/types/user";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
 export function useAllActiveAccounts() {
@@ -13,6 +14,7 @@ export function useAllAccountRequests() {
 
 function useAllAccounts(onlyActive: boolean) {
     const queryClient = useQueryClient();
+    const { state } = useAuth();
 
     const query = useQuery({
         queryKey: ["users", onlyActive],
@@ -20,6 +22,8 @@ function useAllAccounts(onlyActive: boolean) {
             const allUsers = await fetchAllUsers();
             return allUsers.filter(user => ((user.pending === null) == onlyActive));
         },
+        // Listing the whole users collection is admin-only under the Firestore rules.
+        enabled: !state.loading && state.userData?.role === "Admin",
     });
 
     const updateMutation = useMutation({
@@ -69,4 +73,40 @@ function useAllAccounts(onlyActive: boolean) {
         error: query.error,
         refetch: query.refetch,
     };
+}
+
+// A single user document: readable by that user and by admins.
+export function useUser(uid: string | undefined, options?: { enabled?: boolean }) {
+    const query = useQuery({
+        queryKey: ["user", uid],
+        queryFn: () => getUserByUID(uid!),
+        enabled: !!uid && (options?.enabled ?? true),
+    });
+
+    return {
+        user: query.data ?? null,
+        isLoading: query.isLoading,
+    };
+}
+
+// Editing your own profile must not depend on the admin-only users listing.
+export function useUpdateOwnProfile() {
+    const { refreshUser } = useAuth();
+
+    const mutation = useMutation({
+        mutationFn: updateUser,
+        onSuccess: () => refreshUser(),
+    });
+
+    const editAccount = async (newUserData: UserData) => {
+        const promise = mutation.mutateAsync(newUserData);
+        toast.promise(promise, {
+            loading: "Updating profile...",
+            success: "Profile updated successfully!",
+            error: "Error: Couldn't update profile",
+        });
+        await promise;
+    };
+
+    return { editAccount, isSaving: mutation.isPending };
 }

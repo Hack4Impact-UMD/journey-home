@@ -45,6 +45,9 @@ function VerifyEmailView({ oobCode }: { oobCode: string }) {
         const currentUser = auth.currentUser;
         if (currentUser) {
           await currentUser.reload();
+          // Security rules read email_verified off the ID token, which reload()
+          // does not refresh on its own.
+          await currentUser.getIdToken(true);
           await updateEmailVerificationStatus(currentUser.uid, true);
           await refreshUser();
           const userData = await getUserByUID(currentUser.uid);

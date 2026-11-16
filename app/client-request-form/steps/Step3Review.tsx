@@ -9,6 +9,8 @@ import { ClientRequest, ItemRequest } from "@/types/client-requests";
 import { useClientRequests } from "@/lib/queries/client-requests";
 import { getAuth } from "firebase/auth";
 import { Spinner } from "@/components/ui/spinner";
+import { writeErrorMessage } from "@/lib/utils/firebase-errors";
+import { toast } from "sonner";
 
 export default function Step3Review() {
     const auth = getAuth();
@@ -93,7 +95,7 @@ export default function Step3Review() {
 
             const uid = auth.currentUser?.uid;
             if (!uid) {
-                alert("You must be logged in to submit a request.");
+                toast.error("You must be logged in to submit a request.");
                 return;
             }
             const request: ClientRequest = {
@@ -111,8 +113,10 @@ export default function Step3Review() {
 
             setCurrentStep(4);
         } catch (error) {
-            console.error(error);
-            alert("There was an issue submitting this request.");
+            console.error("Client request submission failed:", error);
+            toast.error("We couldn't submit this request.", {
+                description: writeErrorMessage(error),
+            });
         }
     };
 

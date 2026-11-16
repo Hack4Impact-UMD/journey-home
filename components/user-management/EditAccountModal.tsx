@@ -6,6 +6,7 @@ import { Switch } from "../ui/switch";
 import { Timestamp } from "firebase/firestore";
 import { useAuth } from "@/contexts/AuthContext";
 import { ConfirmModal } from "../general/ConfirmModal";
+import { MAX_NAME } from "@/lib/utils/limits";
 
 type EditAccountModalProps = {
     account: UserData;
@@ -67,6 +68,7 @@ export function EditAccountModal({
                                 <input
                                     value={firstName}
                                     onChange={(e) => setFirstName(e.target.value)}
+                                    maxLength={MAX_NAME}
                                     className="rounded-xs h-8 text-sm px-3 border border-light-border outline-0 w-full"
                                 />
                             </div>
@@ -75,6 +77,7 @@ export function EditAccountModal({
                                 <input
                                     value={lastName}
                                     onChange={(e) => setLastName(e.target.value)}
+                                    maxLength={MAX_NAME}
                                     className="rounded-xs h-8 text-sm px-3 border border-light-border outline-0 w-full"
                                 />
                             </div>

@@ -6,6 +6,8 @@ import { auth } from "../lib/firebase";
 import { UserData, UserRole, AuthContextType } from "../types/user";
 import { getUserByUID, updateEmailVerificationStatus } from "../lib/services/users";
 import { login, logout, signUp, sendVerificationEmail } from "@/lib/services/auth";
+import { writeErrorMessage } from "@/lib/utils/firebase-errors";
+import { toast } from "sonner";
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -35,7 +37,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           await updateEmailVerificationStatus(user.uid, user.emailVerified);
           foundUser.emailVerified = user.emailVerified;
         } catch (err) {
+          // Left unsynced this would strand the user on /status/verify-email with
+          // no explanation, so it has to be visible rather than console-only.
           console.error("Failed to sync email verification status:", err);
+          toast.error("Couldn't update your account status.", {
+            description: writeErrorMessage(err),
+          });
         }
       }
 
@@ -100,10 +107,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await user.reload();
 
     if (user.emailVerified) {
+      // reload() refreshes the user object but not the ID token, and security
+      // rules read email_verified off the token.
+      await user.getIdToken(true);
       try {
         await updateEmailVerificationStatus(user.uid, true);
       } catch (err) {
         console.error("Failed to sync email verification status:", err);
+        toast.error("Couldn't update your account status.", {
+          description: writeErrorMessage(err),
+        });
       }
       await _refreshUser();
       return { verified: true };

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { MAX_NOTES } from "@/lib/utils/limits";
 
 function formatLabel(lastSavedAt: Date): string {
     const seconds = Math.floor((Date.now() - lastSavedAt.getTime()) / 1000);
@@ -20,6 +21,7 @@ export function DebounceTextbox({
     setEditSince,
     placeholder,
     className,
+    maxLength = MAX_NOTES,
 }: {
     initialValue: string;
     debounceMs: number;
@@ -27,6 +29,7 @@ export function DebounceTextbox({
     setEditSince?: (label: string | null) => void;
     placeholder?: string;
     className?: string;
+    maxLength?: number;
 }) {
     const [value, setValue] = useState(initialValue);
 
@@ -55,7 +58,10 @@ export function DebounceTextbox({
             lastSavedAtRef.current = new Date();
             setEditSinceRef.current?.(formatLabel(lastSavedAtRef.current));
         } catch {
-            // Parent handles error notification; lastSavedAt stays unchanged
+            // The parent toasts the failure; make sure the label stops claiming a
+            // save is still in flight so the edit isn't assumed to have landed.
+            hasPendingRef.current = true;
+            setEditSinceRef.current?.("Not saved");
         }
     };
 
@@ -89,6 +95,7 @@ export function DebounceTextbox({
             onChange={handleChange}
             onBlur={() => flushRef.current()}
             placeholder={placeholder}
+            maxLength={maxLength}
             className={`w-full h-full resize-none border border-light-border rounded-xs text-sm text-text-1 placeholder:text-[#BFBFBF] p-3 outline-none focus:ring-0${className ? ` ${className}` : ""}`}
         />
     );

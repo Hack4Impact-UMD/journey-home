@@ -2,31 +2,518 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow read/write access to all documents for development
-    // In production, you should implement proper security rules
-    match /{document=**} {
-      allow read, write: if true;
+
+    // ---------------------------------------------------------------- helpers
+
+    function signedIn() {
+      return request.auth != null;
     }
-    
-    // Example of more restrictive rules for production:
-    // 
-    // // Users can only access their own user document
-    // match /users/{userId} {
-    //   allow read, write: if request.auth != null && request.auth.uid == userId;
-    // }
-    // 
-    // // Posts are readable by everyone but only writable by authenticated users
-    // match /posts/{postId} {
-    //   allow read: if true;
-    //   allow write: if request.auth != null;
-    // }
-    // 
-    // // Comments can be read by everyone but only created by authenticated users
-    // match /posts/{postId}/comments/{commentId} {
-    //   allow read: if true;
-    //   allow create: if request.auth != null;
-    //   allow update, delete: if request.auth != null && 
-    //     resource.data.authorId == request.auth.uid;
-    // }
+
+    function isSelf(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function me() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    // An active account with the given role. Mirrors components/general/ProtectedRoute.tsx.
+    // Legacy user docs predate some of these fields, so every lookup falls back to a
+    // permissive default and only an explicit value locks the account out. A missing
+    // user doc makes get() fail, which denies. Rules have a per-request budget of
+    // expressions, so this reads the user doc once and keeps the checks few.
+    function hasRole(role) {
+      return signedIn()
+        && request.auth.token.email_verified == true
+        && activeAs(me(), role);
+    }
+
+    function activeAs(m, role) {
+      return m.get('role', '') == role
+        && m.get('disabled', false) == false
+        && m.get('pending', null) == null
+        && (role != 'Volunteer' || m.get('signedWaiver', null) != null);
+    }
+
+    function isAdmin()       { return hasRole('Admin'); }
+    function isCaseManager() { return hasRole('Case Manager'); }
+    function isVolunteer()   { return hasRole('Volunteer'); }
+
+    // Keys whose values actually differ in this write. Almost every write in the
+    // app is a full-document setDoc, so key-set checks alone would be useless.
+    function changed() {
+      return request.resource.data.diff(resource.data).affectedKeys();
+    }
+
+    function exactKeys(keys) {
+      return request.resource.data.keys().hasAll(keys)
+        && request.resource.data.keys().hasOnly(keys);
+    }
+
+    // Every timestamp in this app comes from a client clock (Timestamp.now()),
+    // so allow for skew instead of comparing against request.time exactly.
+    function recentTs(t) {
+      return t is timestamp
+        && t > request.time - duration.value(10, 'm')
+        && t < request.time + duration.value(10, 'm');
+    }
+
+    function isPhone(s) {
+      return s is string && s.matches('^[0-9]{3}-[0-9]{3}-[0-9]{4}$');
+    }
+
+    function isEmail(s) {
+      return s is string && s.size() < 320 && s.matches('^[^@\\s]+@[^@\\s]+[.][^@\\s]+$');
+    }
+
+    function isText(s, max) {
+      return s is string && s.size() <= max;
+    }
+
+    // Caps below are deliberately generous â€” they exist to stop someone padding a
+    // document toward Firestore's 1 MiB ceiling, not to police how much people
+    // write. Keep them in step with lib/utils/limits.ts, which the forms enforce.
+    function isName(s) {
+      return s is string && s.size() > 0 && s.size() <= 200;
+    }
+
+    function isRole(r) {
+      return r in ['Admin', 'Case Manager', 'Volunteer'];
+    }
+
+    function isStatus(s) {
+      return s in ['Not Reviewed', 'Approved', 'Denied'];
+    }
+
+    // ------------------------------------------------------------------ users
+
+    match /users/{uid} {
+      // Self-read must keep working while an account is disabled, pending or
+      // unverified, otherwise AuthContext cannot load the doc that
+      // ProtectedRoute needs to redirect to the right /status page.
+      allow get: if isSelf(uid) || isAdmin();
+      allow list: if isAdmin();
+
+      // Written by the browser during signup. Role is pinned to Volunteer: an
+      // elevated role may only ever be *requested* through `pending`.
+      allow create: if isSelf(uid)
+        && exactKeys(['uid', 'firstName', 'lastName', 'email', 'phone', 'createdTime',
+                      'signedWaiver', 'disabled', 'role', 'pending', 'emailVerified'])
+        && request.resource.data.uid == uid
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.role == 'Volunteer'
+        && (request.resource.data.pending == null
+            || request.resource.data.pending in ['Admin', 'Case Manager'])
+        && request.resource.data.disabled == false
+        && request.resource.data.signedWaiver == null
+        && request.resource.data.emailVerified is bool
+        && recentTs(request.resource.data.createdTime)
+        && isPhone(request.resource.data.phone)
+        && isName(request.resource.data.firstName)
+        && isName(request.resource.data.lastName);
+
+      // Own profile. Email verification and the waiver signature are self-writes
+      // too because both happen before the account is active. Nothing here can
+      // touch role, pending, disabled, uid, email or createdTime.
+      allow update: if isSelf(uid)
+        && changed().hasOnly(['firstName', 'lastName', 'phone', 'emailVerified', 'signedWaiver'])
+        && (!changed().hasAny(['firstName']) || isName(request.resource.data.firstName))
+        && (!changed().hasAny(['lastName']) || isName(request.resource.data.lastName))
+        && (!changed().hasAny(['phone']) || isPhone(request.resource.data.phone))
+        && (!changed().hasAny(['emailVerified'])
+            || request.resource.data.emailVerified == request.auth.token.email_verified)
+        && (!changed().hasAny(['signedWaiver'])
+            || (resource.data.get('signedWaiver', null) == null
+                && resource.data.get('role', '') == 'Volunteer'
+                && recentTs(request.resource.data.signedWaiver)));
+
+      // Admin user management. Admins cannot demote or disable themselves, which
+      // matches the disabled controls in components/user-management/EditAccountModal.tsx.
+      allow update: if isAdmin()
+        && changed().hasOnly(['firstName', 'lastName', 'role', 'disabled', 'pending'])
+        && (!changed().hasAny(['firstName']) || isName(request.resource.data.firstName))
+        && (!changed().hasAny(['lastName']) || isName(request.resource.data.lastName))
+        && (!changed().hasAny(['role']) || isRole(request.resource.data.role))
+        && (!changed().hasAny(['disabled']) || request.resource.data.disabled is bool)
+        && (!changed().hasAny(['pending'])
+            || request.resource.data.pending == null
+            || isRole(request.resource.data.pending))
+        && (uid != request.auth.uid
+            || !changed().hasAny(['role', 'disabled']));
+
+      allow delete: if false;
+    }
+
+    // -------------------------------------------------------- client requests
+
+    match /client-requests/{requestId} {
+      // Case managers only ever see their own clients. Their list query must
+      // carry where('caseManagerID','==',uid) for Firestore to allow it.
+      allow read: if isAdmin()
+        || (isCaseManager() && resource.data.caseManagerID == request.auth.uid);
+
+      allow create: if isCaseManager()
+        && exactKeys(['id', 'client', 'caseManagerID', 'notes', 'status', 'items',
+                      'associatedTimeBlockID', 'date'])
+        && request.resource.data.id == requestId
+        && request.resource.data.caseManagerID == request.auth.uid
+        && request.resource.data.status == 'Not Reviewed'
+        && request.resource.data.associatedTimeBlockID == null
+        && request.resource.data.notes == ''
+        && recentTs(request.resource.data.date)
+        && request.resource.data.client is map
+        && request.resource.data.items is list
+        && request.resource.data.items.size() <= 200;
+
+      // Reviewing is admin-only; id, caseManagerID and date are immutable.
+      allow update: if isAdmin()
+        && changed().hasOnly(['status', 'notes', 'items', 'client', 'associatedTimeBlockID'])
+        && isStatus(request.resource.data.status)
+        && (request.resource.data.associatedTimeBlockID == null
+            || request.resource.data.associatedTimeBlockID is string)
+        && (!changed().hasAny(['notes']) || isText(request.resource.data.notes, 20000));
+
+      allow delete: if isAdmin();
+    }
+
+    // ------------------------------------------------------ donation requests
+
+    match /donation-requests/{requestId} {
+      allow read: if isAdmin();
+
+      // The public /donate form submits with no account, so this is the one
+      // collection that accepts an unauthenticated create.
+      //
+      // Rules cannot iterate arrays, so items[].status cannot be pinned to
+      // "Not Reviewed" here; a forged submission could pre-mark its own items.
+      // That only affects what an admin sees in the review table, and reviewing
+      // is still admin-only.
+      allow create: if exactKeys(['id', 'donor', 'firstTimeDonor', 'howDidYouHear',
+                                  'canDropOff', 'notes', 'date', 'responded', 'items',
+                                  'associatedTimeBlockID'])
+        && request.resource.data.id == requestId
+        && recentTs(request.resource.data.date)
+        && request.resource.data.responded == false
+        && request.resource.data.associatedTimeBlockID == null
+        && request.resource.data.firstTimeDonor is bool
+        && request.resource.data.canDropOff is bool
+        && isText(request.resource.data.howDidYouHear, 2000)
+        && isText(request.resource.data.notes, 20000)
+        && request.resource.data.items is list
+        && request.resource.data.items.size() > 0
+        && request.resource.data.items.size() <= 100
+        && isDonorContact(request.resource.data.donor);
+
+      allow update: if isAdmin()
+        && changed().hasOnly(['items', 'responded', 'notes', 'associatedTimeBlockID'])
+        && request.resource.data.items is list
+        && request.resource.data.items.size() <= 100
+        && request.resource.data.responded is bool
+        && isText(request.resource.data.notes, 20000)
+        && (request.resource.data.associatedTimeBlockID == null
+            || request.resource.data.associatedTimeBlockID is string);
+
+      allow delete: if isAdmin();
+    }
+
+    function isDonorContact(d) {
+      return d is map
+        && d.keys().hasAll(['firstName', 'lastName', 'email', 'phoneNumber', 'address'])
+        && d.keys().hasOnly(['firstName', 'lastName', 'email', 'phoneNumber', 'address'])
+        && isEmail(d.email)
+        && isPhone(d.phoneNumber)
+        && isText(d.firstName, 200)
+        && isText(d.lastName, 200)
+        && d.address is map;
+    }
+
+    // ----------------------------------------------------------------- donors
+
+    match /donors/{donorEmail} {
+      allow read: if isAdmin();
+
+      // Also public, for the same reason as donation-requests. The document id
+      // is the donor's email, so an anonymous submitter can overwrite an
+      // existing donor record by guessing their address. Closing that needs the
+      // write to move behind a Cloud Function.
+      allow create, update: if exactKeys(['firstName', 'lastName', 'email', 'phoneNumber',
+                                          'address', 'firstTimeDonor', 'howDidYouHear',
+                                          'canDropOff', 'notes'])
+        && request.resource.data.email == donorEmail
+        && isEmail(donorEmail)
+        && isPhone(request.resource.data.phoneNumber)
+        && isText(request.resource.data.firstName, 200)
+        && isText(request.resource.data.lastName, 200)
+        && request.resource.data.address is map
+        && request.resource.data.firstTimeDonor is bool
+        && request.resource.data.canDropOff is bool
+        && isText(request.resource.data.howDidYouHear, 2000)
+        && isText(request.resource.data.notes, 20000);
+
+      allow delete: if isAdmin();
+    }
+
+    // -------------------------------------------- warehouse (item categories)
+
+    match /warehouse/{categoryId} {
+      // Step 2 of the public /donate form lists the categories. These documents
+      // hold only category names and counts.
+      allow read: if true;
+
+      allow create: if isAdmin() && validCategory(categoryId);
+
+      // Volunteers adjust counts from /volunteer-tasks but cannot rename a
+      // category, retune its thresholds or change its icon.
+      allow update: if (isAdmin() || (isVolunteer() && changed().hasOnly(['quantity', 'id'])))
+        && validCategory(categoryId);
+
+      allow delete: if isAdmin();
+    }
+
+    function validCategory(id) {
+      return request.resource.data.keys().hasAll(['name', 'quantity', 'lowThreshold',
+                                                  'highThreshold', 'icon'])
+        && request.resource.data.keys().hasOnly(['id', 'name', 'quantity', 'lowThreshold',
+                                                 'highThreshold', 'icon'])
+        && request.resource.data.get('id', id) == id
+        && isName(request.resource.data.name)
+        && isText(request.resource.data.icon, 200)
+        && request.resource.data.quantity is int
+        && request.resource.data.quantity >= 0
+        && request.resource.data.lowThreshold is int
+        && request.resource.data.highThreshold is int;
+    }
+
+    // ------------------------------------------------------- warehouseHistory
+
+    match /warehouseHistory/{changeId} {
+      allow read: if isAdmin();
+
+      // Written in the same batch as the warehouse quantity it records
+      // (lib/queries/inventory.ts). The author is pinned to the caller so a
+      // volunteer cannot log a change under someone else's name.
+      allow create: if (isAdmin() || isVolunteer())
+        && exactKeys(['id', 'userId', 'timestamp', 'change', 'reverted'])
+        && request.resource.data.id == changeId
+        && request.resource.data.userId == request.auth.uid
+        && recentTs(request.resource.data.timestamp)
+        && request.resource.data.reverted == false
+        && request.resource.data.change.keys().hasAll(['category', 'oldQuantity', 'newQuantity'])
+        && request.resource.data.change.keys().hasOnly(['category', 'oldQuantity', 'newQuantity'])
+        && request.resource.data.change.category is string
+        && request.resource.data.change.oldQuantity is int
+        && request.resource.data.change.newQuantity is int;
+
+      // Marking an entry reverted is the only mutation the log ever accepts.
+      allow update: if isAdmin()
+        && changed().hasOnly(['reverted'])
+        && request.resource.data.reverted == true;
+
+      allow delete: if false;
+    }
+
+    // ------------------------------------------------------------- timeblocks
+
+    // A shift is three documents, always written together:
+    //   timeblocks         what volunteers may read (no tasks)
+    //   timeblock-tasks    donation and client requests, PII included: admin only
+    //   timeblocks-public  the anonymous projection behind the public /volunteer page
+    //
+    // Volunteers sign up and drop by writing timeblocks and timeblocks-public in one
+    // transaction (lib/services/timeblocks.ts). Rules cannot loop over
+    // volunteerGroups, so the roster checks further down spell out each group slot.
+    // That is why a shift is capped at 5 volunteer groups (MAX_VOLUNTEER_GROUPS in
+    // lib/utils/limits.ts): raising it means adding slots to every unrolled list below.
+    match /timeblocks/{timeBlockId} {
+      // `resource == null` lets a volunteer's read of a deleted shift come back as
+      // "not found" (so the app can say so) instead of an opaque permission error.
+      allow read: if isAdmin()
+        || (isVolunteer() && (resource == null || resource.data.published == true));
+
+      allow create: if isAdmin()
+        && validTimeBlock(timeBlockId)
+        && publicMirrorMatches(timeBlockId);
+
+      // An admin may rewrite the shift. A volunteer may only change the roster, to add
+      // or remove themselves, on a published shift that hasn't ended. The roster
+      // check keeps the rest of the document as it was, so validTimeBlock is only
+      // needed on the admin path.
+      allow update: if (isAdmin()
+            && validTimeBlock(timeBlockId)
+            && publicMirrorMatches(timeBlockId))
+        || (isVolunteer()
+            && resource.data.published == true
+            && request.time < resource.data.endTime
+            && changed().hasOnly(['volunteerGroups'])
+            && ownRosterChangeOnly()
+            && publicMirrorMatches(timeBlockId));
+
+      allow delete: if isAdmin()
+        && !existsAfter(/databases/$(database)/documents/timeblocks-public/$(timeBlockId));
+    }
+
+    match /timeblock-tasks/{timeBlockId} {
+      allow read, delete: if isAdmin();
+
+      allow create, update: if isAdmin()
+        && exactKeys(['id', 'tasks'])
+        && request.resource.data.id == timeBlockId
+        && request.resource.data.tasks is list
+        && request.resource.data.tasks.size() <= 200;
+    }
+
+    // Projection of the fields /volunteer needs, with volunteerGroups reduced to
+    // {name, maxNum, filled}. A volunteer may write it only to keep it identical to
+    // the projection of the timeblocks doc, so they can't tamper with what it shows.
+    match /timeblocks-public/{timeBlockId} {
+      allow read: if isAdmin() || resource.data.published == true;
+
+      allow create, update: if (isAdmin() || isVolunteer())
+        && request.resource.data.keys().hasAll(['id', 'name', 'type', 'startTime',
+                                                'endTime', 'published', 'volunteerGroups'])
+        && request.resource.data.keys().hasOnly(['id', 'name', 'type', 'startTime',
+                                                 'endTime', 'published', 'volunteerGroups'])
+        && request.resource.data.id == timeBlockId
+        && privateMirrorMatches(timeBlockId);
+
+      allow delete: if isAdmin()
+        && !existsAfter(/databases/$(database)/documents/timeblocks/$(timeBlockId));
+    }
+
+    function validTimeBlock(id) {
+      return exactKeys(['id', 'name', 'type', 'notes', 'startTime', 'endTime',
+                        'volunteerGroups', 'published'])
+        && request.resource.data.id == id
+        && isText(request.resource.data.name, 500)
+        && isText(request.resource.data.notes, 20000)
+        && request.resource.data.type in ['Pickup/Delivery', 'Warehouse']
+        && request.resource.data.startTime is timestamp
+        && request.resource.data.endTime is timestamp
+        && request.resource.data.published is bool
+        && request.resource.data.volunteerGroups is list
+        && request.resource.data.volunteerGroups.size() <= 5;
+    }
+
+    // Both directions of the mirror are enforced, so neither document can be
+    // written without the other landing in the same batch with matching values,
+    // down to each group's name, cap and filled count.
+    function publicMirrorMatches(id) {
+      return mirrorAgrees(
+        request.resource.data,
+        getAfter(/databases/$(database)/documents/timeblocks-public/$(id)).data
+      );
+    }
+
+    function privateMirrorMatches(id) {
+      return mirrorAgrees(
+        getAfter(/databases/$(database)/documents/timeblocks/$(id)).data,
+        request.resource.data
+      );
+    }
+
+    function mirrorAgrees(t, p) {
+      return p.id == t.id
+        && p.name == t.name
+        && p.type == t.type
+        && p.startTime == t.startTime
+        && p.endTime == t.endTime
+        && p.published == t.published
+        && p.volunteerGroups.size() == t.volunteerGroups.size()
+        && mirrorGroup(t.volunteerGroups, p.volunteerGroups, 0)
+        && mirrorGroup(t.volunteerGroups, p.volunteerGroups, 1)
+        && mirrorGroup(t.volunteerGroups, p.volunteerGroups, 2)
+        && mirrorGroup(t.volunteerGroups, p.volunteerGroups, 3)
+        && mirrorGroup(t.volunteerGroups, p.volunteerGroups, 4);
+    }
+
+    function mirrorGroup(t, p, i) {
+      return t.size() <= i
+        || p[i] == { 'name': t[i].name, 'maxNum': t[i].maxNum, 'filled': t[i].volunterIDs.size() };
+    }
+
+    // ---- volunteer sign-up / drop
+    //
+    // A volunteer may change the roster only by adding their own uid to a group (at
+    // the end, below its maxNum) or removing their own uid from one. Everything else
+    // about every group stays as it was, nobody else's uid moves, and the volunteer
+    // ends up in at most one group. Rules cannot loop, so each of the 5 group slots is
+    // spelled out, and the arithmetic is kept small because rules also cap how many
+    // expressions one request may evaluate.
+    function ownRosterChangeOnly() {
+      let uid = request.auth.uid;
+      let o = resource.data.volunteerGroups;
+      let n = request.resource.data.volunteerGroups;
+      let net = slotDelta(o, n, 0, uid) + slotDelta(o, n, 1, uid) + slotDelta(o, n, 2, uid)
+        + slotDelta(o, n, 3, uid) + slotDelta(o, n, 4, uid);
+      return n.size() == o.size()
+        && net >= -1 && net <= 1
+        && memberAt(n, 0, uid) + memberAt(n, 1, uid) + memberAt(n, 2, uid)
+           + memberAt(n, 3, uid) + memberAt(n, 4, uid) <= 1;
+    }
+
+    // 0 = slot untouched (or past the end), 1 = uid joined, -1 = uid left, 99 = any other
+    // change, which pushes the total out of range.
+    function slotDelta(o, n, i, uid) {
+      return o.size() <= i ? 0 : slotChange(o[i], n[i], uid);
+    }
+
+    function slotChange(og, ng, uid) {
+      return og.diff(ng).affectedKeys().hasOnly(['volunterIDs'])
+        ? (ng.volunterIDs == og.volunterIDs
+            ? 0
+            : (joined(og, ng, uid) ? 1 : (left(og, ng, uid) ? -1 : 99)))
+        : 99;
+    }
+
+    function joined(og, ng, uid) {
+      return !(uid in og.volunterIDs)
+        && ng.volunterIDs == og.volunterIDs.concat([uid])
+        && ng.volunterIDs.size() <= og.maxNum;
+    }
+
+    function left(og, ng, uid) {
+      return uid in og.volunterIDs
+        && ng.volunterIDs == og.volunterIDs.removeAll([uid]);
+    }
+
+    function memberAt(g, i, uid) {
+      return (g.size() > i && uid in g[i].volunterIDs) ? 1 : 0;
+    }
+    // ---------------------------------------------------------------- waivers
+
+    match /waivers/{waiverId} {
+      // Volunteers stuck on /status/waiver-pending are not active yet but still
+      // have to read the waiver they are being asked to sign.
+      allow read: if signedIn();
+
+      allow create, update: if isAdmin()
+        && (waiverId == '_meta' ? validWaiverMeta() : validWaiver(waiverId));
+
+      allow delete: if false;
+    }
+
+    // The sentinel doc lib/services/waivers.ts uses to hand out sequential ids.
+    function validWaiverMeta() {
+      return exactKeys(['nextId', 'activeId'])
+        && request.resource.data.nextId is int
+        && request.resource.data.nextId > 0
+        && (request.resource.data.activeId == null
+            || request.resource.data.activeId is string);
+    }
+
+    function validWaiver(id) {
+      return exactKeys(['id', 'file', 'start', 'end'])
+        && request.resource.data.id == id
+        && request.resource.data.file is string
+        && request.resource.data.start is timestamp
+        && (request.resource.data.end == null || request.resource.data.end is timestamp);
+    }
+
+    // ------------------------------------------------------------ everything else
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
   }
 }
+

@@ -4,16 +4,17 @@ import { ProtectedRoute } from "@/components/general/ProtectedRoute";
 import Navbar from "@/components/general/Navbar";
 import PasswordResetSection from "@/components/profile/PasswordResetSection";
 import { useAuth } from "@/contexts/AuthContext";
-import { useAllActiveAccounts } from "@/lib/queries/users";
+import { useUpdateOwnProfile } from "@/lib/queries/users";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { formatPhone } from "@/lib/utils/phone";
+import { MAX_NAME } from "@/lib/utils/limits";
 
 export default function ProfilePage() {
     const { state, logout } = useAuth();
-    const currentUser = state.userData;
-    const { allAccounts, editAccount, isLoading } = useAllActiveAccounts();
-    const account = allAccounts.find((u) => u.uid === currentUser?.uid) ?? null;
+    const { editAccount } = useUpdateOwnProfile();
+    const account = state.userData;
+    const isLoading = state.loading;
 
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -100,6 +101,7 @@ export default function ProfilePage() {
                                                     type="text"
                                                     value={firstName}
                                                     onChange={(e) => setFirstName(e.target.value)}
+                                                    maxLength={MAX_NAME}
                                                     className="w-full border border-gray-300 rounded-xs h-10 px-3"
                                                 />
                                             </div>
@@ -109,6 +111,7 @@ export default function ProfilePage() {
                                                     type="text"
                                                     value={lastName}
                                                     onChange={(e) => setLastName(e.target.value)}
+                                                    maxLength={MAX_NAME}
                                                     className="w-full border border-gray-300 rounded-xs h-10 px-3"
                                                 />
                                             </div>
@@ -123,6 +126,7 @@ export default function ProfilePage() {
                                                     pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
                                                     onChange={(e) => { e.target.setCustomValidity(""); setPhoneNumber(formatPhone(e.target.value)); }}
                                                     onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Please enter a complete phone number in the format 123-456-7890.")}
+                                                    maxLength={MAX_NAME}
                                                     className="w-full border border-gray-300 rounded-xs h-10 px-3"
                                                 />
                                             </div>
